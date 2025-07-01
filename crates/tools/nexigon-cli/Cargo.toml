@@ -1,0 +1,10 @@
+[package]
+name = "nexigon-cli"
+edition = "2024"
+authors.workspace = true
+version.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+
+[dependencies]

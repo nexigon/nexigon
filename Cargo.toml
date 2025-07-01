@@ -1,0 +1,27 @@
+[workspace]
+members = ["crates/libs/*", "crates/tools/*"]
+resolver = "2"
+
+[workspace.package]
+authors = ["Silitics GmbH <info@silitics.com>"]
+version = "0.1.0"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/silitics/nexigon/"
+homepage = "https://nevigon.dev/"
+
+[workspace.dependencies]
+# Third-Party Dependencies
+rand = "0.9"
+serde = { version = "1.0", features = ["derive"] }
+sha2 = "0.10"
+tokio = { version = "1.0", features = ["full"] }
+
+[profile.release]
+# Reduce the size of the release binaries.
+codegen-units = 1
+lto = true
+opt-level = "z"
+panic = "unwind"
+strip = "symbols"
+# Ensure that any overflows will panic.
+overflow-checks = true
