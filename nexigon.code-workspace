@@ -1,0 +1,11 @@
+{
+  "folders": [
+    {
+      "name": "Root",
+      "path": "."
+    },
+  ],
+  "settings": {
+    "rust-analyzer.rustfmt.extraArgs": ["+nightly"]
+  }
+}
