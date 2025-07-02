@@ -1,0 +1,569 @@
+//! Actions and types related to repositories.
+
+import datetime::Timestamp
+import digest::Digest
+import users::UserId
+
+/// Unique ID of a repository.
+#[rust(type = "nexigon_ids::ids::RepositoryId")]
+#[json(type = "string")]
+opaque RepositoryId
+
+/// Unique ID of a repository asset.
+#[rust(type = "nexigon_ids::ids::RepositoryAssetId")]
+#[json(type = "string")]
+opaque RepositoryAssetId
+
+/// Unique ID of a package.
+#[rust(type = "nexigon_ids::ids::PackageId")]
+#[json(type = "string")]
+opaque PackageId
+
+/// Unique ID of a package version.
+#[rust(type = "nexigon_ids::ids::PackageVersionId")]
+#[json(type = "string")]
+opaque PackageVersionId
+
+/// Asset status.
+#[json(tagged = externally)]
+variant RepositoryAssetStatus {
+    /// The asset has been created but not yet uploaded.
+    Dangling,
+    /// The asset has been uploaded and is available.
+    Available,
+    /// The asset is in the process of being deleted.
+    Deleting,
+}
+
+/// Repository visibility.
+#[json(tagged = externally)]
+variant RepositoryVisibility {
+    /// The repository is public and can be accessed by anyone.
+    Public,
+    /// The repository is private and can only be accessed by its members.
+    Private,
+}
+
+/// Resolve a repository by its name.
+record ResolveRepositoryNameAction {
+    /// Name of the repository.
+    repository: string,
+}
+
+/// Output of resolving a repository by its name.
+#[json(tag = "result")]
+variant ResolveRepositoryNameOutput {
+    /// The repository has been found.
+    #[json(content = "repositoryId")]
+    Found: RepositoryId,
+    /// The repository has not been found.
+    /// 
+    /// This may also be returned if the actor does not have the necessary permissions.
+    NotFound,
+}
+
+/// Get information about a repository.
+record GetRepositoryDetailsAction {
+    /// ID of the repository.
+    repository_id: RepositoryId,
+}
+
+/// Output of getting information about a repository.
+record GetRepositoryDetailsOutput {
+    /// ID of the repository.
+    repository_id: RepositoryId,
+    /// Name of the repository.
+    name: string,
+    /// Visibility of the repository.
+    visibility: RepositoryVisibility,
+    /// Number of packages in the repository.
+    package_count: u64,
+    /// Number of assets in the repository.
+    asset_count: u64,
+}
+
+/// Create a new repository.
+record CreateRepositoryAction {
+    /// Name of the repository.
+    name: string,
+    /// Owner of the repository.
+    owner?: UserId,
+    /// Visibility of the repository.
+    /// 
+    /// Default to private.
+    visibility?: RepositoryVisibility,
+}
+
+/// Output of creating a repository.
+#[json(tag = "result")]
+variant CreateRepositoryOutput {
+    /// A repository with the same name already exists.
+    NameAlreadyExists,
+    /// The repository has been created.
+    Created: CreateRepositorySuccess,
+}
+
+/// Successfully created a repository.
+record CreateRepositorySuccess {
+    /// ID of the repository.
+    repository_id: RepositoryId,
+}
+
+/// Delete a repository.
+record DeleteRepositoryAction {
+    /// ID of the repository.
+    repository_id: RepositoryId,
+}
+
+/// Set the visibility of a repository.
+record SetRepositoryVisibilityAction {
+    /// ID of the repository.
+    repository_id: RepositoryId,
+    /// New visibility of the repository.
+    visibility: RepositoryVisibility,
+}
+
+/// Query the packages of a repository.
+record QueryRepositoryPackagesAction {
+    /// ID of the repository.
+    repository_id: RepositoryId,
+}
+
+/// Output of querying the packages of a repository.
+record QueryRepositoryPackagesOutput {
+    /// List of packages.
+    packages: [QueryRepositoryPackagesItem],
+}
+
+/// Package query item.
+record QueryRepositoryPackagesItem {
+    /// ID of the package.
+    package_id: PackageId,
+    /// Name of the package.
+    name: string,
+    /// Timestamp when the package was created.
+    created_at: Timestamp,
+}
+
+/// Query the assets of a repository.
+record QueryRepositoryAssetsAction {
+    /// ID of the repository.
+    repository_id: RepositoryId,
+}
+
+/// Output of querying the assets of a repository.
+record QueryRepositoryAssetsOutput {
+    /// List of assets.
+    assets: [QueryRepositoryAssetsItem],
+}
+
+/// Asset query item.
+record QueryRepositoryAssetsItem {
+    /// ID of the asset.
+    asset_id: RepositoryAssetId,
+    /// Size of the asset.
+    size: u64,
+    /// Digest of the asset.
+    digest: Digest,
+}
+
+/// Query the members of a repository.
+record QueryRepositoryMembersAction {
+    /// ID of the repository.
+    repository_id: RepositoryId,
+}
+
+/// Output of querying the members of a repository.
+record QueryRepositoryMembersOutput {
+    /// List of members.
+    members: [QueryRepositoryMembersItem],
+}
+
+/// Member query item.
+record QueryRepositoryMembersItem {
+    /// ID of the user.
+    user_id: UserId,
+    /// Email of the user.
+    email: string,
+    /// Display name of the user.
+    display_name?: string,
+    /// Whether the user is an owner of the repository.
+    is_owner: bool,
+}
+
+/// Add a user to a repository.
+record AddRepositoryMemberAction {
+    /// ID of the repository.
+    repository_id: RepositoryId,
+    /// ID of the user to add.
+    user_id: UserId,
+    /// Whether the user should be an owner of the repository.
+    is_owner?: bool,
+}
+
+/// Remove a user from a repository.
+record RemoveRepositoryMemberAction {
+    /// ID of the repository.
+    repository_id: RepositoryId,
+    /// ID of the user to remove.
+    user_id: UserId,
+}
+
+/// Resolve a package by its path.
+record ResolvePackageByPathAction {
+    /// Name of the repository.
+    repository: string,
+    /// Name of the package.
+    package: string,
+}
+
+/// Output of resolving a package by its path.
+#[json(tag = "result")]
+variant ResolvePackageByPathOutput {
+    /// The package has been found.
+    Found: ResolvePackageByPathSuccess,
+    /// The package has not been found.
+    NotFound,
+}
+
+/// Successfully resolved package by path.
+record ResolvePackageByPathSuccess {
+    /// ID of the repository.
+    repository_id: RepositoryId,
+    /// ID of the package.
+    package_id: PackageId,
+}
+
+/// Get information about a package.
+record GetPackageDetailsAction {
+    /// ID of the package.
+    package_id: PackageId,
+}
+
+/// Output of getting information about a package.
+record GetPackageDetailsOutput {
+    /// ID of the package.
+    package_id: PackageId,
+    /// Name of the package.
+    name: string,
+    /// Number of versions of the package.
+    version_count: u64,
+}
+
+/// Create a new package.
+record CreatePackageAction {
+    /// ID of the repository.
+    repository_id: RepositoryId,
+    /// Name of the package.
+    name: string,
+}
+
+/// Output of creating a package.
+#[json(tag = "result")]
+variant CreatePackageOutput {
+    /// A package with the same name already exists.
+    NameAlreadyExists,
+    /// The package has been created.
+    Created: CreatePackageSuccess,
+}
+
+/// Successfully created a package.
+record CreatePackageSuccess {
+    /// ID of the package.
+    package_id: PackageId,
+}
+
+/// Delete a package.
+record DeletePackageAction {
+    /// ID of the package.
+    package_id: PackageId,
+}
+
+/// Query the versions of a package.
+record QueryPackageVersionsAction {
+    /// ID of the package.
+    package_id: PackageId,
+}
+
+/// Output of querying the versions of a package.
+record QueryPackageVersionsOutput {
+    /// List of package versions.
+    versions: [QueryPackageVersionsItem],
+}
+
+/// Package version query item.
+record QueryPackageVersionsItem {
+    /// ID of the package version.
+    version_id: PackageVersionId,
+    /// Timestamp when the package version was created.
+    created_at: Timestamp,
+    /// Tags of the package version.
+    tags: [PackageVersionTag],
+}
+
+/// Package version tag.
+record PackageVersionTag {
+    /// Tag of the package version.
+    tag: string,
+    /// Indicates whether the tag is locked.
+    locked: bool,
+}
+
+/// Add tag item.
+record AddTagItem {
+    /// Tag to add.
+    tag: string,
+    /// Indicates whether the tag should be locked.
+    /// 
+    /// Default to false.
+    locked?: bool,
+    /// Indicates whether the tag should be reassigned, if it already exists.
+    /// 
+    /// Defaults to true.
+    reassign?: bool,
+}
+
+/// Remove tag item.
+record RemoveTagItem {
+    /// Tag to remove.
+    tag: string,
+}
+
+/// Package version asset.
+record PackageVersionAsset {
+    /// Filename of the asset.
+    filename: string,
+    /// ID of the asset.
+    asset_id: RepositoryAssetId,
+    /// Size of the asset.
+    size: u64,
+    /// Digest of the asset.
+    digest: Digest,
+    /// Status of the asset.
+    status: RepositoryAssetStatus,
+}
+
+/// Resolve a package version by its path.
+record ResolvePackageVersionByPathAction {
+    /// Name of the repository.
+    repository: string,
+    /// Name of the package.
+    package: string,
+    /// Tag of the version.
+    tag: string,
+}
+
+/// Output of resolving a package version by its path.
+#[json(tag = "result")]
+variant ResolvePackageVersionByPathOutput {
+    /// The package version has been found.
+    Found: ResolvePackageVersionByPathSuccess,
+    /// The package version has not been found.
+    NotFound,
+}
+
+/// Successfully resolved package version by path.
+record ResolvePackageVersionByPathSuccess {
+    /// ID of the repository.
+    repository_id: RepositoryId,
+    /// ID of the package.
+    package_id: PackageId,
+    /// ID of the package version.
+    version_id: PackageVersionId,
+}
+
+/// Get information about a package version.
+record GetPackageVersionDetailsAction {
+    /// ID of the package version.
+    version_id: PackageVersionId,
+}
+
+/// Output of getting information about a package version.
+record GetPackageVersionDetailsOutput {
+    /// ID of the package version.
+    version_id: PackageVersionId,
+    /// ID of the repository.
+    repository_id: RepositoryId,
+    /// ID of the package.
+    package_id: PackageId,
+    /// Assets of the version.
+    assets: [PackageVersionAsset],
+    /// Tags of the version.
+    tags: [PackageVersionTag],
+}
+
+/// Create a new package version.
+record CreatePackageVersionAction {
+    /// ID of the package.
+    package_id: PackageId,
+    /// Tags to add to the package version.
+    tags?: [AddTagItem],
+}
+
+/// Output of creating a package version.
+#[json(tag = "result")]
+variant CreatePackageVersionOutput {
+    /// The package version has been created.
+    Created: CreatePackageVersionSuccess,
+}
+
+/// Package version creation has been successful.
+record CreatePackageVersionSuccess {
+    /// ID of the package version.
+    version_id: PackageVersionId,
+}
+
+/// Delete a package version.
+record DeletePackageVersionAction {
+    /// ID of the package version.
+    version_id: PackageVersionId,
+}
+
+/// Add an assert to a package version.
+record AddPackageVersionAssetAction {
+    /// ID of the package version.
+    version_id: PackageVersionId,
+    /// ID of the asset.
+    asset_id: RepositoryAssetId,
+    /// Filename of the asset.
+    filename: string,
+}
+
+/// Output of adding an asset to a package version.
+#[json(tag = "result")]
+variant AddPackageVersionAssetOutput {
+    /// An asset with the same filename already exists.
+    FilenameAlreadyExists,
+    /// The asset has been added to the package version.
+    Added,
+}
+
+/// Remove an asset from a package version.
+record RemovePackageVersionAssetAction {
+    /// ID of the package version.
+    version_id: PackageVersionId,
+    /// Filename of the asset.
+    filename: string,
+}
+
+/// Add tags to a version.
+record TagPackageVersionAction {
+    /// ID of the package version.
+    version_id: PackageVersionId,
+    /// Tags to add.
+    tags: [AddTagItem],
+}
+
+/// Remove tags from a version.
+record UntagPackageVersionAction {
+    /// ID of the package version.
+    version_id: PackageVersionId,
+    /// Tags to remove.
+    tags: [RemoveTagItem],
+}
+
+/// Resolve a version asset by its path.
+record ResolvePackageVersionAssetByPathAction {
+    /// Name of the repository.
+    repository: string,
+    /// Name of the package.
+    package: string,
+    /// Tag of the version.
+    tag: string,
+    /// Filename of the asset.
+    filename: string,
+}
+
+/// Output of resolving a version asset by its path.
+#[json(tag = "result")]
+variant ResolvePackageVersionAssetByPathOutput {
+    /// The asset has been found.
+    Found: ResolvePackageVersionAssetByPathSuccess,
+    /// The asset has not been found.
+    NotFound,
+}
+
+/// Successfully resolved version asset by path.
+record ResolvePackageVersionAssetByPathSuccess {
+    /// ID of the repository.
+    repository_id: RepositoryId,
+    /// ID of the package.
+    package_id: PackageId,
+    /// ID of the package version.
+    version_id: PackageVersionId,
+    /// ID of the asset.
+    asset_id: RepositoryAssetId,
+}
+
+/// Get information about an asset.
+record GetAssetDetailsAction {
+    /// ID of the asset.
+    asset_id: RepositoryAssetId,
+}
+
+/// Output of getting information about an asset.
+record GetAssetDetailsOutput {
+    /// ID of the asset.
+    asset_id: RepositoryAssetId,
+    /// Size of the asset.
+    size: u64,
+    /// Digest of the asset.
+    digest: Digest,
+    /// Status of the asset.
+    status: RepositoryAssetStatus,
+    /// Number of package versions that refer to the asset.
+    reference_count: u64,
+}
+
+/// Create an asset.
+record CreateAssetAction {
+    /// ID of the repository.
+    repository_id: RepositoryId,
+    /// Size of the asset.
+    size: u64,
+    /// Digest of the asset.
+    digest: Digest,
+}
+
+/// Output of creating an asset.
+#[json(tag = "result")]
+variant CreateAssetOutput {
+    /// An asset with the same digest already exists.
+    #[json(content = "assetId")]
+    AssetAlreadyExists: RepositoryAssetId,
+    /// The asset has been created.
+    #[json(content = "assetId")]
+    Created: RepositoryAssetId,
+}
+
+/// Delete an asset.
+record DeleteAssetAction {
+    /// ID of the asset.
+    asset_id: RepositoryAssetId,
+}
+
+/// Issue a URL for downloading an asset.
+record IssueAssetDownloadUrlAction {
+    /// ID of the asset to issue the URL for.
+    asset_id: RepositoryAssetId,
+    /// Optional filename for the asset.
+    filename?: string,
+}
+
+/// Output of issuing a URL for downloading an asset.
+record IssueAssetDownloadUrlOutput {
+    /// URL for downloading the asset.
+    url: string,
+}
+
+/// Issue a URL for uploading an asset.
+record IssueAssetUploadUrlAction {
+    /// ID of the asset to issue the URL for.
+    asset_id: RepositoryAssetId,
+}
+
+/// Output of issuing a URL for uploading an asset.
+record IssueAssetUploadUrlOutput {
+    /// URL for uploading the asset.
+    url: string,
+}

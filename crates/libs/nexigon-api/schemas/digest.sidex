@@ -1,0 +1,6 @@
+//! Hash digests.
+
+/// A hash digest.
+#[rust(type = "si_crypto_hashes::HashDigest::<::std::sync::Arc<[u8]>>")]
+#[json(type = "string")]
+opaque Digest

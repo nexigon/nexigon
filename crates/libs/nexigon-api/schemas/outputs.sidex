@@ -1,0 +1,4 @@
+//! Additional output types for actions.
+
+/// Empty output.
+record Empty { }

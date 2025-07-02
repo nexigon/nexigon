@@ -10,3 +10,7 @@ fmt:
 
 doc:
     cargo +nightly doc --all-features --document-private-items
+
+generate:
+    cd crates/libs/nexigon-api && sidex generate rust src/types/generated
+    just fmt

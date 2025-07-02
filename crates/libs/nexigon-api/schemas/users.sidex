@@ -1,0 +1,385 @@
+//! Actions and types related to users.
+
+import actor::Actor
+import datetime::Timestamp
+import projects::ProjectId
+import repositories::RepositoryId
+
+/// Unique ID of a user.
+#[rust(type = "nexigon_ids::ids::UserId")]
+#[json(type = "string")]
+opaque UserId
+
+/// Unique ID of a user token.
+#[rust(type = "nexigon_ids::ids::UserTokenId")]
+#[json(type = "string")]
+opaque UserTokenId
+
+/// User token.
+#[rust(type = "nexigon_ids::ids::UserToken")]
+#[json(type = "string")]
+opaque UserToken
+
+/// User session ID.
+#[rust(type = "nexigon_ids::ids::UserSessionId")]
+#[json(type = "string")]
+opaque UserSessionId
+
+/// User session token.
+#[rust(type = "nexigon_ids::ids::UserSessionToken")]
+#[json(type = "string")]
+opaque UserSessionToken
+
+/// Query the users of the instance.
+record QueryUsersAction { }
+
+/// Output of querying the users of the instance.
+record QueryUsersOutput {
+    /// List of users.
+    users: [QueryUsersItem],
+}
+
+/// User item.
+record QueryUsersItem {
+    /// ID of the user.
+    user_id: UserId,
+    /// Email of the user.
+    email: string,
+    /// Name of the user.
+    display_name?: string,
+    /// Whether the user is an instance admin.
+    is_admin: bool,
+}
+
+/// Get information about a user.
+record GetUserDetailsAction {
+    /// ID of the user.
+    user_id: UserId,
+}
+
+/// Information about the user.
+record GetUserDetailsOutput {
+    /// ID of the user.
+    user_id: UserId,
+    /// Email of the user.
+    email: string,
+    /// Name of the user.
+    display_name?: string,
+    /// Whether the user is an instance admin.
+    is_admin: bool,
+}
+
+/// Create a new user.
+record CreateUserAction {
+    /// Email of the user.
+    email: string,
+    /// Name of the user.
+    display_name?: string,
+    /// Password of the user.
+    password?: string,
+    /// Whether the user is an instance admin.
+    is_admin?: bool,
+}
+
+/// Output of creating a user.
+#[json(tag = "result")]
+variant CreateUserOutput {
+    /// User was created successfully.
+    Created: CreateUserSuccess,
+    /// User with the same email already exists.
+    EmailAlreadyExists,
+}
+
+/// User was created successfully.
+record CreateUserSuccess {
+    /// ID of the user.
+    user_id: UserId,
+}
+
+/// Delete a user.
+record DeleteUserAction {
+    /// ID of the user to delete.
+    user_id: UserId,
+}
+
+/// Set the display name of a user.
+record SetUserDisplayNameAction {
+    /// ID of the user to update.
+    user_id: UserId,
+    /// New name of the user.
+    display_name: string,
+}
+
+/// Set the password of a user.
+record SetUserPasswordAction {
+    /// ID of the user.
+    user_id: UserId,
+    /// New password of the user.
+    password: string,
+}
+
+/// Set whether the user is an instance administrator.
+record SetUserIsAdminAction {
+    /// ID of the user.
+    user_id: UserId,
+    /// Whether the user is an instance administrator.
+    is_admin: bool,
+}
+
+/// Query the tokens of a user.
+record QueryUserTokensAction {
+    /// ID of the user.
+    user_id: UserId,
+}
+
+/// Output of querying the tokens of a user.
+record QueryUserTokensOutput {
+    /// List of user tokens.
+    tokens: [QueryUserTokensItem],
+}
+
+/// User token item.
+record QueryUserTokensItem {
+    /// ID of the token.
+    token_id: UserTokenId,
+    /// Creation date of the token.
+    created_at: Timestamp,
+    /// Name of the token.
+    name?: string,
+}
+
+/// Query the projects of a user.
+record QueryUserProjectsAction {
+    /// User ID.
+    user_id: UserId,
+}
+
+/// Output of querying the projects of a user.
+record QueryUserProjectsOutput {
+    /// List of projects.
+    projects: [QueryUserProjectsItem],
+}
+
+/// Project item.
+record QueryUserProjectsItem {
+    /// ID of the project.
+    project_id: ProjectId,
+    /// Name of the project.
+    name: string,
+    /// Number of devices in the project.
+    devices: u32,
+}
+
+/// Query the repositories of a user.
+record QueryUserRepositoriesAction {
+    /// ID of the user.
+    user_id: UserId,
+}
+
+/// Output of querying the repositories of a user.
+record QueryUserRepositoriesOutput {
+    /// List of repositories.
+    repositories: [QueryUserRepositoriesItem],
+}
+
+/// Repository item.
+record QueryUserRepositoriesItem {
+    /// ID of the repository.
+    repository_id: RepositoryId,
+    /// Public name of the repository.
+    name: string,
+    /// Timestamp when the repository was created.
+    created_at: Timestamp,
+    /// Number of packages in the repository.
+    package_count: u32,
+}
+
+
+/// Query the sessions of a user.
+record QueryUserSessionsAction {
+    /// ID of the user.
+    user_id: UserId,
+}
+
+/// Output of querying the sessions of a user.
+record QueryUserSessionsOutput {
+    /// List of user sessions.
+    sessions: [UserSession],
+}
+
+/// User session.
+record UserSession {
+    /// ID of the session.
+    session_id: UserSessionId,
+    /// Creation date of the session.
+    created_at: Timestamp,
+    /// Expiration date of the session.
+    expires_at: Timestamp,
+    /// User agent of the session.
+    user_agent: string,
+}
+
+/// Authenticate a user with a token.
+record AuthenticateWithUserTokenAction {
+    /// Token.
+    token: UserToken,
+}
+
+/// Output of authenticating a user with a token.
+#[json(tag = "result")]
+variant AuthenticateWithUserTokenOutput {
+    /// Provided token is invalid.
+    Invalid,
+    /// Authentication has been successful.
+    Authenticated: AuthenticateWithUserTokenSuccess,
+}
+
+/// Authentication with user token has been successful.
+record AuthenticateWithUserTokenSuccess {
+    /// ID of the user.
+    user_id: UserId,
+    /// Resulting actor to use for further actions.
+    actor: Actor,
+}
+
+/// Authenticate a user with a session token.
+record AuthenticateWithSessionTokenAction {
+    /// Session token.
+    token: UserSessionToken,
+}
+
+/// Output of authenticating a user with a session token.
+#[json(tag = "result")]
+variant AuthenticateWithSessionTokenOutput {
+    /// Provided token is invalid.
+    Invalid,
+    /// Authentication has been successful.
+    Authenticated: AuthenticateWithSessionTokenSuccess,
+}
+
+/// Authentication with session token has been successful.
+record AuthenticateWithSessionTokenSuccess {
+    /// ID of the user.
+    user_id: UserId,
+    /// ID of the session.
+    session_id: UserSessionId,
+    /// Resulting actor to use for further actions.
+    actor: Actor,
+}
+
+/// Create a user token.
+record CreateUserTokenAction {
+    /// ID of the user.
+    user_id: UserId,
+    /// Name of the token.
+    name?: string,
+}
+
+/// Output of creating a user token.
+record CreateUserTokenOutput {
+    /// ID of the token.
+    token_id: UserTokenId,
+    /// Token.
+    token: UserToken,
+}
+
+/// Delete a user token.
+record DeleteUserTokenAction {
+    /// ID of the token.
+    token_id: UserTokenId,
+}
+
+/// Initiate a user session.
+record InitiateUserSessionAction {
+    /// Email address of the user.
+    email: string,
+    /// Password of the user.
+    password: string,
+    /// User agent of the session.
+    user_agent: string,
+    /// Number of seconds the session should be valid for.
+    /// 
+    /// Defaults to 86400 (1 day).
+    valid_for_secs?: u32,
+}
+
+/// Output of initiating a user session.
+#[json(tag = "result")]
+variant InitiateUserSessionOutput {
+    /// Provided credentials are invalid.
+    InvalidCredentials,
+    /// Session was created successfully.
+    Created: InitiateUserSessionSuccess,
+}
+
+/// Session was created successfully.
+record InitiateUserSessionSuccess {
+    /// ID of the user.
+    user_id: UserId,
+    /// ID of the session.
+    session_id: UserSessionId,
+    /// Session token.
+    session_token: UserSessionToken,
+}
+
+/// Terminate a user session.
+record TerminateUserSessionAction {
+    /// ID of the session.
+    session_id: UserSessionId,
+}
+
+/// Cleanup expired user sessions.
+record CleanupExpiredUserSessionsAction { }
+
+/// Register a new user with an email and password.
+record RegisterUserAction {
+    /// Name of the user.
+    display_name?: string,
+    /// Email address of the user.
+    email: string,
+    /// Password of the user.
+    password: string,
+    /// Indicates whether the user has consented to the terms and conditions.
+    /// 
+    /// This must be `true` to register a user.
+    consented_to_terms: bool,
+    /// Indicates whether the user has consented to marketing communications.
+    consented_to_marketing?: bool,
+}
+
+/// Output of registering a new user.
+#[json(tag = "result")]
+variant RegisterUserOutput {
+    /// User registration has been created.
+    Created: UserRegistration,
+    /// User registration is already pending.
+    Pending: UserRegistration,
+    /// User with the same email already exists.
+    EmailAlreadyExists,
+}
+
+/// User registration.
+record UserRegistration {
+    /// Registration status.
+    status: UserRegistrationStatus,
+    /// Optional message to show to the user.
+    message?: string,
+    /// Timestamp when the registration was created.
+    created_at: Timestamp,
+}
+
+variant UserRegistrationStatus {
+    /// Registration is pending.
+    Pending,
+    //// Registration is waiting for approval.
+    Waiting,
+    /// Registration was successful.
+    Completed,
+    /// Registration failed.
+    Failed,
+}
+
+record ResendRegistrationEmailAction {
+    /// Email address of the user.
+    email: string,
+}

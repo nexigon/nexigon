@@ -10,19 +10,35 @@ repository = "https://github.com/silitics/nexigon/"
 homepage = "https://nevigon.dev/"
 
 [workspace.dependencies]
-# Third-Party Dependencies
+# Third-Party Crates
 bytes = "1.0"
 futures = "0.3"
+jiff = { version = "0.2", features = ["serde"] }
 parking_lot = "0.12"
 paste = "1.0"
 pin-project = "1.1"
 rand = "0.9"
+rcgen = "0.13"
 serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+sha1 = "0.10"
 sha2 = "0.10"
 static_assertions = "1.1"
 thiserror = "2.0"
 tokio = { version = "1.0", features = ["full"] }
 tracing = "0.1"
+x509-cert = "0.2"
+
+# In-House Crates
+si-crypto-hashes = "0.1"
+si-observability = { version = "0.1", features = ["otlp", "clap4"] }
+sidex-serde = { git = "https://github.com/silitics/sidex.git" }
+
+# Local Crates
+nexigon-api = { path = "crates/libs/nexigon-api" }
+nexigon-cert = { path = "crates/libs/nexigon-cert" }
+nexigon-ids = { path = "crates/libs/nexigon-ids" }
+nexigon-multiplex = { path = "crates/libs/nexigon-multiplex" }
 
 [profile.release]
 # Reduce the size of the release binaries.

@@ -1,0 +1,395 @@
+//! Actions and types related to devices.
+
+import actor::Actor
+import cluster::ClusterNodeId
+import datetime::Timestamp
+import json::JsonValue
+import projects::{ProjectId, DeploymentToken, DeploymentTokenId}
+
+/// Unique ID of a device.
+#[rust(type = "nexigon_ids::ids::DeviceId")]
+#[json(type = "string")]
+opaque DeviceId
+
+/// Device fingerprint.
+#[rust(type = "nexigon_ids::ids::DeviceFingerprint")]
+#[json(type = "string")]
+opaque DeviceFingerprint
+
+/// Device fingerprint ID.
+#[rust(type = "nexigon_ids::ids::DeviceFingerprintId")]
+#[json(type = "string")]
+opaque DeviceFingerprintId
+
+/// Unique ID of a device certificate.
+#[rust(type = "nexigon_ids::ids::DeviceCertificateId")]
+#[json(type = "string")]
+opaque DeviceCertificateId
+
+/// Unique ID of a device connection.
+#[rust(type = "nexigon_ids::ids::DeviceConnectionId")]
+#[json(type = "string")]
+opaque DeviceConnectionId
+
+/// Fingerprint of a device certificate.
+#[rust(type = "nexigon_cert::Sha256Fingerprint")]
+#[json(type = "string")]
+opaque CertificateFingerprint
+
+/// ID of a device event (unique per device).
+#[rust(type = "nexigon_ids::ids::DeviceEventId")]
+#[json(type = "string")]
+opaque DeviceEventId
+
+/// Query the devices of the instance.
+record QueryDevicesAction { }
+
+/// Output of querying the devices of the instance.
+record QueryDevicesOutput {
+    /// List of devices.
+    devices: [QueryDevicesItem],
+}
+
+/// Device item.
+record QueryDevicesItem {
+    /// ID of the device.
+    device_id: DeviceId,
+    /// Project ID of the device.
+    project_id: ProjectId,
+}
+
+/// Get information about a device.
+record GetDeviceDetailsAction {
+    /// ID of the device.
+    device_id: DeviceId,
+}
+
+/// Output of getting information about a device.
+record GetDeviceDetailsOutput {
+    /// ID of the device.
+    device_id: DeviceId,
+    /// Project ID of the device.
+    project_id: ProjectId,
+    /// Fingerprint ID the device.
+    fingerprint_id: DeviceFingerprintId,
+    /// Name of the device.
+    name?: string,
+    /// Indicates whether the device is online.
+    is_connected: bool,
+    /// Metadata of the device.
+    metadata: [string: JsonValue],
+    /// Certificates of the device.
+    certificates: [DeviceCertificate],
+    /// Connections of the device.
+    connections: [DeviceConnection],
+}
+
+/// Device certificate.
+record DeviceCertificate {
+    /// ID of the certificate.
+    certificate_id: DeviceCertificateId,
+    /// Status of the certificate.
+    status: DeviceCertificateStatus,
+    /// Fingerprint of the certificate.
+    fingerprint: CertificateFingerprint,
+    /// Timestamp when the certificate was first seen.
+    first_seen: Timestamp,
+}
+
+/// Device connection.
+record DeviceConnection {
+    /// ID of the connection.
+    connection_id: DeviceConnectionId,
+    /// ID of the cluster node.
+    node_id: ClusterNodeId,
+    /// Timestamp when the connection was established.
+    connected_at: Timestamp,
+    /// Duration of the connection in seconds.
+    connected_for_secs: u32,
+}
+
+/// Status of a device certificate.
+#[json(tagged = externally)]
+variant DeviceCertificateStatus {
+    /// The certificate is pending.
+    Pending,
+    /// The certificate is active.
+    Active,
+    /// The certificate has been rejected.
+    Rejected,
+    /// The certificate has been revoked.
+    Revoked,
+}
+
+/// Create a new device.
+record CreateDeviceAction {
+    /// ID of the project.
+    project_id: ProjectId,
+    /// Fingerprint of the device.
+    fingerprint: DeviceFingerprint,
+}
+
+/// Output of creating a new device.
+record CreateDeviceOutput {
+    /// ID of the device.
+    device_id: DeviceId,
+}
+
+/// Delete a device.
+record DeleteDeviceAction {
+    /// ID of the device.
+    device_id: DeviceId,
+}
+
+/// Set the name of a device.
+record SetDeviceNameAction {
+    /// ID of the device.
+    device_id: DeviceId,
+    /// New name of the device.
+    name?: string,
+}
+
+/// Set the metadata of a device.
+record SetDeviceMetadataAction {
+    /// ID of the device.
+    device_id: DeviceId,
+    /// New metadata of the device.
+    metadata: [string: JsonValue],
+}
+
+/// Issue a JWT for a device with user-defined claims.
+/// 
+/// **Note: Only use this action for integration with external systems.**
+record IssueDeviceTokenAction {
+    /// ID of the device.
+    device_id: DeviceId,
+    /// Token validity duration in seconds.
+    valid_for_secs?: u32,
+    /// Additional user-defined claims.
+    claims?: JsonValue,
+}
+
+/// Output of issuing a JWT for a device.
+record IssueDeviceTokenOutput {
+    /// Issued JWT.
+    jwt: string,
+}
+
+/// Validate a device JWT.
+/// 
+/// **Note: Only use this action for integration with external systems.**
+record ValidateDeviceTokenAction {
+    /// JWT to validate.
+    jwt: string,
+}
+
+/// Output of validating a device JWT.
+#[json(tag = "result")]
+variant ValidateDeviceTokenOutput {
+    /// The JWT is invalid.
+    Invalid,
+    /// The JWT is valid.
+    Valid: ValidateDeviceTokenSuccess,
+}
+
+/// Successful validation of a device JWT.
+record ValidateDeviceTokenSuccess {
+    /// ID of the device.
+    device_id: DeviceId,
+    /// User-defined claims.
+    claims: JsonValue,
+}
+
+/// Authenticate a device.
+/// 
+/// **Note: The certificate fingerprint must be externally verified (mutual TLS).**
+record AuthenticateDeviceAction {
+    /// Fingerprint of the device.
+    fingerprint: DeviceFingerprint,
+    /// Deployment token used for authentication.
+    token: DeploymentToken,
+    /// Certificate fingerprint.
+    certificate: CertificateFingerprint,
+}
+
+/// Output of authenticating a device.
+record AuthenticateDeviceOutput {
+    /// ID of the device.
+    device_id: DeviceId,
+    /// ID of the deployment token.
+    token_id: DeploymentTokenId,
+    /// ID of the fingerprint.
+    fingerprint_id: DeviceFingerprintId,
+    /// ID of the certificate.
+    certificate_id: DeviceCertificateId,
+    /// Actor to use for further actions.
+    actor: Actor,
+}
+
+/// Add a device certificate.
+record AddDeviceCertificateAction {
+    /// ID of the device.
+    device_id: DeviceId,
+    /// Fingerprint of the certificate.
+    fingerprint: CertificateFingerprint,
+    /// Initial status of the certificate.
+    /// 
+    /// Defaults to `Pending`.
+    status?: DeviceCertificateStatus,
+}
+
+/// Output of adding a device certificate.
+record AddDeviceCertificateOutput {
+    /// ID of the certificate.
+    certificate_id: DeviceCertificateId,
+}
+
+/// Delete a device certificate.
+record DeleteDeviceCertificateAction {
+    /// ID of the certificate.
+    certificate_id: DeviceCertificateId,
+}
+
+/// Set the status of a device certificate.
+record SetDeviceCertificateStatusAction {
+    /// ID of the certificate.
+    certificate_id: DeviceCertificateId,
+    /// New status of the certificate.
+    status: DeviceCertificateStatus,
+}
+
+/// Register a connection of a device to a cluster node.
+record RegisterDeviceConnectionAction {
+    /// ID of the device.
+    device_id: DeviceId,
+    /// ID of the cluster node.
+    node_id: ClusterNodeId,
+}
+
+/// Output of registering a connection of a device to a cluster node.
+record RegisterDeviceConnectionOutput {
+    /// ID of the connection.
+    connection_id: DeviceConnectionId,
+}
+
+/// Unregister a connection of a device to a cluster node.
+record UnregisterDeviceConnectionAction {
+    /// ID of the connection.
+    connection_id: DeviceConnectionId,
+}
+
+/// Issue a HTTP proxy JWT.
+record IssueDeviceHttpProxyTokenAction {
+    /// ID of the device.
+    device_id: DeviceId,
+    /// Token validity duration in seconds.
+    valid_for_secs?: u32,
+    /// Hostname to accept requests for.
+    /// 
+    /// Defaults to a device-specific pseudo-random subdomain of the instance domain.
+    hostname?: string,
+    /// Device port to proxy to.
+    /// 
+    /// Defaults to `80`.
+    port?: u16,
+    /// Redirect URL in case the token is expired or invalid.
+    redirect?: string,
+}
+
+/// Output of issuing a HTTP proxy JWT.
+record IssueDeviceHttpProxyTokenOutput {
+    /// JWT proxy token.
+    jwt: string,
+    /// Proxy URL.
+    url: string,
+}
+
+/// Validate a HTTP proxy JWT.
+record ValidateDeviceHttpProxyTokenAction {
+    /// JWT to validate.
+    jwt: string,
+}
+
+/// Output of validating a HTTP proxy JWT.
+#[json(tag = "result")]
+variant ValidateDeviceHttpProxyTokenOutput {
+    /// The JWT is invalid.
+    Invalid: ValidateDeviceHttpProxyTokenInvalid,
+    /// The JWT is valid.
+    Valid: ValidateDeviceHttpProxyTokenSuccess,
+}
+
+/// Validation of a HTTP proxy JWT failed.
+record ValidateDeviceHttpProxyTokenInvalid {
+    /// URL to redirect to.
+    redirect?: string,
+}
+
+/// Successful validation of a HTTP proxy JWT.
+record ValidateDeviceHttpProxyTokenSuccess {
+    /// ID of the device.
+    device_id: DeviceId,
+    /// Hostname to accept requests for.
+    hostname?: string,
+    /// Device port to proxy to.
+    port?: u16,
+}
+
+/// Publish device events.
+record PublishDeviceEventsAction {
+    /// ID of the device.
+    device_id: DeviceId,
+    /// Events to push.
+    events: [DeviceEvent],
+}
+
+/// Query device events.
+record QueryDeviceEventsAction {
+    /// ID of the device.
+    device_id: DeviceId,
+    /// Limit the number of events to return.
+    /// 
+    /// Default to `100`.
+    limit?: u32,
+}
+
+/// Output of querying device events.
+record QueryDeviceEventsOutput {
+    /// List of events.
+    events: [DeviceEvent],
+}
+
+/// Event emitted by a device.
+record DeviceEvent {
+    /// ID of the event.
+    event_id: DeviceEventId,
+    /// Event category (optional, low-cardinality category of the event).
+    category?: string,
+    /// Severity of the event.
+    severity: DeviceEventSeverity,
+    /// Event body.
+    body: JsonValue,
+    /// Event attributes.
+    attributes: [string: JsonValue],
+    /// Timestamp when the event was emitted.
+    emitted_at: Timestamp,
+    /// Timestamp when the event was received.
+    received_at?: Timestamp,
+}
+
+/// Severity of a device event.
+#[json(tagged = externally)]
+variant DeviceEventSeverity {
+    /// Tracing event.
+    Trace,
+    /// Debugging event.
+    Debug,
+    /// Informational even.
+    Info,
+    /// Warning event.
+    Warning,
+    /// Error event.
+    Error,
+    /// Critical event.
+    Critical,
+}

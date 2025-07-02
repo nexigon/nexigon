@@ -6,6 +6,7 @@ codegen
 dalek
 devicetree
 dialoguer
+impls
 jsonwebtoken
 mgmt
 MQTT
@@ -18,6 +19,7 @@ reqwest
 rngs
 rustls
 RUSTSEC
+sidex
 spki
 sysinfo
 YOCTO

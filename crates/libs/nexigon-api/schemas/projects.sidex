@@ -1,0 +1,191 @@
+//! Actions and types related to projects.
+
+import datetime::Timestamp
+import devices::DeviceId
+import users::UserId
+
+/// Unique ID of a project.
+#[rust(type = "nexigon_ids::ids::ProjectId")]
+#[json(type = "string")]
+opaque ProjectId
+
+/// Unique ID of a deployment token.
+#[rust(type = "nexigon_ids::ids::DeploymentTokenId")]
+#[json(type = "string")]
+opaque DeploymentTokenId
+
+/// Deployment token.
+#[rust(type = "nexigon_ids::ids::DeploymentToken")]
+#[json(type = "string")]
+opaque DeploymentToken
+
+/// Query the projects of the instance.
+record QueryProjectsAction { }
+
+/// Output of querying the projects of the instance.
+record QueryProjectsOutput {
+    /// List of projects.
+    projects: [QueryProjectsItem],
+}
+
+/// Project item.
+record QueryProjectsItem {
+    /// ID of the project.
+    project_id: ProjectId,
+    /// Name of the project.
+    name: string,
+}
+
+/// Get information about a project.
+record GetProjectDetailsAction {
+    /// ID of the project.
+    project_id: ProjectId,
+}
+
+/// Information about a project.
+record GetProjectDetailsOutput {
+    /// ID of the project.
+    project_id: ProjectId,
+    /// Name of the project.
+    name: string,
+    /// Number of devices in the project.
+    device_count: u32,
+}
+
+/// Create a new project.
+record CreateProjectAction {
+    /// Name of the project.
+    name: string,
+    /// Owner of the project.
+    owner?: UserId,
+}
+
+/// Output of creating a project.
+#[json(tag = "result")]
+variant CreateProjectOutput {
+    Created: CreateProjectSuccess,
+}
+
+/// Project creation has been successful.
+record CreateProjectSuccess {
+    /// ID of the project.
+    project_id: ProjectId,
+}
+
+/// Delete a project.
+record DeleteProjectAction {
+    /// ID of the project.
+    project_id: ProjectId,
+}
+
+/// Query the devices of a project.
+record QueryProjectDevicesAction {
+    /// ID of the project.
+    project_id: ProjectId,
+}
+
+/// Output of querying the devices of a project.
+record QueryProjectDevicesOutput {
+    /// List of devices.
+    devices: [QueryProjectDevicesItem],
+}
+
+/// Device item.
+record QueryProjectDevicesItem {
+    /// ID of the device.
+    device_id: DeviceId,
+    /// Name of the device.
+    name?: string,
+    /// Timestamp when the device was first seen.
+    first_seen: Timestamp,
+    /// Indicates whether the device is online.
+    is_connected: bool,
+    /// Pending device certificates.
+    pending_certificates_count: u32,
+}
+
+/// Query the members of a project.
+record QueryProjectMembersAction {
+    /// ID of the project.
+    project_id: ProjectId,
+}
+
+/// Output of querying the members of a project.
+record QueryProjectMembersOutput {
+    /// List of members.
+    users: [QueryProjectMembersItem],
+}
+
+/// Member item.
+record QueryProjectMembersItem {
+    /// ID of the user.
+    user_id: UserId,
+    /// Name of the user.
+    display_name?: string,
+    /// Email of the user.
+    email: string,
+    /// Whether the user is an owner of the project.
+    is_owner: bool,
+}
+
+/// Query the deployment tokens of a project.
+record QueryProjectDeploymentTokensAction {
+    /// ID of the project.
+    project_id: ProjectId,
+}
+
+/// Output of querying the deployment tokens of a project.
+record QueryProjectDeploymentTokensOutput {
+    /// List of deployment tokens.
+    tokens: [QueryProjectDeploymentTokensItem],
+}
+
+/// Deployment token item.
+record QueryProjectDeploymentTokensItem {
+    /// ID of the token.
+    token_id: DeploymentTokenId,
+    /// Creation date of the token.
+    created_at: Timestamp,
+    /// Name of the token.
+    name?: string,
+}
+
+/// Add a user to a project.
+record AddProjectMemberAction {
+    /// ID of the project.
+    project_id: ProjectId,
+    /// ID of the user to add.
+    user_id: UserId,
+    /// Whether the user should be an owner of the project.
+    is_owner?: bool,
+}
+
+/// Remove a user from a project.
+record RemoveProjectMemberAction {
+    /// ID of the project.
+    project_id: ProjectId,
+    /// ID of the user.
+    user_id: UserId,
+}
+
+/// Create a deployment token.
+record CreateDeploymentTokenAction {
+    /// ID of the project.
+    project_id: ProjectId,
+    /// Name of the token.
+    name: string,
+}
+
+/// Output of creating a deployment token.
+record CreateDeploymentTokenOutput {
+    /// ID of the token.
+    token_id: DeploymentTokenId,
+    /// Token.
+    token: DeploymentToken,
+}
+
+/// Delete a deployment token.
+record DeleteDeploymentTokenAction {
+    /// ID of the token.
+    token_id: DeploymentTokenId,
+}

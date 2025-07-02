@@ -1,0 +1,6 @@
+//! Time and date types.
+
+/// ISO 8601 formatted date and time string.
+#[rust(type = "jiff::Timestamp")]
+#[json(type = "string")]
+opaque Timestamp

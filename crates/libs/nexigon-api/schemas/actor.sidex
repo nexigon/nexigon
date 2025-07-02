@@ -1,0 +1,68 @@
+//! Actor that may be used to perform actions.
+
+import cluster::ClusterNodeId
+import devices::DeviceId
+import projects::DeploymentTokenId
+import users::{UserId, UserSessionId, UserTokenId}
+
+/// Actor that may invoke actions in the system.
+#[json(tag = "actor")]
+variant Actor {
+    /// An anonymous, unauthenticated actor.
+    Anonymous: AnonymousActor,
+    /// The system itself, typically used for internal actions.
+    System: SystemActor,
+    /// A device authenticated via a specific deployment token.
+    Device: DeviceActor,
+    /// A user typically authenticated via a user session.
+    User: UserActor,
+    /// A user authenticated via a specific token.
+    UserToken: UserTokenActor,
+    /// A cluster node.
+    ClusterNode: ClusterNodeActor,
+}
+
+/// Anonymous actor, typically used for unauthenticated actions.
+record AnonymousActor { }
+
+/// System actor, typically used for internal actions.
+record SystemActor { }
+
+/// Device authenticated via a specific deployment token.
+record DeviceActor {
+    /// ID of the device.
+    device_id: DeviceId,
+    /// ID of the deployment token used for authentication.
+    token_id: DeploymentTokenId,
+}
+
+/// User authenticated via a user session.
+record UserActor {
+    /// ID of the user.
+    user_id: UserId,
+}
+
+/// User authenticated via a specific token.
+record UserTokenActor {
+    /// ID of the user.
+    user_id: UserId,
+    /// ID of the user token used for authentication.
+    token_id: UserTokenId,
+}
+
+/// Cluster node.
+record ClusterNodeActor {
+    /// ID of the cluster node.
+    node_id: ClusterNodeId,
+}
+
+/// Get the actor.
+/// 
+/// This action is used to get the actor that is used to invoke the action.
+record GetActorAction { }
+
+/// Output of getting the actor.
+record GetActorOutput {
+    /// The actor.
+    actor: Actor,
+}

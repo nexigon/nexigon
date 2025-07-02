@@ -1,0 +1,21 @@
+//! Error types.
+
+/// Kind of an action error.
+#[rust(derive(Copy))]
+#[json(tagged = externally)]
+variant ActionErrorKind {
+    /// Invalid action.
+    Invalid,
+    /// Forbidden action.
+    Forbidden,
+    /// Internal server error.
+    Internal,
+}
+
+/// Action error.
+record ActionError {
+    /// Kind of the error.
+    kind: ActionErrorKind,
+    /// Message of the error.
+    message: string,
+}

@@ -1,0 +1,49 @@
+//! Actions and types related to the cluster.
+
+import datetime::Timestamp
+
+/// Unique ID of a cluster node.
+#[rust(type = "nexigon_ids::ids::ClusterNodeId")]
+#[json(type = "string")]
+opaque ClusterNodeId
+
+/// Get information about the cluster.
+record GetClusterDetailsAction { }
+
+/// Information about the cluster.
+record GetClusterDetailsOutput {
+    /// Active nodes of the cluster.
+    nodes: [ClusterNode],
+}
+
+/// Cluster node.
+record ClusterNode {
+    /// ID of the cluster node.
+    node_id: ClusterNodeId,
+    /// Name of the cluster node.
+    name?: string,
+    /// Timestamp when the node joined the cluster.
+    joined_at: Timestamp,
+    /// Uptime of the node in seconds.
+    uptime_secs: u32,
+    /// Timestamp when the node last reported a heartbeat.
+    last_heartbeat: Timestamp,
+}
+
+/// Register a new cluster node.
+record RegisterClusterNodeAction {
+    /// Name of the cluster node.
+    name?: string,
+}
+
+/// Output of registering a new cluster node.
+record RegisterClusterNodeOutput {
+    /// ID of the cluster node.
+    node_id: ClusterNodeId,
+}
+
+/// Report the heartbeat of a cluster node.
+record ReportClusterNodeHeartbeatAction { }
+
+/// Cleanup inactive cluster nodes.
+record CleanupInactiveClusterNodesAction { }

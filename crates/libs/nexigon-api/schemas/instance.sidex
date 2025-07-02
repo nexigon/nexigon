@@ -1,0 +1,33 @@
+//! Actions and types related to the instance.
+
+import json::JsonValue
+
+/// Get instance statistics.
+record GetInstanceStatisticsAction { }
+
+/// Instance statistics.
+record GetInstanceStatisticsOutput {
+    /// Number of users.
+    users: u32,
+    /// Number of projects.
+    projects: u32,
+    /// Number of devices.
+    devices: u32,
+}
+
+/// Get the settings of the instance.
+record GetInstanceSettingsRawAction { }
+
+/// Settings of the instance.
+record GetInstanceSettingsRawOutput {
+    /// Settings of the instance.
+    settings: [string: JsonValue],
+}
+
+/// Set a setting of the instance.
+record SetInstanceSettingRawAction {
+    /// Name of the setting.
+    key: string,
+    /// Value of the setting.
+    value: JsonValue,
+}

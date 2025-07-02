@@ -1,0 +1,5 @@
+//! JSON types.
+
+/// JSON value.
+#[rust(type = "serde_json::Value")]
+opaque JsonValue

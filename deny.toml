@@ -32,10 +32,16 @@ ignore = [
 version = 2
 allow = [
     "Apache-2.0",
+    "ISC",
     "MIT",
     "Unicode-3.0",
 ]
 confidence-threshold = 0.96
+
+[sources]
+allow-git = [
+    "git+https://github.com/silitics/sidex.git"
+]
 
 [bans]
 multiple-versions = "allow"
