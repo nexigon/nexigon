@@ -1,0 +1,19 @@
+[package]
+name = "nexigon-multiplex"
+edition = "2024"
+authors.workspace = true
+version.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+
+[dependencies]
+bytes.workspace = true
+futures.workspace = true
+parking_lot.workspace = true
+paste.workspace = true
+pin-project.workspace = true
+static_assertions.workspace = true
+thiserror.workspace = true
+tokio.workspace = true
+tracing.workspace = true

@@ -11,11 +11,13 @@ mgmt
 MQTT
 nexigon
 NTRU
+oneshot
 pkcs
 repr
 reqwest
 rngs
 rustls
+RUSTSEC
 spki
 sysinfo
 YOCTO

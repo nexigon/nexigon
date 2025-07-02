@@ -20,7 +20,13 @@ no-default-features = false
 version = 2
 db-path = "~/.cargo/advisory-db"
 db-urls = ["https://github.com/rustsec/advisory-db"]
-ignore = []
+ignore = [
+    # The `paste` crate is no longer maintained. It is merely a build-time dependency for
+    # generating code through macros. As it does not interact at all with runtime data,
+    # we do not need to worry about security vulnerabilities in it. We will migrate to
+    # something else, when we have time or there a need for it.
+    "RUSTSEC-2024-0436",
+]
 
 [licenses]
 version = 2

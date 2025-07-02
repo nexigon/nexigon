@@ -7,3 +7,6 @@ check:
 fmt:
     cargo +nightly fmt
     taplo fmt
+
+doc:
+    cargo +nightly doc --all-features --document-private-items

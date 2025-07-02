@@ -11,10 +11,18 @@ homepage = "https://nevigon.dev/"
 
 [workspace.dependencies]
 # Third-Party Dependencies
+bytes = "1.0"
+futures = "0.3"
+parking_lot = "0.12"
+paste = "1.0"
+pin-project = "1.1"
 rand = "0.9"
 serde = { version = "1.0", features = ["derive"] }
 sha2 = "0.10"
+static_assertions = "1.1"
+thiserror = "2.0"
 tokio = { version = "1.0", features = ["full"] }
+tracing = "0.1"
 
 [profile.release]
 # Reduce the size of the release binaries.
