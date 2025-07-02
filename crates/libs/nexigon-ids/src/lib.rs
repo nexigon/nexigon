@@ -572,7 +572,7 @@ impl RawId {
 
         fn emit_digit(str: &mut String, digit: u32, base: u32) -> (u32, u32) {
             str.push(ALPHABET_BASE58[(digit % BASE) as usize]);
-            (digit / BASE, (base + BASE - 1) / BASE)
+            (digit / BASE, base.div_ceil(BASE))
         }
 
         fn from_bytes_rec(str: &mut String, bytes: &[u8]) -> (u32, u32) {
@@ -687,7 +687,7 @@ pub mod errors {
 
     impl std::fmt::Display for InvalidIdError {
         fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-            f.write_str(&self.reason)
+            f.write_str(self.reason)
         }
     }
 

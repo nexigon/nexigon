@@ -7,10 +7,7 @@ pub fn encode(out: &mut String, alphabet: &[char], limit: u32, bytes: &[u8]) {
     fn emit_digit(out: &mut String, alphabet: &[char], digit: u32, base: u32) -> (u32, u32) {
         let alphabet_base = alphabet.len() as u32;
         out.push(alphabet[(digit % alphabet_base) as usize]);
-        (
-            digit / alphabet_base,
-            (base + alphabet_base - 1) / alphabet_base,
-        )
+        (digit / alphabet_base, base.div_ceil(alphabet_base))
     }
 
     fn encode_rec(out: &mut String, alphabet: &[char], limit: u32, bytes: &[u8]) -> (u32, u32) {
@@ -57,11 +54,7 @@ fn decode(s: &str, alphabet: &[char], limit: u32, bytes: &mut [u8]) {
         let alphabet_base = alphabet.len() as u32;
         let mut digits = s.chars();
         let digit = digits.next().unwrap();
-        (
-            digits.as_str(),
-            digit,
-            (base + alphabet_base - 1) / alphabet_base,
-        )
+        (digits.as_str(), digit, base.div_ceil(alphabet_base))
     }
 
     fn decode_rec<'s>(s: &'s str, alphabet: &[char], limit: u32, bytes: &[u8]) -> (&'s str, u32) {

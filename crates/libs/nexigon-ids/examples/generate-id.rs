@@ -6,7 +6,7 @@ use nexigon_ids::Id;
 use nexigon_ids::Tag;
 
 pub fn main() {
-    let Some(tag) = std::env::args().skip(1).next() else {
+    let Some(tag) = std::env::args().nth(1) else {
         eprintln!("usage: generate-id <tag>");
         std::process::exit(1);
     };
