@@ -24,7 +24,7 @@ ignore = [
     # The `paste` crate is no longer maintained. It is merely a build-time dependency for
     # generating code through macros. As it does not interact at all with runtime data,
     # we do not need to worry about security vulnerabilities in it. We will migrate to
-    # something else, when we have time or there a need for it.
+    # something else, when we have time or there is a need for it.
     "RUSTSEC-2024-0436",
 ]
 
