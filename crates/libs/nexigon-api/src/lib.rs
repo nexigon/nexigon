@@ -185,3 +185,15 @@ macro_rules! impl_actions {
 }
 
 with_actions!(impl_actions);
+
+/// Executor for actions.
+pub trait Executor {
+    /// Error type.
+    type Error: 'static + std::error::Error + Send + Sync;
+
+    /// Execute an action.
+    fn execute<A: Action>(
+        &self,
+        action: A,
+    ) -> impl Future<Output = Result<A::Output, Self::Error>> + Send;
+}
