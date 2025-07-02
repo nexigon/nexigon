@@ -13,4 +13,8 @@ doc:
 
 generate:
     cd crates/libs/nexigon-api && sidex generate rust src/types/generated
+    cd crates/libs/nexigon-api && sidex generate json-schema ../../../build/api-json-schema
+    mv build/api-json-schema/schema-defs.json crates/utils/nexigon-gen-openapi/schemas.json
+    cargo run --bin nexigon-gen-openapi >api/openapi.json
+    cd api && npx @redocly/cli build-docs openapi.json
     just fmt

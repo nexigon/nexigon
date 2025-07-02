@@ -161,6 +161,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "equivalent"
+version = "1.0.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "877a4ace8713b0bcf2a4e7eec82529c029f1d0619886d18145fea96c3ffe5c0f"
+
+[[package]]
 name = "flagset"
 version = "0.4.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -295,10 +301,27 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "07e28edb80900c19c28f1072f2e8aeca7fa06b23cd4169cefe1af5aa3260783f"
 
 [[package]]
+name = "hashbrown"
+version = "0.15.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5971ac85611da7067dbfcabef3c70ebb5606018acd9e2a3903a0da507521e0d5"
+
+[[package]]
 name = "hex"
 version = "0.4.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7f24254aa9a54b5c858eaee2f5bccdb46aaf0e486a595ed5fd8f86ba55232a70"
+
+[[package]]
+name = "indexmap"
+version = "2.10.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "fe4cd85333e22411419a0bcae1297d25e58c9443848b11dc6a86fefe8c78a661"
+dependencies = [
+ "equivalent",
+ "hashbrown",
+ "serde",
+]
 
 [[package]]
 name = "itoa"
@@ -426,6 +449,16 @@ dependencies = [
 [[package]]
 name = "nexigon-cli"
 version = "0.1.0"
+
+[[package]]
+name = "nexigon-gen-openapi"
+version = "0.1.0"
+dependencies = [
+ "indexmap",
+ "nexigon-api",
+ "serde_json",
+ "sidex-types-openapi",
+]
 
 [[package]]
 name = "nexigon-ids"
@@ -776,6 +809,28 @@ source = "git+https://github.com/silitics/sidex.git#03053966927a8f8e31c16b4b5cba
 dependencies = [
  "base64 0.20.0",
  "serde",
+]
+
+[[package]]
+name = "sidex-types-json-schema"
+version = "0.1.0"
+source = "git+https://github.com/silitics/sidex.git#03053966927a8f8e31c16b4b5cbaa50b98a1cf81"
+dependencies = [
+ "indexmap",
+ "serde",
+ "serde_json",
+ "sidex-serde",
+]
+
+[[package]]
+name = "sidex-types-openapi"
+version = "0.1.0"
+source = "git+https://github.com/silitics/sidex.git#03053966927a8f8e31c16b4b5cbaa50b98a1cf81"
+dependencies = [
+ "indexmap",
+ "serde",
+ "sidex-serde",
+ "sidex-types-json-schema",
 ]
 
 [[package]]

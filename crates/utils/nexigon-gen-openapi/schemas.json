@@ -1,0 +1,3696 @@
+{
+  "nexigon_api.actor.Actor": {
+    "description": "Actor that may invoke actions in the system.",
+    "oneOf": [
+      {
+        "type": "object",
+        "properties": {
+          "actor": {
+            "const": "Anonymous"
+          }
+        },
+        "required": [
+          "actor"
+        ]
+      },
+      {
+        "type": "object",
+        "properties": {
+          "actor": {
+            "const": "System"
+          }
+        },
+        "required": [
+          "actor"
+        ]
+      },
+      {
+        "type": "object",
+        "properties": {
+          "actor": {
+            "const": "Device"
+          },
+          "deviceId": {
+            "$ref": "#/components/schemas/nexigon_api.devices.DeviceId"
+          },
+          "tokenId": {
+            "$ref": "#/components/schemas/nexigon_api.projects.DeploymentTokenId"
+          }
+        },
+        "required": [
+          "actor",
+          "deviceId",
+          "tokenId"
+        ]
+      },
+      {
+        "type": "object",
+        "properties": {
+          "actor": {
+            "const": "User"
+          },
+          "userId": {
+            "$ref": "#/components/schemas/nexigon_api.users.UserId"
+          }
+        },
+        "required": [
+          "actor",
+          "userId"
+        ]
+      },
+      {
+        "type": "object",
+        "properties": {
+          "actor": {
+            "const": "UserToken"
+          },
+          "userId": {
+            "$ref": "#/components/schemas/nexigon_api.users.UserId"
+          },
+          "tokenId": {
+            "$ref": "#/components/schemas/nexigon_api.users.UserTokenId"
+          }
+        },
+        "required": [
+          "actor",
+          "userId",
+          "tokenId"
+        ]
+      },
+      {
+        "type": "object",
+        "properties": {
+          "actor": {
+            "const": "ClusterNode"
+          },
+          "nodeId": {
+            "$ref": "#/components/schemas/nexigon_api.cluster.ClusterNodeId"
+          }
+        },
+        "required": [
+          "actor",
+          "nodeId"
+        ]
+      }
+    ]
+  },
+  "nexigon_api.actor.AnonymousActor": {
+    "type": "object",
+    "description": "Anonymous actor, typically used for unauthenticated actions.",
+    "properties": {},
+    "required": [],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.actor.ClusterNodeActor": {
+    "type": "object",
+    "description": "Cluster node.",
+    "properties": {
+      "nodeId": {
+        "$ref": "#/components/schemas/nexigon_api.cluster.ClusterNodeId"
+      }
+    },
+    "required": [
+      "nodeId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.actor.DeviceActor": {
+    "type": "object",
+    "description": "Device authenticated via a specific deployment token.",
+    "properties": {
+      "deviceId": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceId"
+      },
+      "tokenId": {
+        "$ref": "#/components/schemas/nexigon_api.projects.DeploymentTokenId"
+      }
+    },
+    "required": [
+      "deviceId",
+      "tokenId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.actor.GetActorAction": {
+    "type": "object",
+    "description": "Get the actor.\n\nThis action is used to get the actor that is used to invoke the action.",
+    "properties": {},
+    "required": [],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.actor.GetActorOutput": {
+    "type": "object",
+    "description": "Output of getting the actor.",
+    "properties": {
+      "actor": {
+        "$ref": "#/components/schemas/nexigon_api.actor.Actor"
+      }
+    },
+    "required": [
+      "actor"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.actor.SystemActor": {
+    "type": "object",
+    "description": "System actor, typically used for internal actions.",
+    "properties": {},
+    "required": [],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.actor.UserActor": {
+    "type": "object",
+    "description": "User authenticated via a user session.",
+    "properties": {
+      "userId": {
+        "$ref": "#/components/schemas/nexigon_api.users.UserId"
+      }
+    },
+    "required": [
+      "userId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.actor.UserTokenActor": {
+    "type": "object",
+    "description": "User authenticated via a specific token.",
+    "properties": {
+      "userId": {
+        "$ref": "#/components/schemas/nexigon_api.users.UserId"
+      },
+      "tokenId": {
+        "$ref": "#/components/schemas/nexigon_api.users.UserTokenId"
+      }
+    },
+    "required": [
+      "userId",
+      "tokenId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.cluster.CleanupInactiveClusterNodesAction": {
+    "type": "object",
+    "description": "Cleanup inactive cluster nodes.",
+    "properties": {},
+    "required": [],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.cluster.ClusterNode": {
+    "type": "object",
+    "description": "Cluster node.",
+    "properties": {
+      "nodeId": {
+        "$ref": "#/components/schemas/nexigon_api.cluster.ClusterNodeId"
+      },
+      "name": {
+        "type": "string"
+      },
+      "joinedAt": {
+        "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
+      },
+      "uptimeSecs": {
+        "type": "integer",
+        "format": "uint32"
+      },
+      "lastHeartbeat": {
+        "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
+      }
+    },
+    "required": [
+      "nodeId",
+      "joinedAt",
+      "uptimeSecs",
+      "lastHeartbeat"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.cluster.ClusterNodeId": {
+    "type": [
+      "string"
+    ],
+    "description": "Unique ID of a cluster node."
+  },
+  "nexigon_api.cluster.GetClusterDetailsAction": {
+    "type": "object",
+    "description": "Get information about the cluster.",
+    "properties": {},
+    "required": [],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.cluster.GetClusterDetailsOutput": {
+    "type": "object",
+    "description": "Information about the cluster.",
+    "properties": {
+      "nodes": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.cluster.ClusterNode"
+        }
+      }
+    },
+    "required": [
+      "nodes"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.cluster.RegisterClusterNodeAction": {
+    "type": "object",
+    "description": "Register a new cluster node.",
+    "properties": {
+      "name": {
+        "type": "string"
+      }
+    },
+    "required": [],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.cluster.RegisterClusterNodeOutput": {
+    "type": "object",
+    "description": "Output of registering a new cluster node.",
+    "properties": {
+      "nodeId": {
+        "$ref": "#/components/schemas/nexigon_api.cluster.ClusterNodeId"
+      }
+    },
+    "required": [
+      "nodeId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.cluster.ReportClusterNodeHeartbeatAction": {
+    "type": "object",
+    "description": "Report the heartbeat of a cluster node.",
+    "properties": {},
+    "required": [],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.datetime.Timestamp": {
+    "type": [
+      "string"
+    ],
+    "description": "ISO 8601 formatted date and time string."
+  },
+  "nexigon_api.devices.AddDeviceCertificateAction": {
+    "type": "object",
+    "description": "Add a device certificate.",
+    "properties": {
+      "deviceId": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceId"
+      },
+      "fingerprint": {
+        "$ref": "#/components/schemas/nexigon_api.devices.CertificateFingerprint"
+      },
+      "status": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceCertificateStatus"
+      }
+    },
+    "required": [
+      "deviceId",
+      "fingerprint"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.devices.AddDeviceCertificateOutput": {
+    "type": "object",
+    "description": "Output of adding a device certificate.",
+    "properties": {
+      "certificateId": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceCertificateId"
+      }
+    },
+    "required": [
+      "certificateId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.devices.AuthenticateDeviceAction": {
+    "type": "object",
+    "description": "Authenticate a device.\n\n**Note: The certificate fingerprint must be externally verified (mutual TLS).**",
+    "properties": {
+      "fingerprint": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceFingerprint"
+      },
+      "token": {
+        "$ref": "#/components/schemas/nexigon_api.projects.DeploymentToken"
+      },
+      "certificate": {
+        "$ref": "#/components/schemas/nexigon_api.devices.CertificateFingerprint"
+      }
+    },
+    "required": [
+      "fingerprint",
+      "token",
+      "certificate"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.devices.AuthenticateDeviceOutput": {
+    "type": "object",
+    "description": "Output of authenticating a device.",
+    "properties": {
+      "deviceId": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceId"
+      },
+      "tokenId": {
+        "$ref": "#/components/schemas/nexigon_api.projects.DeploymentTokenId"
+      },
+      "fingerprintId": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceFingerprintId"
+      },
+      "certificateId": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceCertificateId"
+      },
+      "actor": {
+        "$ref": "#/components/schemas/nexigon_api.actor.Actor"
+      }
+    },
+    "required": [
+      "deviceId",
+      "tokenId",
+      "fingerprintId",
+      "certificateId",
+      "actor"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.devices.CertificateFingerprint": {
+    "type": [
+      "string"
+    ],
+    "description": "Fingerprint of a device certificate."
+  },
+  "nexigon_api.devices.CreateDeviceAction": {
+    "type": "object",
+    "description": "Create a new device.",
+    "properties": {
+      "projectId": {
+        "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+      },
+      "fingerprint": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceFingerprint"
+      }
+    },
+    "required": [
+      "projectId",
+      "fingerprint"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.devices.CreateDeviceOutput": {
+    "type": "object",
+    "description": "Output of creating a new device.",
+    "properties": {
+      "deviceId": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceId"
+      }
+    },
+    "required": [
+      "deviceId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.devices.DeleteDeviceAction": {
+    "type": "object",
+    "description": "Delete a device.",
+    "properties": {
+      "deviceId": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceId"
+      }
+    },
+    "required": [
+      "deviceId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.devices.DeleteDeviceCertificateAction": {
+    "type": "object",
+    "description": "Delete a device certificate.",
+    "properties": {
+      "certificateId": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceCertificateId"
+      }
+    },
+    "required": [
+      "certificateId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.devices.DeviceCertificate": {
+    "type": "object",
+    "description": "Device certificate.",
+    "properties": {
+      "certificateId": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceCertificateId"
+      },
+      "status": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceCertificateStatus"
+      },
+      "fingerprint": {
+        "$ref": "#/components/schemas/nexigon_api.devices.CertificateFingerprint"
+      },
+      "firstSeen": {
+        "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
+      }
+    },
+    "required": [
+      "certificateId",
+      "status",
+      "fingerprint",
+      "firstSeen"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.devices.DeviceCertificateId": {
+    "type": [
+      "string"
+    ],
+    "description": "Unique ID of a device certificate."
+  },
+  "nexigon_api.devices.DeviceCertificateStatus": {
+    "enum": [
+      "Pending",
+      "Active",
+      "Rejected",
+      "Revoked"
+    ],
+    "description": "Status of a device certificate."
+  },
+  "nexigon_api.devices.DeviceConnection": {
+    "type": "object",
+    "description": "Device connection.",
+    "properties": {
+      "connectionId": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceConnectionId"
+      },
+      "nodeId": {
+        "$ref": "#/components/schemas/nexigon_api.cluster.ClusterNodeId"
+      },
+      "connectedAt": {
+        "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
+      },
+      "connectedForSecs": {
+        "type": "integer",
+        "format": "uint32"
+      }
+    },
+    "required": [
+      "connectionId",
+      "nodeId",
+      "connectedAt",
+      "connectedForSecs"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.devices.DeviceConnectionId": {
+    "type": [
+      "string"
+    ],
+    "description": "Unique ID of a device connection."
+  },
+  "nexigon_api.devices.DeviceEvent": {
+    "type": "object",
+    "description": "Event emitted by a device.",
+    "properties": {
+      "eventId": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceEventId"
+      },
+      "category": {
+        "type": "string"
+      },
+      "severity": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceEventSeverity"
+      },
+      "body": {
+        "$ref": "#/components/schemas/nexigon_api.json.JsonValue"
+      },
+      "attributes": {
+        "type": "object",
+        "additionalProperties": {
+          "$ref": "#/components/schemas/nexigon_api.json.JsonValue"
+        }
+      },
+      "emittedAt": {
+        "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
+      },
+      "receivedAt": {
+        "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
+      }
+    },
+    "required": [
+      "eventId",
+      "severity",
+      "body",
+      "attributes",
+      "emittedAt"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.devices.DeviceEventId": {
+    "type": [
+      "string"
+    ],
+    "description": "ID of a device event (unique per device)."
+  },
+  "nexigon_api.devices.DeviceEventSeverity": {
+    "enum": [
+      "Trace",
+      "Debug",
+      "Info",
+      "Warning",
+      "Error",
+      "Critical"
+    ],
+    "description": "Severity of a device event."
+  },
+  "nexigon_api.devices.DeviceFingerprint": {
+    "type": [
+      "string"
+    ],
+    "description": "Device fingerprint."
+  },
+  "nexigon_api.devices.DeviceFingerprintId": {
+    "type": [
+      "string"
+    ],
+    "description": "Device fingerprint ID."
+  },
+  "nexigon_api.devices.DeviceId": {
+    "type": [
+      "string"
+    ],
+    "description": "Unique ID of a device."
+  },
+  "nexigon_api.devices.GetDeviceDetailsAction": {
+    "type": "object",
+    "description": "Get information about a device.",
+    "properties": {
+      "deviceId": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceId"
+      }
+    },
+    "required": [
+      "deviceId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.devices.GetDeviceDetailsOutput": {
+    "type": "object",
+    "description": "Output of getting information about a device.",
+    "properties": {
+      "deviceId": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceId"
+      },
+      "projectId": {
+        "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+      },
+      "fingerprintId": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceFingerprintId"
+      },
+      "name": {
+        "type": "string"
+      },
+      "isConnected": {
+        "type": "boolean"
+      },
+      "metadata": {
+        "type": "object",
+        "additionalProperties": {
+          "$ref": "#/components/schemas/nexigon_api.json.JsonValue"
+        }
+      },
+      "certificates": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.devices.DeviceCertificate"
+        }
+      },
+      "connections": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.devices.DeviceConnection"
+        }
+      }
+    },
+    "required": [
+      "deviceId",
+      "projectId",
+      "fingerprintId",
+      "isConnected",
+      "metadata",
+      "certificates",
+      "connections"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.devices.IssueDeviceHttpProxyTokenAction": {
+    "type": "object",
+    "description": "Issue a HTTP proxy JWT.",
+    "properties": {
+      "deviceId": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceId"
+      },
+      "validForSecs": {
+        "type": "integer",
+        "format": "uint32"
+      },
+      "hostname": {
+        "type": "string"
+      },
+      "port": {},
+      "redirect": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "deviceId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.devices.IssueDeviceHttpProxyTokenOutput": {
+    "type": "object",
+    "description": "Output of issuing a HTTP proxy JWT.",
+    "properties": {
+      "jwt": {
+        "type": "string"
+      },
+      "url": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "jwt",
+      "url"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.devices.IssueDeviceTokenAction": {
+    "type": "object",
+    "description": "Issue a JWT for a device with user-defined claims.\n\n**Note: Only use this action for integration with external systems.**",
+    "properties": {
+      "deviceId": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceId"
+      },
+      "validForSecs": {
+        "type": "integer",
+        "format": "uint32"
+      },
+      "claims": {
+        "$ref": "#/components/schemas/nexigon_api.json.JsonValue"
+      }
+    },
+    "required": [
+      "deviceId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.devices.IssueDeviceTokenOutput": {
+    "type": "object",
+    "description": "Output of issuing a JWT for a device.",
+    "properties": {
+      "jwt": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "jwt"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.devices.PublishDeviceEventsAction": {
+    "type": "object",
+    "description": "Publish device events.",
+    "properties": {
+      "deviceId": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceId"
+      },
+      "events": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.devices.DeviceEvent"
+        }
+      }
+    },
+    "required": [
+      "deviceId",
+      "events"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.devices.QueryDeviceEventsAction": {
+    "type": "object",
+    "description": "Query device events.",
+    "properties": {
+      "deviceId": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceId"
+      },
+      "limit": {
+        "type": "integer",
+        "format": "uint32"
+      }
+    },
+    "required": [
+      "deviceId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.devices.QueryDeviceEventsOutput": {
+    "type": "object",
+    "description": "Output of querying device events.",
+    "properties": {
+      "events": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.devices.DeviceEvent"
+        }
+      }
+    },
+    "required": [
+      "events"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.devices.QueryDevicesAction": {
+    "type": "object",
+    "description": "Query the devices of the instance.",
+    "properties": {},
+    "required": [],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.devices.QueryDevicesItem": {
+    "type": "object",
+    "description": "Device item.",
+    "properties": {
+      "deviceId": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceId"
+      },
+      "projectId": {
+        "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+      }
+    },
+    "required": [
+      "deviceId",
+      "projectId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.devices.QueryDevicesOutput": {
+    "type": "object",
+    "description": "Output of querying the devices of the instance.",
+    "properties": {
+      "devices": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.devices.QueryDevicesItem"
+        }
+      }
+    },
+    "required": [
+      "devices"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.devices.RegisterDeviceConnectionAction": {
+    "type": "object",
+    "description": "Register a connection of a device to a cluster node.",
+    "properties": {
+      "deviceId": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceId"
+      },
+      "nodeId": {
+        "$ref": "#/components/schemas/nexigon_api.cluster.ClusterNodeId"
+      }
+    },
+    "required": [
+      "deviceId",
+      "nodeId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.devices.RegisterDeviceConnectionOutput": {
+    "type": "object",
+    "description": "Output of registering a connection of a device to a cluster node.",
+    "properties": {
+      "connectionId": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceConnectionId"
+      }
+    },
+    "required": [
+      "connectionId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.devices.SetDeviceCertificateStatusAction": {
+    "type": "object",
+    "description": "Set the status of a device certificate.",
+    "properties": {
+      "certificateId": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceCertificateId"
+      },
+      "status": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceCertificateStatus"
+      }
+    },
+    "required": [
+      "certificateId",
+      "status"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.devices.SetDeviceMetadataAction": {
+    "type": "object",
+    "description": "Set the metadata of a device.",
+    "properties": {
+      "deviceId": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceId"
+      },
+      "metadata": {
+        "type": "object",
+        "additionalProperties": {
+          "$ref": "#/components/schemas/nexigon_api.json.JsonValue"
+        }
+      }
+    },
+    "required": [
+      "deviceId",
+      "metadata"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.devices.SetDeviceNameAction": {
+    "type": "object",
+    "description": "Set the name of a device.",
+    "properties": {
+      "deviceId": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceId"
+      },
+      "name": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "deviceId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.devices.UnregisterDeviceConnectionAction": {
+    "type": "object",
+    "description": "Unregister a connection of a device to a cluster node.",
+    "properties": {
+      "connectionId": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceConnectionId"
+      }
+    },
+    "required": [
+      "connectionId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.devices.ValidateDeviceHttpProxyTokenAction": {
+    "type": "object",
+    "description": "Validate a HTTP proxy JWT.",
+    "properties": {
+      "jwt": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "jwt"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.devices.ValidateDeviceHttpProxyTokenInvalid": {
+    "type": "object",
+    "description": "Validation of a HTTP proxy JWT failed.",
+    "properties": {
+      "redirect": {
+        "type": "string"
+      }
+    },
+    "required": [],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.devices.ValidateDeviceHttpProxyTokenOutput": {
+    "description": "Output of validating a HTTP proxy JWT.",
+    "oneOf": [
+      {
+        "type": "object",
+        "properties": {
+          "result": {
+            "const": "Invalid"
+          },
+          "redirect": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "result"
+        ]
+      },
+      {
+        "type": "object",
+        "properties": {
+          "result": {
+            "const": "Valid"
+          },
+          "deviceId": {
+            "$ref": "#/components/schemas/nexigon_api.devices.DeviceId"
+          },
+          "hostname": {
+            "type": "string"
+          },
+          "port": {}
+        },
+        "required": [
+          "result",
+          "deviceId"
+        ]
+      }
+    ]
+  },
+  "nexigon_api.devices.ValidateDeviceHttpProxyTokenSuccess": {
+    "type": "object",
+    "description": "Successful validation of a HTTP proxy JWT.",
+    "properties": {
+      "deviceId": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceId"
+      },
+      "hostname": {
+        "type": "string"
+      },
+      "port": {}
+    },
+    "required": [
+      "deviceId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.devices.ValidateDeviceTokenAction": {
+    "type": "object",
+    "description": "Validate a device JWT.\n\n**Note: Only use this action for integration with external systems.**",
+    "properties": {
+      "jwt": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "jwt"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.devices.ValidateDeviceTokenOutput": {
+    "description": "Output of validating a device JWT.",
+    "oneOf": [
+      {
+        "type": "object",
+        "properties": {
+          "result": {
+            "const": "Invalid"
+          }
+        },
+        "required": [
+          "result"
+        ]
+      },
+      {
+        "type": "object",
+        "properties": {
+          "result": {
+            "const": "Valid"
+          },
+          "deviceId": {
+            "$ref": "#/components/schemas/nexigon_api.devices.DeviceId"
+          },
+          "claims": {
+            "$ref": "#/components/schemas/nexigon_api.json.JsonValue"
+          }
+        },
+        "required": [
+          "result",
+          "deviceId",
+          "claims"
+        ]
+      }
+    ]
+  },
+  "nexigon_api.devices.ValidateDeviceTokenSuccess": {
+    "type": "object",
+    "description": "Successful validation of a device JWT.",
+    "properties": {
+      "deviceId": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceId"
+      },
+      "claims": {
+        "$ref": "#/components/schemas/nexigon_api.json.JsonValue"
+      }
+    },
+    "required": [
+      "deviceId",
+      "claims"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.digest.Digest": {
+    "type": [
+      "string"
+    ],
+    "description": "A hash digest."
+  },
+  "nexigon_api.errors.ActionError": {
+    "type": "object",
+    "description": "Action error.",
+    "properties": {
+      "kind": {
+        "$ref": "#/components/schemas/nexigon_api.errors.ActionErrorKind"
+      },
+      "message": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "kind",
+      "message"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.errors.ActionErrorKind": {
+    "enum": [
+      "Invalid",
+      "Forbidden",
+      "Internal"
+    ],
+    "description": "Kind of an action error."
+  },
+  "nexigon_api.instance.GetInstanceSettingsRawAction": {
+    "type": "object",
+    "description": "Get the settings of the instance.",
+    "properties": {},
+    "required": [],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.instance.GetInstanceSettingsRawOutput": {
+    "type": "object",
+    "description": "Settings of the instance.",
+    "properties": {
+      "settings": {
+        "type": "object",
+        "additionalProperties": {
+          "$ref": "#/components/schemas/nexigon_api.json.JsonValue"
+        }
+      }
+    },
+    "required": [
+      "settings"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.instance.GetInstanceStatisticsAction": {
+    "type": "object",
+    "description": "Get instance statistics.",
+    "properties": {},
+    "required": [],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.instance.GetInstanceStatisticsOutput": {
+    "type": "object",
+    "description": "Instance statistics.",
+    "properties": {
+      "users": {
+        "type": "integer",
+        "format": "uint32"
+      },
+      "projects": {
+        "type": "integer",
+        "format": "uint32"
+      },
+      "devices": {
+        "type": "integer",
+        "format": "uint32"
+      }
+    },
+    "required": [
+      "users",
+      "projects",
+      "devices"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.instance.SetInstanceSettingRawAction": {
+    "type": "object",
+    "description": "Set a setting of the instance.",
+    "properties": {
+      "key": {
+        "type": "string"
+      },
+      "value": {
+        "$ref": "#/components/schemas/nexigon_api.json.JsonValue"
+      }
+    },
+    "required": [
+      "key",
+      "value"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.json.JsonValue": {
+    "description": "JSON value."
+  },
+  "nexigon_api.outputs.Empty": {
+    "type": "object",
+    "description": "Empty output.",
+    "properties": {},
+    "required": [],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.projects.AddProjectMemberAction": {
+    "type": "object",
+    "description": "Add a user to a project.",
+    "properties": {
+      "projectId": {
+        "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+      },
+      "userId": {
+        "$ref": "#/components/schemas/nexigon_api.users.UserId"
+      },
+      "isOwner": {
+        "type": "boolean"
+      }
+    },
+    "required": [
+      "projectId",
+      "userId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.projects.CreateDeploymentTokenAction": {
+    "type": "object",
+    "description": "Create a deployment token.",
+    "properties": {
+      "projectId": {
+        "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+      },
+      "name": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "projectId",
+      "name"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.projects.CreateDeploymentTokenOutput": {
+    "type": "object",
+    "description": "Output of creating a deployment token.",
+    "properties": {
+      "tokenId": {
+        "$ref": "#/components/schemas/nexigon_api.projects.DeploymentTokenId"
+      },
+      "token": {
+        "$ref": "#/components/schemas/nexigon_api.projects.DeploymentToken"
+      }
+    },
+    "required": [
+      "tokenId",
+      "token"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.projects.CreateProjectAction": {
+    "type": "object",
+    "description": "Create a new project.",
+    "properties": {
+      "name": {
+        "type": "string"
+      },
+      "owner": {
+        "$ref": "#/components/schemas/nexigon_api.users.UserId"
+      }
+    },
+    "required": [
+      "name"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.projects.CreateProjectOutput": {
+    "description": "Output of creating a project.",
+    "oneOf": [
+      {
+        "type": "object",
+        "properties": {
+          "result": {
+            "const": "Created"
+          },
+          "projectId": {
+            "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+          }
+        },
+        "required": [
+          "result",
+          "projectId"
+        ]
+      }
+    ]
+  },
+  "nexigon_api.projects.CreateProjectSuccess": {
+    "type": "object",
+    "description": "Project creation has been successful.",
+    "properties": {
+      "projectId": {
+        "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+      }
+    },
+    "required": [
+      "projectId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.projects.DeleteDeploymentTokenAction": {
+    "type": "object",
+    "description": "Delete a deployment token.",
+    "properties": {
+      "tokenId": {
+        "$ref": "#/components/schemas/nexigon_api.projects.DeploymentTokenId"
+      }
+    },
+    "required": [
+      "tokenId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.projects.DeleteProjectAction": {
+    "type": "object",
+    "description": "Delete a project.",
+    "properties": {
+      "projectId": {
+        "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+      }
+    },
+    "required": [
+      "projectId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.projects.DeploymentToken": {
+    "type": [
+      "string"
+    ],
+    "description": "Deployment token."
+  },
+  "nexigon_api.projects.DeploymentTokenId": {
+    "type": [
+      "string"
+    ],
+    "description": "Unique ID of a deployment token."
+  },
+  "nexigon_api.projects.GetProjectDetailsAction": {
+    "type": "object",
+    "description": "Get information about a project.",
+    "properties": {
+      "projectId": {
+        "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+      }
+    },
+    "required": [
+      "projectId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.projects.GetProjectDetailsOutput": {
+    "type": "object",
+    "description": "Information about a project.",
+    "properties": {
+      "projectId": {
+        "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+      },
+      "name": {
+        "type": "string"
+      },
+      "deviceCount": {
+        "type": "integer",
+        "format": "uint32"
+      }
+    },
+    "required": [
+      "projectId",
+      "name",
+      "deviceCount"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.projects.ProjectId": {
+    "type": [
+      "string"
+    ],
+    "description": "Unique ID of a project."
+  },
+  "nexigon_api.projects.QueryProjectDeploymentTokensAction": {
+    "type": "object",
+    "description": "Query the deployment tokens of a project.",
+    "properties": {
+      "projectId": {
+        "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+      }
+    },
+    "required": [
+      "projectId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.projects.QueryProjectDeploymentTokensItem": {
+    "type": "object",
+    "description": "Deployment token item.",
+    "properties": {
+      "tokenId": {
+        "$ref": "#/components/schemas/nexigon_api.projects.DeploymentTokenId"
+      },
+      "createdAt": {
+        "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
+      },
+      "name": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "tokenId",
+      "createdAt"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.projects.QueryProjectDeploymentTokensOutput": {
+    "type": "object",
+    "description": "Output of querying the deployment tokens of a project.",
+    "properties": {
+      "tokens": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.projects.QueryProjectDeploymentTokensItem"
+        }
+      }
+    },
+    "required": [
+      "tokens"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.projects.QueryProjectDevicesAction": {
+    "type": "object",
+    "description": "Query the devices of a project.",
+    "properties": {
+      "projectId": {
+        "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+      }
+    },
+    "required": [
+      "projectId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.projects.QueryProjectDevicesItem": {
+    "type": "object",
+    "description": "Device item.",
+    "properties": {
+      "deviceId": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceId"
+      },
+      "name": {
+        "type": "string"
+      },
+      "firstSeen": {
+        "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
+      },
+      "isConnected": {
+        "type": "boolean"
+      },
+      "pendingCertificatesCount": {
+        "type": "integer",
+        "format": "uint32"
+      }
+    },
+    "required": [
+      "deviceId",
+      "firstSeen",
+      "isConnected",
+      "pendingCertificatesCount"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.projects.QueryProjectDevicesOutput": {
+    "type": "object",
+    "description": "Output of querying the devices of a project.",
+    "properties": {
+      "devices": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.projects.QueryProjectDevicesItem"
+        }
+      }
+    },
+    "required": [
+      "devices"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.projects.QueryProjectMembersAction": {
+    "type": "object",
+    "description": "Query the members of a project.",
+    "properties": {
+      "projectId": {
+        "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+      }
+    },
+    "required": [
+      "projectId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.projects.QueryProjectMembersItem": {
+    "type": "object",
+    "description": "Member item.",
+    "properties": {
+      "userId": {
+        "$ref": "#/components/schemas/nexigon_api.users.UserId"
+      },
+      "displayName": {
+        "type": "string"
+      },
+      "email": {
+        "type": "string"
+      },
+      "isOwner": {
+        "type": "boolean"
+      }
+    },
+    "required": [
+      "userId",
+      "email",
+      "isOwner"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.projects.QueryProjectMembersOutput": {
+    "type": "object",
+    "description": "Output of querying the members of a project.",
+    "properties": {
+      "users": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.projects.QueryProjectMembersItem"
+        }
+      }
+    },
+    "required": [
+      "users"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.projects.QueryProjectsAction": {
+    "type": "object",
+    "description": "Query the projects of the instance.",
+    "properties": {},
+    "required": [],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.projects.QueryProjectsItem": {
+    "type": "object",
+    "description": "Project item.",
+    "properties": {
+      "projectId": {
+        "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+      },
+      "name": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "projectId",
+      "name"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.projects.QueryProjectsOutput": {
+    "type": "object",
+    "description": "Output of querying the projects of the instance.",
+    "properties": {
+      "projects": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.projects.QueryProjectsItem"
+        }
+      }
+    },
+    "required": [
+      "projects"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.projects.RemoveProjectMemberAction": {
+    "type": "object",
+    "description": "Remove a user from a project.",
+    "properties": {
+      "projectId": {
+        "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+      },
+      "userId": {
+        "$ref": "#/components/schemas/nexigon_api.users.UserId"
+      }
+    },
+    "required": [
+      "projectId",
+      "userId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.repositories.AddPackageVersionAssetAction": {
+    "type": "object",
+    "description": "Add an assert to a package version.",
+    "properties": {
+      "versionId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.PackageVersionId"
+      },
+      "assetId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryAssetId"
+      },
+      "filename": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "versionId",
+      "assetId",
+      "filename"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.repositories.AddPackageVersionAssetOutput": {
+    "enum": [
+      {
+        "result": "FilenameAlreadyExists"
+      },
+      {
+        "result": "Added"
+      }
+    ],
+    "description": "Output of adding an asset to a package version."
+  },
+  "nexigon_api.repositories.AddRepositoryMemberAction": {
+    "type": "object",
+    "description": "Add a user to a repository.",
+    "properties": {
+      "repositoryId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryId"
+      },
+      "userId": {
+        "$ref": "#/components/schemas/nexigon_api.users.UserId"
+      },
+      "isOwner": {
+        "type": "boolean"
+      }
+    },
+    "required": [
+      "repositoryId",
+      "userId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.repositories.AddTagItem": {
+    "type": "object",
+    "description": "Add tag item.",
+    "properties": {
+      "tag": {
+        "type": "string"
+      },
+      "locked": {
+        "type": "boolean"
+      },
+      "reassign": {
+        "type": "boolean"
+      }
+    },
+    "required": [
+      "tag"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.repositories.CreateAssetAction": {
+    "type": "object",
+    "description": "Create an asset.",
+    "properties": {
+      "repositoryId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryId"
+      },
+      "size": {
+        "type": "integer",
+        "format": "uint64"
+      },
+      "digest": {
+        "$ref": "#/components/schemas/nexigon_api.digest.Digest"
+      }
+    },
+    "required": [
+      "repositoryId",
+      "size",
+      "digest"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.repositories.CreateAssetOutput": {
+    "description": "Output of creating an asset.",
+    "oneOf": [
+      {
+        "type": "object",
+        "properties": {
+          "result": {
+            "const": "AssetAlreadyExists"
+          },
+          "assetId": {
+            "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryAssetId"
+          }
+        }
+      },
+      {
+        "type": "object",
+        "properties": {
+          "result": {
+            "const": "Created"
+          },
+          "assetId": {
+            "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryAssetId"
+          }
+        }
+      }
+    ]
+  },
+  "nexigon_api.repositories.CreatePackageAction": {
+    "type": "object",
+    "description": "Create a new package.",
+    "properties": {
+      "repositoryId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryId"
+      },
+      "name": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "repositoryId",
+      "name"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.repositories.CreatePackageOutput": {
+    "description": "Output of creating a package.",
+    "oneOf": [
+      {
+        "type": "object",
+        "properties": {
+          "result": {
+            "const": "NameAlreadyExists"
+          }
+        },
+        "required": [
+          "result"
+        ]
+      },
+      {
+        "type": "object",
+        "properties": {
+          "result": {
+            "const": "Created"
+          },
+          "packageId": {
+            "$ref": "#/components/schemas/nexigon_api.repositories.PackageId"
+          }
+        },
+        "required": [
+          "result",
+          "packageId"
+        ]
+      }
+    ]
+  },
+  "nexigon_api.repositories.CreatePackageSuccess": {
+    "type": "object",
+    "description": "Successfully created a package.",
+    "properties": {
+      "packageId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.PackageId"
+      }
+    },
+    "required": [
+      "packageId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.repositories.CreatePackageVersionAction": {
+    "type": "object",
+    "description": "Create a new package version.",
+    "properties": {
+      "packageId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.PackageId"
+      },
+      "tags": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.repositories.AddTagItem"
+        }
+      }
+    },
+    "required": [
+      "packageId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.repositories.CreatePackageVersionOutput": {
+    "description": "Output of creating a package version.",
+    "oneOf": [
+      {
+        "type": "object",
+        "properties": {
+          "result": {
+            "const": "Created"
+          },
+          "versionId": {
+            "$ref": "#/components/schemas/nexigon_api.repositories.PackageVersionId"
+          }
+        },
+        "required": [
+          "result",
+          "versionId"
+        ]
+      }
+    ]
+  },
+  "nexigon_api.repositories.CreatePackageVersionSuccess": {
+    "type": "object",
+    "description": "Package version creation has been successful.",
+    "properties": {
+      "versionId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.PackageVersionId"
+      }
+    },
+    "required": [
+      "versionId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.repositories.CreateRepositoryAction": {
+    "type": "object",
+    "description": "Create a new repository.",
+    "properties": {
+      "name": {
+        "type": "string"
+      },
+      "owner": {
+        "$ref": "#/components/schemas/nexigon_api.users.UserId"
+      },
+      "visibility": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryVisibility"
+      }
+    },
+    "required": [
+      "name"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.repositories.CreateRepositoryOutput": {
+    "description": "Output of creating a repository.",
+    "oneOf": [
+      {
+        "type": "object",
+        "properties": {
+          "result": {
+            "const": "NameAlreadyExists"
+          }
+        },
+        "required": [
+          "result"
+        ]
+      },
+      {
+        "type": "object",
+        "properties": {
+          "result": {
+            "const": "Created"
+          },
+          "repositoryId": {
+            "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryId"
+          }
+        },
+        "required": [
+          "result",
+          "repositoryId"
+        ]
+      }
+    ]
+  },
+  "nexigon_api.repositories.CreateRepositorySuccess": {
+    "type": "object",
+    "description": "Successfully created a repository.",
+    "properties": {
+      "repositoryId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryId"
+      }
+    },
+    "required": [
+      "repositoryId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.repositories.DeleteAssetAction": {
+    "type": "object",
+    "description": "Delete an asset.",
+    "properties": {
+      "assetId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryAssetId"
+      }
+    },
+    "required": [
+      "assetId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.repositories.DeletePackageAction": {
+    "type": "object",
+    "description": "Delete a package.",
+    "properties": {
+      "packageId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.PackageId"
+      }
+    },
+    "required": [
+      "packageId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.repositories.DeletePackageVersionAction": {
+    "type": "object",
+    "description": "Delete a package version.",
+    "properties": {
+      "versionId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.PackageVersionId"
+      }
+    },
+    "required": [
+      "versionId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.repositories.DeleteRepositoryAction": {
+    "type": "object",
+    "description": "Delete a repository.",
+    "properties": {
+      "repositoryId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryId"
+      }
+    },
+    "required": [
+      "repositoryId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.repositories.GetAssetDetailsAction": {
+    "type": "object",
+    "description": "Get information about an asset.",
+    "properties": {
+      "assetId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryAssetId"
+      }
+    },
+    "required": [
+      "assetId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.repositories.GetAssetDetailsOutput": {
+    "type": "object",
+    "description": "Output of getting information about an asset.",
+    "properties": {
+      "assetId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryAssetId"
+      },
+      "size": {
+        "type": "integer",
+        "format": "uint64"
+      },
+      "digest": {
+        "$ref": "#/components/schemas/nexigon_api.digest.Digest"
+      },
+      "status": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryAssetStatus"
+      },
+      "referenceCount": {
+        "type": "integer",
+        "format": "uint64"
+      }
+    },
+    "required": [
+      "assetId",
+      "size",
+      "digest",
+      "status",
+      "referenceCount"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.repositories.GetPackageDetailsAction": {
+    "type": "object",
+    "description": "Get information about a package.",
+    "properties": {
+      "packageId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.PackageId"
+      }
+    },
+    "required": [
+      "packageId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.repositories.GetPackageDetailsOutput": {
+    "type": "object",
+    "description": "Output of getting information about a package.",
+    "properties": {
+      "packageId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.PackageId"
+      },
+      "name": {
+        "type": "string"
+      },
+      "versionCount": {
+        "type": "integer",
+        "format": "uint64"
+      }
+    },
+    "required": [
+      "packageId",
+      "name",
+      "versionCount"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.repositories.GetPackageVersionDetailsAction": {
+    "type": "object",
+    "description": "Get information about a package version.",
+    "properties": {
+      "versionId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.PackageVersionId"
+      }
+    },
+    "required": [
+      "versionId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.repositories.GetPackageVersionDetailsOutput": {
+    "type": "object",
+    "description": "Output of getting information about a package version.",
+    "properties": {
+      "versionId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.PackageVersionId"
+      },
+      "repositoryId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryId"
+      },
+      "packageId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.PackageId"
+      },
+      "assets": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.repositories.PackageVersionAsset"
+        }
+      },
+      "tags": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.repositories.PackageVersionTag"
+        }
+      }
+    },
+    "required": [
+      "versionId",
+      "repositoryId",
+      "packageId",
+      "assets",
+      "tags"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.repositories.GetRepositoryDetailsAction": {
+    "type": "object",
+    "description": "Get information about a repository.",
+    "properties": {
+      "repositoryId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryId"
+      }
+    },
+    "required": [
+      "repositoryId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.repositories.GetRepositoryDetailsOutput": {
+    "type": "object",
+    "description": "Output of getting information about a repository.",
+    "properties": {
+      "repositoryId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryId"
+      },
+      "name": {
+        "type": "string"
+      },
+      "visibility": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryVisibility"
+      },
+      "packageCount": {
+        "type": "integer",
+        "format": "uint64"
+      },
+      "assetCount": {
+        "type": "integer",
+        "format": "uint64"
+      }
+    },
+    "required": [
+      "repositoryId",
+      "name",
+      "visibility",
+      "packageCount",
+      "assetCount"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.repositories.IssueAssetDownloadUrlAction": {
+    "type": "object",
+    "description": "Issue a URL for downloading an asset.",
+    "properties": {
+      "assetId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryAssetId"
+      },
+      "filename": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "assetId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.repositories.IssueAssetDownloadUrlOutput": {
+    "type": "object",
+    "description": "Output of issuing a URL for downloading an asset.",
+    "properties": {
+      "url": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "url"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.repositories.IssueAssetUploadUrlAction": {
+    "type": "object",
+    "description": "Issue a URL for uploading an asset.",
+    "properties": {
+      "assetId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryAssetId"
+      }
+    },
+    "required": [
+      "assetId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.repositories.IssueAssetUploadUrlOutput": {
+    "type": "object",
+    "description": "Output of issuing a URL for uploading an asset.",
+    "properties": {
+      "url": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "url"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.repositories.PackageId": {
+    "type": [
+      "string"
+    ],
+    "description": "Unique ID of a package."
+  },
+  "nexigon_api.repositories.PackageVersionAsset": {
+    "type": "object",
+    "description": "Package version asset.",
+    "properties": {
+      "filename": {
+        "type": "string"
+      },
+      "assetId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryAssetId"
+      },
+      "size": {
+        "type": "integer",
+        "format": "uint64"
+      },
+      "digest": {
+        "$ref": "#/components/schemas/nexigon_api.digest.Digest"
+      },
+      "status": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryAssetStatus"
+      }
+    },
+    "required": [
+      "filename",
+      "assetId",
+      "size",
+      "digest",
+      "status"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.repositories.PackageVersionId": {
+    "type": [
+      "string"
+    ],
+    "description": "Unique ID of a package version."
+  },
+  "nexigon_api.repositories.PackageVersionTag": {
+    "type": "object",
+    "description": "Package version tag.",
+    "properties": {
+      "tag": {
+        "type": "string"
+      },
+      "locked": {
+        "type": "boolean"
+      }
+    },
+    "required": [
+      "tag",
+      "locked"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.repositories.QueryPackageVersionsAction": {
+    "type": "object",
+    "description": "Query the versions of a package.",
+    "properties": {
+      "packageId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.PackageId"
+      }
+    },
+    "required": [
+      "packageId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.repositories.QueryPackageVersionsItem": {
+    "type": "object",
+    "description": "Package version query item.",
+    "properties": {
+      "versionId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.PackageVersionId"
+      },
+      "createdAt": {
+        "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
+      },
+      "tags": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.repositories.PackageVersionTag"
+        }
+      }
+    },
+    "required": [
+      "versionId",
+      "createdAt",
+      "tags"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.repositories.QueryPackageVersionsOutput": {
+    "type": "object",
+    "description": "Output of querying the versions of a package.",
+    "properties": {
+      "versions": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.repositories.QueryPackageVersionsItem"
+        }
+      }
+    },
+    "required": [
+      "versions"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.repositories.QueryRepositoryAssetsAction": {
+    "type": "object",
+    "description": "Query the assets of a repository.",
+    "properties": {
+      "repositoryId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryId"
+      }
+    },
+    "required": [
+      "repositoryId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.repositories.QueryRepositoryAssetsItem": {
+    "type": "object",
+    "description": "Asset query item.",
+    "properties": {
+      "assetId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryAssetId"
+      },
+      "size": {
+        "type": "integer",
+        "format": "uint64"
+      },
+      "digest": {
+        "$ref": "#/components/schemas/nexigon_api.digest.Digest"
+      }
+    },
+    "required": [
+      "assetId",
+      "size",
+      "digest"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.repositories.QueryRepositoryAssetsOutput": {
+    "type": "object",
+    "description": "Output of querying the assets of a repository.",
+    "properties": {
+      "assets": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.repositories.QueryRepositoryAssetsItem"
+        }
+      }
+    },
+    "required": [
+      "assets"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.repositories.QueryRepositoryMembersAction": {
+    "type": "object",
+    "description": "Query the members of a repository.",
+    "properties": {
+      "repositoryId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryId"
+      }
+    },
+    "required": [
+      "repositoryId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.repositories.QueryRepositoryMembersItem": {
+    "type": "object",
+    "description": "Member query item.",
+    "properties": {
+      "userId": {
+        "$ref": "#/components/schemas/nexigon_api.users.UserId"
+      },
+      "email": {
+        "type": "string"
+      },
+      "displayName": {
+        "type": "string"
+      },
+      "isOwner": {
+        "type": "boolean"
+      }
+    },
+    "required": [
+      "userId",
+      "email",
+      "isOwner"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.repositories.QueryRepositoryMembersOutput": {
+    "type": "object",
+    "description": "Output of querying the members of a repository.",
+    "properties": {
+      "members": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.repositories.QueryRepositoryMembersItem"
+        }
+      }
+    },
+    "required": [
+      "members"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.repositories.QueryRepositoryPackagesAction": {
+    "type": "object",
+    "description": "Query the packages of a repository.",
+    "properties": {
+      "repositoryId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryId"
+      }
+    },
+    "required": [
+      "repositoryId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.repositories.QueryRepositoryPackagesItem": {
+    "type": "object",
+    "description": "Package query item.",
+    "properties": {
+      "packageId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.PackageId"
+      },
+      "name": {
+        "type": "string"
+      },
+      "createdAt": {
+        "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
+      }
+    },
+    "required": [
+      "packageId",
+      "name",
+      "createdAt"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.repositories.QueryRepositoryPackagesOutput": {
+    "type": "object",
+    "description": "Output of querying the packages of a repository.",
+    "properties": {
+      "packages": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.repositories.QueryRepositoryPackagesItem"
+        }
+      }
+    },
+    "required": [
+      "packages"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.repositories.RemovePackageVersionAssetAction": {
+    "type": "object",
+    "description": "Remove an asset from a package version.",
+    "properties": {
+      "versionId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.PackageVersionId"
+      },
+      "filename": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "versionId",
+      "filename"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.repositories.RemoveRepositoryMemberAction": {
+    "type": "object",
+    "description": "Remove a user from a repository.",
+    "properties": {
+      "repositoryId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryId"
+      },
+      "userId": {
+        "$ref": "#/components/schemas/nexigon_api.users.UserId"
+      }
+    },
+    "required": [
+      "repositoryId",
+      "userId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.repositories.RemoveTagItem": {
+    "type": "object",
+    "description": "Remove tag item.",
+    "properties": {
+      "tag": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "tag"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.repositories.RepositoryAssetId": {
+    "type": [
+      "string"
+    ],
+    "description": "Unique ID of a repository asset."
+  },
+  "nexigon_api.repositories.RepositoryAssetStatus": {
+    "enum": [
+      "Dangling",
+      "Available",
+      "Deleting"
+    ],
+    "description": "Asset status."
+  },
+  "nexigon_api.repositories.RepositoryId": {
+    "type": [
+      "string"
+    ],
+    "description": "Unique ID of a repository."
+  },
+  "nexigon_api.repositories.RepositoryVisibility": {
+    "enum": [
+      "Public",
+      "Private"
+    ],
+    "description": "Repository visibility."
+  },
+  "nexigon_api.repositories.ResolvePackageByPathAction": {
+    "type": "object",
+    "description": "Resolve a package by its path.",
+    "properties": {
+      "repository": {
+        "type": "string"
+      },
+      "package": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "repository",
+      "package"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.repositories.ResolvePackageByPathOutput": {
+    "description": "Output of resolving a package by its path.",
+    "oneOf": [
+      {
+        "type": "object",
+        "properties": {
+          "result": {
+            "const": "Found"
+          },
+          "repositoryId": {
+            "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryId"
+          },
+          "packageId": {
+            "$ref": "#/components/schemas/nexigon_api.repositories.PackageId"
+          }
+        },
+        "required": [
+          "result",
+          "repositoryId",
+          "packageId"
+        ]
+      },
+      {
+        "type": "object",
+        "properties": {
+          "result": {
+            "const": "NotFound"
+          }
+        },
+        "required": [
+          "result"
+        ]
+      }
+    ]
+  },
+  "nexigon_api.repositories.ResolvePackageByPathSuccess": {
+    "type": "object",
+    "description": "Successfully resolved package by path.",
+    "properties": {
+      "repositoryId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryId"
+      },
+      "packageId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.PackageId"
+      }
+    },
+    "required": [
+      "repositoryId",
+      "packageId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.repositories.ResolvePackageVersionAssetByPathAction": {
+    "type": "object",
+    "description": "Resolve a version asset by its path.",
+    "properties": {
+      "repository": {
+        "type": "string"
+      },
+      "package": {
+        "type": "string"
+      },
+      "tag": {
+        "type": "string"
+      },
+      "filename": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "repository",
+      "package",
+      "tag",
+      "filename"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.repositories.ResolvePackageVersionAssetByPathOutput": {
+    "description": "Output of resolving a version asset by its path.",
+    "oneOf": [
+      {
+        "type": "object",
+        "properties": {
+          "result": {
+            "const": "Found"
+          },
+          "repositoryId": {
+            "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryId"
+          },
+          "packageId": {
+            "$ref": "#/components/schemas/nexigon_api.repositories.PackageId"
+          },
+          "versionId": {
+            "$ref": "#/components/schemas/nexigon_api.repositories.PackageVersionId"
+          },
+          "assetId": {
+            "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryAssetId"
+          }
+        },
+        "required": [
+          "result",
+          "repositoryId",
+          "packageId",
+          "versionId",
+          "assetId"
+        ]
+      },
+      {
+        "type": "object",
+        "properties": {
+          "result": {
+            "const": "NotFound"
+          }
+        },
+        "required": [
+          "result"
+        ]
+      }
+    ]
+  },
+  "nexigon_api.repositories.ResolvePackageVersionAssetByPathSuccess": {
+    "type": "object",
+    "description": "Successfully resolved version asset by path.",
+    "properties": {
+      "repositoryId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryId"
+      },
+      "packageId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.PackageId"
+      },
+      "versionId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.PackageVersionId"
+      },
+      "assetId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryAssetId"
+      }
+    },
+    "required": [
+      "repositoryId",
+      "packageId",
+      "versionId",
+      "assetId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.repositories.ResolvePackageVersionByPathAction": {
+    "type": "object",
+    "description": "Resolve a package version by its path.",
+    "properties": {
+      "repository": {
+        "type": "string"
+      },
+      "package": {
+        "type": "string"
+      },
+      "tag": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "repository",
+      "package",
+      "tag"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.repositories.ResolvePackageVersionByPathOutput": {
+    "description": "Output of resolving a package version by its path.",
+    "oneOf": [
+      {
+        "type": "object",
+        "properties": {
+          "result": {
+            "const": "Found"
+          },
+          "repositoryId": {
+            "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryId"
+          },
+          "packageId": {
+            "$ref": "#/components/schemas/nexigon_api.repositories.PackageId"
+          },
+          "versionId": {
+            "$ref": "#/components/schemas/nexigon_api.repositories.PackageVersionId"
+          }
+        },
+        "required": [
+          "result",
+          "repositoryId",
+          "packageId",
+          "versionId"
+        ]
+      },
+      {
+        "type": "object",
+        "properties": {
+          "result": {
+            "const": "NotFound"
+          }
+        },
+        "required": [
+          "result"
+        ]
+      }
+    ]
+  },
+  "nexigon_api.repositories.ResolvePackageVersionByPathSuccess": {
+    "type": "object",
+    "description": "Successfully resolved package version by path.",
+    "properties": {
+      "repositoryId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryId"
+      },
+      "packageId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.PackageId"
+      },
+      "versionId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.PackageVersionId"
+      }
+    },
+    "required": [
+      "repositoryId",
+      "packageId",
+      "versionId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.repositories.ResolveRepositoryNameAction": {
+    "type": "object",
+    "description": "Resolve a repository by its name.",
+    "properties": {
+      "repository": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "repository"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.repositories.ResolveRepositoryNameOutput": {
+    "description": "Output of resolving a repository by its name.",
+    "oneOf": [
+      {
+        "type": "object",
+        "properties": {
+          "result": {
+            "const": "Found"
+          },
+          "repositoryId": {
+            "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryId"
+          }
+        }
+      },
+      {
+        "type": "object",
+        "properties": {
+          "result": {
+            "const": "NotFound"
+          }
+        },
+        "required": [
+          "result"
+        ]
+      }
+    ]
+  },
+  "nexigon_api.repositories.SetRepositoryVisibilityAction": {
+    "type": "object",
+    "description": "Set the visibility of a repository.",
+    "properties": {
+      "repositoryId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryId"
+      },
+      "visibility": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryVisibility"
+      }
+    },
+    "required": [
+      "repositoryId",
+      "visibility"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.repositories.TagPackageVersionAction": {
+    "type": "object",
+    "description": "Add tags to a version.",
+    "properties": {
+      "versionId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.PackageVersionId"
+      },
+      "tags": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.repositories.AddTagItem"
+        }
+      }
+    },
+    "required": [
+      "versionId",
+      "tags"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.repositories.UntagPackageVersionAction": {
+    "type": "object",
+    "description": "Remove tags from a version.",
+    "properties": {
+      "versionId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.PackageVersionId"
+      },
+      "tags": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.repositories.RemoveTagItem"
+        }
+      }
+    },
+    "required": [
+      "versionId",
+      "tags"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.users.AuthenticateWithSessionTokenAction": {
+    "type": "object",
+    "description": "Authenticate a user with a session token.",
+    "properties": {
+      "token": {
+        "$ref": "#/components/schemas/nexigon_api.users.UserSessionToken"
+      }
+    },
+    "required": [
+      "token"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.users.AuthenticateWithSessionTokenOutput": {
+    "description": "Output of authenticating a user with a session token.",
+    "oneOf": [
+      {
+        "type": "object",
+        "properties": {
+          "result": {
+            "const": "Invalid"
+          }
+        },
+        "required": [
+          "result"
+        ]
+      },
+      {
+        "type": "object",
+        "properties": {
+          "result": {
+            "const": "Authenticated"
+          },
+          "userId": {
+            "$ref": "#/components/schemas/nexigon_api.users.UserId"
+          },
+          "sessionId": {
+            "$ref": "#/components/schemas/nexigon_api.users.UserSessionId"
+          },
+          "actor": {
+            "$ref": "#/components/schemas/nexigon_api.actor.Actor"
+          }
+        },
+        "required": [
+          "result",
+          "userId",
+          "sessionId",
+          "actor"
+        ]
+      }
+    ]
+  },
+  "nexigon_api.users.AuthenticateWithSessionTokenSuccess": {
+    "type": "object",
+    "description": "Authentication with session token has been successful.",
+    "properties": {
+      "userId": {
+        "$ref": "#/components/schemas/nexigon_api.users.UserId"
+      },
+      "sessionId": {
+        "$ref": "#/components/schemas/nexigon_api.users.UserSessionId"
+      },
+      "actor": {
+        "$ref": "#/components/schemas/nexigon_api.actor.Actor"
+      }
+    },
+    "required": [
+      "userId",
+      "sessionId",
+      "actor"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.users.AuthenticateWithUserTokenAction": {
+    "type": "object",
+    "description": "Authenticate a user with a token.",
+    "properties": {
+      "token": {
+        "$ref": "#/components/schemas/nexigon_api.users.UserToken"
+      }
+    },
+    "required": [
+      "token"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.users.AuthenticateWithUserTokenOutput": {
+    "description": "Output of authenticating a user with a token.",
+    "oneOf": [
+      {
+        "type": "object",
+        "properties": {
+          "result": {
+            "const": "Invalid"
+          }
+        },
+        "required": [
+          "result"
+        ]
+      },
+      {
+        "type": "object",
+        "properties": {
+          "result": {
+            "const": "Authenticated"
+          },
+          "userId": {
+            "$ref": "#/components/schemas/nexigon_api.users.UserId"
+          },
+          "actor": {
+            "$ref": "#/components/schemas/nexigon_api.actor.Actor"
+          }
+        },
+        "required": [
+          "result",
+          "userId",
+          "actor"
+        ]
+      }
+    ]
+  },
+  "nexigon_api.users.AuthenticateWithUserTokenSuccess": {
+    "type": "object",
+    "description": "Authentication with user token has been successful.",
+    "properties": {
+      "userId": {
+        "$ref": "#/components/schemas/nexigon_api.users.UserId"
+      },
+      "actor": {
+        "$ref": "#/components/schemas/nexigon_api.actor.Actor"
+      }
+    },
+    "required": [
+      "userId",
+      "actor"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.users.CleanupExpiredUserSessionsAction": {
+    "type": "object",
+    "description": "Cleanup expired user sessions.",
+    "properties": {},
+    "required": [],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.users.CreateUserAction": {
+    "type": "object",
+    "description": "Create a new user.",
+    "properties": {
+      "email": {
+        "type": "string"
+      },
+      "displayName": {
+        "type": "string"
+      },
+      "password": {
+        "type": "string"
+      },
+      "isAdmin": {
+        "type": "boolean"
+      }
+    },
+    "required": [
+      "email"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.users.CreateUserOutput": {
+    "description": "Output of creating a user.",
+    "oneOf": [
+      {
+        "type": "object",
+        "properties": {
+          "result": {
+            "const": "Created"
+          },
+          "userId": {
+            "$ref": "#/components/schemas/nexigon_api.users.UserId"
+          }
+        },
+        "required": [
+          "result",
+          "userId"
+        ]
+      },
+      {
+        "type": "object",
+        "properties": {
+          "result": {
+            "const": "EmailAlreadyExists"
+          }
+        },
+        "required": [
+          "result"
+        ]
+      }
+    ]
+  },
+  "nexigon_api.users.CreateUserSuccess": {
+    "type": "object",
+    "description": "User was created successfully.",
+    "properties": {
+      "userId": {
+        "$ref": "#/components/schemas/nexigon_api.users.UserId"
+      }
+    },
+    "required": [
+      "userId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.users.CreateUserTokenAction": {
+    "type": "object",
+    "description": "Create a user token.",
+    "properties": {
+      "userId": {
+        "$ref": "#/components/schemas/nexigon_api.users.UserId"
+      },
+      "name": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "userId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.users.CreateUserTokenOutput": {
+    "type": "object",
+    "description": "Output of creating a user token.",
+    "properties": {
+      "tokenId": {
+        "$ref": "#/components/schemas/nexigon_api.users.UserTokenId"
+      },
+      "token": {
+        "$ref": "#/components/schemas/nexigon_api.users.UserToken"
+      }
+    },
+    "required": [
+      "tokenId",
+      "token"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.users.DeleteUserAction": {
+    "type": "object",
+    "description": "Delete a user.",
+    "properties": {
+      "userId": {
+        "$ref": "#/components/schemas/nexigon_api.users.UserId"
+      }
+    },
+    "required": [
+      "userId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.users.DeleteUserTokenAction": {
+    "type": "object",
+    "description": "Delete a user token.",
+    "properties": {
+      "tokenId": {
+        "$ref": "#/components/schemas/nexigon_api.users.UserTokenId"
+      }
+    },
+    "required": [
+      "tokenId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.users.GetUserDetailsAction": {
+    "type": "object",
+    "description": "Get information about a user.",
+    "properties": {
+      "userId": {
+        "$ref": "#/components/schemas/nexigon_api.users.UserId"
+      }
+    },
+    "required": [
+      "userId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.users.GetUserDetailsOutput": {
+    "type": "object",
+    "description": "Information about the user.",
+    "properties": {
+      "userId": {
+        "$ref": "#/components/schemas/nexigon_api.users.UserId"
+      },
+      "email": {
+        "type": "string"
+      },
+      "displayName": {
+        "type": "string"
+      },
+      "isAdmin": {
+        "type": "boolean"
+      }
+    },
+    "required": [
+      "userId",
+      "email",
+      "isAdmin"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.users.InitiateUserSessionAction": {
+    "type": "object",
+    "description": "Initiate a user session.",
+    "properties": {
+      "email": {
+        "type": "string"
+      },
+      "password": {
+        "type": "string"
+      },
+      "userAgent": {
+        "type": "string"
+      },
+      "validForSecs": {
+        "type": "integer",
+        "format": "uint32"
+      }
+    },
+    "required": [
+      "email",
+      "password",
+      "userAgent"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.users.InitiateUserSessionOutput": {
+    "description": "Output of initiating a user session.",
+    "oneOf": [
+      {
+        "type": "object",
+        "properties": {
+          "result": {
+            "const": "InvalidCredentials"
+          }
+        },
+        "required": [
+          "result"
+        ]
+      },
+      {
+        "type": "object",
+        "properties": {
+          "result": {
+            "const": "Created"
+          },
+          "userId": {
+            "$ref": "#/components/schemas/nexigon_api.users.UserId"
+          },
+          "sessionId": {
+            "$ref": "#/components/schemas/nexigon_api.users.UserSessionId"
+          },
+          "sessionToken": {
+            "$ref": "#/components/schemas/nexigon_api.users.UserSessionToken"
+          }
+        },
+        "required": [
+          "result",
+          "userId",
+          "sessionId",
+          "sessionToken"
+        ]
+      }
+    ]
+  },
+  "nexigon_api.users.InitiateUserSessionSuccess": {
+    "type": "object",
+    "description": "Session was created successfully.",
+    "properties": {
+      "userId": {
+        "$ref": "#/components/schemas/nexigon_api.users.UserId"
+      },
+      "sessionId": {
+        "$ref": "#/components/schemas/nexigon_api.users.UserSessionId"
+      },
+      "sessionToken": {
+        "$ref": "#/components/schemas/nexigon_api.users.UserSessionToken"
+      }
+    },
+    "required": [
+      "userId",
+      "sessionId",
+      "sessionToken"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.users.QueryUserProjectsAction": {
+    "type": "object",
+    "description": "Query the projects of a user.",
+    "properties": {
+      "userId": {
+        "$ref": "#/components/schemas/nexigon_api.users.UserId"
+      }
+    },
+    "required": [
+      "userId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.users.QueryUserProjectsItem": {
+    "type": "object",
+    "description": "Project item.",
+    "properties": {
+      "projectId": {
+        "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+      },
+      "name": {
+        "type": "string"
+      },
+      "devices": {
+        "type": "integer",
+        "format": "uint32"
+      }
+    },
+    "required": [
+      "projectId",
+      "name",
+      "devices"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.users.QueryUserProjectsOutput": {
+    "type": "object",
+    "description": "Output of querying the projects of a user.",
+    "properties": {
+      "projects": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.users.QueryUserProjectsItem"
+        }
+      }
+    },
+    "required": [
+      "projects"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.users.QueryUserRepositoriesAction": {
+    "type": "object",
+    "description": "Query the repositories of a user.",
+    "properties": {
+      "userId": {
+        "$ref": "#/components/schemas/nexigon_api.users.UserId"
+      }
+    },
+    "required": [
+      "userId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.users.QueryUserRepositoriesItem": {
+    "type": "object",
+    "description": "Repository item.",
+    "properties": {
+      "repositoryId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryId"
+      },
+      "name": {
+        "type": "string"
+      },
+      "createdAt": {
+        "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
+      },
+      "packageCount": {
+        "type": "integer",
+        "format": "uint32"
+      }
+    },
+    "required": [
+      "repositoryId",
+      "name",
+      "createdAt",
+      "packageCount"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.users.QueryUserRepositoriesOutput": {
+    "type": "object",
+    "description": "Output of querying the repositories of a user.",
+    "properties": {
+      "repositories": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.users.QueryUserRepositoriesItem"
+        }
+      }
+    },
+    "required": [
+      "repositories"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.users.QueryUserSessionsAction": {
+    "type": "object",
+    "description": "Query the sessions of a user.",
+    "properties": {
+      "userId": {
+        "$ref": "#/components/schemas/nexigon_api.users.UserId"
+      }
+    },
+    "required": [
+      "userId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.users.QueryUserSessionsOutput": {
+    "type": "object",
+    "description": "Output of querying the sessions of a user.",
+    "properties": {
+      "sessions": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.users.UserSession"
+        }
+      }
+    },
+    "required": [
+      "sessions"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.users.QueryUserTokensAction": {
+    "type": "object",
+    "description": "Query the tokens of a user.",
+    "properties": {
+      "userId": {
+        "$ref": "#/components/schemas/nexigon_api.users.UserId"
+      }
+    },
+    "required": [
+      "userId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.users.QueryUserTokensItem": {
+    "type": "object",
+    "description": "User token item.",
+    "properties": {
+      "tokenId": {
+        "$ref": "#/components/schemas/nexigon_api.users.UserTokenId"
+      },
+      "createdAt": {
+        "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
+      },
+      "name": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "tokenId",
+      "createdAt"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.users.QueryUserTokensOutput": {
+    "type": "object",
+    "description": "Output of querying the tokens of a user.",
+    "properties": {
+      "tokens": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.users.QueryUserTokensItem"
+        }
+      }
+    },
+    "required": [
+      "tokens"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.users.QueryUsersAction": {
+    "type": "object",
+    "description": "Query the users of the instance.",
+    "properties": {},
+    "required": [],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.users.QueryUsersItem": {
+    "type": "object",
+    "description": "User item.",
+    "properties": {
+      "userId": {
+        "$ref": "#/components/schemas/nexigon_api.users.UserId"
+      },
+      "email": {
+        "type": "string"
+      },
+      "displayName": {
+        "type": "string"
+      },
+      "isAdmin": {
+        "type": "boolean"
+      }
+    },
+    "required": [
+      "userId",
+      "email",
+      "isAdmin"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.users.QueryUsersOutput": {
+    "type": "object",
+    "description": "Output of querying the users of the instance.",
+    "properties": {
+      "users": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.users.QueryUsersItem"
+        }
+      }
+    },
+    "required": [
+      "users"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.users.RegisterUserAction": {
+    "type": "object",
+    "description": "Register a new user with an email and password.",
+    "properties": {
+      "displayName": {
+        "type": "string"
+      },
+      "email": {
+        "type": "string"
+      },
+      "password": {
+        "type": "string"
+      },
+      "consentedToTerms": {
+        "type": "boolean"
+      },
+      "consentedToMarketing": {
+        "type": "boolean"
+      }
+    },
+    "required": [
+      "email",
+      "password",
+      "consentedToTerms"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.users.RegisterUserOutput": {
+    "description": "Output of registering a new user.",
+    "oneOf": [
+      {
+        "type": "object",
+        "properties": {
+          "result": {
+            "const": "Created"
+          },
+          "status": {
+            "$ref": "#/components/schemas/nexigon_api.users.UserRegistrationStatus"
+          },
+          "message": {
+            "type": "string"
+          },
+          "createdAt": {
+            "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
+          }
+        },
+        "required": [
+          "result",
+          "status",
+          "createdAt"
+        ]
+      },
+      {
+        "type": "object",
+        "properties": {
+          "result": {
+            "const": "Pending"
+          },
+          "status": {
+            "$ref": "#/components/schemas/nexigon_api.users.UserRegistrationStatus"
+          },
+          "message": {
+            "type": "string"
+          },
+          "createdAt": {
+            "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
+          }
+        },
+        "required": [
+          "result",
+          "status",
+          "createdAt"
+        ]
+      },
+      {
+        "type": "object",
+        "properties": {
+          "result": {
+            "const": "EmailAlreadyExists"
+          }
+        },
+        "required": [
+          "result"
+        ]
+      }
+    ]
+  },
+  "nexigon_api.users.ResendRegistrationEmailAction": {
+    "type": "object",
+    "description": "",
+    "properties": {
+      "email": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "email"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.users.SetUserDisplayNameAction": {
+    "type": "object",
+    "description": "Set the display name of a user.",
+    "properties": {
+      "userId": {
+        "$ref": "#/components/schemas/nexigon_api.users.UserId"
+      },
+      "displayName": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "userId",
+      "displayName"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.users.SetUserIsAdminAction": {
+    "type": "object",
+    "description": "Set whether the user is an instance administrator.",
+    "properties": {
+      "userId": {
+        "$ref": "#/components/schemas/nexigon_api.users.UserId"
+      },
+      "isAdmin": {
+        "type": "boolean"
+      }
+    },
+    "required": [
+      "userId",
+      "isAdmin"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.users.SetUserPasswordAction": {
+    "type": "object",
+    "description": "Set the password of a user.",
+    "properties": {
+      "userId": {
+        "$ref": "#/components/schemas/nexigon_api.users.UserId"
+      },
+      "password": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "userId",
+      "password"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.users.TerminateUserSessionAction": {
+    "type": "object",
+    "description": "Terminate a user session.",
+    "properties": {
+      "sessionId": {
+        "$ref": "#/components/schemas/nexigon_api.users.UserSessionId"
+      }
+    },
+    "required": [
+      "sessionId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.users.UserId": {
+    "type": [
+      "string"
+    ],
+    "description": "Unique ID of a user."
+  },
+  "nexigon_api.users.UserRegistration": {
+    "type": "object",
+    "description": "User registration.",
+    "properties": {
+      "status": {
+        "$ref": "#/components/schemas/nexigon_api.users.UserRegistrationStatus"
+      },
+      "message": {
+        "type": "string"
+      },
+      "createdAt": {
+        "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
+      }
+    },
+    "required": [
+      "status",
+      "createdAt"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.users.UserRegistrationStatus": {
+    "enum": [
+      {
+        "tag": "Pending"
+      },
+      {
+        "tag": "Waiting"
+      },
+      {
+        "tag": "Completed"
+      },
+      {
+        "tag": "Failed"
+      }
+    ],
+    "description": ""
+  },
+  "nexigon_api.users.UserSession": {
+    "type": "object",
+    "description": "User session.",
+    "properties": {
+      "sessionId": {
+        "$ref": "#/components/schemas/nexigon_api.users.UserSessionId"
+      },
+      "createdAt": {
+        "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
+      },
+      "expiresAt": {
+        "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
+      },
+      "userAgent": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "sessionId",
+      "createdAt",
+      "expiresAt",
+      "userAgent"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.users.UserSessionId": {
+    "type": [
+      "string"
+    ],
+    "description": "User session ID."
+  },
+  "nexigon_api.users.UserSessionToken": {
+    "type": [
+      "string"
+    ],
+    "description": "User session token."
+  },
+  "nexigon_api.users.UserToken": {
+    "type": [
+      "string"
+    ],
+    "description": "User token."
+  },
+  "nexigon_api.users.UserTokenId": {
+    "type": [
+      "string"
+    ],
+    "description": "Unique ID of a user token."
+  }
+}

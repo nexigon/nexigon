@@ -1,5 +1,5 @@
 [workspace]
-members = ["crates/libs/*", "crates/tools/*"]
+members = ["crates/libs/*", "crates/apps/*", "crates/utils/*"]
 resolver = "2"
 
 [workspace.package]
@@ -13,6 +13,7 @@ homepage = "https://nevigon.dev/"
 # Third-Party Crates
 bytes = "1.0"
 futures = "0.3"
+indexmap = { version = "2.9", features = ["serde"] }
 jiff = { version = "0.2", features = ["serde"] }
 parking_lot = "0.12"
 paste = "1.0"
@@ -33,6 +34,7 @@ x509-cert = "0.2"
 si-crypto-hashes = "0.1"
 si-observability = { version = "0.1", features = ["otlp", "clap4"] }
 sidex-serde = { git = "https://github.com/silitics/sidex.git" }
+sidex-types-openapi = { git = "https://github.com/silitics/sidex.git" }
 
 # Local Crates
 nexigon-api = { path = "crates/libs/nexigon-api" }
