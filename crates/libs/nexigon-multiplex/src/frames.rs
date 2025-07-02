@@ -296,9 +296,6 @@ define_frame_types! {
         /// Reason why the connection should be closed.
         reason: &[u8],
     }
-    /// Ping used for measuring the round-trip time.
-    Ping(0x20) {}
-    Pong(0x21) {}
     /// Request to open a new channel.
     ChannelRequest(0x10){
         /// Channel at the sender of the frame.
@@ -358,6 +355,10 @@ define_frame_types! {
         /// The reason why the channel has been closed.
         reason: &[u8],
     }
+    /// Ping used for measuring the round-trip time.
+    Ping(0x20) {}
+    /// Pong used to measure the round-trip time.
+    Pong(0x21) {}
 }
 
 impl<B: AsRef<[u8]>> AsRef<[u8]> for Frame<B> {
