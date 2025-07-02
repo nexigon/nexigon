@@ -45,8 +45,6 @@ use tracing::debug;
 use tracing::error;
 use tracing::trace;
 use tracing::warn;
-use transport::Transport;
-use transport::TransportError;
 
 use self::frames::Frame;
 use self::frames::FrameChannelAccept;
@@ -60,6 +58,8 @@ use self::frames::FrameHello;
 use self::frames::FramePing;
 use self::frames::FramePong;
 use self::frames::PROTOCOL_MAGIC;
+use self::transport::Transport;
+use self::transport::TransportError;
 
 mod frames;
 pub mod transport;
