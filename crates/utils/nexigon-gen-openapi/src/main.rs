@@ -46,7 +46,7 @@ fn main() {
         })
         .collect(),
     ));
-    serde_json::to_writer(std::io::stdout(), &openapi).unwrap();
+    serde_json::to_writer_pretty(std::io::stdout(), &openapi).unwrap();
 }
 
 pub fn add_action(
