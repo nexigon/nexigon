@@ -419,6 +419,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "nexigon"
+version = "0.1.0"
+
+[[package]]
 name = "nexigon-agent"
 version = "0.1.0"
 
