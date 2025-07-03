@@ -199,7 +199,9 @@ impl ClientBuilder {
                 device_fingerprint.stringify().try_into().unwrap(),
             );
         }
-        if let Some(identity) = &self.identity {
+        if let Some(identity) = &self.identity
+            && self.disable_tls
+        {
             request.headers_mut().append(
                 "X-Client-Cert",
                 urlencoding::encode_binary(identity.certificate_pem.as_bytes())
