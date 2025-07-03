@@ -6,7 +6,7 @@ pub mod config {
     use :: serde as __serde;
     #[allow(unused)]
     use :: sidex_serde as __sidex_serde;
-    #[doc = "Deployment token.\n"]
+    #[doc = "User token.\n"]
     pub type UserToken = nexigon_ids::ids::UserToken;
     #[doc = "Filesystem path.\n"]
     pub type PathBuf = std::path::PathBuf;

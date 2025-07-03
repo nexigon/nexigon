@@ -29,7 +29,7 @@
       "type": [
         "string"
       ],
-      "description": "Deployment token."
+      "description": "User token."
     }
   }
 }
