@@ -1,0 +1,27 @@
+
+/// Deployment token.
+#[rust(type = "nexigon_ids::ids::DeploymentToken")]
+#[json(type = "string")]
+opaque DeploymentToken
+
+/// Filesystem path.
+#[rust(type = "std::path::PathBuf")]
+#[json(type = "string")]
+opaque PathBuf
+
+/// Agent configuration.
+#[json(rename_all = "kebab-case")]
+record Config {
+    /// URL of the Nexigon Hub server.
+    hub_url: string,
+    /// Deployment token.
+    token: DeploymentToken,
+    /// Fingerprint script.
+    fingerprint_script: PathBuf,
+    /// Path to the device certificate.
+    ssl_cert?: PathBuf,
+    /// Path to the device private key.
+    ssl_key?: PathBuf,
+    /// Disable TLS.
+    dangerous_disable_tls?: bool,
+}

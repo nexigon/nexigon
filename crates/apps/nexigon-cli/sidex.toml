@@ -1,0 +1,14 @@
+[bundle]
+name = "nexigon_cli"
+version = "1"
+description = "Definitions for Nexigon CLI."
+authors = ["Silitics GmbH <info@silitics.com>"]
+
+[backend.json-schema]
+
+[backend.rust]
+derive = ["Clone", "Debug"]
+plugins = ["builder", "serde"]
+
+[backend.rust.plugin.serde]
+sidex_serde_path = "::sidex_serde"

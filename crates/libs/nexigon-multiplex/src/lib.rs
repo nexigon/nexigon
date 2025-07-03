@@ -191,6 +191,7 @@ impl Rejection {
 /// A connection over which multiple channels can be multiplexed.
 ///
 /// **The connection must be polled for events to make any progress!**
+#[derive(Debug)]
 #[must_use]
 pub struct Connection<T> {
     /// Underlying transport layer pinned in memory.
@@ -681,6 +682,7 @@ impl Drop for ChannelRequest {
 }
 
 /// Channel handle to be stored in the connection.
+#[derive(Debug)]
 struct ChannelHandle {
     /// Local id of the channel.
     #[expect(dead_code, reason = "unused")]

@@ -1,0 +1,19 @@
+
+/// Deployment token.
+#[rust(type = "nexigon_ids::ids::UserToken")]
+#[json(type = "string")]
+opaque UserToken
+
+/// Filesystem path.
+#[rust(type = "std::path::PathBuf")]
+#[json(type = "string")]
+opaque PathBuf
+
+/// CLI configuration.
+#[json(rename_all = "kebab-case")]
+record Config {
+    /// URL of the Nexigon Hub server.
+    hub_url: string,
+    /// User token.
+    token: UserToken,
+}

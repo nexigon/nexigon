@@ -12,6 +12,7 @@ homepage = "https://nevigon.dev/"
 [workspace.dependencies]
 # Third-Party Crates
 bytes = "1.0"
+clap = "4.5"
 futures = "0.3"
 indexmap = { version = "2.9", features = ["serde"] }
 jiff = { version = "0.2", features = ["serde"] }
@@ -20,6 +21,8 @@ paste = "1.0"
 pin-project = "1.1"
 rand = "0.9"
 rcgen = "0.13"
+rustls = "0.23"
+rustls-native-certs = "0.8"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 sha1 = "0.10"
@@ -27,7 +30,10 @@ sha2 = "0.10"
 static_assertions = "1.1"
 thiserror = "2.0"
 tokio = { version = "1.0", features = ["full"] }
+toml = "0.8"
 tracing = "0.1"
+url = { version = "2.5", features = ["serde"] }
+urlencoding = "2.1"
 x509-cert = "0.2"
 
 # In-House Crates
@@ -39,8 +45,13 @@ sidex-types-openapi = { git = "https://github.com/silitics/sidex.git" }
 # Local Crates
 nexigon-api = { path = "crates/libs/nexigon-api" }
 nexigon-cert = { path = "crates/libs/nexigon-cert" }
+nexigon-client = { path = "crates/libs/nexigon-client" }
 nexigon-ids = { path = "crates/libs/nexigon-ids" }
 nexigon-multiplex = { path = "crates/libs/nexigon-multiplex" }
+
+[workspace.dependencies.tokio-tungstenite]
+features = ["url", "rustls-tls-native-roots"]
+version = "0.27"
 
 [profile.release]
 # Reduce the size of the release binaries.

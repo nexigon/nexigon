@@ -108,7 +108,7 @@ pub fn add_action(
     );
 }
 
-/// Create a [`SchemaObject`] for a reference to another schema.
+/// Create a JSON Schema for a reference to another schema.
 fn schema_ref(path: impl Into<String>) -> openapi::schema::SchemaObject {
     openapi::schema::SchemaObject::new()
         .with_reference(Some(openapi::schema::SchemaRef::new(path.into())))

@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "nexigon_agent.config.Config",
+  "type": "object",
+  "description": "Agent configuration.",
+  "properties": {
+    "hub-url": {
+      "type": "string"
+    },
+    "token": {
+      "$ref": "#/$defs/nexigon_agent.config.DeploymentToken"
+    },
+    "fingerprint-script": {
+      "$ref": "#/$defs/nexigon_agent.config.PathBuf"
+    },
+    "ssl-cert": {
+      "$ref": "#/$defs/nexigon_agent.config.PathBuf"
+    },
+    "ssl-key": {
+      "$ref": "#/$defs/nexigon_agent.config.PathBuf"
+    },
+    "dangerous-disable-tls": {
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "hub-url",
+    "token",
+    "fingerprint-script"
+  ],
+  "unevaluatedProperties": false,
+  "$defs": {
+    "nexigon_agent.config.DeploymentToken": {
+      "$id": "nexigon_agent.config.DeploymentToken",
+      "type": [
+        "string"
+      ],
+      "description": "Deployment token."
+    },
+    "nexigon_agent.config.PathBuf": {
+      "$id": "nexigon_agent.config.PathBuf",
+      "type": [
+        "string"
+      ],
+      "description": "Filesystem path."
+    }
+  }
+}

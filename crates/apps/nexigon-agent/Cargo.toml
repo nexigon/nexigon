@@ -8,3 +8,12 @@ repository.workspace = true
 homepage.workspace = true
 
 [dependencies]
+clap.workspace = true
+nexigon-client.workspace = true
+nexigon-ids.workspace = true
+serde.workspace = true
+si-observability.workspace = true
+sidex-serde.workspace = true
+tokio.workspace = true
+toml.workspace = true
+tracing.workspace = true

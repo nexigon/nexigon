@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "nexigon_cli.config.Config",
+  "type": "object",
+  "description": "CLI configuration.",
+  "properties": {
+    "hub-url": {
+      "type": "string"
+    },
+    "token": {
+      "$ref": "#/$defs/nexigon_cli.config.UserToken"
+    }
+  },
+  "required": [
+    "hub-url",
+    "token"
+  ],
+  "unevaluatedProperties": false,
+  "$defs": {
+    "nexigon_cli.config.PathBuf": {
+      "$id": "nexigon_cli.config.PathBuf",
+      "type": [
+        "string"
+      ],
+      "description": "Filesystem path."
+    },
+    "nexigon_cli.config.UserToken": {
+      "$id": "nexigon_cli.config.UserToken",
+      "type": [
+        "string"
+      ],
+      "description": "Deployment token."
+    }
+  }
+}

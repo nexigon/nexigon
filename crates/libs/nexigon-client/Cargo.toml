@@ -1,0 +1,23 @@
+[package]
+name = "nexigon-client"
+edition = "2024"
+authors.workspace = true
+version.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+
+[dependencies]
+bytes.workspace = true
+futures.workspace = true
+nexigon-api.workspace = true
+nexigon-ids.workspace = true
+nexigon-multiplex.workspace = true
+rustls.workspace = true
+rustls-native-certs.workspace = true
+thiserror.workspace = true
+tokio.workspace = true
+tokio-tungstenite.workspace = true
+tracing.workspace = true
+url.workspace = true
+urlencoding.workspace = true
