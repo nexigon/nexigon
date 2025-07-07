@@ -24,7 +24,6 @@ generate:
     mv build/cli-json-schema/nexigon_cli.config.Config.schema.json schemas/nexigon-cli.schema.json
     mv build/agent-json-schema/nexigon_agent.config.Config.schema.json schemas/nexigon-agent.schema.json
     cargo run --bin nexigon-gen-openapi >api/openapi.json
-    cd api && npx @redocly/cli build-docs openapi.json
     just fmt
 
 run-cli *args:
