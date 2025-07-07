@@ -1,4 +1,4 @@
-# spellchecker:ignore taiki dtolnay Taplo xvzf musleabihf gnueabihf msvc
+# spellchecker:ignore taiki dtolnay Taplo xvzf musleabihf gnueabihf msvc clippy
 
 name: CI Pipeline
 
@@ -22,9 +22,9 @@ jobs:
       - name: Install Just
         uses: taiki-e/install-action@just
       - name: Install Rust Toolchain
-        uses: dtolnay/rust-toolchain@stable
-      - name: Install Nightly Rust Toolchain
         uses: dtolnay/rust-toolchain@nightly
+        with:
+          components: rustfmt, clippy
       - name: Install Taplo
         uses: dtolnay/install@taplo-cli
       - name: Install Cargo Deny
