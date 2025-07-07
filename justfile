@@ -1,18 +1,33 @@
+# spellchecker:ignore clippy extglob taplo elif shopt
+
+# Pass on positional arguments.
 set positional-arguments
 
+# Default Rust target.
+export DEFAULT_TARGET := `rustc --version --verbose | grep -o "host:.*" | awk '{print $2}'`
+
+# List the available recipes.
+[private]
+default:
+    @just --list
+
+# Linting and check formatting.
 check:
     cargo deny check
     cargo +nightly fmt --check
     cargo clippy --all-targets --all-features -- -D warnings
     taplo fmt --check
 
+# Format all files.
 fmt:
     cargo +nightly fmt
     taplo fmt
 
+# Generate documentation.
 doc:
     cargo +nightly doc --all-features --document-private-items
 
+# Generate code.
 generate:
     cd crates/libs/nexigon-api && sidex generate rust src/types/generated
     cd crates/libs/nexigon-api && sidex generate json-schema ../../../build/api-json-schema
@@ -26,8 +41,29 @@ generate:
     cargo run --bin nexigon-gen-openapi >api/openapi.json
     just fmt
 
+# Run tests.
+test:
+    cargo test
+
+# Build binaries.
+build TARGET=DEFAULT_TARGET CROSS="false":
+    #!/usr/bin/env bash
+    TARGET="{{ TARGET }}"
+    CROSS="{{ CROSS }}"
+    if [ "$CROSS" == "true" ]; then
+        cross build --locked --release --bins --target "$TARGET"
+    else
+        cargo build --locked --release --bins --target "$TARGET"
+    fi
+    mkdir -p build/binaries
+    shopt -s extglob
+    cd "target/{{ TARGET }}/release"
+    tar -czf "../../../build/binaries/{{ TARGET }}.tar.gz" nexigon-+([a-z])?(.exe)
+
+# Run Nexigon CLI.
 run-cli *args:
     cargo run --bin nexigon-cli -- "$@"
 
+# Run Nexigon Agent.
 run-agent *args:
     cargo run --bin nexigon-agent -- "$@"
