@@ -15,7 +15,7 @@ default:
 check:
     cargo deny check
     cargo +nightly fmt --check
-    cargo clippy --all-targets --all-features -- -D warnings
+    cargo +nightly clippy --all-targets --all-features -- -D warnings
     taplo fmt --check
 
 # Format all files.

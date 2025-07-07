@@ -1149,20 +1149,20 @@ impl Receiver {
             let mut update_credit = false;
             let smoothened_rtt = *self.connection.shared.smoothened_rtt.read();
             if shared.remaining_frame_credit < shared.max_frame_credit / 2 {
-                if let Some(smoothened_rtt) = smoothened_rtt {
-                    if shared.last_credit_update.elapsed() < 2 * smoothened_rtt {
-                        shared.max_frame_credit =
-                            (shared.max_frame_credit * 2).min(CHANNEL_MAX_FRAME_CREDIT);
-                    }
+                if let Some(smoothened_rtt) = smoothened_rtt
+                    && shared.last_credit_update.elapsed() < 2 * smoothened_rtt
+                {
+                    shared.max_frame_credit =
+                        (shared.max_frame_credit * 2).min(CHANNEL_MAX_FRAME_CREDIT);
                 }
                 update_credit = true;
             }
             if shared.remaining_byte_credit < shared.max_byte_credit / 2 {
-                if let Some(smoothened_rtt) = smoothened_rtt {
-                    if shared.last_credit_update.elapsed() < 2 * smoothened_rtt {
-                        shared.max_byte_credit =
-                            (shared.max_byte_credit * 2).min(CHANNEL_MAX_BYTE_CREDIT);
-                    }
+                if let Some(smoothened_rtt) = smoothened_rtt
+                    && shared.last_credit_update.elapsed() < 2 * smoothened_rtt
+                {
+                    shared.max_byte_credit =
+                        (shared.max_byte_credit * 2).min(CHANNEL_MAX_BYTE_CREDIT);
                 }
                 update_credit = true;
             }
