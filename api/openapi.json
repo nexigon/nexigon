@@ -3627,6 +3627,39 @@
         ],
         "description": "Kind of an action error."
       },
+      "nexigon_api.errors.ActionResult--": {
+        "description": "Action result.",
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "result": {
+                "const": "Ok"
+              },
+              "value": {}
+            }
+          },
+          {
+            "type": "object",
+            "properties": {
+              "result": {
+                "const": "Error"
+              },
+              "kind": {
+                "$ref": "#/components/schemas/nexigon_api.errors.ActionErrorKind"
+              },
+              "message": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "result",
+              "kind",
+              "message"
+            ]
+          }
+        ]
+      },
       "nexigon_api.instance.GetInstanceSettingsRawAction": {
         "type": "object",
         "properties": {},

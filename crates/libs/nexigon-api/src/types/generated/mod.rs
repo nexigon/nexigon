@@ -14668,6 +14668,194 @@ pub mod errors {
             )
         }
     }
+    #[doc = "Action result.\n"]
+    #[derive(Clone, Debug)]
+    pub enum ActionResult<T> {
+        #[doc = ""]
+        Ok(T),
+        #[doc = ""]
+        Error(ActionError),
+    }
+    #[automatically_derived]
+    impl<T: __serde::Serialize> __serde::Serialize for ActionResult<T> {
+        fn serialize<__S: __serde::Serializer>(
+            &self,
+            __serializer: __S,
+        ) -> ::std::result::Result<__S::Ok, __S::Error> {
+            let __serializer =
+                __sidex_serde::ser::VariantSerializer::new(__serializer, "ActionResult");
+            match self {
+                Self::Ok(__value) => {
+                    __serializer.serialize_adjacently_tagged("result", "value", "Ok", 0u32, __value)
+                }
+                Self::Error(__value) => __serializer
+                    .serialize_adjacently_tagged("result", "error", "Error", 1u32, __value),
+            }
+        }
+    }
+    #[automatically_derived]
+    impl<'de, T: __serde::Deserialize<'de>> __serde::Deserialize<'de> for ActionResult<T> {
+        fn deserialize<__D: __serde::Deserializer<'de>>(
+            __deserializer: __D,
+        ) -> ::std::result::Result<Self, __D::Error> {
+            #[doc(hidden)]
+            const __IDENTIFIERS: &'static [&'static str] = &["Ok", "Error"];
+            #[doc(hidden)]
+            const __EXPECTING_IDENTIFIERS: &'static str = "an identifier in [\"Ok\", \"Error\"]";
+            #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
+            #[doc(hidden)]
+            enum __Identifier {
+                __Identifier0,
+                __Identifier1,
+            }
+            #[doc(hidden)]
+            struct __IdentifierVisitor;
+            impl<'de> __serde::de::Visitor<'de> for __IdentifierVisitor {
+                type Value = __Identifier;
+                fn expecting(
+                    &self,
+                    __formatter: &mut ::core::fmt::Formatter,
+                ) -> ::core::fmt::Result {
+                    ::core::fmt::Formatter::write_str(__formatter, __EXPECTING_IDENTIFIERS)
+                }
+                fn visit_u64<__E>(self, __value: u64) -> ::core::result::Result<Self::Value, __E>
+                where
+                    __E: __serde::de::Error,
+                {
+                    match __value {
+                        0u64 => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                        1u64 => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                        __variant => {
+                            ::core::result::Result::Err(__serde::de::Error::invalid_value(
+                                __serde::de::Unexpected::Unsigned(__variant),
+                                &__EXPECTING_IDENTIFIERS,
+                            ))
+                        }
+                    }
+                }
+                fn visit_str<__E>(self, __value: &str) -> ::core::result::Result<Self::Value, __E>
+                where
+                    __E: __serde::de::Error,
+                {
+                    match __value {
+                        "Ok" => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                        "Error" => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                        __variant => ::core::result::Result::Err(
+                            __serde::de::Error::unknown_variant(__variant, __IDENTIFIERS),
+                        ),
+                    }
+                }
+                fn visit_bytes<__E>(
+                    self,
+                    __value: &[u8],
+                ) -> ::core::result::Result<Self::Value, __E>
+                where
+                    __E: __serde::de::Error,
+                {
+                    match __value {
+                        b"Ok" => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                        b"Error" => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                        __variant => {
+                            ::core::result::Result::Err(__serde::de::Error::invalid_value(
+                                __serde::de::Unexpected::Bytes(__variant),
+                                &__EXPECTING_IDENTIFIERS,
+                            ))
+                        }
+                    }
+                }
+            }
+            impl<'de> __serde::Deserialize<'de> for __Identifier {
+                #[inline]
+                fn deserialize<__D>(__deserializer: __D) -> ::core::result::Result<Self, __D::Error>
+                where
+                    __D: __serde::Deserializer<'de>,
+                {
+                    __serde::Deserializer::deserialize_identifier(
+                        __deserializer,
+                        __IdentifierVisitor,
+                    )
+                }
+            }
+            #[doc(hidden)]
+            const __VARIANTS: &'static [&'static str] = &["Ok", "Error"];
+            if __serde::Deserializer::is_human_readable(&__deserializer) {
+                let __tagged = __sidex_serde::de::tagged::deserialize_tagged_variant::<
+                    __Identifier,
+                    __D,
+                >(__deserializer, "result")?;
+                match __tagged.tag {
+                    __Identifier::__Identifier0 => ::core::result::Result::Ok(ActionResult::Ok(
+                        __tagged.deserialize_adjacently_tagged::<T, __D::Error>("value")?,
+                    )),
+                    __Identifier::__Identifier1 => ::core::result::Result::Ok(ActionResult::Error(
+                        __tagged
+                            .deserialize_adjacently_tagged::<ActionError, __D::Error>("error")?,
+                    )),
+                }
+            } else {
+                #[doc(hidden)]
+                struct __Visitor<T> {
+                    __phantom_vars: ::core::marker::PhantomData<fn(&(T,))>,
+                }
+                impl<'de, T: __serde::Deserialize<'de>> __serde::de::Visitor<'de> for __Visitor<T> {
+                    type Value = ActionResult<T>;
+                    fn expecting(
+                        &self,
+                        __formatter: &mut ::core::fmt::Formatter,
+                    ) -> ::core::fmt::Result {
+                        ::core::fmt::Formatter::write_str(__formatter, "enum ActionResult")
+                    }
+                    #[inline]
+                    fn visit_str<__E>(
+                        self,
+                        __value: &str,
+                    ) -> ::core::result::Result<Self::Value, __E>
+                    where
+                        __E: __serde::de::Error,
+                    {
+                        let __identifier = __IdentifierVisitor.visit_str(__value)?;
+                        #[allow(unreachable_patterns)]
+                        match __identifier {
+                            _ => Err(__E::invalid_value(
+                                __serde::de::Unexpected::Str(__value),
+                                &self,
+                            )),
+                        }
+                    }
+                    #[inline]
+                    fn visit_enum<__A>(
+                        self,
+                        __data: __A,
+                    ) -> ::core::result::Result<Self::Value, __A::Error>
+                    where
+                        __A: __serde::de::EnumAccess<'de>,
+                    {
+                        match __serde::de::EnumAccess::variant::<__Identifier>(__data)? {
+                            (__Identifier::__Identifier0, __variant) => {
+                                let __value =
+                                    __serde::de::VariantAccess::newtype_variant::<T>(__variant)?;
+                                ::core::result::Result::Ok(ActionResult::Ok(__value))
+                            }
+                            (__Identifier::__Identifier1, __variant) => {
+                                let __value = __serde::de::VariantAccess::newtype_variant::<
+                                    ActionError,
+                                >(__variant)?;
+                                ::core::result::Result::Ok(ActionResult::Error(__value))
+                            }
+                        }
+                    }
+                }
+                __serde::Deserializer::deserialize_enum(
+                    __deserializer,
+                    "ActionResult",
+                    __VARIANTS,
+                    __Visitor {
+                        __phantom_vars: ::core::marker::PhantomData,
+                    },
+                )
+            }
+        }
+    }
 }
 pub mod instance {
     #![doc = "Actions and types related to the instance.\n"]

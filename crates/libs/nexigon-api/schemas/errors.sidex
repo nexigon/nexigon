@@ -19,3 +19,12 @@ record ActionError {
     /// Message of the error.
     message: string,
 }
+
+/// Action result.
+#[json(tag = "result")]
+variant ActionResult<T> {
+    #[json(content = "value")]
+    Ok: T,
+    #[json(content = "error")]
+    Error: ActionError,
+}
