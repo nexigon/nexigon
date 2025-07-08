@@ -105,3 +105,32 @@ jobs:
           name: binaries-${{ matrix.target }}
           path: build/binaries/${{ matrix.target }}.tar.gz
           if-no-files-found: error
+  upload:
+    name: Upload
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-tags: true
+          fetch-depth: 0
+      - name: Install Just
+        uses: taiki-e/install-action@just
+      - name: Download Binaries
+        uses: actions/download-artifact@v4
+        with:
+          pattern: binaries-*
+          path: build/binaries
+          merge-multiple: true
+      - name: Upload Binaries
+        env:
+          NEXIGON_USER_TOKEN: ${{ secrets.NEXIGON_USER_TOKEN }}
+          NEXIGON_HUB_URL: ${{ secrets.NEXIGON_HUB_URL }}
+        run: |
+          tar -xvf build/binaries/x86_64-unknown-linux-gnu.tar.gz nexigon-cli
+          export NEXIGON_CLI="./nexigon-cli"
+          cat <<EOF >.nexigon-cli.toml
+            hub-url = "$NEXIGON_HUB_URL"
+            token = "$NEXIGON_USER_TOKEN"
+          EOF
+          ./scripts/upload-binaries.sh
