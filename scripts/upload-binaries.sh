@@ -40,10 +40,11 @@ function upload_binaries() {
         filename=$(basename "$archive")
         target=${filename%.tar.gz}
         mkdir -p "build/binaries/$target"
-        tar -xzf "$archive" -C "build/binaries/$target" "$crate"
-        asset_info=$($NEXIGON_CLI repositories assets upload nexigon-downloads "build/binaries/$target/$crate")
-        asset_id=$(echo "$asset_info" | jq -r '.assetId')
-        $NEXIGON_CLI repositories versions assets add "$version_id" "$asset_id" "$target/$crate"
+        if tar -xzf "$archive" -C "build/binaries/$target" "$crate"; then
+            asset_info=$($NEXIGON_CLI repositories assets upload nexigon-downloads "build/binaries/$target/$crate")
+            asset_id=$(echo "$asset_info" | jq -r '.assetId')
+            $NEXIGON_CLI repositories versions assets add "$version_id" "$asset_id" "$target/$crate"
+        fi
     done
 
     $NEXIGON_CLI repositories versions tag "$version_id" \
