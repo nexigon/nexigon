@@ -45,6 +45,11 @@ function upload_binaries() {
             asset_id=$(echo "$asset_info" | jq -r '.assetId')
             $NEXIGON_CLI repositories versions assets add "$version_id" "$asset_id" "$target/$crate"
         fi
+        if tar -xzf "$archive" -C "build/binaries/$target" "$crate.exe"; then
+            asset_info=$($NEXIGON_CLI repositories assets upload nexigon-downloads "build/binaries/$target/$crate.exe")
+            asset_id=$(echo "$asset_info" | jq -r '.assetId')
+            $NEXIGON_CLI repositories versions assets add "$version_id" "$asset_id" "$target/$crate.exe"
+        fi
     done
 
     $NEXIGON_CLI repositories versions tag "$version_id" \
