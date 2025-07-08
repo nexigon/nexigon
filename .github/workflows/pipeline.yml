@@ -126,7 +126,7 @@ jobs:
         env:
           NEXIGON_USER_TOKEN: ${{ secrets.NEXIGON_USER_TOKEN }}
           NEXIGON_HUB_URL: ${{ secrets.NEXIGON_HUB_URL }}
-        run:
+        run: |
           export NEXIGON_CLI="./build/binaries/x86_64-unknown-linux-gnu/nexigon-cli"
           cat <<EOF >.nexigon-cli.toml
             hub_url = "$NEXIGON_HUB_URL"
