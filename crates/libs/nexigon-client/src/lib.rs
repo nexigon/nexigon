@@ -6,8 +6,6 @@ use bytes::BufMut;
 use bytes::BytesMut;
 use futures::Stream;
 use futures::StreamExt;
-use nexigon_api::types::errors::ActionError;
-use nexigon_api::types::errors::ActionResult;
 use rustls::pki_types::pem::PemObject;
 use thiserror::Error;
 use tokio::io::AsyncReadExt;
@@ -24,6 +22,8 @@ use tracing::warn;
 use url::Url;
 
 use nexigon_api::Action;
+use nexigon_api::types::errors::ActionError;
+use nexigon_api::types::errors::ActionResult;
 use nexigon_ids::Id;
 use nexigon_ids::ids::DeploymentToken;
 use nexigon_ids::ids::DeviceFingerprint;
