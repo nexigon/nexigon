@@ -572,6 +572,20 @@ impl<T: ConnectionTransport> Stream for Connection<T> {
     }
 }
 
+impl<T> Drop for Connection<T> {
+    fn drop(&mut self) {
+        debug!("dropping connection");
+        for (channel, handle) in &self.channels {
+            debug!(channel.local_id = channel.0, "closing channel");
+            let mut shared = handle.receiver_shared.lock();
+            shared.closed = true;
+            if let Some(waker) = shared.waker.take() {
+                waker.wake();
+            }
+        }
+    }
+}
+
 /// Connection error.
 #[derive(Debug, Error)]
 pub enum ConnectionError<T: ConnectionTransport> {
@@ -697,6 +711,7 @@ struct ChannelHandle {
 }
 
 /// Bi-directional channel.
+#[derive(Debug)]
 #[pin_project]
 pub struct Channel {
     /// Sender.
@@ -724,6 +739,7 @@ impl Channel {
             receiver: Receiver {
                 shared: Arc::new(Mutex::new(ReceiverShared::new())),
                 remote_id,
+                local_id,
                 connection,
                 pending: None,
                 offset: 0,
@@ -758,6 +774,11 @@ impl Channel {
     /// Split the channel into sender and receiver.
     pub fn split(self) -> (Sender, Receiver) {
         (self.sender, self.receiver)
+    }
+
+    /// Split the channel into a mutable sender and a mutable receiver.
+    pub fn split_mut(&mut self) -> (&mut Sender, &mut Receiver) {
+        (&mut self.sender, &mut self.receiver)
     }
 }
 
@@ -1106,6 +1127,8 @@ impl ReceiverShared {
 /// Implements [`AsyncRead``] to read data from the channel.
 #[derive(Debug)]
 pub struct Receiver {
+    /// Local id of the channel.
+    local_id: ChannelId,
     /// Remote id of the channel.
     remote_id: ChannelId,
     /// Shared receiver state.
@@ -1199,11 +1222,13 @@ impl Drop for Receiver {
 }
 
 impl AsyncRead for Receiver {
+    #[tracing::instrument(level = Level::TRACE, skip_all, fields(channel.local_id = self.local_id.0))]
     fn poll_read(
         mut self: Pin<&mut Self>,
         cx: &mut task::Context<'_>,
         buf: &mut [u8],
     ) -> Poll<io::Result<usize>> {
+        trace!("poll_read");
         loop {
             if let Some(pending) = &self.pending {
                 let bytes = (pending.len() - self.offset).min(buf.len());
@@ -1213,13 +1238,23 @@ impl AsyncRead for Receiver {
                 if self.offset >= pending_len {
                     self.pending = None;
                 }
+                trace!("returning {bytes} bytes");
                 return Poll::Ready(Ok(bytes));
             }
-            if let Some(chunk) = ready!(self.as_mut().poll_next(cx)) {
-                self.pending = Some(chunk.frame.bytes);
-                self.offset = FrameChannelData::<Vec<u8>>::MIN_FRAME_SIZE;
-            } else {
-                return Poll::Pending;
+            match self.as_mut().poll_next(cx) {
+                Poll::Ready(Some(chunk)) => {
+                    trace!("new chunk available");
+                    self.pending = Some(chunk.frame.bytes);
+                    self.offset = FrameChannelData::<Vec<u8>>::MIN_FRAME_SIZE;
+                }
+                Poll::Ready(None) => {
+                    trace!("channel closed");
+                    return Poll::Ready(Ok(0));
+                }
+                Poll::Pending => {
+                    trace!("waiting for new chunk");
+                    return Poll::Pending;
+                }
             }
         }
     }
@@ -1242,11 +1277,20 @@ impl tokio::io::AsyncRead for Receiver {
                 }
                 return Poll::Ready(Ok(()));
             }
-            if let Some(chunk) = ready!(self.as_mut().poll_next(cx)) {
-                self.pending = Some(chunk.frame.bytes);
-                self.offset = FrameChannelData::<Vec<u8>>::MIN_FRAME_SIZE;
-            } else {
-                return Poll::Pending;
+            match self.as_mut().poll_next(cx) {
+                Poll::Ready(Some(chunk)) => {
+                    trace!("new chunk available");
+                    self.pending = Some(chunk.frame.bytes);
+                    self.offset = FrameChannelData::<Vec<u8>>::MIN_FRAME_SIZE;
+                }
+                Poll::Ready(None) => {
+                    trace!("channel closed");
+                    return Poll::Ready(Ok(()));
+                }
+                Poll::Pending => {
+                    trace!("waiting for new chunk");
+                    return Poll::Pending;
+                }
             }
         }
     }

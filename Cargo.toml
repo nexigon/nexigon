@@ -11,8 +11,10 @@ homepage = "https://nevigon.dev/"
 
 [workspace.dependencies]
 # Third-Party Crates
+anyhow = "1.0"
 bytes = "1.0"
 clap = "4.5"
+dialoguer = "0.11"
 futures = "0.3"
 indexmap = { version = "2.9", features = ["serde"] }
 jiff = { version = "0.2", features = ["serde"] }
@@ -21,6 +23,7 @@ paste = "1.0"
 pin-project = "1.1"
 rand = "0.9"
 rcgen = "0.13"
+reqwest = "0.12"
 rustls = "0.23"
 rustls-native-certs = "0.8"
 serde = { version = "1.0", features = ["derive"] }

@@ -2,20 +2,33 @@
 
 use std::sync::Arc;
 
+use bytes::BufMut;
+use bytes::BytesMut;
 use futures::Stream;
 use futures::StreamExt;
+use nexigon_api::types::errors::ActionError;
+use nexigon_api::types::errors::ActionResult;
 use rustls::pki_types::pem::PemObject;
 use thiserror::Error;
+use tokio::io::AsyncReadExt;
+use tokio::io::AsyncWriteExt;
 use tokio::net::TcpStream;
 use tokio_tungstenite::MaybeTlsStream;
 use tokio_tungstenite::tungstenite::client::IntoClientRequest;
+use tracing::Level;
+use tracing::debug;
 use tracing::error;
+use tracing::info;
+use tracing::trace;
+use tracing::warn;
 use url::Url;
 
+use nexigon_api::Action;
 use nexigon_ids::Id;
 use nexigon_ids::ids::DeploymentToken;
 use nexigon_ids::ids::DeviceFingerprint;
 use nexigon_ids::ids::UserToken;
+use nexigon_multiplex::Channel;
 use nexigon_multiplex::Connection;
 use nexigon_multiplex::ConnectionError;
 use nexigon_multiplex::ConnectionEvent;
@@ -33,6 +46,7 @@ pub fn install_crypto_provider() {
 }
 
 /// Client mTLS identity.
+#[derive(Debug)]
 pub struct ClientIdentity {
     /// Client certificate in PEM format.
     certificate_pem: String,
@@ -85,6 +99,7 @@ impl ClientToken {
 }
 
 /// Client builder.
+#[derive(Debug)]
 pub struct ClientBuilder {
     /// Server URL.
     hub_url: Url,
@@ -96,6 +111,8 @@ pub struct ClientBuilder {
     device_fingerprint: Option<DeviceFingerprint>,
     /// Disable TLS.
     disable_tls: bool,
+    /// Indicates whether the connection should be registered.
+    register_connection: bool,
 }
 
 impl ClientBuilder {
@@ -107,6 +124,7 @@ impl ClientBuilder {
             identity: None,
             device_fingerprint: None,
             disable_tls: false,
+            register_connection: true,
         }
     }
 
@@ -135,19 +153,32 @@ impl ClientBuilder {
         self.device_fingerprint = device_fingerprint;
     }
 
-    /// Disable TLS.
+    /// Set whether TLS should be disabled.
     pub fn dangerous_with_disable_tls(mut self, disable_tls: bool) -> Self {
         self.disable_tls = disable_tls;
         self
     }
 
-    /// Disable TLS.
+    /// Set whether TLS should be disabled.
     pub fn dangerous_set_disable_tls(&mut self, disable_tls: bool) {
         self.disable_tls = disable_tls;
     }
 
+    /// Set whether the connection should be registered.
+    pub fn with_register_connection(mut self, register_connection: bool) -> Self {
+        self.register_connection = register_connection;
+        self
+    }
+
+    /// Set whether the connection should be registered.
+    pub fn set_register_connection(&mut self, register_connection: bool) {
+        self.register_connection = register_connection;
+    }
+
     /// Connect to the Nexigon Hub server.
+    #[tracing::instrument(level = tracing::Level::DEBUG, skip_all)]
     pub async fn connect(&self) -> Result<WebsocketConnection, ClientError> {
+        info!("establishing websocket connection to Nexigon Hub");
         let mut ws_url = self.hub_url.clone();
         match ws_url.scheme() {
             "https" => ws_url.set_scheme("wss").unwrap(),
@@ -155,7 +186,9 @@ impl ClientBuilder {
             _ => todo!("handle invalid URL scheme"),
         }
         ws_url.set_path("/api/v1/connect/ws");
+        debug!(ws_url = %ws_url, "websocket URL");
         let connector = if self.disable_tls {
+            debug!("TLS has been disabled, using plain connector");
             tokio_tungstenite::Connector::Plain
         } else {
             let mut root_store = rustls::RootCertStore::empty();
@@ -165,11 +198,13 @@ impl ClientBuilder {
             }
             let client_builder = rustls::ClientConfig::builder().with_root_certificates(root_store);
             let client_config = if let Some(identity) = &self.identity {
+                debug!("TLS has been enabled, using client certificate");
                 client_builder.with_client_auth_cert(
                     vec![identity.certificate_der.clone()],
                     identity.private_key_der.clone_key(),
                 )?
             } else {
+                debug!("TLS has been enabled but no client certificate has been provided");
                 client_builder.with_no_client_auth()
             };
             tokio_tungstenite::Connector::Rustls(Arc::new(client_config))
@@ -180,6 +215,10 @@ impl ClientBuilder {
             format!("Bearer {}", self.token.stringify())
                 .try_into()
                 .unwrap(),
+        );
+        request.headers_mut().append(
+            "X-Register-Connection",
+            self.register_connection.to_string().try_into().unwrap(),
         );
         match &self.token {
             ClientToken::DeploymentToken(token) => {
@@ -202,6 +241,7 @@ impl ClientBuilder {
         if let Some(identity) = &self.identity
             && self.disable_tls
         {
+            warn!("TLS has been disabled, sending client certificate in header");
             request.headers_mut().append(
                 "X-Client-Cert",
                 urlencoding::encode_binary(identity.certificate_pem.as_bytes())
@@ -231,6 +271,21 @@ pub enum ClientError {
     /// Connection error.
     #[error(transparent)]
     Connection(#[from] ConnectionError<WebSocketTransport<MaybeTlsStream<TcpStream>>>),
+    /// IO error.
+    #[error(transparent)]
+    Io(#[from] std::io::Error),
+    /// Serialization.
+    #[error(transparent)]
+    Serde(#[from] serde_json::Error),
+    /// Open error.
+    #[error(transparent)]
+    Open(#[from] nexigon_multiplex::OpenError),
+    /// Other error.
+    #[error("{0}")]
+    Other(String),
+    /// Action error.
+    #[error("action error: {}", _0.message)]
+    ActionError(ActionError),
 }
 
 /// Websocket connection to a Nexigon Hub server.
@@ -249,7 +304,7 @@ impl WebsocketConnection {
     }
 
     /// Spawn a new task polling the connection.
-    pub fn spawn(mut self) {
+    pub fn spawn(mut self) -> tokio::task::JoinHandle<()> {
         tokio::spawn(async move {
             while let Some(event) = self.connection.next().await {
                 match event {
@@ -260,7 +315,7 @@ impl WebsocketConnection {
                     }
                 }
             }
-        });
+        })
     }
 }
 
@@ -278,6 +333,65 @@ impl Stream for WebsocketConnection {
             }
             std::task::Poll::Ready(None) => std::task::Poll::Ready(None),
             std::task::Poll::Pending => std::task::Poll::Pending,
+        }
+    }
+}
+
+/// Connect an executor via the given [`ConnectionRef`].
+pub async fn connect_executor(
+    connection: &mut ConnectionRef,
+) -> Result<ClientExecutor, ClientError> {
+    let channel = connection.open(b"executor").await?;
+    Ok(ClientExecutor::new(channel))
+}
+
+/// Executor for executing [`Action`]s on the Nexigon Hub server.
+#[derive(Debug)]
+pub struct ClientExecutor {
+    /// Channel for sending and receiving data.
+    channel: Channel,
+}
+
+impl ClientExecutor {
+    /// Construct a new [`ClientExecutor`] from the given [`Channel`].
+    fn new(channel: Channel) -> Self {
+        Self { channel }
+    }
+
+    /// Execute the given [`Action`] on the Nexigon Hub server.
+    #[tracing::instrument(level = Level::DEBUG, skip_all, fields(action.name = A::NAME))]
+    pub async fn execute<A: Action>(&mut self, action: A) -> Result<A::Output, ClientError> {
+        debug!("executing action");
+        let mut buffer = BytesMut::new();
+        buffer.put_u16(A::NAME.len() as u16);
+        buffer.put_slice(A::NAME.as_bytes());
+        let input = serde_json::to_vec(&action).unwrap();
+        buffer.put_u32(input.len() as u32);
+        buffer.put_slice(&input);
+        let (sender, receiver) = self.channel.split_mut();
+        let (write_result, read_result) = tokio::join!(
+            async {
+                sender.write_all(&buffer).await?;
+                sender.flush().await?;
+                trace!("done sending invocation");
+                Result::<_, std::io::Error>::Ok(())
+            },
+            async {
+                let mut output_size = [0u8; 4];
+                receiver.read_exact(&mut output_size).await?;
+                let output_size = u32::from_be_bytes(output_size);
+                trace!(output_size, "received output size");
+                let mut output = vec![0u8; output_size as usize];
+                receiver.read_exact(&mut output).await?;
+                trace!("done reading output");
+                Result::<_, std::io::Error>::Ok(output)
+            }
+        );
+        write_result?;
+        let output = read_result?;
+        match serde_json::from_slice::<ActionResult<A::Output>>(&output)? {
+            ActionResult::Ok(value) => Ok(value),
+            ActionResult::Error(error) => Err(ClientError::ActionError(error)),
         }
     }
 }
