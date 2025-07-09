@@ -1100,6 +1100,7 @@ dependencies = [
  "clap",
  "futures",
  "nexigon-api",
+ "nexigon-cert",
  "nexigon-client",
  "nexigon-ids",
  "nexigon-multiplex",

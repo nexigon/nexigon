@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 use std::net::Ipv4Addr;
 use std::net::SocketAddr;
+use std::path::Path;
 use std::path::PathBuf;
 
 use anyhow::Context;
@@ -50,10 +51,37 @@ async fn main() -> anyhow::Result<()> {
     )
     .context("cannot parse config")?;
     nexigon_client::install_crypto_provider();
-    let cert = tokio::fs::read_to_string(config_dir.join(config.ssl_cert.unwrap()))
+    let cert_path = config_dir.join(
+        config
+            .ssl_cert
+            .as_deref()
+            .unwrap_or(Path::new("/etc/nexigon/agent/ssl/cert.pem")),
+    );
+    let key_path = config_dir.join(
+        config
+            .ssl_key
+            .as_deref()
+            .unwrap_or(Path::new("/etc/nexigon/agent/ssl/key.pem")),
+    );
+    if !cert_path.exists() {
+        if key_path.exists() {
+            bail!("found SSL key but certificate is missing");
+        }
+        info!("generating SSL certificate and key");
+        let (certificate, key) = nexigon_cert::generate_self_signed_certificate();
+        if let Some(parent) = cert_path.parent() {
+            tokio::fs::create_dir_all(parent).await.ok();
+        }
+        if let Some(parent) = key_path.parent() {
+            tokio::fs::create_dir_all(parent).await.ok();
+        }
+        tokio::fs::write(&cert_path, certificate.to_pem()).await?;
+        tokio::fs::write(&key_path, key).await?;
+    }
+    let cert = tokio::fs::read_to_string(&cert_path)
         .await
         .context("cannot read certificate")?;
-    let key = tokio::fs::read_to_string(config_dir.join(config.ssl_key.unwrap()))
+    let key = tokio::fs::read_to_string(&key_path)
         .await
         .context("cannot read private key")?;
     let identity = ClientIdentity::from_pem(&cert, &key).context("cannot parse identity")?;
