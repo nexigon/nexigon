@@ -39,13 +39,15 @@ async fn main() -> anyhow::Result<()> {
     info!("starting Nexigon Agent");
     let config_path = args
         .config
+        .as_deref()
+        .unwrap_or(Path::new("/etc/nexigon/agent.toml"))
         .canonicalize()
         .context("cannot canonicalize config path")?;
     let Some(config_dir) = config_path.parent() else {
         bail!("config path has no parent");
     };
     let config = toml::from_str::<Config>(
-        &tokio::fs::read_to_string(&args.config)
+        &tokio::fs::read_to_string(&config_path)
             .await
             .context("cannot read config")?,
     )
@@ -233,7 +235,7 @@ pub struct Args {
     logging: si_observability::clap4::LoggingArgs,
     /// Configuration file.
     #[clap(long)]
-    config: PathBuf,
+    config: Option<PathBuf>,
     /// Command.
     #[clap(subcommand)]
     cmd: Cmd,
