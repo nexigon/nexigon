@@ -104,7 +104,7 @@ async fn main() -> anyhow::Result<()> {
         while let Some(event) = connection.next().await {
             match event {
                 Ok(ConnectionEvent::RequestChannel(request)) => {
-                    info!("channel request: {request:?}");
+                    debug!("channel request: {request:?}");
                     let endpoint = std::str::from_utf8(request.endpoint())
                         .context("invalid UTF-8 in endpoint")?;
                     // TODO: Handle other endpoints and errors.
