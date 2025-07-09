@@ -9,6 +9,7 @@ use anyhow::bail;
 use clap::Parser;
 use futures::StreamExt;
 use tokio::net::TcpStream;
+use tracing::debug;
 use tracing::info;
 
 use nexigon_api::types::actor::GetActorAction;
@@ -120,9 +121,11 @@ async fn main() -> anyhow::Result<()> {
                             ))
                             .await
                             .unwrap();
-                            tokio::io::copy_bidirectional(&mut channel, &mut tcp)
-                                .await
-                                .unwrap();
+                            if let Err(error) =
+                                tokio::io::copy_bidirectional(&mut channel, &mut tcp).await
+                            {
+                                debug!("forwarding error: {error}");
+                            }
                         });
                     });
                 }
