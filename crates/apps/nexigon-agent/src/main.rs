@@ -3,6 +3,7 @@ use std::net::Ipv4Addr;
 use std::net::SocketAddr;
 use std::path::Path;
 use std::path::PathBuf;
+use std::process::Stdio;
 
 use anyhow::Context;
 use anyhow::bail;
@@ -81,6 +82,15 @@ async fn main() -> anyhow::Result<()> {
         tokio::fs::write(&cert_path, certificate.to_pem()).await?;
         tokio::fs::write(&key_path, key).await?;
     }
+    let fingerprint_data =
+        tokio::process::Command::new(config_dir.join(&config.fingerprint_script))
+            .stderr(Stdio::inherit())
+            .stdout(Stdio::piped())
+            .output()
+            .await
+            .context("running fingerprint script")?
+            .stdout;
+    let fingerprint = DeviceFingerprint::from_data(&fingerprint_data);
     let cert = tokio::fs::read_to_string(&cert_path)
         .await
         .context("cannot read certificate")?;
@@ -93,7 +103,7 @@ async fn main() -> anyhow::Result<()> {
         ClientToken::DeploymentToken(config.token.clone()),
     )
     .with_identity(Some(identity))
-    .with_device_fingerprint(Some(DeviceFingerprint::from_data(b"xyz")))
+    .with_device_fingerprint(Some(fingerprint))
     .with_register_connection(matches!(args.cmd, Cmd::Run))
     .dangerous_with_disable_tls(config.dangerous_disable_tls.unwrap_or(false))
     .connect()
