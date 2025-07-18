@@ -26,3 +26,29 @@ impl Default for devices::DeviceEventSeverity {
         devices::DeviceEventSeverity::Info
     }
 }
+
+impl<T> From<errors::ActionResult<T>> for Result<T, errors::ActionError> {
+    fn from(value: errors::ActionResult<T>) -> Self {
+        match value {
+            errors::ActionResult::Ok(value) => Ok(value),
+            errors::ActionResult::Error(error) => Err(error),
+        }
+    }
+}
+
+impl<T> From<Result<T, errors::ActionError>> for errors::ActionResult<T> {
+    fn from(value: Result<T, errors::ActionError>) -> Self {
+        match value {
+            Ok(value) => errors::ActionResult::Ok(value),
+            Err(error) => errors::ActionResult::Error(error),
+        }
+    }
+}
+
+impl std::fmt::Display for errors::ActionError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{:?}: {}", self.kind, self.message)
+    }
+}
+
+impl std::error::Error for errors::ActionError {}

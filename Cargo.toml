@@ -50,6 +50,7 @@ nexigon-cert = { path = "crates/libs/nexigon-cert" }
 nexigon-client = { path = "crates/libs/nexigon-client" }
 nexigon-ids = { path = "crates/libs/nexigon-ids" }
 nexigon-multiplex = { path = "crates/libs/nexigon-multiplex" }
+nexigon-rpc = { path = "crates/libs/nexigon-rpc" }
 
 [workspace.dependencies.tokio-tungstenite]
 features = ["url", "rustls-tls-native-roots"]

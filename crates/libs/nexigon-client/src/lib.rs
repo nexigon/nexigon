@@ -2,28 +2,21 @@
 
 use std::sync::Arc;
 
-use bytes::BufMut;
-use bytes::BytesMut;
 use futures::Stream;
 use futures::StreamExt;
 use rustls::pki_types::pem::PemObject;
 use thiserror::Error;
-use tokio::io::AsyncReadExt;
-use tokio::io::AsyncWriteExt;
 use tokio::net::TcpStream;
 use tokio_tungstenite::MaybeTlsStream;
 use tokio_tungstenite::tungstenite::client::IntoClientRequest;
-use tracing::Level;
 use tracing::debug;
 use tracing::error;
 use tracing::info;
-use tracing::trace;
 use tracing::warn;
 use url::Url;
 
 use nexigon_api::Action;
 use nexigon_api::types::errors::ActionError;
-use nexigon_api::types::errors::ActionResult;
 use nexigon_ids::Id;
 use nexigon_ids::ids::DeploymentToken;
 use nexigon_ids::ids::DeviceFingerprint;
@@ -33,6 +26,7 @@ use nexigon_multiplex::Connection;
 use nexigon_multiplex::ConnectionError;
 use nexigon_multiplex::ConnectionEvent;
 use nexigon_multiplex::ConnectionRef;
+use nexigon_rpc::ExecuteError;
 
 use crate::websocket::WebSocketTransport;
 
@@ -359,39 +353,11 @@ impl ClientExecutor {
     }
 
     /// Execute the given [`Action`] on the Nexigon Hub server.
-    #[tracing::instrument(level = Level::DEBUG, skip_all, fields(action.name = A::NAME))]
-    pub async fn execute<A: Action>(&mut self, action: A) -> Result<A::Output, ClientError> {
-        debug!("executing action");
-        let mut buffer = BytesMut::new();
-        buffer.put_u16(A::NAME.len() as u16);
-        buffer.put_slice(A::NAME.as_bytes());
-        let input = serde_json::to_vec(&action).unwrap();
-        buffer.put_u32(input.len() as u32);
-        buffer.put_slice(&input);
-        let (sender, receiver) = self.channel.split_mut();
-        let (write_result, read_result) = tokio::join!(
-            async {
-                sender.write_all(&buffer).await?;
-                sender.flush().await?;
-                trace!("done sending invocation");
-                Result::<_, std::io::Error>::Ok(())
-            },
-            async {
-                let mut output_size = [0u8; 4];
-                receiver.read_exact(&mut output_size).await?;
-                let output_size = u32::from_be_bytes(output_size);
-                trace!(output_size, "received output size");
-                let mut output = vec![0u8; output_size as usize];
-                receiver.read_exact(&mut output).await?;
-                trace!("done reading output");
-                Result::<_, std::io::Error>::Ok(output)
-            }
-        );
-        write_result?;
-        let output = read_result?;
-        match serde_json::from_slice::<ActionResult<A::Output>>(&output)? {
-            ActionResult::Ok(value) => Ok(value),
-            ActionResult::Error(error) => Err(ClientError::ActionError(error)),
-        }
+    pub async fn execute<A: Action>(
+        &mut self,
+        action: A,
+    ) -> Result<Result<A::Output, ActionError>, ExecuteError> {
+        let (tx, rx) = self.channel.split_mut();
+        nexigon_rpc::execute(&action, rx, tx).await
     }
 }

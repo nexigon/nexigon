@@ -111,7 +111,13 @@ async fn main() -> anyhow::Result<()> {
     let mut connection_ref = connection.make_ref();
     let join_handle = connection.spawn();
     let mut executor = connect_executor(&mut connection_ref).await.unwrap();
-    let _actor = match executor.execute(GetActorAction::new()).await.unwrap().actor {
+    let _actor = match executor
+        .execute(GetActorAction::new())
+        .await
+        .unwrap()
+        .unwrap()
+        .actor
+    {
         nexigon_api::types::actor::Actor::UserToken(actor) => {
             info!(user_id = %actor.user_id);
             actor
@@ -312,6 +318,7 @@ async fn main() -> anyhow::Result<()> {
                         let output = executor
                             .execute(CreateAssetAction::new(repository_id.clone(), size, digest))
                             .await
+                            .unwrap()
                             .unwrap();
                         let asset_id = match &output {
                             nexigon_api::types::repositories::CreateAssetOutput::AssetAlreadyExists(asset_id) => asset_id,
@@ -321,6 +328,7 @@ async fn main() -> anyhow::Result<()> {
                         let upload_url = executor
                             .execute(IssueAssetUploadUrlAction::new(asset_id.clone()))
                             .await
+                            .context("issuing upload URL")?
                             .context("issuing upload URL")?
                             .url;
                         reqwest::Client::new()
@@ -625,7 +633,7 @@ pub async fn resolve_repository(
     }
     let output = executor
         .execute(ResolveRepositoryNameAction::new(repository.to_owned()))
-        .await?;
+        .await??;
     match output {
         ResolveRepositoryNameOutput::Found(id) => Ok(id),
         ResolveRepositoryNameOutput::NotFound => {
@@ -656,7 +664,7 @@ pub async fn resolve_package(
             repository.to_owned(),
             package.to_owned(),
         ))
-        .await?;
+        .await??;
     match output {
         nexigon_api::types::repositories::ResolvePackageByPathOutput::Found(output) => {
             Ok(output.package_id)
@@ -711,7 +719,7 @@ pub async fn resolve_version(
             path.package,
             path.tag,
         ))
-        .await?;
+        .await??;
     match output {
         ResolvePackageVersionByPathOutput::Found(output) => Ok(output.version_id),
         ResolvePackageVersionByPathOutput::NotFound => {
@@ -771,7 +779,7 @@ pub async fn resolve_asset(
             path.tag,
             path.filename,
         ))
-        .await?;
+        .await??;
     match output {
         nexigon_api::types::repositories::ResolvePackageVersionAssetByPathOutput::Found(output) => {
             Ok(output.asset_id)

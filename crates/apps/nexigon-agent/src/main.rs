@@ -152,7 +152,13 @@ async fn main() -> anyhow::Result<()> {
         anyhow::Result::Ok(())
     });
     let mut executor = connect_executor(&mut connection_ref).await.unwrap();
-    let actor = match executor.execute(GetActorAction::new()).await.unwrap().actor {
+    let actor = match executor
+        .execute(GetActorAction::new())
+        .await
+        .unwrap()
+        .unwrap()
+        .actor
+    {
         nexigon_api::types::actor::Actor::Device(actor) => {
             info!(device_id = %actor.device_id);
             actor
@@ -197,7 +203,7 @@ async fn main() -> anyhow::Result<()> {
                                 .context("device metadata must be valid JSON")?,
                         ))
                         .await
-                        .context("unable to set device metadata")?;
+                        .context("unable to set device metadata")??;
                 }
             },
         },
@@ -233,7 +239,7 @@ async fn main() -> anyhow::Result<()> {
                 executor
                     .execute(publish_events)
                     .await
-                    .context("unable to emit event")?;
+                    .context("unable to emit event")??;
             }
         },
     }
