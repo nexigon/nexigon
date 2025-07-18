@@ -350,6 +350,7 @@ async fn main() -> anyhow::Result<()> {
 
 /// CLI arguments.
 #[derive(Debug, Parser)]
+#[clap(version)]
 pub struct Args {
     /// Logging arguments.
     #[clap(flatten)]
