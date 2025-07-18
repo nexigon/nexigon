@@ -2992,6 +2992,30 @@
     "required": [],
     "unevaluatedProperties": false
   },
+  "nexigon_api.users.CompleteRegistrationAction": {
+    "type": "object",
+    "description": "Complete the registration of a user.",
+    "properties": {
+      "activationToken": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "activationToken"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.users.CompleteRegistrationOutput": {
+    "enum": [
+      {
+        "result": "Completed"
+      },
+      {
+        "result": "Failed"
+      }
+    ],
+    "description": "Output of completing the registration of a user."
+  },
   "nexigon_api.users.CreateUserAction": {
     "type": "object",
     "description": "Create a new user.",

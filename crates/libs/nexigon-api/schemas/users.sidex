@@ -398,3 +398,18 @@ record ResendRegistrationEmailAction {
     /// Email address of the user.
     email: string,
 }
+
+/// Complete the registration of a user.
+record CompleteRegistrationAction {
+    /// Token to use for account activation.
+    activation_token: string,
+}
+
+/// Output of completing the registration of a user.
+#[json(tag = "result")]
+variant CompleteRegistrationOutput {
+    /// Registration was successful.
+    Completed,
+    /// Registration failed.
+    Failed,
+}

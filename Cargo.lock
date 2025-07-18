@@ -1191,6 +1191,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "nexigon-gen-ts-bindings"
+version = "0.1.0"
+dependencies = [
+ "nexigon-api",
+]
+
+[[package]]
 name = "nexigon-ids"
 version = "0.1.0"
 dependencies = [

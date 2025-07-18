@@ -51,6 +51,7 @@ macro_rules! with_actions {
             // ## User Registrations
             ("users_RegisterUser", RegisterUser, users::RegisterUserAction, users::RegisterUserOutput),
             ("users_ResendRegistrationEmail", ResendRegistrationEmail, users::ResendRegistrationEmailAction, outputs::Empty),
+            ("users_CompleteRegistration", CompleteRegistration, users::CompleteRegistrationAction, users::CompleteRegistrationOutput),
 
             // # Projects
             ("projects_QueryProjects", QueryProjects, projects::QueryProjectsAction, projects::QueryProjectsOutput),

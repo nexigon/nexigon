@@ -636,6 +636,36 @@
         }
       }
     },
+    "/api/v1/invoke/users_CompleteRegistration": {
+      "post": {
+        "tags": [
+          "users"
+        ],
+        "summary": "CompleteRegistration",
+        "description": "Complete the registration of a user.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/nexigon_api.users.CompleteRegistrationAction"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/nexigon_api.users.CompleteRegistrationOutput"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/invoke/projects_QueryProjects": {
       "post": {
         "tags": [
@@ -5508,6 +5538,29 @@
         "properties": {},
         "required": [],
         "unevaluatedProperties": false
+      },
+      "nexigon_api.users.CompleteRegistrationAction": {
+        "type": "object",
+        "properties": {
+          "activationToken": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "activationToken"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.users.CompleteRegistrationOutput": {
+        "enum": [
+          {
+            "result": "Completed"
+          },
+          {
+            "result": "Failed"
+          }
+        ],
+        "description": "Output of completing the registration of a user."
       },
       "nexigon_api.users.CreateUserAction": {
         "type": "object",

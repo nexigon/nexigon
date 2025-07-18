@@ -1,0 +1,11 @@
+[package]
+name = "nexigon-gen-ts-bindings"
+edition = "2024"
+authors.workspace = true
+version.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+
+[dependencies]
+nexigon-api.workspace = true
