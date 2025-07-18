@@ -396,6 +396,36 @@
         }
       }
     },
+    "/api/v1/invoke/users_GetDevicePermissions": {
+      "post": {
+        "tags": [
+          "users"
+        ],
+        "summary": "GetDevicePermissions",
+        "description": "Check the permissions of a user for a given device.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/nexigon_api.users.GetDevicePermissionsAction"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/nexigon_api.users.GetDevicePermissionsOutput"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/invoke/users_CreateUserToken": {
       "post": {
         "tags": [
@@ -5597,6 +5627,35 @@
         },
         "required": [
           "tokenId"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.users.GetDevicePermissionsAction": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "$ref": "#/components/schemas/nexigon_api.users.UserId"
+          },
+          "deviceId": {
+            "$ref": "#/components/schemas/nexigon_api.devices.DeviceId"
+          }
+        },
+        "required": [
+          "userId",
+          "deviceId"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.users.GetDevicePermissionsOutput": {
+        "type": "object",
+        "description": "Output of checking the permissions of a user for a given device.",
+        "properties": {
+          "hasAccess": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "hasAccess"
         ],
         "unevaluatedProperties": false
       },

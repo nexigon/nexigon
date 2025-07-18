@@ -39,7 +39,8 @@ macro_rules! with_actions {
             ("users_QueryUserSessions", QueryUserSessions, users::QueryUserSessionsAction, users::QueryUserSessionsOutput),
             ("users_AuthenticateWithUserToken", AuthenticateWithUserToken, users::AuthenticateWithUserTokenAction, users::AuthenticateWithUserTokenOutput),
             ("users_AuthenticateWithSessionToken", AuthenticateWithSessionToken, users::AuthenticateWithSessionTokenAction, users::AuthenticateWithSessionTokenOutput),
-
+            // # User Permissions
+            ("users_GetDevicePermissions", GetDevicePermissions, users::GetDevicePermissionsAction, users::GetDevicePermissionsOutput),
             // ## User Tokens
             ("users_CreateUserToken", CreateUserToken, users::CreateUserTokenAction, users::CreateUserTokenOutput),
             ("users_DeleteUserToken", DeleteUserToken, users::DeleteUserTokenAction, outputs::Empty),

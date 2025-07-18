@@ -2,6 +2,7 @@
 
 import actor::Actor
 import datetime::Timestamp
+import devices::DeviceId
 import projects::ProjectId
 import repositories::RepositoryId
 
@@ -265,6 +266,20 @@ record AuthenticateWithSessionTokenSuccess {
     session_id: UserSessionId,
     /// Resulting actor to use for further actions.
     actor: Actor,
+}
+
+/// Check the permissions of a user for a given device.
+record GetDevicePermissionsAction {
+    /// ID of the user.
+    user_id: UserId,
+    /// ID of the device.
+    device_id: DeviceId,
+}
+
+/// Output of checking the permissions of a user for a given device.
+record GetDevicePermissionsOutput {
+    /// Whether the user has access to the device.
+    has_access: bool,
 }
 
 /// Create a user token.

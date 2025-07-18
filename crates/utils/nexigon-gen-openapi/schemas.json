@@ -3117,6 +3117,36 @@
     ],
     "unevaluatedProperties": false
   },
+  "nexigon_api.users.GetDevicePermissionsAction": {
+    "type": "object",
+    "description": "Check the permissions of a user for a given device.",
+    "properties": {
+      "userId": {
+        "$ref": "#/components/schemas/nexigon_api.users.UserId"
+      },
+      "deviceId": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceId"
+      }
+    },
+    "required": [
+      "userId",
+      "deviceId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.users.GetDevicePermissionsOutput": {
+    "type": "object",
+    "description": "Output of checking the permissions of a user for a given device.",
+    "properties": {
+      "hasAccess": {
+        "type": "boolean"
+      }
+    },
+    "required": [
+      "hasAccess"
+    ],
+    "unevaluatedProperties": false
+  },
   "nexigon_api.users.GetUserDetailsAction": {
     "type": "object",
     "description": "Get information about a user.",
