@@ -155,7 +155,7 @@ async fn main() -> anyhow::Result<()> {
                             .with_valid_for_secs(*valid_for),
                     )
                     .await
-                    .context("issuing HTTP proxy URL")?;
+                    .context("issuing HTTP proxy URL")??;
                 println!("{}", serde_json::to_string(&output).unwrap())
             }
         },
@@ -191,7 +191,7 @@ async fn main() -> anyhow::Result<()> {
                             name.to_owned(),
                         ))
                         .await
-                        .context("creating package")?;
+                        .context("creating package")??;
                     serde_json::to_writer_pretty(std::io::stdout(), &output).unwrap();
                 }
                 PackagesCmd::Delete { package } => {
@@ -199,7 +199,7 @@ async fn main() -> anyhow::Result<()> {
                     let output = executor
                         .execute(DeletePackageAction::new(package_id.clone()))
                         .await
-                        .context("deleting package")?;
+                        .context("deleting package")??;
                     serde_json::to_writer_pretty(std::io::stdout(), &output).unwrap();
                 }
             },
@@ -209,7 +209,7 @@ async fn main() -> anyhow::Result<()> {
                     let output = executor
                         .execute(GetPackageVersionDetailsAction::new(version_id))
                         .await
-                        .context("getting package version info")?;
+                        .context("getting package version info")??;
                     serde_json::to_writer_pretty(std::io::stdout(), &output).unwrap();
                 }
                 PackageVersionsCmd::Resolve { version } => {
@@ -221,7 +221,7 @@ async fn main() -> anyhow::Result<()> {
                             path.tag,
                         ))
                         .await
-                        .context("getting package version info")?;
+                        .context("getting package version info")??;
                     serde_json::to_writer_pretty(std::io::stdout(), &output).unwrap();
                 }
                 PackageVersionsCmd::Create { package, tags } => {
@@ -232,7 +232,7 @@ async fn main() -> anyhow::Result<()> {
                                 .with_tags(Some(tags.iter().map(|tag| tag.0.clone()).collect())),
                         )
                         .await
-                        .context("creating package version")?;
+                        .context("creating package version")??;
                     serde_json::to_writer_pretty(std::io::stdout(), &output).unwrap();
                 }
                 PackageVersionsCmd::Delete { version } => {
@@ -240,7 +240,7 @@ async fn main() -> anyhow::Result<()> {
                     let output = executor
                         .execute(DeletePackageVersionAction::new(version_id.clone()))
                         .await
-                        .context("deleting package version")?;
+                        .context("deleting package version")??;
                     serde_json::to_writer_pretty(std::io::stdout(), &output).unwrap();
                 }
                 PackageVersionsCmd::Tag { version, tags } => {
@@ -251,7 +251,7 @@ async fn main() -> anyhow::Result<()> {
                             tags.iter().map(|tag| tag.0.clone()).collect(),
                         ))
                         .await
-                        .context("adding package version tags")?;
+                        .context("adding package version tags")??;
                     serde_json::to_writer_pretty(std::io::stdout(), &output).unwrap();
                 }
                 PackageVersionsCmd::Assets(cmd) => match cmd {
@@ -267,8 +267,7 @@ async fn main() -> anyhow::Result<()> {
                                 asset_id.clone(),
                                 filename.to_owned(),
                             ))
-                            .await
-                            .unwrap();
+                            .await??;
                         serde_json::to_writer_pretty(std::io::stdout(), &output).unwrap();
                     }
                     VersionAssetsCommand::Remove { version, filename } => {
@@ -278,8 +277,7 @@ async fn main() -> anyhow::Result<()> {
                                 version_id.clone(),
                                 filename.clone(),
                             ))
-                            .await
-                            .unwrap();
+                            .await??;
                         serde_json::to_writer_pretty(std::io::stdout(), &output).unwrap();
                     }
                 },
@@ -317,9 +315,7 @@ async fn main() -> anyhow::Result<()> {
                         // Try to create the asset.
                         let output = executor
                             .execute(CreateAssetAction::new(repository_id.clone(), size, digest))
-                            .await
-                            .unwrap()
-                            .unwrap();
+                            .await??;
                         let asset_id = match &output {
                             nexigon_api::types::repositories::CreateAssetOutput::AssetAlreadyExists(asset_id) => asset_id,
                             nexigon_api::types::repositories::CreateAssetOutput::Created(asset_id) => asset_id,
