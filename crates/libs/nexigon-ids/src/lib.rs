@@ -2,9 +2,11 @@
 //! Unique identifiers for entities and access tokens.
 //!
 //! Within Nexigon, entities are identified by *ids* of the form `<tag>_<raw>` where
-//! `<tag>` indicates the type of the entity and `<raw>` is a base 58 numeric string
-//! uniquely identifying an entity of the respective type. We refer to `<raw>` as a
-//! *raw id*.
+//! `<tag>` indicates the type of the entity and `<raw>` is a *raw id* taking one of the
+//! following forms:
+//!
+//! - [`FlatRawId`]: Base 58 numeric string.
+//! - [`DatedRawId`]: Base 58 numeric string with a datetime prefix.
 //!
 //! Internally, entities in the database may have sequential numeric ids, however,
 //! Nexigon's APIs work exclusively with entity ids as defined here. These ids have the
@@ -22,6 +24,7 @@
 //! security precaution, the [`Display`][std::fmt::Display] and [`Debug`] implementations
 //! of secret ids will not include the raw id.
 
+use std::fmt::Write;
 use std::sync::Arc;
 
 use rand::RngCore;
@@ -113,7 +116,8 @@ macro_rules! define_types {
     ($(
         $(#[$meta:meta])*
         $name:ident => (
-            $string:literal,
+            $type:ty,
+            $tag:literal,
             $size:literal,
             secret = $secret:tt
         ),
@@ -132,7 +136,7 @@ macro_rules! define_types {
             pub fn as_str(&self) -> &'static str {
                 match self {
                     $(
-                        Self::$name => $string,
+                        Self::$name => $tag,
                     )*
                 }
             }
@@ -181,7 +185,7 @@ macro_rules! define_types {
             fn from_str(s: &str) -> Result<Self, Self::Err> {
                 match s {
                     $(
-                        $string => Ok(Self::$name),
+                        $tag => Ok(Self::$name),
                     )*
                     _ => Err(errors::InvalidTagError::new())
                 }
@@ -252,10 +256,9 @@ macro_rules! define_types {
             fn from_str(s: &str) -> Result<Self, Self::Err> {
                 // cspell:ignore rsplit
                 if let Some((tag, raw)) = s.rsplit_once("_") {
-                    let raw = RawId::from_str(raw)?;
                     match tag {
                         $(
-                            $string => Ok(Self::$name(raw.try_into()?)),
+                            $tag => Ok(Self::$name(raw.parse()?)),
                         )*
                         _ => Err(errors::InvalidIdError::new("unknown tag"))
                     }
@@ -276,13 +279,13 @@ macro_rules! define_types {
                 #[derive(Clone, PartialEq, Eq, Hash)]
                 pub struct $name {
                     /// Raw id.
-                    raw: RawId,
+                    raw: $type,
                 }
 
                 impl $name {
                     /// Create an id from the provided raw id without checking its size.
                     pub fn from_raw_unchecked(raw: RawId) -> Self {
-                        Self { raw }
+                        Self { raw: <$type>::from_raw_unchecked(raw) }
                     }
                 }
 
@@ -304,12 +307,12 @@ macro_rules! define_types {
                     }
 
                     fn raw(&self) -> &RawId {
-                        &self.raw
+                        self.raw.as_ref()
                     }
 
                     fn stringify(&self) -> String {
-                        let mut string = String::with_capacity($string.len() + 1 + $size);
-                        string.push_str($string);
+                        let mut string = String::with_capacity($tag.len() + 1 + $size);
+                        string.push_str($tag);
                         string.push('_');
                         string.push_str(self.raw.as_str());
                         string
@@ -318,7 +321,7 @@ macro_rules! define_types {
 
                 impl Generate for $name {
                     fn generate() -> Self {
-                        Self::from_raw_unchecked(RawId::generate($size))
+                        Self { raw: <$type>::generate($size) }
                     }
                 }
 
@@ -335,7 +338,7 @@ macro_rules! define_types {
                         string.parse().map_err(|_| {
                             D::Error::invalid_value(
                                 serde::de::Unexpected::Str(&string),
-                                &concat!("expected id with tag `", $string, "`")
+                                &concat!("expected id with tag `", $tag, "`")
                             )
                         })
                     }
@@ -343,7 +346,7 @@ macro_rules! define_types {
 
                 impl std::fmt::Display for $name {
                     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-                        f.write_str($string)?;
+                        f.write_str($tag)?;
                         f.write_str("_")?;
                         if $secret {
                             f.write_str("<redacted>")?;
@@ -358,11 +361,11 @@ macro_rules! define_types {
                     type Err = errors::InvalidIdError;
 
                     fn from_str(s: &str) -> Result<Self, Self::Err> {
-                        if let Some(raw) = s.strip_prefix(concat!($string, "_")) {
-                            Self::try_from(RawId::from_str(raw)?)
+                        if let Some(raw) = s.strip_prefix(concat!($tag, "_")) {
+                            Self::try_from(<$type>::from_str(raw)?)
                         } else {
                             Err(errors::InvalidIdError::new(
-                                concat!("invalid prefix (expected: `", $string, "_`)")
+                                concat!("invalid prefix (expected: `", $tag, "_`)")
                             ))
                         }
                     }
@@ -374,16 +377,16 @@ macro_rules! define_types {
                     }
                 }
 
-                impl From<$name> for RawId {
-                    fn from(id: $name) -> RawId {
+                impl From<$name> for $type {
+                    fn from(id: $name) -> $type {
                         id.raw
                     }
                 }
 
-                impl TryFrom<RawId> for $name {
+                impl TryFrom<$type> for $name {
                     type Error = errors::InvalidIdError;
 
-                    fn try_from(raw: RawId) -> Result<Self, Self::Error> {
+                    fn try_from(raw: $type) -> Result<Self, Self::Error> {
                         if raw.as_str().len() == $size {
                             Ok(Self { raw })
                         } else {
@@ -402,78 +405,81 @@ define_types! {
     /// Cluster node id (globally unique).
     ///
     /// Uniquely identifies a cluster node within the system.
-    ClusterNodeId => ("cluster_node", 22, secret = false),
+    ClusterNodeId => (FlatRawId, "cluster_node", 22, secret = false),
 
     /// User id (globally unique).
     ///
     /// Uniquely identifies a user within the system.
-    UserId => ("u", 22, secret = false),
+    UserId => (FlatRawId, "u", 22, secret = false),
     /// User secret access token (globally unique).
     ///
     /// Used in-place of the password for login with the API and client.
-    UserToken => ("u_sk", 66, secret = true),
+    UserToken => (FlatRawId, "u_sk", 66, secret = true),
     /// User access token id (globally unique).
     ///
     /// The first 22 characters of the respective secret access token.
-    UserTokenId => ("u_pk", 22, secret = false),
+    UserTokenId => (FlatRawId, "u_pk", 22, secret = false),
     /// User session token (globally unique).
-    UserSessionToken => ("u_session_sk", 66, secret = true),
+    UserSessionToken => (FlatRawId, "u_session_sk", 66, secret = true),
     /// User session id (globally unique).
-    UserSessionId => ("u_session_pk", 22, secret = false),
+    UserSessionId => (FlatRawId, "u_session_pk", 22, secret = false),
 
     /// Project id (globally unique).
     ///
     /// Uniquely identifies a project within the system.
-    ProjectId => ("p", 22, secret = false),
+    ProjectId => (FlatRawId, "p", 22, secret = false),
     /// Project secret access token (globally unique).
     ///
     /// Used by devices to connect to the project.
-    ProjectToken => ("p_sk", 44, secret = true),
+    ProjectToken => (FlatRawId, "p_sk", 44, secret = true),
     /// Project access token id (globally unique).
     ///
     /// The first 22 characters of the respective secret access token.
-    ProjectTokenId => ("p_pk", 22, secret = false),
+    ProjectTokenId => (FlatRawId, "p_pk", 22, secret = false),
 
     /// Deployment token (globally unique).
     ///
     /// Used by devices to connect to a project.
-    DeploymentToken => ("deployment", 66, secret = true),
+    DeploymentToken => (FlatRawId, "deployment", 66, secret = true),
     /// Deployment token id (globally unique).
     ///
     /// The first 22 characters of the respective deployment token.
-    DeploymentTokenId => ("deployment_id", 22, secret = false),
+    DeploymentTokenId => (FlatRawId, "deployment_id", 22, secret = false),
 
     /// Device id (globally unique).
     ///
     /// Uniquely identifies a device within the system.
-    DeviceId => ("d", 22, secret = false),
+    DeviceId => (FlatRawId, "d", 22, secret = false),
     /// Device fingerprint (unique per project).
     ///
     /// Generated by the device as a unique identifier for itself.
     ///
     /// Used for authenticating the device together with a project token.
-    DeviceFingerprint => ("d_sk", 44, secret = true),
+    DeviceFingerprint => (FlatRawId, "d_sk", 44, secret = true),
     /// Device fingerprint id (unique per project).
-    DeviceFingerprintId => ("d_pk", 22, secret = false),
+    DeviceFingerprintId => (FlatRawId, "d_pk", 22, secret = false),
     /// Device certificate id (globally unique).
-    DeviceCertificateId => ("d_c", 22, secret = false),
+    DeviceCertificateId => (FlatRawId, "d_c", 22, secret = false),
     /// Device connection id (globally unique).
-    DeviceConnectionId => ("d_conn", 22, secret = false),
+    DeviceConnectionId => (FlatRawId, "d_conn", 22, secret = false),
     /// Device event id (unique per device).
-    DeviceEventId => ("d_ev", 22, secret = false),
+    DeviceEventId => (DatedRawId, "d_ev", 22, secret = false),
 
     /// Repository id (globally unique).
-    RepositoryId => ("repo", 22, secret = false),
+    RepositoryId => (FlatRawId, "repo", 22, secret = false),
     /// Repository asset it (globally unique).
-    RepositoryAssetId => ("repo_a", 22, secret = false),
+    RepositoryAssetId => (FlatRawId, "repo_a", 22, secret = false),
 
     /// Package id (globally unique).
-    PackageId => ("pkg", 22, secret = false),
+    PackageId => (FlatRawId, "pkg", 22, secret = false),
     /// Package version id (globally unique).
-    PackageVersionId => ("pkg_v", 22, secret = false),
+    PackageVersionId => (FlatRawId, "pkg_v", 22, secret = false),
 
     /// Job id (globally unique).
-    JobId => ("job", 22, secret = false),
+    JobId => (DatedRawId, "job", 22, secret = false),
+
+    /// Audit log entry id (globally unique).
+    AuditLogId => (DatedRawId, "log", 22, secret = false),
 }
 
 /// Check whether a character is a base 58 digit.
@@ -502,7 +508,7 @@ impl std::fmt::Display for AnyId {
 impl ids::UserToken {
     /// Id of the token.
     pub fn token_id(&self) -> ids::UserTokenId {
-        ids::UserTokenId::from_raw_unchecked(RawId::new_unchecked(
+        ids::UserTokenId::from_raw_unchecked(RawId::new(
             &self.raw().as_str()[..Tag::UserTokenId.raw_size()],
         ))
     }
@@ -511,7 +517,7 @@ impl ids::UserToken {
 impl ids::DeploymentToken {
     /// Id of the token.
     pub fn token_id(&self) -> ids::DeploymentTokenId {
-        ids::DeploymentTokenId::from_raw_unchecked(RawId::new_unchecked(
+        ids::DeploymentTokenId::from_raw_unchecked(RawId::new(
             &self.raw().as_str()[..Tag::ProjectTokenId.raw_size()],
         ))
     }
@@ -520,7 +526,7 @@ impl ids::DeploymentToken {
 impl ids::ProjectToken {
     /// Id of the token.
     pub fn token_id(&self) -> ids::ProjectTokenId {
-        ids::ProjectTokenId::from_raw_unchecked(RawId::new_unchecked(
+        ids::ProjectTokenId::from_raw_unchecked(RawId::new(
             &self.raw().as_str()[..Tag::ProjectTokenId.raw_size()],
         ))
     }
@@ -529,7 +535,7 @@ impl ids::ProjectToken {
 impl ids::UserSessionToken {
     /// Id of the token.
     pub fn token_id(&self) -> ids::UserSessionId {
-        ids::UserSessionId::from_raw_unchecked(RawId::new_unchecked(
+        ids::UserSessionId::from_raw_unchecked(RawId::new(
             &self.raw().as_str()[..Tag::UserSessionId.raw_size()],
         ))
     }
@@ -538,7 +544,7 @@ impl ids::UserSessionToken {
 impl ids::DeviceFingerprint {
     /// Id of the fingerprint.
     pub fn fingerprint_id(&self) -> ids::DeviceFingerprintId {
-        ids::DeviceFingerprintId::from_raw_unchecked(RawId::new_unchecked(
+        ids::DeviceFingerprintId::from_raw_unchecked(RawId::new(
             &self.raw().as_str()[..Tag::DeviceFingerprintId.raw_size()],
         ))
     }
@@ -547,22 +553,146 @@ impl ids::DeviceFingerprint {
     pub fn from_data(data: &[u8]) -> ids::DeviceFingerprint {
         let mut hasher = Sha512_256::new();
         hasher.update(data);
-        Self::from_raw_unchecked(RawId::from_bytes(&hasher.finalize()))
+        Self::from_raw_unchecked(FlatRawId::from_bytes(hasher.finalize().as_slice()).into())
+    }
+}
+
+/// Fill the given string up to the given size with randomly generated base 58 digits.
+fn fill_random_base58_digits(str: &mut String, size: usize) {
+    const MASK: u32 = BASE.next_power_of_two() - 1;
+
+    // We use rejection sampling to get a uniform distribution over the base 58 space. We
+    // use a buffer to avoid calling the random number generator in the hot loop.
+    let mut rng = rand::rng();
+    let mut buffer = [0; 64];
+    'outer: while str.len() < size {
+        rng.fill_bytes(&mut buffer);
+        for byte in &buffer {
+            let digit = (*byte as u32) & MASK;
+            if digit < BASE {
+                str.push(ALPHABET_BASE58[digit as usize]);
+                if str.len() >= size {
+                    break 'outer;
+                }
+            }
+        }
     }
 }
 
 /// Raw id without a tag.
-///
-/// The internal representation is a base 58 numeric string.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct RawId {
     str: Arc<str>,
 }
 
 impl RawId {
-    /// Create a raw id from the given string without checking it for validity.
-    fn new_unchecked(str: impl Into<Arc<str>>) -> Self {
+    /// Create a raw id from the given string.
+    fn new(str: impl Into<Arc<str>>) -> Self {
         Self { str: str.into() }
+    }
+
+    /// String representation of the raw id.
+    pub fn as_str(&self) -> &str {
+        &self.str
+    }
+}
+
+/// Dated raw id without a tag.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct DatedRawId {
+    /// Underlying raw id.
+    raw: RawId,
+}
+
+impl DatedRawId {
+    /// Create a new flat raw id without checking its validity.
+    fn from_raw_unchecked(raw: RawId) -> Self {
+        Self { raw }
+    }
+
+    /// Generate a random dated raw id with the given size and current date.
+    pub(crate) fn generate(size: usize) -> Self {
+        let mut str = String::with_capacity(size);
+        write!(
+            &mut str,
+            "{}",
+            jiff::Timestamp::now().strftime("%Y%m%d-%H%M")
+        )
+        .expect("writing to string should not fail");
+        str.push('-');
+        fill_random_base58_digits(&mut str, size);
+        Self::from_raw_unchecked(RawId::new(str))
+    }
+
+    /// String representation of the dated raw id.
+    pub fn as_str(&self) -> &str {
+        &self.raw.str
+    }
+}
+
+impl AsRef<str> for DatedRawId {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl AsRef<RawId> for DatedRawId {
+    fn as_ref(&self) -> &RawId {
+        &self.raw
+    }
+}
+
+impl std::str::FromStr for DatedRawId {
+    type Err = errors::InvalidIdError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let Some((datetime, suffix)) = s.rsplit_once('-') else {
+            return Err(errors::InvalidIdError::new(
+                "missing '-' separator in dated raw id",
+            ));
+        };
+        let Some((date, time)) = datetime.split_once(' ') else {
+            return Err(errors::InvalidIdError::new(
+                "missing '-' separator in dated raw id",
+            ));
+        };
+        if date.len() != 8 {
+            return Err(errors::InvalidIdError::new("invalid date length"));
+        }
+        if time.len() != 2 {
+            return Err(errors::InvalidIdError::new("invalid time length"));
+        }
+        if !date.chars().all(|c| c.is_ascii_digit()) {
+            return Err(errors::InvalidIdError::new("invalid character in date"));
+        }
+        if !time.chars().all(|c| c.is_ascii_digit()) {
+            return Err(errors::InvalidIdError::new("invalid character in time"));
+        }
+        if suffix.chars().all(is_base58_digit) {
+            Ok(Self { raw: RawId::new(s) })
+        } else {
+            Err(errors::InvalidIdError::new("invalid digit in raw id"))
+        }
+    }
+}
+
+impl From<DatedRawId> for RawId {
+    fn from(value: DatedRawId) -> Self {
+        value.raw
+    }
+}
+
+/// Flat raw id without a tag.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct FlatRawId {
+    /// Underlying raw id.
+    raw: RawId,
+}
+
+impl FlatRawId {
+    /// Create a new flat raw id without checking its validity.
+    fn from_raw_unchecked(raw: RawId) -> Self {
+        Self { raw }
     }
 
     /// Create a raw id from the given bytes.
@@ -598,54 +728,49 @@ impl RawId {
         while base > 1 {
             (digit, base) = emit_digit(&mut str, digit, base);
         }
-        Self::new_unchecked(str)
+        Self::from_raw_unchecked(RawId::new(str))
     }
 
     /// Generate a random raw id with the given size.
     pub(crate) fn generate(size: usize) -> Self {
-        const MASK: u32 = BASE.next_power_of_two() - 1;
-
-        // We use rejection sampling to get a uniform distribution over the raw id space. We use a
-        // buffer to avoid calling the random number generator in the hot loop.
-        let mut rng = rand::rng();
-        let mut buffer = [0; 64];
         let mut str = String::with_capacity(size);
-        'outer: while str.len() < size {
-            rng.fill_bytes(&mut buffer);
-            for byte in &buffer {
-                let digit = (*byte as u32) & MASK;
-                if digit < BASE {
-                    str.push(ALPHABET_BASE58[digit as usize]);
-                    if str.len() >= size {
-                        break 'outer;
-                    }
-                }
-            }
-        }
-        Self::new_unchecked(str)
+        fill_random_base58_digits(&mut str, size);
+        Self::from_raw_unchecked(RawId::new(str))
     }
 
     /// String representation of the raw id.
     pub fn as_str(&self) -> &str {
-        &self.str
+        &self.raw.str
     }
 }
 
-impl std::str::FromStr for RawId {
+impl std::str::FromStr for FlatRawId {
     type Err = errors::InvalidIdError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         if s.chars().all(is_base58_digit) {
-            Ok(Self { str: s.into() })
+            Ok(Self { raw: RawId::new(s) })
         } else {
             Err(errors::InvalidIdError::new("invalid digit in raw id"))
         }
     }
 }
 
-impl AsRef<str> for RawId {
+impl AsRef<str> for FlatRawId {
     fn as_ref(&self) -> &str {
-        &self.str
+        self.as_str()
+    }
+}
+
+impl AsRef<RawId> for FlatRawId {
+    fn as_ref(&self) -> &RawId {
+        &self.raw
+    }
+}
+
+impl From<FlatRawId> for RawId {
+    fn from(value: FlatRawId) -> Self {
+        value.raw
     }
 }
 
@@ -703,14 +828,14 @@ mod tests {
     #[test]
     pub fn test_raw_id_generation() {
         for size in 0..256 {
-            assert_eq!(RawId::generate(size).as_str().len(), size);
+            assert_eq!(FlatRawId::generate(size).as_str().len(), size);
         }
     }
 
     #[test]
     pub fn test_raw_id_parsing() {
-        assert!(RawId::from_str("abc0").is_err());
-        assert!(RawId::from_str("abc123").is_ok());
+        assert!(FlatRawId::from_str("abc0").is_err());
+        assert!(FlatRawId::from_str("abc123").is_ok());
     }
 
     #[test]

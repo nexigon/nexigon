@@ -1201,6 +1201,7 @@ dependencies = [
 name = "nexigon-ids"
 version = "0.1.0"
 dependencies = [
+ "jiff",
  "rand",
  "serde",
  "sha2",

@@ -8,6 +8,7 @@ repository.workspace = true
 homepage.workspace = true
 
 [dependencies]
+jiff.workspace = true
 rand.workspace = true
 serde.workspace = true
 sha2.workspace = true
