@@ -661,7 +661,7 @@ impl std::str::FromStr for DatedRawId {
                 "missing '-' separator in dated raw id",
             ));
         };
-        let Some((date, time)) = datetime.split_once(' ') else {
+        let Some((date, time)) = datetime.split_once('-') else {
             return Err(errors::InvalidIdError::new(
                 "missing '-' separator in dated raw id",
             ));
@@ -669,7 +669,7 @@ impl std::str::FromStr for DatedRawId {
         if date.len() != 8 {
             return Err(errors::InvalidIdError::new("invalid date length"));
         }
-        if time.len() != 2 {
+        if time.len() != 4 {
             return Err(errors::InvalidIdError::new("invalid time length"));
         }
         if !date.chars().all(|c| c.is_ascii_digit()) {
@@ -860,6 +860,8 @@ mod tests {
             AnyId::from_str(TEST_ID).unwrap(),
             AnyId::from(ids::UserId::from_str(TEST_ID).unwrap())
         );
+        DatedRawId::from_str("20250721-1133-ArDVfyQp").unwrap();
+        ids::AuditLogId::from_str("log_20250721-1133-ArDVfyQp").unwrap();
     }
 
     #[test]
