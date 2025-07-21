@@ -1,0 +1,57 @@
+//! Actions and types related to the audit log.
+
+import actor::Actor
+import datetime::Timestamp
+import json::JsonValue
+
+/// Unique ID of an audit event.
+#[rust(type = "nexigon_ids::ids::AuditEventId")]
+#[json(type = "string")]
+opaque AuditEventId
+
+/// Status associated with an audit event.
+#[json(tagged = externally)]
+variant AuditEventStatus {
+    /// Action got rejected (failed precondition check).
+    Rejected,
+    /// Action or precondition check panicked (e.g., due to a bug).
+    Panicked,
+    /// Action was executed successfully.
+    Succeeded,
+    /// Action execution failed (e.g., due to missing permissions).
+    Failed,
+    /// Action is being executed.
+    Pending,
+}
+
+/// Event in the audit log.
+/// 
+/// Audit data is guaranteed to not contain any sensitive information.
+record AuditEvent {
+    /// ID of the audit event.
+    event_id: AuditEventId,
+    /// Actor that performed the action.
+    actor: Actor,
+    /// Type of the action that was performed.
+    action: string,
+    /// Additional audit data associated with the event.
+    data: [string: JsonValue],
+    /// Status associated with the event.
+    status: AuditEventStatus,
+    /// Timestamp indicating when the audit event was recorded.
+    created_at: Timestamp,
+}
+
+/// Query the audit log of the instance.
+/// 
+/// Requires admin permissions.
+record QueryAuditLogAction {
+    /// Optionally filter the audit log by the given status.
+    status_equals?: AuditEventStatus,
+}
+
+/// Output of querying the audit log of the instance.
+record QueryAuditLogOutput {
+    /// List of audit events.
+    entries: [AuditEvent],
+}

@@ -66,6 +66,8 @@ macro_rules! with_actions {
             // ## Deployment Tokens
             ("projects_CreateDeploymentToken", CreateDeploymentToken, projects::CreateDeploymentTokenAction, projects::CreateDeploymentTokenOutput),
             ("projects_DeleteDeploymentToken", DeleteDeploymentToken, projects::DeleteDeploymentTokenAction, outputs::Empty),
+            // ## Audit Log
+            ("projects_QueryAuditLog", QueryProjectAuditLog, projects::QueryAuditLogAction, projects::QueryAuditLogOutput),
 
             // # Devices
             ("devices_QueryDevices", QueryDevices, devices::QueryDevicesAction, devices::QueryDevicesOutput),
@@ -124,6 +126,9 @@ macro_rules! with_actions {
             ("repositories_DeleteAsset", DeleteAsset, repositories::DeleteAssetAction, outputs::Empty),
             ("repositories_IssueAssetDownloadUrl", IssueAssetDownloadUrl, repositories::IssueAssetDownloadUrlAction, repositories::IssueAssetDownloadUrlOutput),
             ("repositories_IssueAssetUploadUrl", IssueAssetUploadUrl, repositories::IssueAssetUploadUrlAction, repositories::IssueAssetUploadUrlOutput),
+
+            // # Audit Log
+            ("audit_QueryAuditLog", QueryAuditLog, audit::QueryAuditLogAction, audit::QueryAuditLogOutput),
 
             // # Instance
             ("instance_GetInstanceStatistics", GetInstanceStatistics, instance::GetInstanceStatisticsAction, instance::GetInstanceStatisticsOutput),

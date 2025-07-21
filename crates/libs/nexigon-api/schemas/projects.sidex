@@ -3,6 +3,7 @@
 import datetime::Timestamp
 import devices::DeviceId
 import users::UserId
+import audit::{AuditEventId, AuditEventStatus, AuditEvent}
 
 /// Unique ID of a project.
 #[rust(type = "nexigon_ids::ids::ProjectId")]
@@ -188,4 +189,16 @@ record CreateDeploymentTokenOutput {
 record DeleteDeploymentTokenAction {
     /// ID of the token.
     token_id: DeploymentTokenId,
+}
+
+/// Query the audit log of the project.
+record QueryAuditLogAction {
+    /// ID of the project.
+    project_id: ProjectId,
+}
+
+/// Output of querying the audit log of the project.
+record QueryAuditLogOutput {
+    /// List of audit log entries.
+    entries: [AuditEvent],
 }

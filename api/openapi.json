@@ -996,6 +996,36 @@
         }
       }
     },
+    "/api/v1/invoke/projects_QueryAuditLog": {
+      "post": {
+        "tags": [
+          "projects"
+        ],
+        "summary": "QueryAuditLog",
+        "description": "Query the audit log of the project.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/nexigon_api.projects.QueryAuditLogAction"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/nexigon_api.projects.QueryAuditLogOutput"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/invoke/devices_QueryDevices": {
       "post": {
         "tags": [
@@ -2837,6 +2867,83 @@
         ],
         "unevaluatedProperties": false
       },
+      "nexigon_api.audit.AuditEvent": {
+        "type": "object",
+        "description": "Event in the audit log.\n\nAudit data is guaranteed to not contain any sensitive information.",
+        "properties": {
+          "eventId": {
+            "$ref": "#/components/schemas/nexigon_api.audit.AuditEventId"
+          },
+          "actor": {
+            "$ref": "#/components/schemas/nexigon_api.actor.Actor"
+          },
+          "action": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/nexigon_api.json.JsonValue"
+            }
+          },
+          "status": {
+            "$ref": "#/components/schemas/nexigon_api.audit.AuditEventStatus"
+          },
+          "createdAt": {
+            "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
+          }
+        },
+        "required": [
+          "eventId",
+          "actor",
+          "action",
+          "data",
+          "status",
+          "createdAt"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.audit.AuditEventId": {
+        "type": "string",
+        "description": "Unique ID of an audit event."
+      },
+      "nexigon_api.audit.AuditEventStatus": {
+        "enum": [
+          "Rejected",
+          "Panicked",
+          "Succeeded",
+          "Failed",
+          "Pending"
+        ],
+        "description": "Status associated with an audit event."
+      },
+      "nexigon_api.audit.QueryAuditLogAction": {
+        "type": "object",
+        "description": "Query the audit log of the instance.\n\nRequires admin permissions.",
+        "properties": {
+          "statusEquals": {
+            "$ref": "#/components/schemas/nexigon_api.audit.AuditEventStatus"
+          }
+        },
+        "required": [],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.audit.QueryAuditLogOutput": {
+        "type": "object",
+        "description": "Output of querying the audit log of the instance.",
+        "properties": {
+          "entries": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/nexigon_api.audit.AuditEvent"
+            }
+          }
+        },
+        "required": [
+          "entries"
+        ],
+        "unevaluatedProperties": false
+      },
       "nexigon_api.cluster.CleanupInactiveClusterNodesAction": {
         "type": "object",
         "properties": {},
@@ -3967,6 +4074,34 @@
       "nexigon_api.projects.ProjectId": {
         "type": "string",
         "description": "Unique ID of a project."
+      },
+      "nexigon_api.projects.QueryAuditLogAction": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+          }
+        },
+        "required": [
+          "projectId"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.projects.QueryAuditLogOutput": {
+        "type": "object",
+        "description": "Output of querying the audit log of the project.",
+        "properties": {
+          "entries": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/nexigon_api.audit.AuditEvent"
+            }
+          }
+        },
+        "required": [
+          "entries"
+        ],
+        "unevaluatedProperties": false
       },
       "nexigon_api.projects.QueryProjectDeploymentTokensAction": {
         "type": "object",

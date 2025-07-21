@@ -488,8 +488,8 @@ define_types! {
     /// Job id (globally unique).
     JobId => (DatedRawId, "job", 22, secret = false),
 
-    /// Audit log entry id (globally unique).
-    AuditLogId => (DatedRawId, "log", 22, secret = false),
+    /// Audit event id (globally unique).
+    AuditEventId => (DatedRawId, "audit_ev", 22, secret = false),
 }
 
 /// Check whether a character is a base 58 digit.
@@ -861,7 +861,7 @@ mod tests {
             AnyId::from(ids::UserId::from_str(TEST_ID).unwrap())
         );
         DatedRawId::from_str("20250721-1133-ArDVfyQp").unwrap();
-        ids::AuditLogId::from_str("log_20250721-1133-ArDVfyQp").unwrap();
+        ids::AuditEventId::from_str("audit_ev_20250721-1133-ArDVfyQp").unwrap();
     }
 
     #[test]
