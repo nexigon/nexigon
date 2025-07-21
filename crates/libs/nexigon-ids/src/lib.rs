@@ -1,4 +1,4 @@
-// cspell:ignore NTRU
+// cspell:ignore NTRU, rsplit
 //! Unique identifiers for entities and access tokens.
 //!
 //! Within Nexigon, entities are identified by *ids* of the form `<tag>_<raw>` where
@@ -25,6 +25,7 @@
 //! of secret ids will not include the raw id.
 
 use std::fmt::Write;
+use std::str::FromStr;
 use std::sync::Arc;
 
 use rand::RngCore;
@@ -89,11 +90,17 @@ pub trait Id {
     }
 }
 
+/// Concrete id type.
+pub trait ConcreteId: Id + TryFrom<Self::Type, Error = errors::InvalidIdError> {
+    /// Type of the underlying raw id.
+    type Type: FromStr<Err = errors::InvalidIdError>;
+}
+
 /// Marker trait for public ids.
-pub trait PublicId: Id {}
+pub trait PublicId: ConcreteId {}
 
 /// Marker trait for secret ids.
-pub trait SecretId: Id {}
+pub trait SecretId: ConcreteId {}
 
 /// Random generation of ids.
 pub trait Generate {
@@ -254,11 +261,10 @@ macro_rules! define_types {
             type Err = errors::InvalidIdError;
 
             fn from_str(s: &str) -> Result<Self, Self::Err> {
-                // cspell:ignore rsplit
                 if let Some((tag, raw)) = s.rsplit_once("_") {
                     match tag {
                         $(
-                            $tag => Ok(Self::$name(raw.parse()?)),
+                            $tag => Ok(Self::$name(raw.parse::<$type>()?.try_into()?)),
                         )*
                         _ => Err(errors::InvalidIdError::new("unknown tag"))
                     }
@@ -299,8 +305,6 @@ macro_rules! define_types {
                     }
                 }
 
-                impl_marker_trait!($name, $secret);
-
                 impl Id for $name {
                     fn tag(&self) -> Tag {
                         Tag::$name
@@ -318,6 +322,12 @@ macro_rules! define_types {
                         string
                     }
                 }
+
+                impl ConcreteId for $name {
+                    type Type = $type;
+                }
+
+                impl_marker_trait!($name, $secret);
 
                 impl Generate for $name {
                     fn generate() -> Self {
