@@ -149,6 +149,8 @@ record QueryProjectDeploymentTokensItem {
     created_at: Timestamp,
     /// Name of the token.
     name?: string,
+    /// Flags.
+    flags: DeploymentTokenFlags,
 }
 
 /// Add a user to a project.
@@ -169,12 +171,20 @@ record RemoveProjectMemberAction {
     user_id: UserId,
 }
 
+/// Flags for deployment tokens.
+record DeploymentTokenFlags {
+    /// Whether to automatically accept new devices.
+    auto_accept?: bool,
+}
+
 /// Create a deployment token.
 record CreateDeploymentTokenAction {
     /// ID of the project.
     project_id: ProjectId,
     /// Name of the token.
     name: string,
+    /// Flags.
+    flags?: DeploymentTokenFlags,
 }
 
 /// Output of creating a deployment token.
@@ -189,6 +199,14 @@ record CreateDeploymentTokenOutput {
 record DeleteDeploymentTokenAction {
     /// ID of the token.
     token_id: DeploymentTokenId,
+}
+
+/// Set the flags of a deployment token.
+record SetDeploymentTokenFlagsAction {
+    /// ID of the token.
+    token_id: DeploymentTokenId,
+    /// Flags.
+    flags: DeploymentTokenFlags,
 }
 
 /// Query the audit log of the project.
@@ -239,6 +257,8 @@ record DeploymentTokenCreatedEvent {
     project_id: ProjectId,
     /// ID of the deployment token.
     token_id: DeploymentTokenId,
+    /// Flags.
+    flags: DeploymentTokenFlags,
 }
 
 /// Event indicating that a deployment token has been deleted.
@@ -247,4 +267,14 @@ record DeploymentTokenDeletedEvent {
     project_id: ProjectId,
     /// ID of the deployment token.
     token_id: DeploymentTokenId,
+}
+
+/// Event indicating that deployment token flags have been changed.
+record DeploymentTokenFlagsChangedEvent {
+    /// ID of the project.
+    project_id: ProjectId,
+    /// ID of the deployment token.
+    token_id: DeploymentTokenId,
+    /// Flags.
+    flags: DeploymentTokenFlags,
 }

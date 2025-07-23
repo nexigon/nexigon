@@ -81,6 +81,7 @@ macro_rules! with_actions {
             // ## Deployment Tokens
             ("projects_CreateDeploymentToken", CreateDeploymentToken, projects::CreateDeploymentTokenAction, projects::CreateDeploymentTokenOutput),
             ("projects_DeleteDeploymentToken", DeleteDeploymentToken, projects::DeleteDeploymentTokenAction, outputs::Empty),
+            ("projects_SetDeploymentTokenFlags", SetDeploymentTokenFlags, projects::SetDeploymentTokenFlagsAction, outputs::Empty),
             // ## Audit Log
             ("projects_QueryAuditLog", QueryProjectAuditLog, projects::QueryAuditLogEventsAction, projects::QueryAuditLogEventsOutput),
 
@@ -238,6 +239,7 @@ macro_rules! with_events {
             ("projects_MemberRemoved", projects::ProjectMemberRemovedEvent, { user_id }, { project_id }),
             ("projects_DeploymentTokenCreated", projects::DeploymentTokenCreatedEvent, {}, { project_id }),
             ("projects_DeploymentTokenDeleted", projects::DeploymentTokenDeletedEvent, {}, { project_id }),
+            ("projects_DeploymentTokenFlagsChanged", projects::DeploymentTokenFlagsChangedEvent, { }, { project_id }),
 
             // # Devices
             ("devices_Created", devices::DeviceCreatedEvent, {}, { project_id }),

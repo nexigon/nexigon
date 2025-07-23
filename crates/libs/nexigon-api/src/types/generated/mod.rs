@@ -25800,13 +25800,20 @@ pub mod projects {
         pub created_at: super::datetime::Timestamp,
         #[doc = "Name of the token.\n"]
         pub name: ::std::option::Option<::std::string::String>,
+        #[doc = "Flags.\n"]
+        pub flags: DeploymentTokenFlags,
     }
     impl QueryProjectDeploymentTokensItem {
         #[doc = "Creates a new [`QueryProjectDeploymentTokensItem`]."]
-        pub fn new(token_id: DeploymentTokenId, created_at: super::datetime::Timestamp) -> Self {
+        pub fn new(
+            token_id: DeploymentTokenId,
+            created_at: super::datetime::Timestamp,
+            flags: DeploymentTokenFlags,
+        ) -> Self {
             Self {
                 token_id,
                 created_at,
+                flags,
                 name: ::std::default::Default::default(),
             }
         }
@@ -25843,6 +25850,16 @@ pub mod projects {
             self.name = name;
             self
         }
+        #[doc = "Sets the value of `flags`."]
+        pub fn set_flags(&mut self, flags: DeploymentTokenFlags) -> &mut Self {
+            self.flags = flags;
+            self
+        }
+        #[doc = "Sets the value of `flags`."]
+        pub fn with_flags(mut self, flags: DeploymentTokenFlags) -> Self {
+            self.flags = flags;
+            self
+        }
     }
     #[automatically_derived]
     impl __serde::Serialize for QueryProjectDeploymentTokensItem {
@@ -25853,12 +25870,13 @@ pub mod projects {
             let mut __record = __sidex_serde::ser::RecordSerializer::new(
                 __serializer,
                 "QueryProjectDeploymentTokensItem",
-                3usize,
+                4usize,
             )?;
             __record.serialize_field("tokenId", &self.token_id)?;
             __record.serialize_field("createdAt", &self.created_at)?;
             __record
                 .serialize_optional_field("name", ::core::option::Option::as_ref(&self.name))?;
+            __record.serialize_field("flags", &self.flags)?;
             __record.end()
         }
     }
@@ -25896,7 +25914,7 @@ pub mod projects {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(0usize, &"record with 3 fields"),
+                                __serde::de::Error::invalid_length(0usize, &"record with 4 fields"),
                             );
                         }
                     };
@@ -25907,7 +25925,7 @@ pub mod projects {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(1usize, &"record with 3 fields"),
+                                __serde::de::Error::invalid_length(1usize, &"record with 4 fields"),
                             );
                         }
                     };
@@ -25918,7 +25936,17 @@ pub mod projects {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(2usize, &"record with 3 fields"),
+                                __serde::de::Error::invalid_length(2usize, &"record with 4 fields"),
+                            );
+                        }
+                    };
+                    let __field3 = match __serde::de::SeqAccess::next_element::<DeploymentTokenFlags>(
+                        &mut __seq,
+                    )? {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(3usize, &"record with 4 fields"),
                             );
                         }
                     };
@@ -25926,6 +25954,7 @@ pub mod projects {
                         token_id: __field0,
                         created_at: __field1,
                         name: __field2,
+                        flags: __field3,
                     })
                 }
                 #[inline]
@@ -25938,16 +25967,17 @@ pub mod projects {
                 {
                     #[doc(hidden)]
                     const __IDENTIFIERS: &'static [&'static str] =
-                        &["tokenId", "createdAt", "name"];
+                        &["tokenId", "createdAt", "name", "flags"];
                     #[doc(hidden)]
                     const __EXPECTING_IDENTIFIERS: &'static str =
-                        "an identifier in [\"tokenId\", \"createdAt\", \"name\"]";
+                        "an identifier in [\"tokenId\", \"createdAt\", \"name\", \"flags\"]";
                     #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
                     #[doc(hidden)]
                     enum __Identifier {
                         __Identifier0,
                         __Identifier1,
                         __Identifier2,
+                        __Identifier3,
                         __Unknown,
                     }
                     #[doc(hidden)]
@@ -25971,6 +26001,7 @@ pub mod projects {
                                 0u64 => ::core::result::Result::Ok(__Identifier::__Identifier0),
                                 1u64 => ::core::result::Result::Ok(__Identifier::__Identifier1),
                                 2u64 => ::core::result::Result::Ok(__Identifier::__Identifier2),
+                                3u64 => ::core::result::Result::Ok(__Identifier::__Identifier3),
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
                         }
@@ -25989,6 +26020,7 @@ pub mod projects {
                                     ::core::result::Result::Ok(__Identifier::__Identifier1)
                                 }
                                 "name" => ::core::result::Result::Ok(__Identifier::__Identifier2),
+                                "flags" => ::core::result::Result::Ok(__Identifier::__Identifier3),
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
                         }
@@ -26007,6 +26039,7 @@ pub mod projects {
                                     ::core::result::Result::Ok(__Identifier::__Identifier1)
                                 }
                                 b"name" => ::core::result::Result::Ok(__Identifier::__Identifier2),
+                                b"flags" => ::core::result::Result::Ok(__Identifier::__Identifier3),
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
                         }
@@ -26032,6 +26065,8 @@ pub mod projects {
                     let mut __field2: ::core::option::Option<
                         ::std::option::Option<::std::string::String>,
                     > = ::core::option::Option::None;
+                    let mut __field3: ::core::option::Option<DeploymentTokenFlags> =
+                        ::core::option::Option::None;
                     while let ::core::option::Option::Some(__key) =
                         __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
                     {
@@ -26076,6 +26111,20 @@ pub mod projects {
                                     >(&mut __map)?,
                                 );
                             }
+                            __Identifier::__Identifier3 => {
+                                if ::core::option::Option::is_some(&__field3) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "flags",
+                                        ),
+                                    );
+                                }
+                                __field3 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<DeploymentTokenFlags>(
+                                        &mut __map,
+                                    )?,
+                                );
+                            }
                             _ => {
                                 __serde::de::MapAccess::next_value::<__serde::de::IgnoredAny>(
                                     &mut __map,
@@ -26103,15 +26152,24 @@ pub mod projects {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => ::core::option::Option::None,
                     };
+                    let __field3 = match __field3 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                <__A::Error as __serde::de::Error>::missing_field("flags"),
+                            );
+                        }
+                    };
                     ::core::result::Result::Ok(QueryProjectDeploymentTokensItem {
                         token_id: __field0,
                         created_at: __field1,
                         name: __field2,
+                        flags: __field3,
                     })
                 }
             }
             #[doc(hidden)]
-            const __FIELDS: &'static [&'static str] = &["tokenId", "createdAt", "name"];
+            const __FIELDS: &'static [&'static str] = &["tokenId", "createdAt", "name", "flags"];
             __serde::Deserializer::deserialize_struct(
                 __deserializer,
                 "QueryProjectDeploymentTokensItem",
@@ -26724,6 +26782,225 @@ pub mod projects {
             )
         }
     }
+    #[doc = "Flags for deployment tokens.\n"]
+    #[derive(Clone, Debug)]
+    pub struct DeploymentTokenFlags {
+        #[doc = "Whether to automatically accept new devices.\n"]
+        pub auto_accept: ::std::option::Option<bool>,
+    }
+    impl DeploymentTokenFlags {
+        #[doc = "Creates a new [`DeploymentTokenFlags`]."]
+        pub fn new() -> Self {
+            Self {
+                auto_accept: ::std::default::Default::default(),
+            }
+        }
+        #[doc = "Sets the value of `auto_accept`."]
+        pub fn set_auto_accept(&mut self, auto_accept: ::std::option::Option<bool>) -> &mut Self {
+            self.auto_accept = auto_accept;
+            self
+        }
+        #[doc = "Sets the value of `auto_accept`."]
+        pub fn with_auto_accept(mut self, auto_accept: ::std::option::Option<bool>) -> Self {
+            self.auto_accept = auto_accept;
+            self
+        }
+    }
+    impl ::std::default::Default for DeploymentTokenFlags {
+        fn default() -> Self {
+            Self::new()
+        }
+    }
+    #[automatically_derived]
+    impl __serde::Serialize for DeploymentTokenFlags {
+        fn serialize<__S: __serde::Serializer>(
+            &self,
+            __serializer: __S,
+        ) -> ::std::result::Result<__S::Ok, __S::Error> {
+            let mut __record = __sidex_serde::ser::RecordSerializer::new(
+                __serializer,
+                "DeploymentTokenFlags",
+                1usize,
+            )?;
+            __record.serialize_optional_field(
+                "autoAccept",
+                ::core::option::Option::as_ref(&self.auto_accept),
+            )?;
+            __record.end()
+        }
+    }
+    #[automatically_derived]
+    impl<'de> __serde::Deserialize<'de> for DeploymentTokenFlags {
+        fn deserialize<__D: __serde::Deserializer<'de>>(
+            __deserializer: __D,
+        ) -> ::std::result::Result<Self, __D::Error> {
+            #[doc(hidden)]
+            struct __Visitor {
+                __phantom_vars: ::core::marker::PhantomData<fn(&())>,
+            }
+            impl<'de> __serde::de::Visitor<'de> for __Visitor {
+                type Value = DeploymentTokenFlags;
+                fn expecting(
+                    &self,
+                    __formatter: &mut ::core::fmt::Formatter,
+                ) -> ::core::fmt::Result {
+                    ::core::fmt::Formatter::write_str(__formatter, "record DeploymentTokenFlags")
+                }
+                #[inline]
+                fn visit_seq<__A>(
+                    self,
+                    mut __seq: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::SeqAccess<'de>,
+                {
+                    let __field0 = match __serde::de::SeqAccess::next_element::<
+                        ::std::option::Option<bool>,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(0usize, &"record with 1 fields"),
+                            );
+                        }
+                    };
+                    ::core::result::Result::Ok(DeploymentTokenFlags {
+                        auto_accept: __field0,
+                    })
+                }
+                #[inline]
+                fn visit_map<__A>(
+                    self,
+                    mut __map: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::MapAccess<'de>,
+                {
+                    #[doc(hidden)]
+                    const __IDENTIFIERS: &'static [&'static str] = &["autoAccept"];
+                    #[doc(hidden)]
+                    const __EXPECTING_IDENTIFIERS: &'static str =
+                        "an identifier in [\"autoAccept\"]";
+                    #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
+                    #[doc(hidden)]
+                    enum __Identifier {
+                        __Identifier0,
+                        __Unknown,
+                    }
+                    #[doc(hidden)]
+                    struct __IdentifierVisitor;
+                    impl<'de> __serde::de::Visitor<'de> for __IdentifierVisitor {
+                        type Value = __Identifier;
+                        fn expecting(
+                            &self,
+                            __formatter: &mut ::core::fmt::Formatter,
+                        ) -> ::core::fmt::Result {
+                            ::core::fmt::Formatter::write_str(__formatter, __EXPECTING_IDENTIFIERS)
+                        }
+                        fn visit_u64<__E>(
+                            self,
+                            __value: u64,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                0u64 => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_str<__E>(
+                            self,
+                            __value: &str,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                "autoAccept" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
+                                }
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_bytes<__E>(
+                            self,
+                            __value: &[u8],
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                b"autoAccept" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
+                                }
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                    }
+                    impl<'de> __serde::Deserialize<'de> for __Identifier {
+                        #[inline]
+                        fn deserialize<__D>(
+                            __deserializer: __D,
+                        ) -> ::core::result::Result<Self, __D::Error>
+                        where
+                            __D: __serde::Deserializer<'de>,
+                        {
+                            __serde::Deserializer::deserialize_identifier(
+                                __deserializer,
+                                __IdentifierVisitor,
+                            )
+                        }
+                    }
+                    let mut __field0: ::core::option::Option<::std::option::Option<bool>> =
+                        ::core::option::Option::None;
+                    while let ::core::option::Option::Some(__key) =
+                        __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
+                    {
+                        match __key {
+                            __Identifier::__Identifier0 => {
+                                if ::core::option::Option::is_some(&__field0) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "autoAccept",
+                                        ),
+                                    );
+                                }
+                                __field0 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<
+                                        ::std::option::Option<bool>,
+                                    >(&mut __map)?,
+                                );
+                            }
+                            _ => {
+                                __serde::de::MapAccess::next_value::<__serde::de::IgnoredAny>(
+                                    &mut __map,
+                                )?;
+                            }
+                        }
+                    }
+                    let __field0 = match __field0 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => ::core::option::Option::None,
+                    };
+                    ::core::result::Result::Ok(DeploymentTokenFlags {
+                        auto_accept: __field0,
+                    })
+                }
+            }
+            #[doc(hidden)]
+            const __FIELDS: &'static [&'static str] = &["autoAccept"];
+            __serde::Deserializer::deserialize_struct(
+                __deserializer,
+                "DeploymentTokenFlags",
+                __FIELDS,
+                __Visitor {
+                    __phantom_vars: ::core::marker::PhantomData,
+                },
+            )
+        }
+    }
     #[doc = "Create a deployment token.\n"]
     #[derive(Clone, Debug)]
     pub struct CreateDeploymentTokenAction {
@@ -26731,11 +27008,17 @@ pub mod projects {
         pub project_id: ProjectId,
         #[doc = "Name of the token.\n"]
         pub name: ::std::string::String,
+        #[doc = "Flags.\n"]
+        pub flags: ::std::option::Option<DeploymentTokenFlags>,
     }
     impl CreateDeploymentTokenAction {
         #[doc = "Creates a new [`CreateDeploymentTokenAction`]."]
         pub fn new(project_id: ProjectId, name: ::std::string::String) -> Self {
-            Self { project_id, name }
+            Self {
+                project_id,
+                name,
+                flags: ::std::default::Default::default(),
+            }
         }
         #[doc = "Sets the value of `project_id`."]
         pub fn set_project_id(&mut self, project_id: ProjectId) -> &mut Self {
@@ -26757,6 +27040,19 @@ pub mod projects {
             self.name = name;
             self
         }
+        #[doc = "Sets the value of `flags`."]
+        pub fn set_flags(
+            &mut self,
+            flags: ::std::option::Option<DeploymentTokenFlags>,
+        ) -> &mut Self {
+            self.flags = flags;
+            self
+        }
+        #[doc = "Sets the value of `flags`."]
+        pub fn with_flags(mut self, flags: ::std::option::Option<DeploymentTokenFlags>) -> Self {
+            self.flags = flags;
+            self
+        }
     }
     #[automatically_derived]
     impl __serde::Serialize for CreateDeploymentTokenAction {
@@ -26767,10 +27063,12 @@ pub mod projects {
             let mut __record = __sidex_serde::ser::RecordSerializer::new(
                 __serializer,
                 "CreateDeploymentTokenAction",
-                2usize,
+                3usize,
             )?;
             __record.serialize_field("projectId", &self.project_id)?;
             __record.serialize_field("name", &self.name)?;
+            __record
+                .serialize_optional_field("flags", ::core::option::Option::as_ref(&self.flags))?;
             __record.end()
         }
     }
@@ -26809,7 +27107,7 @@ pub mod projects {
                                 return ::core::result::Result::Err(
                                     __serde::de::Error::invalid_length(
                                         0usize,
-                                        &"record with 2 fields",
+                                        &"record with 3 fields",
                                     ),
                                 );
                             }
@@ -26821,13 +27119,25 @@ pub mod projects {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(1usize, &"record with 2 fields"),
+                                __serde::de::Error::invalid_length(1usize, &"record with 3 fields"),
+                            );
+                        }
+                    };
+                    let __field2 = match __serde::de::SeqAccess::next_element::<
+                        ::std::option::Option<DeploymentTokenFlags>,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(2usize, &"record with 3 fields"),
                             );
                         }
                     };
                     ::core::result::Result::Ok(CreateDeploymentTokenAction {
                         project_id: __field0,
                         name: __field1,
+                        flags: __field2,
                     })
                 }
                 #[inline]
@@ -26839,15 +27149,16 @@ pub mod projects {
                     __A: __serde::de::MapAccess<'de>,
                 {
                     #[doc(hidden)]
-                    const __IDENTIFIERS: &'static [&'static str] = &["projectId", "name"];
+                    const __IDENTIFIERS: &'static [&'static str] = &["projectId", "name", "flags"];
                     #[doc(hidden)]
                     const __EXPECTING_IDENTIFIERS: &'static str =
-                        "an identifier in [\"projectId\", \"name\"]";
+                        "an identifier in [\"projectId\", \"name\", \"flags\"]";
                     #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
                     #[doc(hidden)]
                     enum __Identifier {
                         __Identifier0,
                         __Identifier1,
+                        __Identifier2,
                         __Unknown,
                     }
                     #[doc(hidden)]
@@ -26870,6 +27181,7 @@ pub mod projects {
                             match __value {
                                 0u64 => ::core::result::Result::Ok(__Identifier::__Identifier0),
                                 1u64 => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                                2u64 => ::core::result::Result::Ok(__Identifier::__Identifier2),
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
                         }
@@ -26885,6 +27197,7 @@ pub mod projects {
                                     ::core::result::Result::Ok(__Identifier::__Identifier0)
                                 }
                                 "name" => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                                "flags" => ::core::result::Result::Ok(__Identifier::__Identifier2),
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
                         }
@@ -26900,6 +27213,7 @@ pub mod projects {
                                     ::core::result::Result::Ok(__Identifier::__Identifier0)
                                 }
                                 b"name" => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                                b"flags" => ::core::result::Result::Ok(__Identifier::__Identifier2),
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
                         }
@@ -26922,6 +27236,9 @@ pub mod projects {
                         ::core::option::Option::None;
                     let mut __field1: ::core::option::Option<::std::string::String> =
                         ::core::option::Option::None;
+                    let mut __field2: ::core::option::Option<
+                        ::std::option::Option<DeploymentTokenFlags>,
+                    > = ::core::option::Option::None;
                     while let ::core::option::Option::Some(__key) =
                         __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
                     {
@@ -26950,6 +27267,20 @@ pub mod projects {
                                     )?,
                                 );
                             }
+                            __Identifier::__Identifier2 => {
+                                if ::core::option::Option::is_some(&__field2) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "flags",
+                                        ),
+                                    );
+                                }
+                                __field2 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<
+                                        ::std::option::Option<DeploymentTokenFlags>,
+                                    >(&mut __map)?,
+                                );
+                            }
                             _ => {
                                 __serde::de::MapAccess::next_value::<__serde::de::IgnoredAny>(
                                     &mut __map,
@@ -26973,14 +27304,19 @@ pub mod projects {
                             );
                         }
                     };
+                    let __field2 = match __field2 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => ::core::option::Option::None,
+                    };
                     ::core::result::Result::Ok(CreateDeploymentTokenAction {
                         project_id: __field0,
                         name: __field1,
+                        flags: __field2,
                     })
                 }
             }
             #[doc(hidden)]
-            const __FIELDS: &'static [&'static str] = &["projectId", "name"];
+            const __FIELDS: &'static [&'static str] = &["projectId", "name", "flags"];
             __serde::Deserializer::deserialize_struct(
                 __deserializer,
                 "CreateDeploymentTokenAction",
@@ -27462,6 +27798,274 @@ pub mod projects {
             __serde::Deserializer::deserialize_struct(
                 __deserializer,
                 "DeleteDeploymentTokenAction",
+                __FIELDS,
+                __Visitor {
+                    __phantom_vars: ::core::marker::PhantomData,
+                },
+            )
+        }
+    }
+    #[doc = "Set the flags of a deployment token.\n"]
+    #[derive(Clone, Debug)]
+    pub struct SetDeploymentTokenFlagsAction {
+        #[doc = "ID of the token.\n"]
+        pub token_id: DeploymentTokenId,
+        #[doc = "Flags.\n"]
+        pub flags: DeploymentTokenFlags,
+    }
+    impl SetDeploymentTokenFlagsAction {
+        #[doc = "Creates a new [`SetDeploymentTokenFlagsAction`]."]
+        pub fn new(token_id: DeploymentTokenId, flags: DeploymentTokenFlags) -> Self {
+            Self { token_id, flags }
+        }
+        #[doc = "Sets the value of `token_id`."]
+        pub fn set_token_id(&mut self, token_id: DeploymentTokenId) -> &mut Self {
+            self.token_id = token_id;
+            self
+        }
+        #[doc = "Sets the value of `token_id`."]
+        pub fn with_token_id(mut self, token_id: DeploymentTokenId) -> Self {
+            self.token_id = token_id;
+            self
+        }
+        #[doc = "Sets the value of `flags`."]
+        pub fn set_flags(&mut self, flags: DeploymentTokenFlags) -> &mut Self {
+            self.flags = flags;
+            self
+        }
+        #[doc = "Sets the value of `flags`."]
+        pub fn with_flags(mut self, flags: DeploymentTokenFlags) -> Self {
+            self.flags = flags;
+            self
+        }
+    }
+    #[automatically_derived]
+    impl __serde::Serialize for SetDeploymentTokenFlagsAction {
+        fn serialize<__S: __serde::Serializer>(
+            &self,
+            __serializer: __S,
+        ) -> ::std::result::Result<__S::Ok, __S::Error> {
+            let mut __record = __sidex_serde::ser::RecordSerializer::new(
+                __serializer,
+                "SetDeploymentTokenFlagsAction",
+                2usize,
+            )?;
+            __record.serialize_field("tokenId", &self.token_id)?;
+            __record.serialize_field("flags", &self.flags)?;
+            __record.end()
+        }
+    }
+    #[automatically_derived]
+    impl<'de> __serde::Deserialize<'de> for SetDeploymentTokenFlagsAction {
+        fn deserialize<__D: __serde::Deserializer<'de>>(
+            __deserializer: __D,
+        ) -> ::std::result::Result<Self, __D::Error> {
+            #[doc(hidden)]
+            struct __Visitor {
+                __phantom_vars: ::core::marker::PhantomData<fn(&())>,
+            }
+            impl<'de> __serde::de::Visitor<'de> for __Visitor {
+                type Value = SetDeploymentTokenFlagsAction;
+                fn expecting(
+                    &self,
+                    __formatter: &mut ::core::fmt::Formatter,
+                ) -> ::core::fmt::Result {
+                    ::core::fmt::Formatter::write_str(
+                        __formatter,
+                        "record SetDeploymentTokenFlagsAction",
+                    )
+                }
+                #[inline]
+                fn visit_seq<__A>(
+                    self,
+                    mut __seq: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::SeqAccess<'de>,
+                {
+                    let __field0 = match __serde::de::SeqAccess::next_element::<DeploymentTokenId>(
+                        &mut __seq,
+                    )? {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(0usize, &"record with 2 fields"),
+                            );
+                        }
+                    };
+                    let __field1 = match __serde::de::SeqAccess::next_element::<DeploymentTokenFlags>(
+                        &mut __seq,
+                    )? {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(1usize, &"record with 2 fields"),
+                            );
+                        }
+                    };
+                    ::core::result::Result::Ok(SetDeploymentTokenFlagsAction {
+                        token_id: __field0,
+                        flags: __field1,
+                    })
+                }
+                #[inline]
+                fn visit_map<__A>(
+                    self,
+                    mut __map: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::MapAccess<'de>,
+                {
+                    #[doc(hidden)]
+                    const __IDENTIFIERS: &'static [&'static str] = &["tokenId", "flags"];
+                    #[doc(hidden)]
+                    const __EXPECTING_IDENTIFIERS: &'static str =
+                        "an identifier in [\"tokenId\", \"flags\"]";
+                    #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
+                    #[doc(hidden)]
+                    enum __Identifier {
+                        __Identifier0,
+                        __Identifier1,
+                        __Unknown,
+                    }
+                    #[doc(hidden)]
+                    struct __IdentifierVisitor;
+                    impl<'de> __serde::de::Visitor<'de> for __IdentifierVisitor {
+                        type Value = __Identifier;
+                        fn expecting(
+                            &self,
+                            __formatter: &mut ::core::fmt::Formatter,
+                        ) -> ::core::fmt::Result {
+                            ::core::fmt::Formatter::write_str(__formatter, __EXPECTING_IDENTIFIERS)
+                        }
+                        fn visit_u64<__E>(
+                            self,
+                            __value: u64,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                0u64 => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                                1u64 => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_str<__E>(
+                            self,
+                            __value: &str,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                "tokenId" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
+                                }
+                                "flags" => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_bytes<__E>(
+                            self,
+                            __value: &[u8],
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                b"tokenId" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
+                                }
+                                b"flags" => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                    }
+                    impl<'de> __serde::Deserialize<'de> for __Identifier {
+                        #[inline]
+                        fn deserialize<__D>(
+                            __deserializer: __D,
+                        ) -> ::core::result::Result<Self, __D::Error>
+                        where
+                            __D: __serde::Deserializer<'de>,
+                        {
+                            __serde::Deserializer::deserialize_identifier(
+                                __deserializer,
+                                __IdentifierVisitor,
+                            )
+                        }
+                    }
+                    let mut __field0: ::core::option::Option<DeploymentTokenId> =
+                        ::core::option::Option::None;
+                    let mut __field1: ::core::option::Option<DeploymentTokenFlags> =
+                        ::core::option::Option::None;
+                    while let ::core::option::Option::Some(__key) =
+                        __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
+                    {
+                        match __key {
+                            __Identifier::__Identifier0 => {
+                                if ::core::option::Option::is_some(&__field0) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "tokenId",
+                                        ),
+                                    );
+                                }
+                                __field0 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<DeploymentTokenId>(
+                                        &mut __map,
+                                    )?,
+                                );
+                            }
+                            __Identifier::__Identifier1 => {
+                                if ::core::option::Option::is_some(&__field1) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "flags",
+                                        ),
+                                    );
+                                }
+                                __field1 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<DeploymentTokenFlags>(
+                                        &mut __map,
+                                    )?,
+                                );
+                            }
+                            _ => {
+                                __serde::de::MapAccess::next_value::<__serde::de::IgnoredAny>(
+                                    &mut __map,
+                                )?;
+                            }
+                        }
+                    }
+                    let __field0 = match __field0 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                <__A::Error as __serde::de::Error>::missing_field("tokenId"),
+                            );
+                        }
+                    };
+                    let __field1 = match __field1 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                <__A::Error as __serde::de::Error>::missing_field("flags"),
+                            );
+                        }
+                    };
+                    ::core::result::Result::Ok(SetDeploymentTokenFlagsAction {
+                        token_id: __field0,
+                        flags: __field1,
+                    })
+                }
+            }
+            #[doc(hidden)]
+            const __FIELDS: &'static [&'static str] = &["tokenId", "flags"];
+            __serde::Deserializer::deserialize_struct(
+                __deserializer,
+                "SetDeploymentTokenFlagsAction",
                 __FIELDS,
                 __Visitor {
                     __phantom_vars: ::core::marker::PhantomData,
@@ -28925,13 +29529,20 @@ pub mod projects {
         pub project_id: ProjectId,
         #[doc = "ID of the deployment token.\n"]
         pub token_id: DeploymentTokenId,
+        #[doc = "Flags.\n"]
+        pub flags: DeploymentTokenFlags,
     }
     impl DeploymentTokenCreatedEvent {
         #[doc = "Creates a new [`DeploymentTokenCreatedEvent`]."]
-        pub fn new(project_id: ProjectId, token_id: DeploymentTokenId) -> Self {
+        pub fn new(
+            project_id: ProjectId,
+            token_id: DeploymentTokenId,
+            flags: DeploymentTokenFlags,
+        ) -> Self {
             Self {
                 project_id,
                 token_id,
+                flags,
             }
         }
         #[doc = "Sets the value of `project_id`."]
@@ -28954,6 +29565,16 @@ pub mod projects {
             self.token_id = token_id;
             self
         }
+        #[doc = "Sets the value of `flags`."]
+        pub fn set_flags(&mut self, flags: DeploymentTokenFlags) -> &mut Self {
+            self.flags = flags;
+            self
+        }
+        #[doc = "Sets the value of `flags`."]
+        pub fn with_flags(mut self, flags: DeploymentTokenFlags) -> Self {
+            self.flags = flags;
+            self
+        }
     }
     #[automatically_derived]
     impl __serde::Serialize for DeploymentTokenCreatedEvent {
@@ -28964,10 +29585,11 @@ pub mod projects {
             let mut __record = __sidex_serde::ser::RecordSerializer::new(
                 __serializer,
                 "DeploymentTokenCreatedEvent",
-                2usize,
+                3usize,
             )?;
             __record.serialize_field("projectId", &self.project_id)?;
             __record.serialize_field("tokenId", &self.token_id)?;
+            __record.serialize_field("flags", &self.flags)?;
             __record.end()
         }
     }
@@ -29006,7 +29628,7 @@ pub mod projects {
                                 return ::core::result::Result::Err(
                                     __serde::de::Error::invalid_length(
                                         0usize,
-                                        &"record with 2 fields",
+                                        &"record with 3 fields",
                                     ),
                                 );
                             }
@@ -29017,13 +29639,24 @@ pub mod projects {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(1usize, &"record with 2 fields"),
+                                __serde::de::Error::invalid_length(1usize, &"record with 3 fields"),
+                            );
+                        }
+                    };
+                    let __field2 = match __serde::de::SeqAccess::next_element::<DeploymentTokenFlags>(
+                        &mut __seq,
+                    )? {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(2usize, &"record with 3 fields"),
                             );
                         }
                     };
                     ::core::result::Result::Ok(DeploymentTokenCreatedEvent {
                         project_id: __field0,
                         token_id: __field1,
+                        flags: __field2,
                     })
                 }
                 #[inline]
@@ -29035,15 +29668,17 @@ pub mod projects {
                     __A: __serde::de::MapAccess<'de>,
                 {
                     #[doc(hidden)]
-                    const __IDENTIFIERS: &'static [&'static str] = &["projectId", "tokenId"];
+                    const __IDENTIFIERS: &'static [&'static str] =
+                        &["projectId", "tokenId", "flags"];
                     #[doc(hidden)]
                     const __EXPECTING_IDENTIFIERS: &'static str =
-                        "an identifier in [\"projectId\", \"tokenId\"]";
+                        "an identifier in [\"projectId\", \"tokenId\", \"flags\"]";
                     #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
                     #[doc(hidden)]
                     enum __Identifier {
                         __Identifier0,
                         __Identifier1,
+                        __Identifier2,
                         __Unknown,
                     }
                     #[doc(hidden)]
@@ -29066,6 +29701,7 @@ pub mod projects {
                             match __value {
                                 0u64 => ::core::result::Result::Ok(__Identifier::__Identifier0),
                                 1u64 => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                                2u64 => ::core::result::Result::Ok(__Identifier::__Identifier2),
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
                         }
@@ -29083,6 +29719,7 @@ pub mod projects {
                                 "tokenId" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier1)
                                 }
+                                "flags" => ::core::result::Result::Ok(__Identifier::__Identifier2),
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
                         }
@@ -29100,6 +29737,7 @@ pub mod projects {
                                 b"tokenId" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier1)
                                 }
+                                b"flags" => ::core::result::Result::Ok(__Identifier::__Identifier2),
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
                         }
@@ -29121,6 +29759,8 @@ pub mod projects {
                     let mut __field0: ::core::option::Option<ProjectId> =
                         ::core::option::Option::None;
                     let mut __field1: ::core::option::Option<DeploymentTokenId> =
+                        ::core::option::Option::None;
+                    let mut __field2: ::core::option::Option<DeploymentTokenFlags> =
                         ::core::option::Option::None;
                     while let ::core::option::Option::Some(__key) =
                         __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
@@ -29152,6 +29792,20 @@ pub mod projects {
                                     )?,
                                 );
                             }
+                            __Identifier::__Identifier2 => {
+                                if ::core::option::Option::is_some(&__field2) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "flags",
+                                        ),
+                                    );
+                                }
+                                __field2 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<DeploymentTokenFlags>(
+                                        &mut __map,
+                                    )?,
+                                );
+                            }
                             _ => {
                                 __serde::de::MapAccess::next_value::<__serde::de::IgnoredAny>(
                                     &mut __map,
@@ -29175,14 +29829,23 @@ pub mod projects {
                             );
                         }
                     };
+                    let __field2 = match __field2 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                <__A::Error as __serde::de::Error>::missing_field("flags"),
+                            );
+                        }
+                    };
                     ::core::result::Result::Ok(DeploymentTokenCreatedEvent {
                         project_id: __field0,
                         token_id: __field1,
+                        flags: __field2,
                     })
                 }
             }
             #[doc(hidden)]
-            const __FIELDS: &'static [&'static str] = &["projectId", "tokenId"];
+            const __FIELDS: &'static [&'static str] = &["projectId", "tokenId", "flags"];
             __serde::Deserializer::deserialize_struct(
                 __deserializer,
                 "DeploymentTokenCreatedEvent",
@@ -29461,6 +30124,340 @@ pub mod projects {
             __serde::Deserializer::deserialize_struct(
                 __deserializer,
                 "DeploymentTokenDeletedEvent",
+                __FIELDS,
+                __Visitor {
+                    __phantom_vars: ::core::marker::PhantomData,
+                },
+            )
+        }
+    }
+    #[doc = "Event indicating that deployment token flags have been changed.\n"]
+    #[derive(Clone, Debug)]
+    pub struct DeploymentTokenFlagsChangedEvent {
+        #[doc = "ID of the project.\n"]
+        pub project_id: ProjectId,
+        #[doc = "ID of the deployment token.\n"]
+        pub token_id: DeploymentTokenId,
+        #[doc = "Flags.\n"]
+        pub flags: DeploymentTokenFlags,
+    }
+    impl DeploymentTokenFlagsChangedEvent {
+        #[doc = "Creates a new [`DeploymentTokenFlagsChangedEvent`]."]
+        pub fn new(
+            project_id: ProjectId,
+            token_id: DeploymentTokenId,
+            flags: DeploymentTokenFlags,
+        ) -> Self {
+            Self {
+                project_id,
+                token_id,
+                flags,
+            }
+        }
+        #[doc = "Sets the value of `project_id`."]
+        pub fn set_project_id(&mut self, project_id: ProjectId) -> &mut Self {
+            self.project_id = project_id;
+            self
+        }
+        #[doc = "Sets the value of `project_id`."]
+        pub fn with_project_id(mut self, project_id: ProjectId) -> Self {
+            self.project_id = project_id;
+            self
+        }
+        #[doc = "Sets the value of `token_id`."]
+        pub fn set_token_id(&mut self, token_id: DeploymentTokenId) -> &mut Self {
+            self.token_id = token_id;
+            self
+        }
+        #[doc = "Sets the value of `token_id`."]
+        pub fn with_token_id(mut self, token_id: DeploymentTokenId) -> Self {
+            self.token_id = token_id;
+            self
+        }
+        #[doc = "Sets the value of `flags`."]
+        pub fn set_flags(&mut self, flags: DeploymentTokenFlags) -> &mut Self {
+            self.flags = flags;
+            self
+        }
+        #[doc = "Sets the value of `flags`."]
+        pub fn with_flags(mut self, flags: DeploymentTokenFlags) -> Self {
+            self.flags = flags;
+            self
+        }
+    }
+    #[automatically_derived]
+    impl __serde::Serialize for DeploymentTokenFlagsChangedEvent {
+        fn serialize<__S: __serde::Serializer>(
+            &self,
+            __serializer: __S,
+        ) -> ::std::result::Result<__S::Ok, __S::Error> {
+            let mut __record = __sidex_serde::ser::RecordSerializer::new(
+                __serializer,
+                "DeploymentTokenFlagsChangedEvent",
+                3usize,
+            )?;
+            __record.serialize_field("projectId", &self.project_id)?;
+            __record.serialize_field("tokenId", &self.token_id)?;
+            __record.serialize_field("flags", &self.flags)?;
+            __record.end()
+        }
+    }
+    #[automatically_derived]
+    impl<'de> __serde::Deserialize<'de> for DeploymentTokenFlagsChangedEvent {
+        fn deserialize<__D: __serde::Deserializer<'de>>(
+            __deserializer: __D,
+        ) -> ::std::result::Result<Self, __D::Error> {
+            #[doc(hidden)]
+            struct __Visitor {
+                __phantom_vars: ::core::marker::PhantomData<fn(&())>,
+            }
+            impl<'de> __serde::de::Visitor<'de> for __Visitor {
+                type Value = DeploymentTokenFlagsChangedEvent;
+                fn expecting(
+                    &self,
+                    __formatter: &mut ::core::fmt::Formatter,
+                ) -> ::core::fmt::Result {
+                    ::core::fmt::Formatter::write_str(
+                        __formatter,
+                        "record DeploymentTokenFlagsChangedEvent",
+                    )
+                }
+                #[inline]
+                fn visit_seq<__A>(
+                    self,
+                    mut __seq: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::SeqAccess<'de>,
+                {
+                    let __field0 =
+                        match __serde::de::SeqAccess::next_element::<ProjectId>(&mut __seq)? {
+                            ::core::option::Option::Some(__value) => __value,
+                            ::core::option::Option::None => {
+                                return ::core::result::Result::Err(
+                                    __serde::de::Error::invalid_length(
+                                        0usize,
+                                        &"record with 3 fields",
+                                    ),
+                                );
+                            }
+                        };
+                    let __field1 = match __serde::de::SeqAccess::next_element::<DeploymentTokenId>(
+                        &mut __seq,
+                    )? {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(1usize, &"record with 3 fields"),
+                            );
+                        }
+                    };
+                    let __field2 = match __serde::de::SeqAccess::next_element::<DeploymentTokenFlags>(
+                        &mut __seq,
+                    )? {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(2usize, &"record with 3 fields"),
+                            );
+                        }
+                    };
+                    ::core::result::Result::Ok(DeploymentTokenFlagsChangedEvent {
+                        project_id: __field0,
+                        token_id: __field1,
+                        flags: __field2,
+                    })
+                }
+                #[inline]
+                fn visit_map<__A>(
+                    self,
+                    mut __map: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::MapAccess<'de>,
+                {
+                    #[doc(hidden)]
+                    const __IDENTIFIERS: &'static [&'static str] =
+                        &["projectId", "tokenId", "flags"];
+                    #[doc(hidden)]
+                    const __EXPECTING_IDENTIFIERS: &'static str =
+                        "an identifier in [\"projectId\", \"tokenId\", \"flags\"]";
+                    #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
+                    #[doc(hidden)]
+                    enum __Identifier {
+                        __Identifier0,
+                        __Identifier1,
+                        __Identifier2,
+                        __Unknown,
+                    }
+                    #[doc(hidden)]
+                    struct __IdentifierVisitor;
+                    impl<'de> __serde::de::Visitor<'de> for __IdentifierVisitor {
+                        type Value = __Identifier;
+                        fn expecting(
+                            &self,
+                            __formatter: &mut ::core::fmt::Formatter,
+                        ) -> ::core::fmt::Result {
+                            ::core::fmt::Formatter::write_str(__formatter, __EXPECTING_IDENTIFIERS)
+                        }
+                        fn visit_u64<__E>(
+                            self,
+                            __value: u64,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                0u64 => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                                1u64 => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                                2u64 => ::core::result::Result::Ok(__Identifier::__Identifier2),
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_str<__E>(
+                            self,
+                            __value: &str,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                "projectId" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
+                                }
+                                "tokenId" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier1)
+                                }
+                                "flags" => ::core::result::Result::Ok(__Identifier::__Identifier2),
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_bytes<__E>(
+                            self,
+                            __value: &[u8],
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                b"projectId" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
+                                }
+                                b"tokenId" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier1)
+                                }
+                                b"flags" => ::core::result::Result::Ok(__Identifier::__Identifier2),
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                    }
+                    impl<'de> __serde::Deserialize<'de> for __Identifier {
+                        #[inline]
+                        fn deserialize<__D>(
+                            __deserializer: __D,
+                        ) -> ::core::result::Result<Self, __D::Error>
+                        where
+                            __D: __serde::Deserializer<'de>,
+                        {
+                            __serde::Deserializer::deserialize_identifier(
+                                __deserializer,
+                                __IdentifierVisitor,
+                            )
+                        }
+                    }
+                    let mut __field0: ::core::option::Option<ProjectId> =
+                        ::core::option::Option::None;
+                    let mut __field1: ::core::option::Option<DeploymentTokenId> =
+                        ::core::option::Option::None;
+                    let mut __field2: ::core::option::Option<DeploymentTokenFlags> =
+                        ::core::option::Option::None;
+                    while let ::core::option::Option::Some(__key) =
+                        __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
+                    {
+                        match __key {
+                            __Identifier::__Identifier0 => {
+                                if ::core::option::Option::is_some(&__field0) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "projectId",
+                                        ),
+                                    );
+                                }
+                                __field0 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<ProjectId>(&mut __map)?,
+                                );
+                            }
+                            __Identifier::__Identifier1 => {
+                                if ::core::option::Option::is_some(&__field1) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "tokenId",
+                                        ),
+                                    );
+                                }
+                                __field1 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<DeploymentTokenId>(
+                                        &mut __map,
+                                    )?,
+                                );
+                            }
+                            __Identifier::__Identifier2 => {
+                                if ::core::option::Option::is_some(&__field2) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "flags",
+                                        ),
+                                    );
+                                }
+                                __field2 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<DeploymentTokenFlags>(
+                                        &mut __map,
+                                    )?,
+                                );
+                            }
+                            _ => {
+                                __serde::de::MapAccess::next_value::<__serde::de::IgnoredAny>(
+                                    &mut __map,
+                                )?;
+                            }
+                        }
+                    }
+                    let __field0 = match __field0 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                <__A::Error as __serde::de::Error>::missing_field("projectId"),
+                            );
+                        }
+                    };
+                    let __field1 = match __field1 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                <__A::Error as __serde::de::Error>::missing_field("tokenId"),
+                            );
+                        }
+                    };
+                    let __field2 = match __field2 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                <__A::Error as __serde::de::Error>::missing_field("flags"),
+                            );
+                        }
+                    };
+                    ::core::result::Result::Ok(DeploymentTokenFlagsChangedEvent {
+                        project_id: __field0,
+                        token_id: __field1,
+                        flags: __field2,
+                    })
+                }
+            }
+            #[doc(hidden)]
+            const __FIELDS: &'static [&'static str] = &["projectId", "tokenId", "flags"];
+            __serde::Deserializer::deserialize_struct(
+                __deserializer,
+                "DeploymentTokenFlagsChangedEvent",
                 __FIELDS,
                 __Visitor {
                     __phantom_vars: ::core::marker::PhantomData,

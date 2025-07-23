@@ -1583,6 +1583,9 @@
       },
       "name": {
         "type": "string"
+      },
+      "flags": {
+        "$ref": "#/components/schemas/nexigon_api.projects.DeploymentTokenFlags"
       }
     },
     "required": [
@@ -1698,11 +1701,15 @@
       },
       "tokenId": {
         "$ref": "#/components/schemas/nexigon_api.projects.DeploymentTokenId"
+      },
+      "flags": {
+        "$ref": "#/components/schemas/nexigon_api.projects.DeploymentTokenFlags"
       }
     },
     "required": [
       "projectId",
-      "tokenId"
+      "tokenId",
+      "flags"
     ],
     "unevaluatedProperties": false
   },
@@ -1720,6 +1727,38 @@
     "required": [
       "projectId",
       "tokenId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.projects.DeploymentTokenFlags": {
+    "type": "object",
+    "description": "Flags for deployment tokens.",
+    "properties": {
+      "autoAccept": {
+        "type": "boolean"
+      }
+    },
+    "required": [],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.projects.DeploymentTokenFlagsChangedEvent": {
+    "type": "object",
+    "description": "Event indicating that deployment token flags have been changed.",
+    "properties": {
+      "projectId": {
+        "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+      },
+      "tokenId": {
+        "$ref": "#/components/schemas/nexigon_api.projects.DeploymentTokenId"
+      },
+      "flags": {
+        "$ref": "#/components/schemas/nexigon_api.projects.DeploymentTokenFlags"
+      }
+    },
+    "required": [
+      "projectId",
+      "tokenId",
+      "flags"
     ],
     "unevaluatedProperties": false
   },
@@ -1888,11 +1927,15 @@
       },
       "name": {
         "type": "string"
+      },
+      "flags": {
+        "$ref": "#/components/schemas/nexigon_api.projects.DeploymentTokenFlags"
       }
     },
     "required": [
       "tokenId",
-      "createdAt"
+      "createdAt",
+      "flags"
     ],
     "unevaluatedProperties": false
   },
@@ -2077,6 +2120,23 @@
     "required": [
       "projectId",
       "userId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.projects.SetDeploymentTokenFlagsAction": {
+    "type": "object",
+    "description": "Set the flags of a deployment token.",
+    "properties": {
+      "tokenId": {
+        "$ref": "#/components/schemas/nexigon_api.projects.DeploymentTokenId"
+      },
+      "flags": {
+        "$ref": "#/components/schemas/nexigon_api.projects.DeploymentTokenFlags"
+      }
+    },
+    "required": [
+      "tokenId",
+      "flags"
     ],
     "unevaluatedProperties": false
   },
