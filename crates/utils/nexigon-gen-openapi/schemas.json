@@ -625,6 +625,52 @@
     ],
     "unevaluatedProperties": false
   },
+  "nexigon_api.devices.DeviceCertificateAddedEvent": {
+    "type": "object",
+    "description": "Device certificate has been added.",
+    "properties": {
+      "projectId": {
+        "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+      },
+      "deviceId": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceId"
+      },
+      "certificateId": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceCertificateId"
+      },
+      "status": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceCertificateStatus"
+      }
+    },
+    "required": [
+      "projectId",
+      "deviceId",
+      "certificateId",
+      "status"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.devices.DeviceCertificateDeletedEvent": {
+    "type": "object",
+    "description": "Device certificate has been deleted.",
+    "properties": {
+      "projectId": {
+        "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+      },
+      "deviceId": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceId"
+      },
+      "certificateId": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceCertificateId"
+      }
+    },
+    "required": [
+      "projectId",
+      "deviceId",
+      "certificateId"
+    ],
+    "unevaluatedProperties": false
+  },
   "nexigon_api.devices.DeviceCertificateId": {
     "type": [
       "string"
@@ -639,6 +685,31 @@
       "Revoked"
     ],
     "description": "Status of a device certificate."
+  },
+  "nexigon_api.devices.DeviceCertificateStatusChangedEvent": {
+    "type": "object",
+    "description": "Status of device certificate has been changed.",
+    "properties": {
+      "projectId": {
+        "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+      },
+      "deviceId": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceId"
+      },
+      "certificateId": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceCertificateId"
+      },
+      "status": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceCertificateStatus"
+      }
+    },
+    "required": [
+      "projectId",
+      "deviceId",
+      "certificateId",
+      "status"
+    ],
+    "unevaluatedProperties": false
   },
   "nexigon_api.devices.DeviceConnection": {
     "type": "object",

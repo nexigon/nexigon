@@ -17206,6 +17206,1139 @@ pub mod devices {
             )
         }
     }
+    #[doc = "Device certificate has been added.\n"]
+    #[derive(Clone, Debug)]
+    pub struct DeviceCertificateAddedEvent {
+        #[doc = "ID of the project.\n"]
+        pub project_id: super::projects::ProjectId,
+        #[doc = "ID of the device.\n"]
+        pub device_id: DeviceId,
+        #[doc = "ID of the certificate.\n"]
+        pub certificate_id: DeviceCertificateId,
+        #[doc = "Status of the certificate.\n"]
+        pub status: DeviceCertificateStatus,
+    }
+    impl DeviceCertificateAddedEvent {
+        #[doc = "Creates a new [`DeviceCertificateAddedEvent`]."]
+        pub fn new(
+            project_id: super::projects::ProjectId,
+            device_id: DeviceId,
+            certificate_id: DeviceCertificateId,
+            status: DeviceCertificateStatus,
+        ) -> Self {
+            Self {
+                project_id,
+                device_id,
+                certificate_id,
+                status,
+            }
+        }
+        #[doc = "Sets the value of `project_id`."]
+        pub fn set_project_id(&mut self, project_id: super::projects::ProjectId) -> &mut Self {
+            self.project_id = project_id;
+            self
+        }
+        #[doc = "Sets the value of `project_id`."]
+        pub fn with_project_id(mut self, project_id: super::projects::ProjectId) -> Self {
+            self.project_id = project_id;
+            self
+        }
+        #[doc = "Sets the value of `device_id`."]
+        pub fn set_device_id(&mut self, device_id: DeviceId) -> &mut Self {
+            self.device_id = device_id;
+            self
+        }
+        #[doc = "Sets the value of `device_id`."]
+        pub fn with_device_id(mut self, device_id: DeviceId) -> Self {
+            self.device_id = device_id;
+            self
+        }
+        #[doc = "Sets the value of `certificate_id`."]
+        pub fn set_certificate_id(&mut self, certificate_id: DeviceCertificateId) -> &mut Self {
+            self.certificate_id = certificate_id;
+            self
+        }
+        #[doc = "Sets the value of `certificate_id`."]
+        pub fn with_certificate_id(mut self, certificate_id: DeviceCertificateId) -> Self {
+            self.certificate_id = certificate_id;
+            self
+        }
+        #[doc = "Sets the value of `status`."]
+        pub fn set_status(&mut self, status: DeviceCertificateStatus) -> &mut Self {
+            self.status = status;
+            self
+        }
+        #[doc = "Sets the value of `status`."]
+        pub fn with_status(mut self, status: DeviceCertificateStatus) -> Self {
+            self.status = status;
+            self
+        }
+    }
+    #[automatically_derived]
+    impl __serde::Serialize for DeviceCertificateAddedEvent {
+        fn serialize<__S: __serde::Serializer>(
+            &self,
+            __serializer: __S,
+        ) -> ::std::result::Result<__S::Ok, __S::Error> {
+            let mut __record = __sidex_serde::ser::RecordSerializer::new(
+                __serializer,
+                "DeviceCertificateAddedEvent",
+                4usize,
+            )?;
+            __record.serialize_field("projectId", &self.project_id)?;
+            __record.serialize_field("deviceId", &self.device_id)?;
+            __record.serialize_field("certificateId", &self.certificate_id)?;
+            __record.serialize_field("status", &self.status)?;
+            __record.end()
+        }
+    }
+    #[automatically_derived]
+    impl<'de> __serde::Deserialize<'de> for DeviceCertificateAddedEvent {
+        fn deserialize<__D: __serde::Deserializer<'de>>(
+            __deserializer: __D,
+        ) -> ::std::result::Result<Self, __D::Error> {
+            #[doc(hidden)]
+            struct __Visitor {
+                __phantom_vars: ::core::marker::PhantomData<fn(&())>,
+            }
+            impl<'de> __serde::de::Visitor<'de> for __Visitor {
+                type Value = DeviceCertificateAddedEvent;
+                fn expecting(
+                    &self,
+                    __formatter: &mut ::core::fmt::Formatter,
+                ) -> ::core::fmt::Result {
+                    ::core::fmt::Formatter::write_str(
+                        __formatter,
+                        "record DeviceCertificateAddedEvent",
+                    )
+                }
+                #[inline]
+                fn visit_seq<__A>(
+                    self,
+                    mut __seq: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::SeqAccess<'de>,
+                {
+                    let __field0 = match __serde::de::SeqAccess::next_element::<
+                        super::projects::ProjectId,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(0usize, &"record with 4 fields"),
+                            );
+                        }
+                    };
+                    let __field1 =
+                        match __serde::de::SeqAccess::next_element::<DeviceId>(&mut __seq)? {
+                            ::core::option::Option::Some(__value) => __value,
+                            ::core::option::Option::None => {
+                                return ::core::result::Result::Err(
+                                    __serde::de::Error::invalid_length(
+                                        1usize,
+                                        &"record with 4 fields",
+                                    ),
+                                );
+                            }
+                        };
+                    let __field2 = match __serde::de::SeqAccess::next_element::<DeviceCertificateId>(
+                        &mut __seq,
+                    )? {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(2usize, &"record with 4 fields"),
+                            );
+                        }
+                    };
+                    let __field3 = match __serde::de::SeqAccess::next_element::<
+                        DeviceCertificateStatus,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(3usize, &"record with 4 fields"),
+                            );
+                        }
+                    };
+                    ::core::result::Result::Ok(DeviceCertificateAddedEvent {
+                        project_id: __field0,
+                        device_id: __field1,
+                        certificate_id: __field2,
+                        status: __field3,
+                    })
+                }
+                #[inline]
+                fn visit_map<__A>(
+                    self,
+                    mut __map: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::MapAccess<'de>,
+                {
+                    #[doc(hidden)]
+                    const __IDENTIFIERS: &'static [&'static str] =
+                        &["projectId", "deviceId", "certificateId", "status"];
+                    #[doc(hidden)]
+                    const __EXPECTING_IDENTIFIERS: &'static str = "an identifier in [\"projectId\", \"deviceId\", \"certificateId\", \"status\"]";
+                    #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
+                    #[doc(hidden)]
+                    enum __Identifier {
+                        __Identifier0,
+                        __Identifier1,
+                        __Identifier2,
+                        __Identifier3,
+                        __Unknown,
+                    }
+                    #[doc(hidden)]
+                    struct __IdentifierVisitor;
+                    impl<'de> __serde::de::Visitor<'de> for __IdentifierVisitor {
+                        type Value = __Identifier;
+                        fn expecting(
+                            &self,
+                            __formatter: &mut ::core::fmt::Formatter,
+                        ) -> ::core::fmt::Result {
+                            ::core::fmt::Formatter::write_str(__formatter, __EXPECTING_IDENTIFIERS)
+                        }
+                        fn visit_u64<__E>(
+                            self,
+                            __value: u64,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                0u64 => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                                1u64 => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                                2u64 => ::core::result::Result::Ok(__Identifier::__Identifier2),
+                                3u64 => ::core::result::Result::Ok(__Identifier::__Identifier3),
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_str<__E>(
+                            self,
+                            __value: &str,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                "projectId" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
+                                }
+                                "deviceId" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier1)
+                                }
+                                "certificateId" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier2)
+                                }
+                                "status" => ::core::result::Result::Ok(__Identifier::__Identifier3),
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_bytes<__E>(
+                            self,
+                            __value: &[u8],
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                b"projectId" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
+                                }
+                                b"deviceId" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier1)
+                                }
+                                b"certificateId" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier2)
+                                }
+                                b"status" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier3)
+                                }
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                    }
+                    impl<'de> __serde::Deserialize<'de> for __Identifier {
+                        #[inline]
+                        fn deserialize<__D>(
+                            __deserializer: __D,
+                        ) -> ::core::result::Result<Self, __D::Error>
+                        where
+                            __D: __serde::Deserializer<'de>,
+                        {
+                            __serde::Deserializer::deserialize_identifier(
+                                __deserializer,
+                                __IdentifierVisitor,
+                            )
+                        }
+                    }
+                    let mut __field0: ::core::option::Option<super::projects::ProjectId> =
+                        ::core::option::Option::None;
+                    let mut __field1: ::core::option::Option<DeviceId> =
+                        ::core::option::Option::None;
+                    let mut __field2: ::core::option::Option<DeviceCertificateId> =
+                        ::core::option::Option::None;
+                    let mut __field3: ::core::option::Option<DeviceCertificateStatus> =
+                        ::core::option::Option::None;
+                    while let ::core::option::Option::Some(__key) =
+                        __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
+                    {
+                        match __key {
+                            __Identifier::__Identifier0 => {
+                                if ::core::option::Option::is_some(&__field0) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "projectId",
+                                        ),
+                                    );
+                                }
+                                __field0 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<super::projects::ProjectId>(
+                                        &mut __map,
+                                    )?,
+                                );
+                            }
+                            __Identifier::__Identifier1 => {
+                                if ::core::option::Option::is_some(&__field1) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "deviceId",
+                                        ),
+                                    );
+                                }
+                                __field1 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<DeviceId>(&mut __map)?,
+                                );
+                            }
+                            __Identifier::__Identifier2 => {
+                                if ::core::option::Option::is_some(&__field2) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "certificateId",
+                                        ),
+                                    );
+                                }
+                                __field2 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<DeviceCertificateId>(
+                                        &mut __map,
+                                    )?,
+                                );
+                            }
+                            __Identifier::__Identifier3 => {
+                                if ::core::option::Option::is_some(&__field3) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "status",
+                                        ),
+                                    );
+                                }
+                                __field3 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<DeviceCertificateStatus>(
+                                        &mut __map,
+                                    )?,
+                                );
+                            }
+                            _ => {
+                                __serde::de::MapAccess::next_value::<__serde::de::IgnoredAny>(
+                                    &mut __map,
+                                )?;
+                            }
+                        }
+                    }
+                    let __field0 = match __field0 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                <__A::Error as __serde::de::Error>::missing_field("projectId"),
+                            );
+                        }
+                    };
+                    let __field1 = match __field1 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                <__A::Error as __serde::de::Error>::missing_field("deviceId"),
+                            );
+                        }
+                    };
+                    let __field2 = match __field2 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                <__A::Error as __serde::de::Error>::missing_field("certificateId"),
+                            );
+                        }
+                    };
+                    let __field3 = match __field3 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                <__A::Error as __serde::de::Error>::missing_field("status"),
+                            );
+                        }
+                    };
+                    ::core::result::Result::Ok(DeviceCertificateAddedEvent {
+                        project_id: __field0,
+                        device_id: __field1,
+                        certificate_id: __field2,
+                        status: __field3,
+                    })
+                }
+            }
+            #[doc(hidden)]
+            const __FIELDS: &'static [&'static str] =
+                &["projectId", "deviceId", "certificateId", "status"];
+            __serde::Deserializer::deserialize_struct(
+                __deserializer,
+                "DeviceCertificateAddedEvent",
+                __FIELDS,
+                __Visitor {
+                    __phantom_vars: ::core::marker::PhantomData,
+                },
+            )
+        }
+    }
+    #[doc = "Device certificate has been deleted.\n"]
+    #[derive(Clone, Debug)]
+    pub struct DeviceCertificateDeletedEvent {
+        #[doc = "ID of the project.\n"]
+        pub project_id: super::projects::ProjectId,
+        #[doc = "ID of the device.\n"]
+        pub device_id: DeviceId,
+        #[doc = "ID of the certificate.\n"]
+        pub certificate_id: DeviceCertificateId,
+    }
+    impl DeviceCertificateDeletedEvent {
+        #[doc = "Creates a new [`DeviceCertificateDeletedEvent`]."]
+        pub fn new(
+            project_id: super::projects::ProjectId,
+            device_id: DeviceId,
+            certificate_id: DeviceCertificateId,
+        ) -> Self {
+            Self {
+                project_id,
+                device_id,
+                certificate_id,
+            }
+        }
+        #[doc = "Sets the value of `project_id`."]
+        pub fn set_project_id(&mut self, project_id: super::projects::ProjectId) -> &mut Self {
+            self.project_id = project_id;
+            self
+        }
+        #[doc = "Sets the value of `project_id`."]
+        pub fn with_project_id(mut self, project_id: super::projects::ProjectId) -> Self {
+            self.project_id = project_id;
+            self
+        }
+        #[doc = "Sets the value of `device_id`."]
+        pub fn set_device_id(&mut self, device_id: DeviceId) -> &mut Self {
+            self.device_id = device_id;
+            self
+        }
+        #[doc = "Sets the value of `device_id`."]
+        pub fn with_device_id(mut self, device_id: DeviceId) -> Self {
+            self.device_id = device_id;
+            self
+        }
+        #[doc = "Sets the value of `certificate_id`."]
+        pub fn set_certificate_id(&mut self, certificate_id: DeviceCertificateId) -> &mut Self {
+            self.certificate_id = certificate_id;
+            self
+        }
+        #[doc = "Sets the value of `certificate_id`."]
+        pub fn with_certificate_id(mut self, certificate_id: DeviceCertificateId) -> Self {
+            self.certificate_id = certificate_id;
+            self
+        }
+    }
+    #[automatically_derived]
+    impl __serde::Serialize for DeviceCertificateDeletedEvent {
+        fn serialize<__S: __serde::Serializer>(
+            &self,
+            __serializer: __S,
+        ) -> ::std::result::Result<__S::Ok, __S::Error> {
+            let mut __record = __sidex_serde::ser::RecordSerializer::new(
+                __serializer,
+                "DeviceCertificateDeletedEvent",
+                3usize,
+            )?;
+            __record.serialize_field("projectId", &self.project_id)?;
+            __record.serialize_field("deviceId", &self.device_id)?;
+            __record.serialize_field("certificateId", &self.certificate_id)?;
+            __record.end()
+        }
+    }
+    #[automatically_derived]
+    impl<'de> __serde::Deserialize<'de> for DeviceCertificateDeletedEvent {
+        fn deserialize<__D: __serde::Deserializer<'de>>(
+            __deserializer: __D,
+        ) -> ::std::result::Result<Self, __D::Error> {
+            #[doc(hidden)]
+            struct __Visitor {
+                __phantom_vars: ::core::marker::PhantomData<fn(&())>,
+            }
+            impl<'de> __serde::de::Visitor<'de> for __Visitor {
+                type Value = DeviceCertificateDeletedEvent;
+                fn expecting(
+                    &self,
+                    __formatter: &mut ::core::fmt::Formatter,
+                ) -> ::core::fmt::Result {
+                    ::core::fmt::Formatter::write_str(
+                        __formatter,
+                        "record DeviceCertificateDeletedEvent",
+                    )
+                }
+                #[inline]
+                fn visit_seq<__A>(
+                    self,
+                    mut __seq: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::SeqAccess<'de>,
+                {
+                    let __field0 = match __serde::de::SeqAccess::next_element::<
+                        super::projects::ProjectId,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(0usize, &"record with 3 fields"),
+                            );
+                        }
+                    };
+                    let __field1 =
+                        match __serde::de::SeqAccess::next_element::<DeviceId>(&mut __seq)? {
+                            ::core::option::Option::Some(__value) => __value,
+                            ::core::option::Option::None => {
+                                return ::core::result::Result::Err(
+                                    __serde::de::Error::invalid_length(
+                                        1usize,
+                                        &"record with 3 fields",
+                                    ),
+                                );
+                            }
+                        };
+                    let __field2 = match __serde::de::SeqAccess::next_element::<DeviceCertificateId>(
+                        &mut __seq,
+                    )? {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(2usize, &"record with 3 fields"),
+                            );
+                        }
+                    };
+                    ::core::result::Result::Ok(DeviceCertificateDeletedEvent {
+                        project_id: __field0,
+                        device_id: __field1,
+                        certificate_id: __field2,
+                    })
+                }
+                #[inline]
+                fn visit_map<__A>(
+                    self,
+                    mut __map: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::MapAccess<'de>,
+                {
+                    #[doc(hidden)]
+                    const __IDENTIFIERS: &'static [&'static str] =
+                        &["projectId", "deviceId", "certificateId"];
+                    #[doc(hidden)]
+                    const __EXPECTING_IDENTIFIERS: &'static str =
+                        "an identifier in [\"projectId\", \"deviceId\", \"certificateId\"]";
+                    #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
+                    #[doc(hidden)]
+                    enum __Identifier {
+                        __Identifier0,
+                        __Identifier1,
+                        __Identifier2,
+                        __Unknown,
+                    }
+                    #[doc(hidden)]
+                    struct __IdentifierVisitor;
+                    impl<'de> __serde::de::Visitor<'de> for __IdentifierVisitor {
+                        type Value = __Identifier;
+                        fn expecting(
+                            &self,
+                            __formatter: &mut ::core::fmt::Formatter,
+                        ) -> ::core::fmt::Result {
+                            ::core::fmt::Formatter::write_str(__formatter, __EXPECTING_IDENTIFIERS)
+                        }
+                        fn visit_u64<__E>(
+                            self,
+                            __value: u64,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                0u64 => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                                1u64 => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                                2u64 => ::core::result::Result::Ok(__Identifier::__Identifier2),
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_str<__E>(
+                            self,
+                            __value: &str,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                "projectId" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
+                                }
+                                "deviceId" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier1)
+                                }
+                                "certificateId" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier2)
+                                }
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_bytes<__E>(
+                            self,
+                            __value: &[u8],
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                b"projectId" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
+                                }
+                                b"deviceId" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier1)
+                                }
+                                b"certificateId" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier2)
+                                }
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                    }
+                    impl<'de> __serde::Deserialize<'de> for __Identifier {
+                        #[inline]
+                        fn deserialize<__D>(
+                            __deserializer: __D,
+                        ) -> ::core::result::Result<Self, __D::Error>
+                        where
+                            __D: __serde::Deserializer<'de>,
+                        {
+                            __serde::Deserializer::deserialize_identifier(
+                                __deserializer,
+                                __IdentifierVisitor,
+                            )
+                        }
+                    }
+                    let mut __field0: ::core::option::Option<super::projects::ProjectId> =
+                        ::core::option::Option::None;
+                    let mut __field1: ::core::option::Option<DeviceId> =
+                        ::core::option::Option::None;
+                    let mut __field2: ::core::option::Option<DeviceCertificateId> =
+                        ::core::option::Option::None;
+                    while let ::core::option::Option::Some(__key) =
+                        __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
+                    {
+                        match __key {
+                            __Identifier::__Identifier0 => {
+                                if ::core::option::Option::is_some(&__field0) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "projectId",
+                                        ),
+                                    );
+                                }
+                                __field0 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<super::projects::ProjectId>(
+                                        &mut __map,
+                                    )?,
+                                );
+                            }
+                            __Identifier::__Identifier1 => {
+                                if ::core::option::Option::is_some(&__field1) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "deviceId",
+                                        ),
+                                    );
+                                }
+                                __field1 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<DeviceId>(&mut __map)?,
+                                );
+                            }
+                            __Identifier::__Identifier2 => {
+                                if ::core::option::Option::is_some(&__field2) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "certificateId",
+                                        ),
+                                    );
+                                }
+                                __field2 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<DeviceCertificateId>(
+                                        &mut __map,
+                                    )?,
+                                );
+                            }
+                            _ => {
+                                __serde::de::MapAccess::next_value::<__serde::de::IgnoredAny>(
+                                    &mut __map,
+                                )?;
+                            }
+                        }
+                    }
+                    let __field0 = match __field0 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                <__A::Error as __serde::de::Error>::missing_field("projectId"),
+                            );
+                        }
+                    };
+                    let __field1 = match __field1 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                <__A::Error as __serde::de::Error>::missing_field("deviceId"),
+                            );
+                        }
+                    };
+                    let __field2 = match __field2 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                <__A::Error as __serde::de::Error>::missing_field("certificateId"),
+                            );
+                        }
+                    };
+                    ::core::result::Result::Ok(DeviceCertificateDeletedEvent {
+                        project_id: __field0,
+                        device_id: __field1,
+                        certificate_id: __field2,
+                    })
+                }
+            }
+            #[doc(hidden)]
+            const __FIELDS: &'static [&'static str] = &["projectId", "deviceId", "certificateId"];
+            __serde::Deserializer::deserialize_struct(
+                __deserializer,
+                "DeviceCertificateDeletedEvent",
+                __FIELDS,
+                __Visitor {
+                    __phantom_vars: ::core::marker::PhantomData,
+                },
+            )
+        }
+    }
+    #[doc = "Status of device certificate has been changed.\n"]
+    #[derive(Clone, Debug)]
+    pub struct DeviceCertificateStatusChangedEvent {
+        #[doc = "ID of the project.\n"]
+        pub project_id: super::projects::ProjectId,
+        #[doc = "ID of the device.\n"]
+        pub device_id: DeviceId,
+        #[doc = "ID of the certificate.\n"]
+        pub certificate_id: DeviceCertificateId,
+        #[doc = "Status of the certificate.\n"]
+        pub status: DeviceCertificateStatus,
+    }
+    impl DeviceCertificateStatusChangedEvent {
+        #[doc = "Creates a new [`DeviceCertificateStatusChangedEvent`]."]
+        pub fn new(
+            project_id: super::projects::ProjectId,
+            device_id: DeviceId,
+            certificate_id: DeviceCertificateId,
+            status: DeviceCertificateStatus,
+        ) -> Self {
+            Self {
+                project_id,
+                device_id,
+                certificate_id,
+                status,
+            }
+        }
+        #[doc = "Sets the value of `project_id`."]
+        pub fn set_project_id(&mut self, project_id: super::projects::ProjectId) -> &mut Self {
+            self.project_id = project_id;
+            self
+        }
+        #[doc = "Sets the value of `project_id`."]
+        pub fn with_project_id(mut self, project_id: super::projects::ProjectId) -> Self {
+            self.project_id = project_id;
+            self
+        }
+        #[doc = "Sets the value of `device_id`."]
+        pub fn set_device_id(&mut self, device_id: DeviceId) -> &mut Self {
+            self.device_id = device_id;
+            self
+        }
+        #[doc = "Sets the value of `device_id`."]
+        pub fn with_device_id(mut self, device_id: DeviceId) -> Self {
+            self.device_id = device_id;
+            self
+        }
+        #[doc = "Sets the value of `certificate_id`."]
+        pub fn set_certificate_id(&mut self, certificate_id: DeviceCertificateId) -> &mut Self {
+            self.certificate_id = certificate_id;
+            self
+        }
+        #[doc = "Sets the value of `certificate_id`."]
+        pub fn with_certificate_id(mut self, certificate_id: DeviceCertificateId) -> Self {
+            self.certificate_id = certificate_id;
+            self
+        }
+        #[doc = "Sets the value of `status`."]
+        pub fn set_status(&mut self, status: DeviceCertificateStatus) -> &mut Self {
+            self.status = status;
+            self
+        }
+        #[doc = "Sets the value of `status`."]
+        pub fn with_status(mut self, status: DeviceCertificateStatus) -> Self {
+            self.status = status;
+            self
+        }
+    }
+    #[automatically_derived]
+    impl __serde::Serialize for DeviceCertificateStatusChangedEvent {
+        fn serialize<__S: __serde::Serializer>(
+            &self,
+            __serializer: __S,
+        ) -> ::std::result::Result<__S::Ok, __S::Error> {
+            let mut __record = __sidex_serde::ser::RecordSerializer::new(
+                __serializer,
+                "DeviceCertificateStatusChangedEvent",
+                4usize,
+            )?;
+            __record.serialize_field("projectId", &self.project_id)?;
+            __record.serialize_field("deviceId", &self.device_id)?;
+            __record.serialize_field("certificateId", &self.certificate_id)?;
+            __record.serialize_field("status", &self.status)?;
+            __record.end()
+        }
+    }
+    #[automatically_derived]
+    impl<'de> __serde::Deserialize<'de> for DeviceCertificateStatusChangedEvent {
+        fn deserialize<__D: __serde::Deserializer<'de>>(
+            __deserializer: __D,
+        ) -> ::std::result::Result<Self, __D::Error> {
+            #[doc(hidden)]
+            struct __Visitor {
+                __phantom_vars: ::core::marker::PhantomData<fn(&())>,
+            }
+            impl<'de> __serde::de::Visitor<'de> for __Visitor {
+                type Value = DeviceCertificateStatusChangedEvent;
+                fn expecting(
+                    &self,
+                    __formatter: &mut ::core::fmt::Formatter,
+                ) -> ::core::fmt::Result {
+                    ::core::fmt::Formatter::write_str(
+                        __formatter,
+                        "record DeviceCertificateStatusChangedEvent",
+                    )
+                }
+                #[inline]
+                fn visit_seq<__A>(
+                    self,
+                    mut __seq: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::SeqAccess<'de>,
+                {
+                    let __field0 = match __serde::de::SeqAccess::next_element::<
+                        super::projects::ProjectId,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(0usize, &"record with 4 fields"),
+                            );
+                        }
+                    };
+                    let __field1 =
+                        match __serde::de::SeqAccess::next_element::<DeviceId>(&mut __seq)? {
+                            ::core::option::Option::Some(__value) => __value,
+                            ::core::option::Option::None => {
+                                return ::core::result::Result::Err(
+                                    __serde::de::Error::invalid_length(
+                                        1usize,
+                                        &"record with 4 fields",
+                                    ),
+                                );
+                            }
+                        };
+                    let __field2 = match __serde::de::SeqAccess::next_element::<DeviceCertificateId>(
+                        &mut __seq,
+                    )? {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(2usize, &"record with 4 fields"),
+                            );
+                        }
+                    };
+                    let __field3 = match __serde::de::SeqAccess::next_element::<
+                        DeviceCertificateStatus,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(3usize, &"record with 4 fields"),
+                            );
+                        }
+                    };
+                    ::core::result::Result::Ok(DeviceCertificateStatusChangedEvent {
+                        project_id: __field0,
+                        device_id: __field1,
+                        certificate_id: __field2,
+                        status: __field3,
+                    })
+                }
+                #[inline]
+                fn visit_map<__A>(
+                    self,
+                    mut __map: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::MapAccess<'de>,
+                {
+                    #[doc(hidden)]
+                    const __IDENTIFIERS: &'static [&'static str] =
+                        &["projectId", "deviceId", "certificateId", "status"];
+                    #[doc(hidden)]
+                    const __EXPECTING_IDENTIFIERS: &'static str = "an identifier in [\"projectId\", \"deviceId\", \"certificateId\", \"status\"]";
+                    #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
+                    #[doc(hidden)]
+                    enum __Identifier {
+                        __Identifier0,
+                        __Identifier1,
+                        __Identifier2,
+                        __Identifier3,
+                        __Unknown,
+                    }
+                    #[doc(hidden)]
+                    struct __IdentifierVisitor;
+                    impl<'de> __serde::de::Visitor<'de> for __IdentifierVisitor {
+                        type Value = __Identifier;
+                        fn expecting(
+                            &self,
+                            __formatter: &mut ::core::fmt::Formatter,
+                        ) -> ::core::fmt::Result {
+                            ::core::fmt::Formatter::write_str(__formatter, __EXPECTING_IDENTIFIERS)
+                        }
+                        fn visit_u64<__E>(
+                            self,
+                            __value: u64,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                0u64 => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                                1u64 => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                                2u64 => ::core::result::Result::Ok(__Identifier::__Identifier2),
+                                3u64 => ::core::result::Result::Ok(__Identifier::__Identifier3),
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_str<__E>(
+                            self,
+                            __value: &str,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                "projectId" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
+                                }
+                                "deviceId" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier1)
+                                }
+                                "certificateId" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier2)
+                                }
+                                "status" => ::core::result::Result::Ok(__Identifier::__Identifier3),
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_bytes<__E>(
+                            self,
+                            __value: &[u8],
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                b"projectId" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
+                                }
+                                b"deviceId" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier1)
+                                }
+                                b"certificateId" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier2)
+                                }
+                                b"status" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier3)
+                                }
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                    }
+                    impl<'de> __serde::Deserialize<'de> for __Identifier {
+                        #[inline]
+                        fn deserialize<__D>(
+                            __deserializer: __D,
+                        ) -> ::core::result::Result<Self, __D::Error>
+                        where
+                            __D: __serde::Deserializer<'de>,
+                        {
+                            __serde::Deserializer::deserialize_identifier(
+                                __deserializer,
+                                __IdentifierVisitor,
+                            )
+                        }
+                    }
+                    let mut __field0: ::core::option::Option<super::projects::ProjectId> =
+                        ::core::option::Option::None;
+                    let mut __field1: ::core::option::Option<DeviceId> =
+                        ::core::option::Option::None;
+                    let mut __field2: ::core::option::Option<DeviceCertificateId> =
+                        ::core::option::Option::None;
+                    let mut __field3: ::core::option::Option<DeviceCertificateStatus> =
+                        ::core::option::Option::None;
+                    while let ::core::option::Option::Some(__key) =
+                        __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
+                    {
+                        match __key {
+                            __Identifier::__Identifier0 => {
+                                if ::core::option::Option::is_some(&__field0) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "projectId",
+                                        ),
+                                    );
+                                }
+                                __field0 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<super::projects::ProjectId>(
+                                        &mut __map,
+                                    )?,
+                                );
+                            }
+                            __Identifier::__Identifier1 => {
+                                if ::core::option::Option::is_some(&__field1) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "deviceId",
+                                        ),
+                                    );
+                                }
+                                __field1 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<DeviceId>(&mut __map)?,
+                                );
+                            }
+                            __Identifier::__Identifier2 => {
+                                if ::core::option::Option::is_some(&__field2) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "certificateId",
+                                        ),
+                                    );
+                                }
+                                __field2 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<DeviceCertificateId>(
+                                        &mut __map,
+                                    )?,
+                                );
+                            }
+                            __Identifier::__Identifier3 => {
+                                if ::core::option::Option::is_some(&__field3) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "status",
+                                        ),
+                                    );
+                                }
+                                __field3 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<DeviceCertificateStatus>(
+                                        &mut __map,
+                                    )?,
+                                );
+                            }
+                            _ => {
+                                __serde::de::MapAccess::next_value::<__serde::de::IgnoredAny>(
+                                    &mut __map,
+                                )?;
+                            }
+                        }
+                    }
+                    let __field0 = match __field0 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                <__A::Error as __serde::de::Error>::missing_field("projectId"),
+                            );
+                        }
+                    };
+                    let __field1 = match __field1 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                <__A::Error as __serde::de::Error>::missing_field("deviceId"),
+                            );
+                        }
+                    };
+                    let __field2 = match __field2 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                <__A::Error as __serde::de::Error>::missing_field("certificateId"),
+                            );
+                        }
+                    };
+                    let __field3 = match __field3 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                <__A::Error as __serde::de::Error>::missing_field("status"),
+                            );
+                        }
+                    };
+                    ::core::result::Result::Ok(DeviceCertificateStatusChangedEvent {
+                        project_id: __field0,
+                        device_id: __field1,
+                        certificate_id: __field2,
+                        status: __field3,
+                    })
+                }
+            }
+            #[doc(hidden)]
+            const __FIELDS: &'static [&'static str] =
+                &["projectId", "deviceId", "certificateId", "status"];
+            __serde::Deserializer::deserialize_struct(
+                __deserializer,
+                "DeviceCertificateStatusChangedEvent",
+                __FIELDS,
+                __Visitor {
+                    __phantom_vars: ::core::marker::PhantomData,
+                },
+            )
+        }
+    }
 }
 pub mod digest {
     #![doc = "Hash digests.\n"]

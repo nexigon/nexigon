@@ -242,6 +242,9 @@ macro_rules! with_events {
             // # Devices
             ("devices_Created", devices::DeviceCreatedEvent, {}, { project_id }),
             ("devices_Deleted", devices::DeviceDeletedEvent, {}, { project_id }),
+            ("devices_CertificateAdded", devices::DeviceCertificateAddedEvent, { }, { project_id }),
+            ("devices_CertificateDeleted", devices::DeviceCertificateDeletedEvent, { }, { project_id }),
+            ("devices_CertificateStatusChanged", devices::DeviceCertificateStatusChangedEvent, { }, { project_id }),
         ];
     };
 }
