@@ -2,16 +2,72 @@
 
 import actor::Actor
 import datetime::Timestamp
+import jobs::JobId
 import json::JsonValue
 
-/// Unique ID of an audit event.
-#[rust(type = "nexigon_ids::ids::AuditEventId")]
+/// Unique ID of an audit log action.
+#[rust(type = "nexigon_ids::ids::AuditLogActionId")]
 #[json(type = "string")]
-opaque AuditEventId
+opaque AuditLogActionId
 
-/// Status associated with an audit event.
+/// Unique ID of an audit log event.
+#[rust(type = "nexigon_ids::ids::AuditLogEventId")]
+#[json(type = "string")]
+opaque AuditLogEventId
+
+/// Event recorded in the audit log.
+/// 
+/// Audit data is guaranteed to not contain any secret information.
+record AuditLogEvent {
+    /// ID of the audit log event.
+    event_id: AuditLogEventId,
+    /// Actor causing the event.
+    actor: Actor,
+    /// Type of the event that was recorded.
+    event: string,
+    /// Additional audit data associated with the event.
+    data: JsonValue,
+    /// Timestamp indicating when the audit log event was recorded.
+    created_at: Timestamp,
+    /// Action the event has been caused by (if any).
+    action?: AuditLogEventAction,
+    /// Job the event has been caused by (if any).
+    job?: AuditLogEventJob,
+}
+
+/// Action that caused an event.
+record AuditLogEventAction {
+    /// ID of the action.
+    action_id: AuditLogActionId,
+}
+
+/// Job that caused an event.
+record AuditLogEventJob {
+    /// ID of the job.
+    job_id: JobId,
+}
+
+/// Action recorded in the audit log.
+/// 
+/// Audit data is guaranteed to not contain any secret information.
+record AuditLogAction {
+    /// ID of the audit log action.
+    action_id: AuditLogActionId,
+    /// Actor that performed the action.
+    actor: Actor,
+    /// Type of the action that was performed.
+    action: string,
+    /// Additional audit data associated with the action.
+    data: [string: JsonValue],
+    /// Status associated with the action
+    status: AuditLogActionStatus,
+    /// Timestamp indicating when the audit log action was recorded.
+    created_at: Timestamp,
+}
+
+/// Status associated with an audit log action.
 #[json(tagged = externally)]
-variant AuditEventStatus {
+variant AuditLogActionStatus {
     /// Action got rejected (failed precondition check).
     Rejected,
     /// Action or precondition check panicked (e.g., due to a bug).
@@ -24,34 +80,24 @@ variant AuditEventStatus {
     Pending,
 }
 
-/// Event in the audit log.
+/// Query the events recorded in the audit log.
 /// 
-/// Audit data is guaranteed to not contain any sensitive information.
-record AuditEvent {
-    /// ID of the audit event.
-    event_id: AuditEventId,
-    /// Actor that performed the action.
-    actor: Actor,
-    /// Type of the action that was performed.
-    action: string,
-    /// Additional audit data associated with the event.
-    data: [string: JsonValue],
-    /// Status associated with the event.
-    status: AuditEventStatus,
-    /// Timestamp indicating when the audit event was recorded.
-    created_at: Timestamp,
-}
+/// Requires administrator permissions.
+record QueryAuditLogEventsAction { }
 
-/// Query the audit log of the instance.
-/// 
-/// Requires admin permissions.
-record QueryAuditLogAction {
-    /// Optionally filter the audit log by the given status.
-    status_equals?: AuditEventStatus,
-}
-
-/// Output of querying the audit log of the instance.
-record QueryAuditLogOutput {
+/// Output of querying the events recorded in the audit log.
+record QueryAuditLogEventsOutput {
     /// List of audit events.
-    entries: [AuditEvent],
+    events: [AuditLogEvent],
+}
+
+/// Query the actions recorded in the audit log.
+/// 
+/// Requires administrator permissions.
+record QueryAuditLogActionsAction { }
+
+/// Output of querying the actions recorded in the audit log.
+record QueryAuditLogActionsOutput {
+    /// List of actions.
+    actions: [AuditLogAction],
 }

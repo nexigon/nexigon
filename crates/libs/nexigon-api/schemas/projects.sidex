@@ -1,9 +1,9 @@
 //! Actions and types related to projects.
 
+import audit::AuditLogEvent
 import datetime::Timestamp
 import devices::DeviceId
 import users::UserId
-import audit::{AuditEventId, AuditEventStatus, AuditEvent}
 
 /// Unique ID of a project.
 #[rust(type = "nexigon_ids::ids::ProjectId")]
@@ -192,13 +192,59 @@ record DeleteDeploymentTokenAction {
 }
 
 /// Query the audit log of the project.
-record QueryAuditLogAction {
+record QueryAuditLogEventsAction {
     /// ID of the project.
     project_id: ProjectId,
 }
 
 /// Output of querying the audit log of the project.
-record QueryAuditLogOutput {
-    /// List of audit log entries.
-    entries: [AuditEvent],
+record QueryAuditLogEventsOutput {
+   /// List of audit log events.
+   events: [AuditLogEvent],
+}
+
+/// Event indicating the creation of a project.
+record ProjectCreatedEvent {
+    /// ID of the project.
+    project_id: ProjectId,
+}
+
+/// Event indicating the deletion of a project.
+record ProjectDeletedEvent {
+    /// ID of the project.
+    project_id: ProjectId,
+}
+
+/// Event indicating that a member has been added to a project.
+record ProjectMemberAddedEvent {
+    /// ID of the project.
+    project_id: ProjectId,
+    /// ID of the user.
+    user_id: UserId,
+    /// Indicates whether the member is an owner of the project.
+    is_owner: bool,
+}
+
+/// Event indicating that a member has been removed from a project.
+record ProjectMemberRemovedEvent {
+    /// ID of the project.
+    project_id: ProjectId,
+    /// ID of the user.
+    user_id: UserId,
+}
+
+/// Event indicating that a deployment token has been created.
+record DeploymentTokenCreatedEvent {
+    /// ID of the project.
+    project_id: ProjectId,
+    /// ID of the deployment token.
+    token_id: DeploymentTokenId,
+}
+
+/// Event indicating that a deployment token has been deleted.
+record DeploymentTokenDeletedEvent {
+    /// ID of the project.
+    project_id: ProjectId,
+    /// ID of the deployment token.
+    token_id: DeploymentTokenId,
 }

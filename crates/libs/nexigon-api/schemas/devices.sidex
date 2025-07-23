@@ -393,3 +393,19 @@ variant DeviceEventSeverity {
     /// Critical event.
     Critical,
 }
+
+/// Device has been created.
+record DeviceCreatedEvent {
+    /// ID of the device.
+    device_id: DeviceId,
+    /// Project the device belongs to.
+    project_id: ProjectId,
+}
+
+/// Device has been deleted.
+record DeviceDeletedEvent {
+    /// ID of the device.
+    device_id: DeviceId,
+    /// ID of the project.
+    project_id: ProjectId,
+}

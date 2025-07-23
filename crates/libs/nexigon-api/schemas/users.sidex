@@ -413,3 +413,77 @@ variant CompleteRegistrationOutput {
     /// Registration failed.
     Failed,
 }
+
+/// Event indicating that a user has been created.
+record UserCreatedEvent {
+    /// ID of the user.
+    user_id: UserId,
+    /// Email address of the user.
+    email: string,
+}
+
+/// Event indicating that a user has been deleted.
+record UserDeletedEvent {
+    /// ID of the user.
+    user_id: UserId,
+}
+
+/// Event indicating that administrator privileges have been granted or revoked.
+record UserSetIsAdminEvent {
+    /// ID of the user.
+    user_id: UserId,
+    /// Indicates whether the user is an administrator.
+    is_admin: bool,
+}
+
+/// Event indicating that a user password has been changed.
+record UserSetPasswordEvent {
+    /// ID of the user.
+    user_id: UserId,
+}
+
+/// Event indicating that a user token has been created.
+record UserTokenCreatedEvent {
+    /// ID of the user.
+    user_id: UserId,
+    /// ID of the user token.
+    token_id: UserTokenId,
+}
+
+/// Event indicating that a user token has been deleted.
+record UserTokenDeletedEvent {
+    /// ID of the user.
+    user_id: UserId,
+    /// ID of the user token.
+    token_id: UserTokenId,
+}
+
+/// Event indicating that a user session has been initiated.
+record UserSessionInitiatedEvent {
+    /// ID of the user.
+    user_id: UserId,
+    /// ID of the user session.
+    session_id: UserSessionId,
+}
+
+/// Event indicating that a new user has registered.
+record UserRegistrationCreatedEvent {
+    /// ID of the user.
+    user_id: UserId,
+    /// Email address of the user.
+    email: string,
+}
+
+/// Event indicating that a registration email has been sent.
+record UserRegistrationEmailSentEvent {
+    /// ID of the user.
+    user_id: UserId,
+    /// Email address the email has been sent to.
+    email: string,
+}
+
+/// Event indicating that the registration of a user has been completed.
+record UserRegistrationCompletedEvent {
+    /// ID of the user.
+    user_id: UserId,
+}

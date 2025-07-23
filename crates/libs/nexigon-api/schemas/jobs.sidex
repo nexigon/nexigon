@@ -1,0 +1,56 @@
+//! Actions and types related to the jobs.
+
+import datetime::Timestamp
+
+/// Unique ID of a job.
+#[rust(type = "nexigon_ids::ids::JobId")]
+#[json(type = "string")]
+opaque JobId
+
+/// Job.
+record Job {
+    /// Job ID.
+    job_id: JobId,
+    /// Status of the job.
+    status: JobStatus,
+    /// Type of the job.
+    job: string,
+    /// Indicates whether the job is currently queued for execution.
+    queued: bool,
+    /// Attempts of executing the job.
+    attempts: u32,
+    /// Maximum number of retries for the job.
+    retry_limit?: u32,
+    /// Delay in seconds for retrying the job.
+    retry_delay: u32,
+    /// Timeout for an individual execution of the job (defaults to 30 minutes).
+    timeout: u32,
+    /// Timestamp indicating when the job was created.
+    created_at: Timestamp,
+    /// Timestamp indicating when the job has finished (if applicable).
+    finished_at?: Timestamp,
+}
+
+/// Execution status of a job.
+#[json(tagged = externally)]
+variant JobStatus {
+    /// Job is pending.
+    Pending,
+    /// Job has been completed successfully.
+    Completed,
+    /// Job has failed.
+    Failed,
+    /// Job has expired and is no longer valid.
+    Expired,
+    /// Job has been cancelled.
+    Cancelled,
+}
+
+/// Query the jobs of the instance.
+record QueryJobsAction {}
+
+/// Output of querying the jobs of the instance.
+record QueryJobsOutput {
+    /// List of jobs.
+    jobs: [Job],
+}

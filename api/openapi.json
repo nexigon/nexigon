@@ -1007,7 +1007,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/nexigon_api.projects.QueryAuditLogAction"
+                "$ref": "#/components/schemas/nexigon_api.projects.QueryAuditLogEventsAction"
               }
             }
           }
@@ -1018,7 +1018,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/nexigon_api.projects.QueryAuditLogOutput"
+                  "$ref": "#/components/schemas/nexigon_api.projects.QueryAuditLogEventsOutput"
                 }
               }
             }
@@ -2436,6 +2436,96 @@
         }
       }
     },
+    "/api/v1/invoke/audit_QueryAuditLogEvents": {
+      "post": {
+        "tags": [
+          "audit"
+        ],
+        "summary": "QueryAuditLogEvents",
+        "description": "Query the events recorded in the audit log.\n\nRequires administrator permissions.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/nexigon_api.audit.QueryAuditLogEventsAction"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/nexigon_api.audit.QueryAuditLogEventsOutput"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/invoke/audit_QueryAuditLogActions": {
+      "post": {
+        "tags": [
+          "audit"
+        ],
+        "summary": "QueryAuditLogActions",
+        "description": "Query the actions recorded in the audit log.\n\nRequires administrator permissions.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/nexigon_api.audit.QueryAuditLogActionsAction"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/nexigon_api.audit.QueryAuditLogActionsOutput"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/invoke/jobs_QueryJobs": {
+      "post": {
+        "tags": [
+          "jobs"
+        ],
+        "summary": "QueryJobs",
+        "description": "Query the jobs of the instance.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/nexigon_api.jobs.QueryJobsAction"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/nexigon_api.jobs.QueryJobsOutput"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/invoke/instance_GetInstanceStatistics": {
       "post": {
         "tags": [
@@ -2867,12 +2957,12 @@
         ],
         "unevaluatedProperties": false
       },
-      "nexigon_api.audit.AuditEvent": {
+      "nexigon_api.audit.AuditLogAction": {
         "type": "object",
-        "description": "Event in the audit log.\n\nAudit data is guaranteed to not contain any sensitive information.",
+        "description": "Action recorded in the audit log.\n\nAudit data is guaranteed to not contain any secret information.",
         "properties": {
-          "eventId": {
-            "$ref": "#/components/schemas/nexigon_api.audit.AuditEventId"
+          "actionId": {
+            "$ref": "#/components/schemas/nexigon_api.audit.AuditLogActionId"
           },
           "actor": {
             "$ref": "#/components/schemas/nexigon_api.actor.Actor"
@@ -2887,14 +2977,14 @@
             }
           },
           "status": {
-            "$ref": "#/components/schemas/nexigon_api.audit.AuditEventStatus"
+            "$ref": "#/components/schemas/nexigon_api.audit.AuditLogActionStatus"
           },
           "createdAt": {
             "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
           }
         },
         "required": [
-          "eventId",
+          "actionId",
           "actor",
           "action",
           "data",
@@ -2903,11 +2993,11 @@
         ],
         "unevaluatedProperties": false
       },
-      "nexigon_api.audit.AuditEventId": {
+      "nexigon_api.audit.AuditLogActionId": {
         "type": "string",
-        "description": "Unique ID of an audit event."
+        "description": "Unique ID of an audit log action."
       },
-      "nexigon_api.audit.AuditEventStatus": {
+      "nexigon_api.audit.AuditLogActionStatus": {
         "enum": [
           "Rejected",
           "Panicked",
@@ -2915,32 +3005,114 @@
           "Failed",
           "Pending"
         ],
-        "description": "Status associated with an audit event."
+        "description": "Status associated with an audit log action."
       },
-      "nexigon_api.audit.QueryAuditLogAction": {
+      "nexigon_api.audit.AuditLogEvent": {
         "type": "object",
-        "description": "Query the audit log of the instance.\n\nRequires admin permissions.",
+        "description": "Event recorded in the audit log.\n\nAudit data is guaranteed to not contain any secret information.",
         "properties": {
-          "statusEquals": {
-            "$ref": "#/components/schemas/nexigon_api.audit.AuditEventStatus"
+          "eventId": {
+            "$ref": "#/components/schemas/nexigon_api.audit.AuditLogEventId"
+          },
+          "actor": {
+            "$ref": "#/components/schemas/nexigon_api.actor.Actor"
+          },
+          "event": {
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/nexigon_api.json.JsonValue"
+          },
+          "createdAt": {
+            "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
+          },
+          "action": {
+            "$ref": "#/components/schemas/nexigon_api.audit.AuditLogEventAction"
+          },
+          "job": {
+            "$ref": "#/components/schemas/nexigon_api.audit.AuditLogEventJob"
           }
         },
+        "required": [
+          "eventId",
+          "actor",
+          "event",
+          "data",
+          "createdAt"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.audit.AuditLogEventAction": {
+        "type": "object",
+        "description": "Action that caused an event.",
+        "properties": {
+          "actionId": {
+            "$ref": "#/components/schemas/nexigon_api.audit.AuditLogActionId"
+          }
+        },
+        "required": [
+          "actionId"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.audit.AuditLogEventId": {
+        "type": "string",
+        "description": "Unique ID of an audit log event."
+      },
+      "nexigon_api.audit.AuditLogEventJob": {
+        "type": "object",
+        "description": "Job that caused an event.",
+        "properties": {
+          "jobId": {
+            "$ref": "#/components/schemas/nexigon_api.jobs.JobId"
+          }
+        },
+        "required": [
+          "jobId"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.audit.QueryAuditLogActionsAction": {
+        "type": "object",
+        "properties": {},
         "required": [],
         "unevaluatedProperties": false
       },
-      "nexigon_api.audit.QueryAuditLogOutput": {
+      "nexigon_api.audit.QueryAuditLogActionsOutput": {
         "type": "object",
-        "description": "Output of querying the audit log of the instance.",
+        "description": "Output of querying the actions recorded in the audit log.",
         "properties": {
-          "entries": {
+          "actions": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/nexigon_api.audit.AuditEvent"
+              "$ref": "#/components/schemas/nexigon_api.audit.AuditLogAction"
             }
           }
         },
         "required": [
-          "entries"
+          "actions"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.audit.QueryAuditLogEventsAction": {
+        "type": "object",
+        "properties": {},
+        "required": [],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.audit.QueryAuditLogEventsOutput": {
+        "type": "object",
+        "description": "Output of querying the events recorded in the audit log.",
+        "properties": {
+          "events": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/nexigon_api.audit.AuditLogEvent"
+            }
+          }
+        },
+        "required": [
+          "events"
         ],
         "unevaluatedProperties": false
       },
@@ -3243,6 +3415,40 @@
       "nexigon_api.devices.DeviceConnectionId": {
         "type": "string",
         "description": "Unique ID of a device connection."
+      },
+      "nexigon_api.devices.DeviceCreatedEvent": {
+        "type": "object",
+        "description": "Device has been created.",
+        "properties": {
+          "deviceId": {
+            "$ref": "#/components/schemas/nexigon_api.devices.DeviceId"
+          },
+          "projectId": {
+            "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+          }
+        },
+        "required": [
+          "deviceId",
+          "projectId"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.devices.DeviceDeletedEvent": {
+        "type": "object",
+        "description": "Device has been deleted.",
+        "properties": {
+          "deviceId": {
+            "$ref": "#/components/schemas/nexigon_api.devices.DeviceId"
+          },
+          "projectId": {
+            "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+          }
+        },
+        "required": [
+          "deviceId",
+          "projectId"
+        ],
+        "unevaluatedProperties": false
       },
       "nexigon_api.devices.DeviceEvent": {
         "type": "object",
@@ -3895,6 +4101,93 @@
         ],
         "unevaluatedProperties": false
       },
+      "nexigon_api.jobs.Job": {
+        "type": "object",
+        "description": "Job.",
+        "properties": {
+          "jobId": {
+            "$ref": "#/components/schemas/nexigon_api.jobs.JobId"
+          },
+          "status": {
+            "$ref": "#/components/schemas/nexigon_api.jobs.JobStatus"
+          },
+          "job": {
+            "type": "string"
+          },
+          "queued": {
+            "type": "boolean"
+          },
+          "attempts": {
+            "type": "integer",
+            "format": "uint32"
+          },
+          "retryLimit": {
+            "type": "integer",
+            "format": "uint32"
+          },
+          "retryDelay": {
+            "type": "integer",
+            "format": "uint32"
+          },
+          "timeout": {
+            "type": "integer",
+            "format": "uint32"
+          },
+          "createdAt": {
+            "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
+          },
+          "finishedAt": {
+            "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
+          }
+        },
+        "required": [
+          "jobId",
+          "status",
+          "job",
+          "queued",
+          "attempts",
+          "retryDelay",
+          "timeout",
+          "createdAt"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.jobs.JobId": {
+        "type": "string",
+        "description": "Unique ID of a job."
+      },
+      "nexigon_api.jobs.JobStatus": {
+        "enum": [
+          "Pending",
+          "Completed",
+          "Failed",
+          "Expired",
+          "Cancelled"
+        ],
+        "description": "Execution status of a job."
+      },
+      "nexigon_api.jobs.QueryJobsAction": {
+        "type": "object",
+        "properties": {},
+        "required": [],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.jobs.QueryJobsOutput": {
+        "type": "object",
+        "description": "Output of querying the jobs of the instance.",
+        "properties": {
+          "jobs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/nexigon_api.jobs.Job"
+            }
+          }
+        },
+        "required": [
+          "jobs"
+        ],
+        "unevaluatedProperties": false
+      },
       "nexigon_api.json.JsonValue": {
         "description": "JSON value."
       },
@@ -4033,6 +4326,40 @@
         "type": "string",
         "description": "Deployment token."
       },
+      "nexigon_api.projects.DeploymentTokenCreatedEvent": {
+        "type": "object",
+        "description": "Event indicating that a deployment token has been created.",
+        "properties": {
+          "projectId": {
+            "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+          },
+          "tokenId": {
+            "$ref": "#/components/schemas/nexigon_api.projects.DeploymentTokenId"
+          }
+        },
+        "required": [
+          "projectId",
+          "tokenId"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.projects.DeploymentTokenDeletedEvent": {
+        "type": "object",
+        "description": "Event indicating that a deployment token has been deleted.",
+        "properties": {
+          "projectId": {
+            "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+          },
+          "tokenId": {
+            "$ref": "#/components/schemas/nexigon_api.projects.DeploymentTokenId"
+          }
+        },
+        "required": [
+          "projectId",
+          "tokenId"
+        ],
+        "unevaluatedProperties": false
+      },
       "nexigon_api.projects.DeploymentTokenId": {
         "type": "string",
         "description": "Unique ID of a deployment token."
@@ -4071,11 +4398,75 @@
         ],
         "unevaluatedProperties": false
       },
+      "nexigon_api.projects.ProjectCreatedEvent": {
+        "type": "object",
+        "description": "Event indicating the creation of a project.",
+        "properties": {
+          "projectId": {
+            "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+          }
+        },
+        "required": [
+          "projectId"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.projects.ProjectDeletedEvent": {
+        "type": "object",
+        "description": "Event indicating the deletion of a project.",
+        "properties": {
+          "projectId": {
+            "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+          }
+        },
+        "required": [
+          "projectId"
+        ],
+        "unevaluatedProperties": false
+      },
       "nexigon_api.projects.ProjectId": {
         "type": "string",
         "description": "Unique ID of a project."
       },
-      "nexigon_api.projects.QueryAuditLogAction": {
+      "nexigon_api.projects.ProjectMemberAddedEvent": {
+        "type": "object",
+        "description": "Event indicating that a member has been added to a project.",
+        "properties": {
+          "projectId": {
+            "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+          },
+          "userId": {
+            "$ref": "#/components/schemas/nexigon_api.users.UserId"
+          },
+          "isOwner": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "projectId",
+          "userId",
+          "isOwner"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.projects.ProjectMemberRemovedEvent": {
+        "type": "object",
+        "description": "Event indicating that a member has been removed from a project.",
+        "properties": {
+          "projectId": {
+            "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+          },
+          "userId": {
+            "$ref": "#/components/schemas/nexigon_api.users.UserId"
+          }
+        },
+        "required": [
+          "projectId",
+          "userId"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.projects.QueryAuditLogEventsAction": {
         "type": "object",
         "properties": {
           "projectId": {
@@ -4087,19 +4478,19 @@
         ],
         "unevaluatedProperties": false
       },
-      "nexigon_api.projects.QueryAuditLogOutput": {
+      "nexigon_api.projects.QueryAuditLogEventsOutput": {
         "type": "object",
         "description": "Output of querying the audit log of the project.",
         "properties": {
-          "entries": {
+          "events": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/nexigon_api.audit.AuditEvent"
+              "$ref": "#/components/schemas/nexigon_api.audit.AuditLogEvent"
             }
           }
         },
         "required": [
-          "entries"
+          "events"
         ],
         "unevaluatedProperties": false
       },
@@ -6351,6 +6742,36 @@
         ],
         "unevaluatedProperties": false
       },
+      "nexigon_api.users.UserCreatedEvent": {
+        "type": "object",
+        "description": "Event indicating that a user has been created.",
+        "properties": {
+          "userId": {
+            "$ref": "#/components/schemas/nexigon_api.users.UserId"
+          },
+          "email": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "userId",
+          "email"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.users.UserDeletedEvent": {
+        "type": "object",
+        "description": "Event indicating that a user has been deleted.",
+        "properties": {
+          "userId": {
+            "$ref": "#/components/schemas/nexigon_api.users.UserId"
+          }
+        },
+        "required": [
+          "userId"
+        ],
+        "unevaluatedProperties": false
+      },
       "nexigon_api.users.UserId": {
         "type": "string",
         "description": "Unique ID of a user."
@@ -6372,6 +6793,53 @@
         "required": [
           "status",
           "createdAt"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.users.UserRegistrationCompletedEvent": {
+        "type": "object",
+        "description": "Event indicating that the registration of a user has been completed.",
+        "properties": {
+          "userId": {
+            "$ref": "#/components/schemas/nexigon_api.users.UserId"
+          }
+        },
+        "required": [
+          "userId"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.users.UserRegistrationCreatedEvent": {
+        "type": "object",
+        "description": "Event indicating that a new user has registered.",
+        "properties": {
+          "userId": {
+            "$ref": "#/components/schemas/nexigon_api.users.UserId"
+          },
+          "email": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "userId",
+          "email"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.users.UserRegistrationEmailSentEvent": {
+        "type": "object",
+        "description": "Event indicating that a registration email has been sent.",
+        "properties": {
+          "userId": {
+            "$ref": "#/components/schemas/nexigon_api.users.UserId"
+          },
+          "email": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "userId",
+          "email"
         ],
         "unevaluatedProperties": false
       },
@@ -6421,13 +6889,94 @@
         "type": "string",
         "description": "User session ID."
       },
+      "nexigon_api.users.UserSessionInitiatedEvent": {
+        "type": "object",
+        "description": "Event indicating that a user session has been initiated.",
+        "properties": {
+          "userId": {
+            "$ref": "#/components/schemas/nexigon_api.users.UserId"
+          },
+          "sessionId": {
+            "$ref": "#/components/schemas/nexigon_api.users.UserSessionId"
+          }
+        },
+        "required": [
+          "userId",
+          "sessionId"
+        ],
+        "unevaluatedProperties": false
+      },
       "nexigon_api.users.UserSessionToken": {
         "type": "string",
         "description": "User session token."
       },
+      "nexigon_api.users.UserSetIsAdminEvent": {
+        "type": "object",
+        "description": "Event indicating that administrator privileges have been granted or revoked.",
+        "properties": {
+          "userId": {
+            "$ref": "#/components/schemas/nexigon_api.users.UserId"
+          },
+          "isAdmin": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "userId",
+          "isAdmin"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.users.UserSetPasswordEvent": {
+        "type": "object",
+        "description": "Event indicating that a user password has been changed.",
+        "properties": {
+          "userId": {
+            "$ref": "#/components/schemas/nexigon_api.users.UserId"
+          }
+        },
+        "required": [
+          "userId"
+        ],
+        "unevaluatedProperties": false
+      },
       "nexigon_api.users.UserToken": {
         "type": "string",
         "description": "User token."
+      },
+      "nexigon_api.users.UserTokenCreatedEvent": {
+        "type": "object",
+        "description": "Event indicating that a user token has been created.",
+        "properties": {
+          "userId": {
+            "$ref": "#/components/schemas/nexigon_api.users.UserId"
+          },
+          "tokenId": {
+            "$ref": "#/components/schemas/nexigon_api.users.UserTokenId"
+          }
+        },
+        "required": [
+          "userId",
+          "tokenId"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.users.UserTokenDeletedEvent": {
+        "type": "object",
+        "description": "Event indicating that a user token has been deleted.",
+        "properties": {
+          "userId": {
+            "$ref": "#/components/schemas/nexigon_api.users.UserId"
+          },
+          "tokenId": {
+            "$ref": "#/components/schemas/nexigon_api.users.UserTokenId"
+          }
+        },
+        "required": [
+          "userId",
+          "tokenId"
+        ],
+        "unevaluatedProperties": false
       },
       "nexigon_api.users.UserTokenId": {
         "type": "string",

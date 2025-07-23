@@ -1,7 +1,10 @@
 use std::any::Any;
 
+use nexigon_ids::ids::ProjectId;
 use serde::Serialize;
 use serde::de::DeserializeOwned;
+
+use crate::types::users::UserId;
 
 pub mod types;
 
@@ -15,6 +18,18 @@ pub trait Action: Any + Serialize + DeserializeOwned + Send + std::fmt::Debug {
 
     /// Convert the action to [`AnyAction`].
     fn into_any(self) -> AnyAction;
+}
+
+/// Represents an event that can be recorded in the audit log.
+pub trait Event: Any + Serialize + DeserializeOwned + Send + std::fmt::Debug {
+    /// Unique name of the event.
+    const NAME: &'static str;
+
+    /// Affected users.
+    fn affected_users(&self) -> impl Iterator<Item = &UserId>;
+
+    /// Affected projects.
+    fn affected_projects(&self) -> impl Iterator<Item = &ProjectId>;
 }
 
 /// Macro for generating code for all actions.
@@ -67,7 +82,7 @@ macro_rules! with_actions {
             ("projects_CreateDeploymentToken", CreateDeploymentToken, projects::CreateDeploymentTokenAction, projects::CreateDeploymentTokenOutput),
             ("projects_DeleteDeploymentToken", DeleteDeploymentToken, projects::DeleteDeploymentTokenAction, outputs::Empty),
             // ## Audit Log
-            ("projects_QueryAuditLog", QueryProjectAuditLog, projects::QueryAuditLogAction, projects::QueryAuditLogOutput),
+            ("projects_QueryAuditLog", QueryProjectAuditLog, projects::QueryAuditLogEventsAction, projects::QueryAuditLogEventsOutput),
 
             // # Devices
             ("devices_QueryDevices", QueryDevices, devices::QueryDevicesAction, devices::QueryDevicesOutput),
@@ -128,7 +143,11 @@ macro_rules! with_actions {
             ("repositories_IssueAssetUploadUrl", IssueAssetUploadUrl, repositories::IssueAssetUploadUrlAction, repositories::IssueAssetUploadUrlOutput),
 
             // # Audit Log
-            ("audit_QueryAuditLog", QueryAuditLog, audit::QueryAuditLogAction, audit::QueryAuditLogOutput),
+            ("audit_QueryAuditLogEvents", QueryAuditLogEvents, audit::QueryAuditLogEventsAction, audit::QueryAuditLogEventsOutput),
+            ("audit_QueryAuditLogActions", QueryAuditLogActions, audit::QueryAuditLogActionsAction, audit::QueryAuditLogActionsOutput),
+
+            // # Jobs
+            ("jobs_QueryJobs", QueryJobs, jobs::QueryJobsAction, jobs::QueryJobsOutput),
 
             // # Instance
             ("instance_GetInstanceStatistics", GetInstanceStatistics, instance::GetInstanceStatisticsAction, instance::GetInstanceStatisticsOutput),
@@ -192,6 +211,68 @@ macro_rules! impl_actions {
 }
 
 with_actions!(impl_actions);
+
+/// Macro for generating code for all events.
+/// 
+/// This macro takes another macro as an argument and invokes it with a list of events.
+#[rustfmt::skip]
+macro_rules! with_events {
+    ($name:ident) => {
+        $name![
+            // # Users
+            ("users_Created", users::UserCreatedEvent, { user_id }, {}),
+            ("users_Deleted", users::UserDeletedEvent, {}, {}),
+            ("users_SetIsAdmin", users::UserSetIsAdminEvent, { user_id }, {}),
+            ("users_SetPassword", users::UserSetPasswordEvent, { user_id }, {}),
+            ("users_TokenCreated", users::UserTokenCreatedEvent, { user_id }, {}),
+            ("users_TokenDeleted", users::UserTokenDeletedEvent, { user_id }, {}),
+            ("users_SessionInitiated", users::UserSessionInitiatedEvent, { user_id }, {}),
+            ("users_RegistrationCreated", users::UserRegistrationCreatedEvent, { user_id }, {}),
+            ("users_RegistrationEmailSent", users::UserRegistrationEmailSentEvent, { user_id }, {}),
+            ("users_RegistrationCompleted", users::UserRegistrationCompletedEvent, { user_id }, {}),
+
+            // # Projects
+            ("projects_Created", projects::ProjectCreatedEvent, {}, { project_id }),
+            ("projects_Deleted", projects::ProjectDeletedEvent, {}, {}),
+            ("projects_MemberAdded", projects::ProjectMemberAddedEvent, { user_id }, { project_id }),
+            ("projects_MemberRemoved", projects::ProjectMemberRemovedEvent, { user_id }, { project_id }),
+            ("projects_DeploymentTokenCreated", projects::DeploymentTokenCreatedEvent, {}, { project_id }),
+            ("projects_DeploymentTokenDeleted", projects::DeploymentTokenDeletedEvent, {}, { project_id }),
+
+            // # Devices
+            ("devices_Created", devices::DeviceCreatedEvent, {}, { project_id }),
+            ("devices_Deleted", devices::DeviceDeletedEvent, {}, { project_id }),
+        ];
+    };
+}
+
+macro_rules! impl_events {
+    ($(($name:literal, $event:path, { $($user:ident),* }, { $($project:ident),* }),)*) => {
+        $(
+            impl Event for $event {
+                const NAME: &'static str = $name;
+
+                fn affected_users(&self) -> impl Iterator<Item = &UserId> {
+                    [
+                        $(
+                            &self.$user
+                        )*
+                    ].into_iter()
+                }
+
+                fn affected_projects(&self) -> impl Iterator<Item = &ProjectId> {
+                    [
+                        $(
+                            &self.$project
+                        )*
+                    ].into_iter()
+                }
+            }
+        )*
+    };
+}
+
+with_events!(impl_events);
 
 /// Executor for actions.
 pub trait Executor {
