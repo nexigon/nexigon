@@ -63,13 +63,17 @@ install_agent() {
             ;;
     esac
 
-    if [ "${USE_MUSL}" = "true" ]; then
-        _target_libc="musl"
+    if [ "$_target_os" = "linux" ]; then
+        if [ "${USE_MUSL}" = "true" ]; then
+            _target_suffix="-musl"
+        else
+            _target_suffix="-gnu"
+        fi
     else
-        _target_libc="gnu"
+        _target_suffix=""
     fi
 
-    _target="$_target_arch-$_target_os-$_target_libc"
+    _target="$_target_arch-$_target_os$_target_suffix"
 
     _download_url="https://downloads.nexigon.dev/nexigon-agent/$VERSION/assets/$_target/nexigon-agent"
 
