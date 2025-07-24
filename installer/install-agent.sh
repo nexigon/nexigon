@@ -10,6 +10,8 @@ export PATH="/sbin:/usr/sbin:$PATH"
 VERSION=${VERSION:-"latest"}
 # Indicates whether to use the MUSL version of the agent.
 USE_MUSL=${USE_MUSL:-"false"}
+# Hub URL to use to configure the agent.
+HUB_URL=${HUB_URL:-"https://demo.nexigon.dev"}
 
 if [ "$(id -u)" -eq 0 ]; then
   sudo=''
@@ -32,6 +34,11 @@ install_agent() {
     _cpu_type=$(uname -m)
     _os_type=$(uname -s | tr '[:upper:]' '[:lower:]')
     _temp_dir=$(run_cmd mktemp -d)
+
+    if [ -z "$TOKEN" ]; then
+        echo "Please set the TOKEN environment variable to the deployment token."
+        exit 1
+    fi
 
     case "$_os_type" in
         linux)
@@ -121,20 +128,12 @@ EOF
 
     echo "=> Configuring Nexigon Agent..."
 
-    printf "Nexigon Hub instance URL [https://demo.nexigon.dev]: "
-    read -r _hub_url
-
-    _hub_url=${_hub_url:-"https://demo.nexigon.dev"}
-
-    printf "Deployment Token: "
-    read -r _deployment_token
-
     _config_file="$_temp_dir/nexigon-agent.toml"
     cat > "$_config_file" <<EOF
 #:schema https://raw.githubusercontent.com/nexigon/nexigon/refs/heads/main/schemas/nexigon-agent.schema.json
 
-hub-url = "$_hub_url"
-token = "$_deployment_token"
+hub-url = "$HUB_URL"
+token = "$TOKEN"
 
 fingerprint-script = "/usr/libexec/nexigon/nexigon-device-fingerprint"
 EOF
