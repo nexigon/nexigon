@@ -48,7 +48,7 @@ download_cli() {
             ;;
     esac
 
-    if [ "$_target_os" = "linux" ]; then
+    if [ "$_target_os" = "unknown-linux" ]; then
         if [ "${USE_MUSL}" = "true" ]; then
             _target_suffix="-musl"
         else
