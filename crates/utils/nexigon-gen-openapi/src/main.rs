@@ -69,7 +69,7 @@ pub fn add_action(
         .unwrap_or_default();
     let input_ref = format!("#/components/schemas/nexigon_api.{input_type}");
     let output_ref = format!("#/components/schemas/nexigon_api.{output_type}");
-    let path = format!("/api/v1/invoke/{name}");
+    let path = format!("/api/v1/actions/invoke/{name}");
     paths.insert(
         path,
         openapi::PathItem::new().with_post(Some(

@@ -6,7 +6,7 @@
     "description": "Welcome to the Nexigon Hub API documentation!\n\nNexigon Hub offers an RPC-style HTTP API.\n"
   },
   "paths": {
-    "/api/v1/invoke/users_QueryUsers": {
+    "/api/v1/actions/invoke/users_QueryUsers": {
       "post": {
         "tags": [
           "users"
@@ -36,7 +36,7 @@
         }
       }
     },
-    "/api/v1/invoke/users_GetUserDetails": {
+    "/api/v1/actions/invoke/users_GetUserDetails": {
       "post": {
         "tags": [
           "users"
@@ -66,7 +66,7 @@
         }
       }
     },
-    "/api/v1/invoke/users_CreateUser": {
+    "/api/v1/actions/invoke/users_CreateUser": {
       "post": {
         "tags": [
           "users"
@@ -96,7 +96,7 @@
         }
       }
     },
-    "/api/v1/invoke/users_DeleteUser": {
+    "/api/v1/actions/invoke/users_DeleteUser": {
       "post": {
         "tags": [
           "users"
@@ -126,7 +126,7 @@
         }
       }
     },
-    "/api/v1/invoke/users_SetUserDisplayName": {
+    "/api/v1/actions/invoke/users_SetUserDisplayName": {
       "post": {
         "tags": [
           "users"
@@ -156,7 +156,7 @@
         }
       }
     },
-    "/api/v1/invoke/users_SetUserPassword": {
+    "/api/v1/actions/invoke/users_SetUserPassword": {
       "post": {
         "tags": [
           "users"
@@ -186,7 +186,7 @@
         }
       }
     },
-    "/api/v1/invoke/users_SetUserIsAdmin": {
+    "/api/v1/actions/invoke/users_SetUserIsAdmin": {
       "post": {
         "tags": [
           "users"
@@ -216,7 +216,7 @@
         }
       }
     },
-    "/api/v1/invoke/users_QueryUserTokens": {
+    "/api/v1/actions/invoke/users_QueryUserTokens": {
       "post": {
         "tags": [
           "users"
@@ -246,7 +246,7 @@
         }
       }
     },
-    "/api/v1/invoke/users_QueryUserProjects": {
+    "/api/v1/actions/invoke/users_QueryUserProjects": {
       "post": {
         "tags": [
           "users"
@@ -276,7 +276,7 @@
         }
       }
     },
-    "/api/v1/invoke/users_QueryUserRepositories": {
+    "/api/v1/actions/invoke/users_QueryUserRepositories": {
       "post": {
         "tags": [
           "users"
@@ -306,7 +306,7 @@
         }
       }
     },
-    "/api/v1/invoke/users_QueryUserSessions": {
+    "/api/v1/actions/invoke/users_QueryUserSessions": {
       "post": {
         "tags": [
           "users"
@@ -336,7 +336,7 @@
         }
       }
     },
-    "/api/v1/invoke/users_AuthenticateWithUserToken": {
+    "/api/v1/actions/invoke/users_AuthenticateWithUserToken": {
       "post": {
         "tags": [
           "users"
@@ -366,7 +366,7 @@
         }
       }
     },
-    "/api/v1/invoke/users_AuthenticateWithSessionToken": {
+    "/api/v1/actions/invoke/users_AuthenticateWithSessionToken": {
       "post": {
         "tags": [
           "users"
@@ -396,7 +396,7 @@
         }
       }
     },
-    "/api/v1/invoke/users_GetDevicePermissions": {
+    "/api/v1/actions/invoke/users_GetDevicePermissions": {
       "post": {
         "tags": [
           "users"
@@ -426,7 +426,7 @@
         }
       }
     },
-    "/api/v1/invoke/users_CreateUserToken": {
+    "/api/v1/actions/invoke/users_CreateUserToken": {
       "post": {
         "tags": [
           "users"
@@ -456,7 +456,7 @@
         }
       }
     },
-    "/api/v1/invoke/users_DeleteUserToken": {
+    "/api/v1/actions/invoke/users_DeleteUserToken": {
       "post": {
         "tags": [
           "users"
@@ -486,7 +486,7 @@
         }
       }
     },
-    "/api/v1/invoke/users_InitiateUserSession": {
+    "/api/v1/actions/invoke/users_InitiateUserSession": {
       "post": {
         "tags": [
           "users"
@@ -516,7 +516,7 @@
         }
       }
     },
-    "/api/v1/invoke/users_TerminateUserSession": {
+    "/api/v1/actions/invoke/users_TerminateUserSession": {
       "post": {
         "tags": [
           "users"
@@ -546,7 +546,7 @@
         }
       }
     },
-    "/api/v1/invoke/users_CleanupExpiredUserSessions": {
+    "/api/v1/actions/invoke/users_CleanupExpiredUserSessions": {
       "post": {
         "tags": [
           "users"
@@ -576,7 +576,7 @@
         }
       }
     },
-    "/api/v1/invoke/users_RegisterUser": {
+    "/api/v1/actions/invoke/users_RegisterUser": {
       "post": {
         "tags": [
           "users"
@@ -606,7 +606,7 @@
         }
       }
     },
-    "/api/v1/invoke/users_ResendRegistrationEmail": {
+    "/api/v1/actions/invoke/users_ResendRegistrationEmail": {
       "post": {
         "tags": [
           "users"
@@ -636,7 +636,7 @@
         }
       }
     },
-    "/api/v1/invoke/users_CompleteRegistration": {
+    "/api/v1/actions/invoke/users_CompleteRegistration": {
       "post": {
         "tags": [
           "users"
@@ -666,7 +666,7 @@
         }
       }
     },
-    "/api/v1/invoke/projects_QueryProjects": {
+    "/api/v1/actions/invoke/projects_QueryProjects": {
       "post": {
         "tags": [
           "projects"
@@ -696,7 +696,7 @@
         }
       }
     },
-    "/api/v1/invoke/projects_GetProjectDetails": {
+    "/api/v1/actions/invoke/projects_GetProjectDetails": {
       "post": {
         "tags": [
           "projects"
@@ -726,7 +726,7 @@
         }
       }
     },
-    "/api/v1/invoke/projects_CreateProject": {
+    "/api/v1/actions/invoke/projects_CreateProject": {
       "post": {
         "tags": [
           "projects"
@@ -756,7 +756,7 @@
         }
       }
     },
-    "/api/v1/invoke/projects_DeleteProject": {
+    "/api/v1/actions/invoke/projects_DeleteProject": {
       "post": {
         "tags": [
           "projects"
@@ -786,7 +786,7 @@
         }
       }
     },
-    "/api/v1/invoke/projects_QueryProjectDevices": {
+    "/api/v1/actions/invoke/projects_QueryProjectDevices": {
       "post": {
         "tags": [
           "projects"
@@ -816,7 +816,7 @@
         }
       }
     },
-    "/api/v1/invoke/projects_QueryProjectMembers": {
+    "/api/v1/actions/invoke/projects_QueryProjectMembers": {
       "post": {
         "tags": [
           "projects"
@@ -846,7 +846,7 @@
         }
       }
     },
-    "/api/v1/invoke/projects_QueryProjectDeploymentTokens": {
+    "/api/v1/actions/invoke/projects_QueryProjectDeploymentTokens": {
       "post": {
         "tags": [
           "projects"
@@ -876,7 +876,7 @@
         }
       }
     },
-    "/api/v1/invoke/projects_AddProjectMember": {
+    "/api/v1/actions/invoke/projects_AddProjectMember": {
       "post": {
         "tags": [
           "projects"
@@ -906,7 +906,7 @@
         }
       }
     },
-    "/api/v1/invoke/projects_RemoveProjectMember": {
+    "/api/v1/actions/invoke/projects_RemoveProjectMember": {
       "post": {
         "tags": [
           "projects"
@@ -936,7 +936,7 @@
         }
       }
     },
-    "/api/v1/invoke/projects_CreateDeploymentToken": {
+    "/api/v1/actions/invoke/projects_CreateDeploymentToken": {
       "post": {
         "tags": [
           "projects"
@@ -966,7 +966,7 @@
         }
       }
     },
-    "/api/v1/invoke/projects_DeleteDeploymentToken": {
+    "/api/v1/actions/invoke/projects_DeleteDeploymentToken": {
       "post": {
         "tags": [
           "projects"
@@ -996,7 +996,7 @@
         }
       }
     },
-    "/api/v1/invoke/projects_SetDeploymentTokenFlags": {
+    "/api/v1/actions/invoke/projects_SetDeploymentTokenFlags": {
       "post": {
         "tags": [
           "projects"
@@ -1026,7 +1026,7 @@
         }
       }
     },
-    "/api/v1/invoke/projects_QueryAuditLog": {
+    "/api/v1/actions/invoke/projects_QueryAuditLog": {
       "post": {
         "tags": [
           "projects"
@@ -1056,7 +1056,7 @@
         }
       }
     },
-    "/api/v1/invoke/devices_QueryDevices": {
+    "/api/v1/actions/invoke/devices_QueryDevices": {
       "post": {
         "tags": [
           "devices"
@@ -1086,7 +1086,7 @@
         }
       }
     },
-    "/api/v1/invoke/devices_GetDeviceDetails": {
+    "/api/v1/actions/invoke/devices_GetDeviceDetails": {
       "post": {
         "tags": [
           "devices"
@@ -1116,7 +1116,7 @@
         }
       }
     },
-    "/api/v1/invoke/devices_CreateDevice": {
+    "/api/v1/actions/invoke/devices_CreateDevice": {
       "post": {
         "tags": [
           "devices"
@@ -1146,7 +1146,7 @@
         }
       }
     },
-    "/api/v1/invoke/devices_DeleteDevice": {
+    "/api/v1/actions/invoke/devices_DeleteDevice": {
       "post": {
         "tags": [
           "devices"
@@ -1176,7 +1176,7 @@
         }
       }
     },
-    "/api/v1/invoke/devices_SetDeviceName": {
+    "/api/v1/actions/invoke/devices_SetDeviceName": {
       "post": {
         "tags": [
           "devices"
@@ -1206,7 +1206,7 @@
         }
       }
     },
-    "/api/v1/invoke/devices_SetDeviceMetadata": {
+    "/api/v1/actions/invoke/devices_SetDeviceMetadata": {
       "post": {
         "tags": [
           "devices"
@@ -1236,7 +1236,7 @@
         }
       }
     },
-    "/api/v1/invoke/devices_IssueDeviceToken": {
+    "/api/v1/actions/invoke/devices_IssueDeviceToken": {
       "post": {
         "tags": [
           "devices"
@@ -1266,7 +1266,7 @@
         }
       }
     },
-    "/api/v1/invoke/devices_ValidateDeviceToken": {
+    "/api/v1/actions/invoke/devices_ValidateDeviceToken": {
       "post": {
         "tags": [
           "devices"
@@ -1296,7 +1296,7 @@
         }
       }
     },
-    "/api/v1/invoke/devices_AuthenticateDevice": {
+    "/api/v1/actions/invoke/devices_AuthenticateDevice": {
       "post": {
         "tags": [
           "devices"
@@ -1326,7 +1326,7 @@
         }
       }
     },
-    "/api/v1/invoke/devices_AddDeviceCertificate": {
+    "/api/v1/actions/invoke/devices_AddDeviceCertificate": {
       "post": {
         "tags": [
           "devices"
@@ -1356,7 +1356,7 @@
         }
       }
     },
-    "/api/v1/invoke/devices_DeleteDeviceCertificate": {
+    "/api/v1/actions/invoke/devices_DeleteDeviceCertificate": {
       "post": {
         "tags": [
           "devices"
@@ -1386,7 +1386,7 @@
         }
       }
     },
-    "/api/v1/invoke/devices_SetDeviceCertificateStatus": {
+    "/api/v1/actions/invoke/devices_SetDeviceCertificateStatus": {
       "post": {
         "tags": [
           "devices"
@@ -1416,7 +1416,7 @@
         }
       }
     },
-    "/api/v1/invoke/devices_RegisterDeviceConnection": {
+    "/api/v1/actions/invoke/devices_RegisterDeviceConnection": {
       "post": {
         "tags": [
           "devices"
@@ -1446,7 +1446,7 @@
         }
       }
     },
-    "/api/v1/invoke/devices_UnregisterDeviceConnection": {
+    "/api/v1/actions/invoke/devices_UnregisterDeviceConnection": {
       "post": {
         "tags": [
           "devices"
@@ -1476,7 +1476,7 @@
         }
       }
     },
-    "/api/v1/invoke/devices_IssueDeviceHttpProxyToken": {
+    "/api/v1/actions/invoke/devices_IssueDeviceHttpProxyToken": {
       "post": {
         "tags": [
           "devices"
@@ -1506,7 +1506,7 @@
         }
       }
     },
-    "/api/v1/invoke/devices_ValidateDeviceHttpProxyToken": {
+    "/api/v1/actions/invoke/devices_ValidateDeviceHttpProxyToken": {
       "post": {
         "tags": [
           "devices"
@@ -1536,7 +1536,7 @@
         }
       }
     },
-    "/api/v1/invoke/devices_PublishDeviceEvents": {
+    "/api/v1/actions/invoke/devices_PublishDeviceEvents": {
       "post": {
         "tags": [
           "devices"
@@ -1566,7 +1566,7 @@
         }
       }
     },
-    "/api/v1/invoke/devices_QueryDeviceEvents": {
+    "/api/v1/actions/invoke/devices_QueryDeviceEvents": {
       "post": {
         "tags": [
           "devices"
@@ -1596,7 +1596,7 @@
         }
       }
     },
-    "/api/v1/invoke/repositories_ResolveRepositoryName": {
+    "/api/v1/actions/invoke/repositories_ResolveRepositoryName": {
       "post": {
         "tags": [
           "repositories"
@@ -1626,7 +1626,7 @@
         }
       }
     },
-    "/api/v1/invoke/repositories_GetRepositoryDetails": {
+    "/api/v1/actions/invoke/repositories_GetRepositoryDetails": {
       "post": {
         "tags": [
           "repositories"
@@ -1656,7 +1656,7 @@
         }
       }
     },
-    "/api/v1/invoke/repositories_CreateRepository": {
+    "/api/v1/actions/invoke/repositories_CreateRepository": {
       "post": {
         "tags": [
           "repositories"
@@ -1686,7 +1686,7 @@
         }
       }
     },
-    "/api/v1/invoke/repositories_DeleteRepository": {
+    "/api/v1/actions/invoke/repositories_DeleteRepository": {
       "post": {
         "tags": [
           "repositories"
@@ -1716,7 +1716,7 @@
         }
       }
     },
-    "/api/v1/invoke/repositories_SetRepositoryVisibility": {
+    "/api/v1/actions/invoke/repositories_SetRepositoryVisibility": {
       "post": {
         "tags": [
           "repositories"
@@ -1746,7 +1746,7 @@
         }
       }
     },
-    "/api/v1/invoke/repositories_QueryRepositoryPackages": {
+    "/api/v1/actions/invoke/repositories_QueryRepositoryPackages": {
       "post": {
         "tags": [
           "repositories"
@@ -1776,7 +1776,7 @@
         }
       }
     },
-    "/api/v1/invoke/repositories_QueryRepositoryAssets": {
+    "/api/v1/actions/invoke/repositories_QueryRepositoryAssets": {
       "post": {
         "tags": [
           "repositories"
@@ -1806,7 +1806,7 @@
         }
       }
     },
-    "/api/v1/invoke/repositories_QueryRepositoryMembers": {
+    "/api/v1/actions/invoke/repositories_QueryRepositoryMembers": {
       "post": {
         "tags": [
           "repositories"
@@ -1836,7 +1836,7 @@
         }
       }
     },
-    "/api/v1/invoke/repositories_AddRepositoryMember": {
+    "/api/v1/actions/invoke/repositories_AddRepositoryMember": {
       "post": {
         "tags": [
           "repositories"
@@ -1866,7 +1866,7 @@
         }
       }
     },
-    "/api/v1/invoke/repositories_RemoveRepositoryMember": {
+    "/api/v1/actions/invoke/repositories_RemoveRepositoryMember": {
       "post": {
         "tags": [
           "repositories"
@@ -1896,7 +1896,7 @@
         }
       }
     },
-    "/api/v1/invoke/repositories_ResolvePackageByPath": {
+    "/api/v1/actions/invoke/repositories_ResolvePackageByPath": {
       "post": {
         "tags": [
           "repositories"
@@ -1926,7 +1926,7 @@
         }
       }
     },
-    "/api/v1/invoke/repositories_GetPackageDetails": {
+    "/api/v1/actions/invoke/repositories_GetPackageDetails": {
       "post": {
         "tags": [
           "repositories"
@@ -1956,7 +1956,7 @@
         }
       }
     },
-    "/api/v1/invoke/repositories_CreatePackage": {
+    "/api/v1/actions/invoke/repositories_CreatePackage": {
       "post": {
         "tags": [
           "repositories"
@@ -1986,7 +1986,7 @@
         }
       }
     },
-    "/api/v1/invoke/repositories_DeletePackage": {
+    "/api/v1/actions/invoke/repositories_DeletePackage": {
       "post": {
         "tags": [
           "repositories"
@@ -2016,7 +2016,7 @@
         }
       }
     },
-    "/api/v1/invoke/repositories_QueryPackageVersions": {
+    "/api/v1/actions/invoke/repositories_QueryPackageVersions": {
       "post": {
         "tags": [
           "repositories"
@@ -2046,7 +2046,7 @@
         }
       }
     },
-    "/api/v1/invoke/repositories_ResolvePackageVersionByPath": {
+    "/api/v1/actions/invoke/repositories_ResolvePackageVersionByPath": {
       "post": {
         "tags": [
           "repositories"
@@ -2076,7 +2076,7 @@
         }
       }
     },
-    "/api/v1/invoke/repositories_GetPackageVersionDetails": {
+    "/api/v1/actions/invoke/repositories_GetPackageVersionDetails": {
       "post": {
         "tags": [
           "repositories"
@@ -2106,7 +2106,7 @@
         }
       }
     },
-    "/api/v1/invoke/repositories_CreatePackageVersion": {
+    "/api/v1/actions/invoke/repositories_CreatePackageVersion": {
       "post": {
         "tags": [
           "repositories"
@@ -2136,7 +2136,7 @@
         }
       }
     },
-    "/api/v1/invoke/repositories_DeletePackageVersion": {
+    "/api/v1/actions/invoke/repositories_DeletePackageVersion": {
       "post": {
         "tags": [
           "repositories"
@@ -2166,7 +2166,7 @@
         }
       }
     },
-    "/api/v1/invoke/repositories_AddPackageVersionAsset": {
+    "/api/v1/actions/invoke/repositories_AddPackageVersionAsset": {
       "post": {
         "tags": [
           "repositories"
@@ -2196,7 +2196,7 @@
         }
       }
     },
-    "/api/v1/invoke/repositories_RemovePackageVersionAsset": {
+    "/api/v1/actions/invoke/repositories_RemovePackageVersionAsset": {
       "post": {
         "tags": [
           "repositories"
@@ -2226,7 +2226,7 @@
         }
       }
     },
-    "/api/v1/invoke/repositories_TagPackageVersion": {
+    "/api/v1/actions/invoke/repositories_TagPackageVersion": {
       "post": {
         "tags": [
           "repositories"
@@ -2256,7 +2256,7 @@
         }
       }
     },
-    "/api/v1/invoke/repositories_UntagPackageVersion": {
+    "/api/v1/actions/invoke/repositories_UntagPackageVersion": {
       "post": {
         "tags": [
           "repositories"
@@ -2286,7 +2286,7 @@
         }
       }
     },
-    "/api/v1/invoke/repositories_ResolvePackageVersionAssetByPath": {
+    "/api/v1/actions/invoke/repositories_ResolvePackageVersionAssetByPath": {
       "post": {
         "tags": [
           "repositories"
@@ -2316,7 +2316,7 @@
         }
       }
     },
-    "/api/v1/invoke/repositories_GetAssetDetails": {
+    "/api/v1/actions/invoke/repositories_GetAssetDetails": {
       "post": {
         "tags": [
           "repositories"
@@ -2346,7 +2346,7 @@
         }
       }
     },
-    "/api/v1/invoke/repositories_CreateAsset": {
+    "/api/v1/actions/invoke/repositories_CreateAsset": {
       "post": {
         "tags": [
           "repositories"
@@ -2376,7 +2376,7 @@
         }
       }
     },
-    "/api/v1/invoke/repositories_DeleteAsset": {
+    "/api/v1/actions/invoke/repositories_DeleteAsset": {
       "post": {
         "tags": [
           "repositories"
@@ -2406,7 +2406,7 @@
         }
       }
     },
-    "/api/v1/invoke/repositories_IssueAssetDownloadUrl": {
+    "/api/v1/actions/invoke/repositories_IssueAssetDownloadUrl": {
       "post": {
         "tags": [
           "repositories"
@@ -2436,7 +2436,7 @@
         }
       }
     },
-    "/api/v1/invoke/repositories_IssueAssetUploadUrl": {
+    "/api/v1/actions/invoke/repositories_IssueAssetUploadUrl": {
       "post": {
         "tags": [
           "repositories"
@@ -2466,7 +2466,7 @@
         }
       }
     },
-    "/api/v1/invoke/audit_QueryAuditLogEvents": {
+    "/api/v1/actions/invoke/audit_QueryAuditLogEvents": {
       "post": {
         "tags": [
           "audit"
@@ -2496,7 +2496,7 @@
         }
       }
     },
-    "/api/v1/invoke/audit_QueryAuditLogActions": {
+    "/api/v1/actions/invoke/audit_QueryAuditLogActions": {
       "post": {
         "tags": [
           "audit"
@@ -2526,7 +2526,7 @@
         }
       }
     },
-    "/api/v1/invoke/jobs_QueryJobs": {
+    "/api/v1/actions/invoke/jobs_QueryJobs": {
       "post": {
         "tags": [
           "jobs"
@@ -2556,7 +2556,7 @@
         }
       }
     },
-    "/api/v1/invoke/instance_GetInstanceStatistics": {
+    "/api/v1/actions/invoke/instance_GetInstanceStatistics": {
       "post": {
         "tags": [
           "instance"
@@ -2586,7 +2586,7 @@
         }
       }
     },
-    "/api/v1/invoke/instance_GetInstanceSettingsRaw": {
+    "/api/v1/actions/invoke/instance_GetInstanceSettingsRaw": {
       "post": {
         "tags": [
           "instance"
@@ -2616,7 +2616,7 @@
         }
       }
     },
-    "/api/v1/invoke/instance_SetInstanceSettingRaw": {
+    "/api/v1/actions/invoke/instance_SetInstanceSettingRaw": {
       "post": {
         "tags": [
           "instance"
@@ -2646,7 +2646,7 @@
         }
       }
     },
-    "/api/v1/invoke/cluster_GetClusterDetails": {
+    "/api/v1/actions/invoke/cluster_GetClusterDetails": {
       "post": {
         "tags": [
           "cluster"
@@ -2676,7 +2676,7 @@
         }
       }
     },
-    "/api/v1/invoke/cluster_RegisterClusterNode": {
+    "/api/v1/actions/invoke/cluster_RegisterClusterNode": {
       "post": {
         "tags": [
           "cluster"
@@ -2706,7 +2706,7 @@
         }
       }
     },
-    "/api/v1/invoke/cluster_ReportClusterNodeHeartbeat": {
+    "/api/v1/actions/invoke/cluster_ReportClusterNodeHeartbeat": {
       "post": {
         "tags": [
           "cluster"
@@ -2736,7 +2736,7 @@
         }
       }
     },
-    "/api/v1/invoke/cluster_CleanupInactiveClusterNodes": {
+    "/api/v1/actions/invoke/cluster_CleanupInactiveClusterNodes": {
       "post": {
         "tags": [
           "cluster"
@@ -2766,7 +2766,7 @@
         }
       }
     },
-    "/api/v1/invoke/actor_GetActor": {
+    "/api/v1/actions/invoke/actor_GetActor": {
       "post": {
         "tags": [
           "actor"
