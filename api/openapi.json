@@ -7146,6 +7146,10 @@
   },
   "tags": [
     {
+      "name": "actor",
+      "x-displayName": "Actor"
+    },
+    {
       "name": "users",
       "x-displayName": "Users"
     },
@@ -7170,8 +7174,12 @@
       "x-displayName": "Cluster"
     },
     {
-      "name": "actor",
-      "x-displayName": "Actor"
+      "name": "audit",
+      "x-displayName": "Audit"
+    },
+    {
+      "name": "jobs",
+      "x-displayName": "Jobs"
     }
   ]
 }

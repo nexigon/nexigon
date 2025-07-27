@@ -32,13 +32,15 @@ fn main() {
     .with_paths(Some(openapi::Paths::new(paths)))
     .with_tags(Some(
         [
+            ("actor", "Actor"),
             ("users", "Users"),
             ("projects", "Projects"),
             ("devices", "Devices"),
             ("repositories", "Repositories"),
             ("instance", "Instance"),
             ("cluster", "Cluster"),
-            ("actor", "Actor"),
+            ("audit", "Audit"),
+            ("jobs", "Jobs"),
         ]
         .into_iter()
         .map(|(tag, name)| {
