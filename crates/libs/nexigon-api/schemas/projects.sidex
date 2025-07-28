@@ -3,6 +3,7 @@
 import audit::AuditLogEvent
 import datetime::Timestamp
 import devices::DeviceId
+import repositories::RepositoryId
 import users::UserId
 
 /// Unique ID of a project.
@@ -180,6 +181,26 @@ record QueryProjectDeploymentTokensItem {
     flags: DeploymentTokenFlags,
 }
 
+/// Query repositories of a project.
+record QueryProjectRepositoriesAction {
+    /// ID of the project.
+    project_id: ProjectId,
+}
+
+/// Output of querying the repositories of a project.
+record QueryProjectRepositoriesOutput {
+    /// List of repositories.
+    repositories: [QueryProjectRepositoriesItem],
+}
+
+/// Repository item.
+record QueryProjectRepositoriesItem {
+    /// ID of the repository.
+    repository_id: RepositoryId,
+    /// Name of the repository.
+    name: string,
+}
+
 /// Add a user to a project.
 record AddProjectMemberAction {
     /// ID of the project.
@@ -268,6 +289,22 @@ record QueryAuditLogEventsOutput {
    events: [AuditLogEvent],
 }
 
+/// Add a repository to the project.
+record AddProjectRepositoryAction {
+    /// ID of the project.
+    project_id: ProjectId,
+    /// ID of the repository.
+    repository_id: RepositoryId,
+}
+
+/// Remove a repository from the project.
+record RemoveProjectRepositoryAction {
+    /// ID of the project.
+    project_id: ProjectId,
+    /// ID of the repository.
+    repository_id: RepositoryId,
+}
+
 /// Event indicating the creation of a project.
 record ProjectCreatedEvent {
     /// ID of the project.
@@ -334,4 +371,20 @@ record DeploymentTokenFlagsChangedEvent {
     token_id: DeploymentTokenId,
     /// Flags.
     flags: DeploymentTokenFlags,
+}
+
+/// Event indicating that a repository has been added to a project.
+record ProjectRepositoryAddedEvent {
+    /// ID of the project.
+    project_id: ProjectId,
+    /// ID of the repository.
+    repository_id: RepositoryId,
+}
+
+/// Event indicating that a repository has been removed from a project.
+record ProjectRepositoryRemovedEvent {
+    /// ID of the project.
+    project_id: ProjectId,
+    /// ID of the repository.
+    repository_id: RepositoryId,
 }

@@ -251,8 +251,9 @@ record QueryUserRepositoriesItem {
     created_at: Timestamp,
     /// Number of packages in the repository.
     package_count: u32,
+    /// Indicates whether the user is an owner of the repository.
+    is_owner: bool,
 }
-
 
 /// Query the sessions of a user.
 record QueryUserSessionsAction {

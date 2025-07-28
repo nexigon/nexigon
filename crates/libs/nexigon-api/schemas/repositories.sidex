@@ -1,7 +1,9 @@
 //! Actions and types related to repositories.
 
+import audit::AuditLogEvent
 import datetime::Timestamp
 import digest::Digest
+import projects::ProjectId
 import users::UserId
 
 /// Unique ID of a repository.
@@ -206,6 +208,26 @@ record QueryRepositoryInvitationsAction {
 record QueryRepositoryInvitationsOutput {
     /// List of invitations.
     invitations: [QueryRepositoryInvitationsItem],
+}
+
+/// Query repository projects.
+record QueryRepositoryProjectsAction {
+    /// ID of the repository.
+    repository_id: RepositoryId,
+}
+
+/// Output of querying the projects of a repository.
+record QueryRepositoryProjectsOutput {
+    /// List of projects.
+    projects: [QueryRepositoryProjectsItem],
+}
+
+/// Project item.
+record QueryRepositoryProjectsItem {
+    /// ID of the project.
+    project_id: ProjectId,
+    /// Name of the project.
+    name: string,
 }
 
 /// An invitation to a repository.
@@ -613,6 +635,18 @@ record IssueAssetUploadUrlAction {
 record IssueAssetUploadUrlOutput {
     /// URL for uploading the asset.
     url: string,
+}
+
+/// Query the audit log of the repository.
+record QueryAuditLogEventsAction {
+    /// ID of the repository.
+    repository_id: RepositoryId,
+}
+
+/// Output of querying the audit log of the repository.
+record QueryAuditLogEventsOutput {
+   /// List of audit log events.
+   events: [AuditLogEvent],
 }
 
 /// Event indicating that a member has been invited to a repository.

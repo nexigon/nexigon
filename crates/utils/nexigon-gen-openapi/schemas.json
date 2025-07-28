@@ -1574,6 +1574,23 @@
     ],
     "unevaluatedProperties": false
   },
+  "nexigon_api.projects.AddProjectRepositoryAction": {
+    "type": "object",
+    "description": "Add a repository to the project.",
+    "properties": {
+      "projectId": {
+        "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+      },
+      "repositoryId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryId"
+      }
+    },
+    "required": [
+      "projectId",
+      "repositoryId"
+    ],
+    "unevaluatedProperties": false
+  },
   "nexigon_api.projects.CreateDeploymentTokenAction": {
     "type": "object",
     "description": "Create a deployment token.",
@@ -1943,6 +1960,40 @@
     ],
     "unevaluatedProperties": false
   },
+  "nexigon_api.projects.ProjectRepositoryAddedEvent": {
+    "type": "object",
+    "description": "Event indicating that a repository has been added to a project.",
+    "properties": {
+      "projectId": {
+        "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+      },
+      "repositoryId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryId"
+      }
+    },
+    "required": [
+      "projectId",
+      "repositoryId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.projects.ProjectRepositoryRemovedEvent": {
+    "type": "object",
+    "description": "Event indicating that a repository has been removed from a project.",
+    "properties": {
+      "projectId": {
+        "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+      },
+      "repositoryId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryId"
+      }
+    },
+    "required": [
+      "projectId",
+      "repositoryId"
+    ],
+    "unevaluatedProperties": false
+  },
   "nexigon_api.projects.QueryAuditLogEventsAction": {
     "type": "object",
     "description": "Query the audit log of the project.",
@@ -2185,6 +2236,52 @@
     ],
     "unevaluatedProperties": false
   },
+  "nexigon_api.projects.QueryProjectRepositoriesAction": {
+    "type": "object",
+    "description": "Query repositories of a project.",
+    "properties": {
+      "projectId": {
+        "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+      }
+    },
+    "required": [
+      "projectId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.projects.QueryProjectRepositoriesItem": {
+    "type": "object",
+    "description": "Repository item.",
+    "properties": {
+      "repositoryId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryId"
+      },
+      "name": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "repositoryId",
+      "name"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.projects.QueryProjectRepositoriesOutput": {
+    "type": "object",
+    "description": "Output of querying the repositories of a project.",
+    "properties": {
+      "repositories": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.projects.QueryProjectRepositoriesItem"
+        }
+      }
+    },
+    "required": [
+      "repositories"
+    ],
+    "unevaluatedProperties": false
+  },
   "nexigon_api.projects.QueryProjectsAction": {
     "type": "object",
     "description": "Query the projects of the instance.",
@@ -2239,6 +2336,23 @@
     "required": [
       "projectId",
       "userId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.projects.RemoveProjectRepositoryAction": {
+    "type": "object",
+    "description": "Remove a repository from the project.",
+    "properties": {
+      "projectId": {
+        "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+      },
+      "repositoryId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryId"
+      }
+    },
+    "required": [
+      "projectId",
+      "repositoryId"
     ],
     "unevaluatedProperties": false
   },
@@ -2935,6 +3049,35 @@
     ],
     "unevaluatedProperties": false
   },
+  "nexigon_api.repositories.QueryAuditLogEventsAction": {
+    "type": "object",
+    "description": "Query the audit log of the repository.",
+    "properties": {
+      "repositoryId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryId"
+      }
+    },
+    "required": [
+      "repositoryId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.repositories.QueryAuditLogEventsOutput": {
+    "type": "object",
+    "description": "Output of querying the audit log of the repository.",
+    "properties": {
+      "events": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.audit.AuditLogEvent"
+        }
+      }
+    },
+    "required": [
+      "events"
+    ],
+    "unevaluatedProperties": false
+  },
   "nexigon_api.repositories.QueryPackageVersionsAction": {
     "type": "object",
     "description": "Query the versions of a package.",
@@ -3188,6 +3331,52 @@
     },
     "required": [
       "packages"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.repositories.QueryRepositoryProjectsAction": {
+    "type": "object",
+    "description": "Query repository projects.",
+    "properties": {
+      "repositoryId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryId"
+      }
+    },
+    "required": [
+      "repositoryId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.repositories.QueryRepositoryProjectsItem": {
+    "type": "object",
+    "description": "Project item.",
+    "properties": {
+      "projectId": {
+        "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+      },
+      "name": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "projectId",
+      "name"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.repositories.QueryRepositoryProjectsOutput": {
+    "type": "object",
+    "description": "Output of querying the projects of a repository.",
+    "properties": {
+      "projects": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.repositories.QueryRepositoryProjectsItem"
+        }
+      }
+    },
+    "required": [
+      "projects"
     ],
     "unevaluatedProperties": false
   },
@@ -4247,13 +4436,17 @@
       "packageCount": {
         "type": "integer",
         "format": "uint32"
+      },
+      "isOwner": {
+        "type": "boolean"
       }
     },
     "required": [
       "repositoryId",
       "name",
       "createdAt",
-      "packageCount"
+      "packageCount",
+      "isOwner"
     ],
     "unevaluatedProperties": false
   },
