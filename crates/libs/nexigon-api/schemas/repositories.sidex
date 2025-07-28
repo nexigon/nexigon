@@ -9,6 +9,11 @@ import users::UserId
 #[json(type = "string")]
 opaque RepositoryId
 
+/// Unique ID of an invitation to a repository.
+#[rust(type = "nexigon_ids::ids::RepositoryInvitationId")]
+#[json(type = "string")]
+opaque RepositoryInvitationId
+
 /// Unique ID of a repository asset.
 #[rust(type = "nexigon_ids::ids::RepositoryAssetId")]
 #[json(type = "string")]
@@ -191,6 +196,28 @@ record QueryRepositoryMembersItem {
     is_owner: bool,
 }
 
+/// Query the invitations of a repository.
+record QueryRepositoryInvitationsAction {
+    /// ID of the repository.
+    repository_id: RepositoryId,
+}
+
+/// Output of querying the invitations of a repository.
+record QueryRepositoryInvitationsOutput {
+    /// List of invitations.
+    invitations: [QueryRepositoryInvitationsItem],
+}
+
+/// An invitation to a repository.
+record QueryRepositoryInvitationsItem {
+    /// ID of the invitation.
+    invitation_id: RepositoryInvitationId,
+    /// Email address of the invitation.
+    email: string,
+    /// ID of the inviting user.
+    inviting_user_id?: UserId,
+}
+
 /// Add a user to a repository.
 record AddRepositoryMemberAction {
     /// ID of the repository.
@@ -207,6 +234,26 @@ record RemoveRepositoryMemberAction {
     repository_id: RepositoryId,
     /// ID of the user to remove.
     user_id: UserId,
+}
+
+/// Invite a user to a repository.
+record InviteRepositoryMemberAction {
+    /// ID of the repository.
+    repository_id: RepositoryId,
+    /// Email address of the user to invite.
+    email: string,
+}
+
+/// Output of inviting a user to a repository.
+record InviteRepositoryMemberOutput {
+    /// ID of the invitation.
+    invitation_id: RepositoryInvitationId,
+}
+
+/// Delete an invitation to a repository.
+record DeleteRepositoryInvitationAction {
+    /// ID of the invitation.
+    invitation_id: RepositoryInvitationId,
 }
 
 /// Resolve a package by its path.
@@ -566,4 +613,14 @@ record IssueAssetUploadUrlAction {
 record IssueAssetUploadUrlOutput {
     /// URL for uploading the asset.
     url: string,
+}
+
+/// Event indicating that a member has been invited to a repository.
+record RepositoryInvitationCreatedEvent {
+    /// ID of the repository.
+    repository_id: RepositoryId,
+    /// ID of the invitation.
+    invitation_id: RepositoryInvitationId,
+    /// Email address of the invitation.
+    email: string,
 }

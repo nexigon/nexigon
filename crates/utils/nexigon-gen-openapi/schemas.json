@@ -1686,6 +1686,19 @@
     ],
     "unevaluatedProperties": false
   },
+  "nexigon_api.projects.DeleteProjectInvitationAction": {
+    "type": "object",
+    "description": "Delete an invitation to a project.",
+    "properties": {
+      "invitationId": {
+        "$ref": "#/components/schemas/nexigon_api.projects.ProjectInvitationId"
+      }
+    },
+    "required": [
+      "invitationId"
+    ],
+    "unevaluatedProperties": false
+  },
   "nexigon_api.projects.DeploymentToken": {
     "type": [
       "string"
@@ -1803,6 +1816,36 @@
     ],
     "unevaluatedProperties": false
   },
+  "nexigon_api.projects.InviteProjectMemberAction": {
+    "type": "object",
+    "description": "Invite a user to a project.",
+    "properties": {
+      "projectId": {
+        "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+      },
+      "email": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "projectId",
+      "email"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.projects.InviteProjectMemberOutput": {
+    "type": "object",
+    "description": "Output of inviting a user to a project.",
+    "properties": {
+      "invitationId": {
+        "$ref": "#/components/schemas/nexigon_api.projects.ProjectInvitationId"
+      }
+    },
+    "required": [
+      "invitationId"
+    ],
+    "unevaluatedProperties": false
+  },
   "nexigon_api.projects.ProjectCreatedEvent": {
     "type": "object",
     "description": "Event indicating the creation of a project.",
@@ -1834,6 +1877,33 @@
       "string"
     ],
     "description": "Unique ID of a project."
+  },
+  "nexigon_api.projects.ProjectInvitationCreatedEvent": {
+    "type": "object",
+    "description": "Event indicating that a member has been invited to a project.",
+    "properties": {
+      "projectId": {
+        "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+      },
+      "invitationId": {
+        "$ref": "#/components/schemas/nexigon_api.projects.ProjectInvitationId"
+      },
+      "email": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "projectId",
+      "invitationId",
+      "email"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.projects.ProjectInvitationId": {
+    "type": [
+      "string"
+    ],
+    "description": "Unique ID of an invitation to a project."
   },
   "nexigon_api.projects.ProjectMemberAddedEvent": {
     "type": "object",
@@ -2010,6 +2080,55 @@
     },
     "required": [
       "devices"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.projects.QueryProjectInvitationsAction": {
+    "type": "object",
+    "description": "Query the outstanding invitations of a project.",
+    "properties": {
+      "projectId": {
+        "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+      }
+    },
+    "required": [
+      "projectId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.projects.QueryProjectInvitationsItem": {
+    "type": "object",
+    "description": "Project invitation item.",
+    "properties": {
+      "invitationId": {
+        "$ref": "#/components/schemas/nexigon_api.projects.ProjectInvitationId"
+      },
+      "email": {
+        "type": "string"
+      },
+      "invitingUserId": {
+        "$ref": "#/components/schemas/nexigon_api.users.UserId"
+      }
+    },
+    "required": [
+      "invitationId",
+      "email"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.projects.QueryProjectInvitationsOutput": {
+    "type": "object",
+    "description": "Output of querying the invitations of a project.",
+    "properties": {
+      "invitations": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.projects.QueryProjectInvitationsItem"
+        }
+      }
+    },
+    "required": [
+      "invitations"
     ],
     "unevaluatedProperties": false
   },
@@ -2488,6 +2607,19 @@
     ],
     "unevaluatedProperties": false
   },
+  "nexigon_api.repositories.DeleteRepositoryInvitationAction": {
+    "type": "object",
+    "description": "Delete an invitation to a repository.",
+    "properties": {
+      "invitationId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryInvitationId"
+      }
+    },
+    "required": [
+      "invitationId"
+    ],
+    "unevaluatedProperties": false
+  },
   "nexigon_api.repositories.GetAssetDetailsAction": {
     "type": "object",
     "description": "Get information about an asset.",
@@ -2656,6 +2788,36 @@
       "visibility",
       "packageCount",
       "assetCount"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.repositories.InviteRepositoryMemberAction": {
+    "type": "object",
+    "description": "Invite a user to a repository.",
+    "properties": {
+      "repositoryId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryId"
+      },
+      "email": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "repositoryId",
+      "email"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.repositories.InviteRepositoryMemberOutput": {
+    "type": "object",
+    "description": "Output of inviting a user to a repository.",
+    "properties": {
+      "invitationId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryInvitationId"
+      }
+    },
+    "required": [
+      "invitationId"
     ],
     "unevaluatedProperties": false
   },
@@ -2877,6 +3039,55 @@
     ],
     "unevaluatedProperties": false
   },
+  "nexigon_api.repositories.QueryRepositoryInvitationsAction": {
+    "type": "object",
+    "description": "Query the invitations of a repository.",
+    "properties": {
+      "repositoryId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryId"
+      }
+    },
+    "required": [
+      "repositoryId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.repositories.QueryRepositoryInvitationsItem": {
+    "type": "object",
+    "description": "An invitation to a repository.",
+    "properties": {
+      "invitationId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryInvitationId"
+      },
+      "email": {
+        "type": "string"
+      },
+      "invitingUserId": {
+        "$ref": "#/components/schemas/nexigon_api.users.UserId"
+      }
+    },
+    "required": [
+      "invitationId",
+      "email"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.repositories.QueryRepositoryInvitationsOutput": {
+    "type": "object",
+    "description": "Output of querying the invitations of a repository.",
+    "properties": {
+      "invitations": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.repositories.QueryRepositoryInvitationsItem"
+        }
+      }
+    },
+    "required": [
+      "invitations"
+    ],
+    "unevaluatedProperties": false
+  },
   "nexigon_api.repositories.QueryRepositoryMembersAction": {
     "type": "object",
     "description": "Query the members of a repository.",
@@ -3046,6 +3257,33 @@
       "string"
     ],
     "description": "Unique ID of a repository."
+  },
+  "nexigon_api.repositories.RepositoryInvitationCreatedEvent": {
+    "type": "object",
+    "description": "Event indicating that a member has been invited to a repository.",
+    "properties": {
+      "repositoryId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryId"
+      },
+      "invitationId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryInvitationId"
+      },
+      "email": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "repositoryId",
+      "invitationId",
+      "email"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.repositories.RepositoryInvitationId": {
+    "type": [
+      "string"
+    ],
+    "description": "Unique ID of an invitation to a repository."
   },
   "nexigon_api.repositories.RepositoryVisibility": {
     "enum": [
@@ -3391,6 +3629,32 @@
     "required": [
       "versionId",
       "tags"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.users.AcceptProjectInvitationAction": {
+    "type": "object",
+    "description": "Accept a project invitation.",
+    "properties": {
+      "invitationId": {
+        "$ref": "#/components/schemas/nexigon_api.projects.ProjectInvitationId"
+      }
+    },
+    "required": [
+      "invitationId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.users.AcceptRepositoryInvitationAction": {
+    "type": "object",
+    "description": "Accept a repository invitation.",
+    "properties": {
+      "invitationId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryInvitationId"
+      }
+    },
+    "required": [
+      "invitationId"
     ],
     "unevaluatedProperties": false
   },
@@ -3840,6 +4104,69 @@
     ],
     "unevaluatedProperties": false
   },
+  "nexigon_api.users.QueryUserProjectInvitationsAction": {
+    "type": "object",
+    "description": "Query the project invitations of a user.",
+    "properties": {
+      "userId": {
+        "$ref": "#/components/schemas/nexigon_api.users.UserId"
+      }
+    },
+    "required": [
+      "userId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.users.QueryUserProjectInvitationsItem": {
+    "type": "object",
+    "description": "Project invitation item.",
+    "properties": {
+      "invitationId": {
+        "$ref": "#/components/schemas/nexigon_api.projects.ProjectInvitationId"
+      },
+      "project": {
+        "$ref": "#/components/schemas/nexigon_api.users.QueryUserProjectInvitationsItemProject"
+      }
+    },
+    "required": [
+      "invitationId",
+      "project"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.users.QueryUserProjectInvitationsItemProject": {
+    "type": "object",
+    "description": "Project invitation item project.",
+    "properties": {
+      "projectId": {
+        "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+      },
+      "name": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "projectId",
+      "name"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.users.QueryUserProjectInvitationsOutput": {
+    "type": "object",
+    "description": "Output of querying the project invitations of a user.",
+    "properties": {
+      "invitations": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.users.QueryUserProjectInvitationsItem"
+        }
+      }
+    },
+    "required": [
+      "invitations"
+    ],
+    "unevaluatedProperties": false
+  },
   "nexigon_api.users.QueryUserProjectsAction": {
     "type": "object",
     "description": "Query the projects of a user.",
@@ -3943,6 +4270,69 @@
     },
     "required": [
       "repositories"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.users.QueryUserRepositoryInvitationsAction": {
+    "type": "object",
+    "description": "Query the repository invitations of a user.",
+    "properties": {
+      "userId": {
+        "$ref": "#/components/schemas/nexigon_api.users.UserId"
+      }
+    },
+    "required": [
+      "userId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.users.QueryUserRepositoryInvitationsItem": {
+    "type": "object",
+    "description": "Repository invitation item.",
+    "properties": {
+      "invitationId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryInvitationId"
+      },
+      "repository": {
+        "$ref": "#/components/schemas/nexigon_api.users.QueryUserRepositoryInvitationsItemRepository"
+      }
+    },
+    "required": [
+      "invitationId",
+      "repository"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.users.QueryUserRepositoryInvitationsItemRepository": {
+    "type": "object",
+    "description": "Repository invitation item repository.",
+    "properties": {
+      "repositoryId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryId"
+      },
+      "name": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "repositoryId",
+      "name"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.users.QueryUserRepositoryInvitationsOutput": {
+    "type": "object",
+    "description": "Output of querying the repository invitations of a user.",
+    "properties": {
+      "invitations": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.users.QueryUserRepositoryInvitationsItem"
+        }
+      }
+    },
+    "required": [
+      "invitations"
     ],
     "unevaluatedProperties": false
   },

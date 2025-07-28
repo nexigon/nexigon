@@ -4,7 +4,9 @@ import actor::Actor
 import datetime::Timestamp
 import devices::DeviceId
 import projects::ProjectId
+import projects::ProjectInvitationId
 import repositories::RepositoryId
+import repositories::RepositoryInvitationId
 
 /// Unique ID of a user.
 #[rust(type = "nexigon_ids::ids::UserId")]
@@ -169,6 +171,62 @@ record QueryUserProjectsItem {
     name: string,
     /// Number of devices in the project.
     devices: u32,
+}
+
+/// Query the project invitations of a user.
+record QueryUserProjectInvitationsAction {
+    /// ID of the user.
+    user_id: UserId,
+}
+
+/// Output of querying the project invitations of a user.
+record QueryUserProjectInvitationsOutput {
+    /// List of project invitations.
+    invitations: [QueryUserProjectInvitationsItem],
+}
+
+/// Project invitation item.
+record QueryUserProjectInvitationsItem {
+    /// ID of the invitation.
+    invitation_id: ProjectInvitationId,
+    /// Information about the project.
+    project: QueryUserProjectInvitationsItemProject,
+}
+
+/// Project invitation item project.
+record QueryUserProjectInvitationsItemProject {
+    /// ID of the project.
+    project_id: ProjectId,
+    /// Name of the project.
+    name: string,
+}
+
+/// Query the repository invitations of a user.
+record QueryUserRepositoryInvitationsAction {
+    /// ID of the user.
+    user_id: UserId,
+}
+
+/// Output of querying the repository invitations of a user.
+record QueryUserRepositoryInvitationsOutput {
+    /// List of repository invitations.
+    invitations: [QueryUserRepositoryInvitationsItem],
+}
+
+/// Repository invitation item.
+record QueryUserRepositoryInvitationsItem {
+    /// ID of the invitation.
+    invitation_id: RepositoryInvitationId,
+    /// Information about the repository.
+    repository: QueryUserRepositoryInvitationsItemRepository,
+}
+
+/// Repository invitation item repository.
+record QueryUserRepositoryInvitationsItemRepository {
+    /// ID of the repository.
+    repository_id: RepositoryId,
+    /// Name of the repository.
+    name: string,
 }
 
 /// Query the repositories of a user.
@@ -412,6 +470,18 @@ variant CompleteRegistrationOutput {
     Completed,
     /// Registration failed.
     Failed,
+}
+
+/// Accept a project invitation.
+record AcceptProjectInvitationAction {
+    /// ID of the invitation.
+    invitation_id: ProjectInvitationId,
+}
+
+/// Accept a repository invitation.
+record AcceptRepositoryInvitationAction {
+    /// ID of the repository.
+    invitation_id: RepositoryInvitationId,
 }
 
 /// Event indicating that a user has been created.

@@ -446,6 +446,9 @@ define_types! {
     ///
     /// The first 22 characters of the respective secret access token.
     ProjectTokenId => (FlatRawId, "p_pk", 22, secret = false),
+    /// Uniquely identifies an invitation to a project.
+    ProjectInvitationId => (FlatRawId, "p_invite", 22, secret = false),
+
 
     /// Deployment token (globally unique).
     ///
@@ -479,6 +482,8 @@ define_types! {
     RepositoryId => (FlatRawId, "repo", 22, secret = false),
     /// Repository asset it (globally unique).
     RepositoryAssetId => (FlatRawId, "repo_a", 22, secret = false),
+    /// Uniquely identifies an invitation to a repository.
+    RepositoryInvitationId => (FlatRawId, "repo_invite", 22, secret = false),
 
     /// Package id (globally unique).
     PackageId => (FlatRawId, "pkg", 22, secret = false),
