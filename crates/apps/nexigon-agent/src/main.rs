@@ -190,7 +190,7 @@ async fn main() -> anyhow::Result<()> {
                                 .with_valid_for_secs(*valid_for),
                         )
                         .await
-                        .context("unable to issue device token")?;
+                        .context("unable to issue device token")??;
                     println!("{}", serde_json::to_string(&output).unwrap());
                 }
             },
