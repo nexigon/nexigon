@@ -564,6 +564,46 @@ record ResolvePackageVersionAssetByPathSuccess {
     asset_id: RepositoryAssetId,
 }
 
+/// Set the S3 configuration for the repository.
+record SetRepositoryS3ConfigAction {
+    /// ID of the repository.
+    repository_id: RepositoryId,
+    /// S3 endpoint (e.g. https://s3.amazonaws.com or https://minio.local:9000).
+    s3_endpoint: string,
+    /// S3 bucket name.
+    s3_bucket: string,
+    /// AWS region (required by AWS, may be NULL for MinIO/other providers).
+    s3_region?: string,
+    /// Optional prefix inside the bucket to scope this repository.
+    s3_prefix?: string,
+    /// S3 access key ID (not sensitive, can be plain text).
+    s3_access_key_id: string,
+    /// S3 secret access key (sensitive, will be stored encrypted).
+    s3_secret_access_key: string,
+}
+
+/// Get the S3 configuration for the repository.
+record GetRepositoryS3ConfigAction {
+    /// ID of the repository.
+    repository_id: RepositoryId,
+}
+
+/// Output of getting the S3 configuration for the repository.
+/// 
+/// This intentionally does not include the secret access key.
+record GetRepositoryS3ConfigOutput {
+    /// S3 endpoint (e.g. https://s3.amazonaws.com or https://minio.local:9000).
+    s3_endpoint?: string,
+    /// S3 bucket name.
+    s3_bucket?: string,
+    /// AWS region (required by AWS, may be NULL for MinIO/other providers).
+    s3_region?: string,
+    /// Optional prefix inside the bucket to scope this repository.
+    s3_prefix?: string,
+    /// S3 access key ID (not sensitive, can be plain text).
+    s3_access_key_id?: string,
+}
+
 /// Get information about an asset.
 record GetAssetDetailsAction {
     /// ID of the asset.

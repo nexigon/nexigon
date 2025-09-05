@@ -2736,6 +2736,66 @@
         }
       }
     },
+    "/api/v1/actions/invoke/repositories_SetRepositoryS3Config": {
+      "post": {
+        "tags": [
+          "repositories"
+        ],
+        "summary": "SetRepositoryS3Credentials",
+        "description": "Set the S3 configuration for the repository.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/nexigon_api.repositories.SetRepositoryS3ConfigAction"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/nexigon_api.outputs.Empty"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/actions/invoke/repositories_GetRepositoryS3Config": {
+      "post": {
+        "tags": [
+          "repositories"
+        ],
+        "summary": "GetRepositoryS3Credentials",
+        "description": "Get the S3 configuration for the repository.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/nexigon_api.repositories.GetRepositoryS3ConfigAction"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/nexigon_api.repositories.GetRepositoryS3ConfigOutput"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/actions/invoke/repositories_GetAssetDetails": {
       "post": {
         "tags": [
@@ -6058,6 +6118,41 @@
         ],
         "unevaluatedProperties": false
       },
+      "nexigon_api.repositories.GetRepositoryS3ConfigAction": {
+        "type": "object",
+        "properties": {
+          "repositoryId": {
+            "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryId"
+          }
+        },
+        "required": [
+          "repositoryId"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.repositories.GetRepositoryS3ConfigOutput": {
+        "type": "object",
+        "description": "Output of getting the S3 configuration for the repository.\n\nThis intentionally does not include the secret access key.",
+        "properties": {
+          "s3Endpoint": {
+            "type": "string"
+          },
+          "s3Bucket": {
+            "type": "string"
+          },
+          "s3Region": {
+            "type": "string"
+          },
+          "s3Prefix": {
+            "type": "string"
+          },
+          "s3AccessKeyId": {
+            "type": "string"
+          }
+        },
+        "required": [],
+        "unevaluatedProperties": false
+      },
       "nexigon_api.repositories.InviteRepositoryMemberAction": {
         "type": "object",
         "properties": {
@@ -6890,6 +6985,40 @@
             ]
           }
         ]
+      },
+      "nexigon_api.repositories.SetRepositoryS3ConfigAction": {
+        "type": "object",
+        "properties": {
+          "repositoryId": {
+            "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryId"
+          },
+          "s3Endpoint": {
+            "type": "string"
+          },
+          "s3Bucket": {
+            "type": "string"
+          },
+          "s3Region": {
+            "type": "string"
+          },
+          "s3Prefix": {
+            "type": "string"
+          },
+          "s3AccessKeyId": {
+            "type": "string"
+          },
+          "s3SecretAccessKey": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "repositoryId",
+          "s3Endpoint",
+          "s3Bucket",
+          "s3AccessKeyId",
+          "s3SecretAccessKey"
+        ],
+        "unevaluatedProperties": false
       },
       "nexigon_api.repositories.SetRepositoryVisibilityAction": {
         "type": "object",

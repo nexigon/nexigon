@@ -50860,6 +50860,1336 @@ pub mod repositories {
             )
         }
     }
+    #[doc = "Set the S3 configuration for the repository.\n"]
+    #[derive(Clone, Debug)]
+    pub struct SetRepositoryS3ConfigAction {
+        #[doc = "ID of the repository.\n"]
+        pub repository_id: RepositoryId,
+        #[doc = "S3 endpoint (e.g. https://s3.amazonaws.com or https://minio.local:9000).\n"]
+        pub s3_endpoint: ::std::string::String,
+        #[doc = "S3 bucket name.\n"]
+        pub s3_bucket: ::std::string::String,
+        #[doc = "AWS region (required by AWS, may be NULL for MinIO/other providers).\n"]
+        pub s3_region: ::std::option::Option<::std::string::String>,
+        #[doc = "Optional prefix inside the bucket to scope this repository.\n"]
+        pub s3_prefix: ::std::option::Option<::std::string::String>,
+        #[doc = "S3 access key ID (not sensitive, can be plain text).\n"]
+        pub s3_access_key_id: ::std::string::String,
+        #[doc = "S3 secret access key (sensitive, will be stored encrypted).\n"]
+        pub s3_secret_access_key: ::std::string::String,
+    }
+    impl SetRepositoryS3ConfigAction {
+        #[doc = "Creates a new [`SetRepositoryS3ConfigAction`]."]
+        pub fn new(
+            repository_id: RepositoryId,
+            s3_endpoint: ::std::string::String,
+            s3_bucket: ::std::string::String,
+            s3_access_key_id: ::std::string::String,
+            s3_secret_access_key: ::std::string::String,
+        ) -> Self {
+            Self {
+                repository_id,
+                s3_endpoint,
+                s3_bucket,
+                s3_access_key_id,
+                s3_secret_access_key,
+                s3_region: ::std::default::Default::default(),
+                s3_prefix: ::std::default::Default::default(),
+            }
+        }
+        #[doc = "Sets the value of `repository_id`."]
+        pub fn set_repository_id(&mut self, repository_id: RepositoryId) -> &mut Self {
+            self.repository_id = repository_id;
+            self
+        }
+        #[doc = "Sets the value of `repository_id`."]
+        pub fn with_repository_id(mut self, repository_id: RepositoryId) -> Self {
+            self.repository_id = repository_id;
+            self
+        }
+        #[doc = "Sets the value of `s3_endpoint`."]
+        pub fn set_s3_endpoint(&mut self, s3_endpoint: ::std::string::String) -> &mut Self {
+            self.s3_endpoint = s3_endpoint;
+            self
+        }
+        #[doc = "Sets the value of `s3_endpoint`."]
+        pub fn with_s3_endpoint(mut self, s3_endpoint: ::std::string::String) -> Self {
+            self.s3_endpoint = s3_endpoint;
+            self
+        }
+        #[doc = "Sets the value of `s3_bucket`."]
+        pub fn set_s3_bucket(&mut self, s3_bucket: ::std::string::String) -> &mut Self {
+            self.s3_bucket = s3_bucket;
+            self
+        }
+        #[doc = "Sets the value of `s3_bucket`."]
+        pub fn with_s3_bucket(mut self, s3_bucket: ::std::string::String) -> Self {
+            self.s3_bucket = s3_bucket;
+            self
+        }
+        #[doc = "Sets the value of `s3_region`."]
+        pub fn set_s3_region(
+            &mut self,
+            s3_region: ::std::option::Option<::std::string::String>,
+        ) -> &mut Self {
+            self.s3_region = s3_region;
+            self
+        }
+        #[doc = "Sets the value of `s3_region`."]
+        pub fn with_s3_region(
+            mut self,
+            s3_region: ::std::option::Option<::std::string::String>,
+        ) -> Self {
+            self.s3_region = s3_region;
+            self
+        }
+        #[doc = "Sets the value of `s3_prefix`."]
+        pub fn set_s3_prefix(
+            &mut self,
+            s3_prefix: ::std::option::Option<::std::string::String>,
+        ) -> &mut Self {
+            self.s3_prefix = s3_prefix;
+            self
+        }
+        #[doc = "Sets the value of `s3_prefix`."]
+        pub fn with_s3_prefix(
+            mut self,
+            s3_prefix: ::std::option::Option<::std::string::String>,
+        ) -> Self {
+            self.s3_prefix = s3_prefix;
+            self
+        }
+        #[doc = "Sets the value of `s3_access_key_id`."]
+        pub fn set_s3_access_key_id(
+            &mut self,
+            s3_access_key_id: ::std::string::String,
+        ) -> &mut Self {
+            self.s3_access_key_id = s3_access_key_id;
+            self
+        }
+        #[doc = "Sets the value of `s3_access_key_id`."]
+        pub fn with_s3_access_key_id(mut self, s3_access_key_id: ::std::string::String) -> Self {
+            self.s3_access_key_id = s3_access_key_id;
+            self
+        }
+        #[doc = "Sets the value of `s3_secret_access_key`."]
+        pub fn set_s3_secret_access_key(
+            &mut self,
+            s3_secret_access_key: ::std::string::String,
+        ) -> &mut Self {
+            self.s3_secret_access_key = s3_secret_access_key;
+            self
+        }
+        #[doc = "Sets the value of `s3_secret_access_key`."]
+        pub fn with_s3_secret_access_key(
+            mut self,
+            s3_secret_access_key: ::std::string::String,
+        ) -> Self {
+            self.s3_secret_access_key = s3_secret_access_key;
+            self
+        }
+    }
+    #[automatically_derived]
+    impl __serde::Serialize for SetRepositoryS3ConfigAction {
+        fn serialize<__S: __serde::Serializer>(
+            &self,
+            __serializer: __S,
+        ) -> ::std::result::Result<__S::Ok, __S::Error> {
+            let mut __record = __sidex_serde::ser::RecordSerializer::new(
+                __serializer,
+                "SetRepositoryS3ConfigAction",
+                7usize,
+            )?;
+            __record.serialize_field("repositoryId", &self.repository_id)?;
+            __record.serialize_field("s3Endpoint", &self.s3_endpoint)?;
+            __record.serialize_field("s3Bucket", &self.s3_bucket)?;
+            __record.serialize_optional_field(
+                "s3Region",
+                ::core::option::Option::as_ref(&self.s3_region),
+            )?;
+            __record.serialize_optional_field(
+                "s3Prefix",
+                ::core::option::Option::as_ref(&self.s3_prefix),
+            )?;
+            __record.serialize_field("s3AccessKeyId", &self.s3_access_key_id)?;
+            __record.serialize_field("s3SecretAccessKey", &self.s3_secret_access_key)?;
+            __record.end()
+        }
+    }
+    #[automatically_derived]
+    impl<'de> __serde::Deserialize<'de> for SetRepositoryS3ConfigAction {
+        fn deserialize<__D: __serde::Deserializer<'de>>(
+            __deserializer: __D,
+        ) -> ::std::result::Result<Self, __D::Error> {
+            #[doc(hidden)]
+            struct __Visitor {
+                __phantom_vars: ::core::marker::PhantomData<fn(&())>,
+            }
+            impl<'de> __serde::de::Visitor<'de> for __Visitor {
+                type Value = SetRepositoryS3ConfigAction;
+                fn expecting(
+                    &self,
+                    __formatter: &mut ::core::fmt::Formatter,
+                ) -> ::core::fmt::Result {
+                    ::core::fmt::Formatter::write_str(
+                        __formatter,
+                        "record SetRepositoryS3ConfigAction",
+                    )
+                }
+                #[inline]
+                fn visit_seq<__A>(
+                    self,
+                    mut __seq: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::SeqAccess<'de>,
+                {
+                    let __field0 =
+                        match __serde::de::SeqAccess::next_element::<RepositoryId>(&mut __seq)? {
+                            ::core::option::Option::Some(__value) => __value,
+                            ::core::option::Option::None => {
+                                return ::core::result::Result::Err(
+                                    __serde::de::Error::invalid_length(
+                                        0usize,
+                                        &"record with 7 fields",
+                                    ),
+                                );
+                            }
+                        };
+                    let __field1 = match __serde::de::SeqAccess::next_element::<
+                        ::std::string::String,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(1usize, &"record with 7 fields"),
+                            );
+                        }
+                    };
+                    let __field2 = match __serde::de::SeqAccess::next_element::<
+                        ::std::string::String,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(2usize, &"record with 7 fields"),
+                            );
+                        }
+                    };
+                    let __field3 = match __serde::de::SeqAccess::next_element::<
+                        ::std::option::Option<::std::string::String>,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(3usize, &"record with 7 fields"),
+                            );
+                        }
+                    };
+                    let __field4 = match __serde::de::SeqAccess::next_element::<
+                        ::std::option::Option<::std::string::String>,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(4usize, &"record with 7 fields"),
+                            );
+                        }
+                    };
+                    let __field5 = match __serde::de::SeqAccess::next_element::<
+                        ::std::string::String,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(5usize, &"record with 7 fields"),
+                            );
+                        }
+                    };
+                    let __field6 = match __serde::de::SeqAccess::next_element::<
+                        ::std::string::String,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(6usize, &"record with 7 fields"),
+                            );
+                        }
+                    };
+                    ::core::result::Result::Ok(SetRepositoryS3ConfigAction {
+                        repository_id: __field0,
+                        s3_endpoint: __field1,
+                        s3_bucket: __field2,
+                        s3_region: __field3,
+                        s3_prefix: __field4,
+                        s3_access_key_id: __field5,
+                        s3_secret_access_key: __field6,
+                    })
+                }
+                #[inline]
+                fn visit_map<__A>(
+                    self,
+                    mut __map: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::MapAccess<'de>,
+                {
+                    #[doc(hidden)]
+                    const __IDENTIFIERS: &'static [&'static str] = &[
+                        "repositoryId",
+                        "s3Endpoint",
+                        "s3Bucket",
+                        "s3Region",
+                        "s3Prefix",
+                        "s3AccessKeyId",
+                        "s3SecretAccessKey",
+                    ];
+                    #[doc(hidden)]
+                    const __EXPECTING_IDENTIFIERS: &'static str = "an identifier in [\"repositoryId\", \"s3Endpoint\", \"s3Bucket\", \"s3Region\", \"s3Prefix\", \"s3AccessKeyId\", \"s3SecretAccessKey\"]";
+                    #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
+                    #[doc(hidden)]
+                    enum __Identifier {
+                        __Identifier0,
+                        __Identifier1,
+                        __Identifier2,
+                        __Identifier3,
+                        __Identifier4,
+                        __Identifier5,
+                        __Identifier6,
+                        __Unknown,
+                    }
+                    #[doc(hidden)]
+                    struct __IdentifierVisitor;
+                    impl<'de> __serde::de::Visitor<'de> for __IdentifierVisitor {
+                        type Value = __Identifier;
+                        fn expecting(
+                            &self,
+                            __formatter: &mut ::core::fmt::Formatter,
+                        ) -> ::core::fmt::Result {
+                            ::core::fmt::Formatter::write_str(__formatter, __EXPECTING_IDENTIFIERS)
+                        }
+                        fn visit_u64<__E>(
+                            self,
+                            __value: u64,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                0u64 => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                                1u64 => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                                2u64 => ::core::result::Result::Ok(__Identifier::__Identifier2),
+                                3u64 => ::core::result::Result::Ok(__Identifier::__Identifier3),
+                                4u64 => ::core::result::Result::Ok(__Identifier::__Identifier4),
+                                5u64 => ::core::result::Result::Ok(__Identifier::__Identifier5),
+                                6u64 => ::core::result::Result::Ok(__Identifier::__Identifier6),
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_str<__E>(
+                            self,
+                            __value: &str,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                "repositoryId" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
+                                }
+                                "s3Endpoint" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier1)
+                                }
+                                "s3Bucket" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier2)
+                                }
+                                "s3Region" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier3)
+                                }
+                                "s3Prefix" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier4)
+                                }
+                                "s3AccessKeyId" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier5)
+                                }
+                                "s3SecretAccessKey" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier6)
+                                }
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_bytes<__E>(
+                            self,
+                            __value: &[u8],
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                b"repositoryId" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
+                                }
+                                b"s3Endpoint" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier1)
+                                }
+                                b"s3Bucket" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier2)
+                                }
+                                b"s3Region" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier3)
+                                }
+                                b"s3Prefix" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier4)
+                                }
+                                b"s3AccessKeyId" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier5)
+                                }
+                                b"s3SecretAccessKey" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier6)
+                                }
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                    }
+                    impl<'de> __serde::Deserialize<'de> for __Identifier {
+                        #[inline]
+                        fn deserialize<__D>(
+                            __deserializer: __D,
+                        ) -> ::core::result::Result<Self, __D::Error>
+                        where
+                            __D: __serde::Deserializer<'de>,
+                        {
+                            __serde::Deserializer::deserialize_identifier(
+                                __deserializer,
+                                __IdentifierVisitor,
+                            )
+                        }
+                    }
+                    let mut __field0: ::core::option::Option<RepositoryId> =
+                        ::core::option::Option::None;
+                    let mut __field1: ::core::option::Option<::std::string::String> =
+                        ::core::option::Option::None;
+                    let mut __field2: ::core::option::Option<::std::string::String> =
+                        ::core::option::Option::None;
+                    let mut __field3: ::core::option::Option<
+                        ::std::option::Option<::std::string::String>,
+                    > = ::core::option::Option::None;
+                    let mut __field4: ::core::option::Option<
+                        ::std::option::Option<::std::string::String>,
+                    > = ::core::option::Option::None;
+                    let mut __field5: ::core::option::Option<::std::string::String> =
+                        ::core::option::Option::None;
+                    let mut __field6: ::core::option::Option<::std::string::String> =
+                        ::core::option::Option::None;
+                    while let ::core::option::Option::Some(__key) =
+                        __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
+                    {
+                        match __key {
+                            __Identifier::__Identifier0 => {
+                                if ::core::option::Option::is_some(&__field0) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "repositoryId",
+                                        ),
+                                    );
+                                }
+                                __field0 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<RepositoryId>(&mut __map)?,
+                                );
+                            }
+                            __Identifier::__Identifier1 => {
+                                if ::core::option::Option::is_some(&__field1) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "s3Endpoint",
+                                        ),
+                                    );
+                                }
+                                __field1 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<::std::string::String>(
+                                        &mut __map,
+                                    )?,
+                                );
+                            }
+                            __Identifier::__Identifier2 => {
+                                if ::core::option::Option::is_some(&__field2) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "s3Bucket",
+                                        ),
+                                    );
+                                }
+                                __field2 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<::std::string::String>(
+                                        &mut __map,
+                                    )?,
+                                );
+                            }
+                            __Identifier::__Identifier3 => {
+                                if ::core::option::Option::is_some(&__field3) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "s3Region",
+                                        ),
+                                    );
+                                }
+                                __field3 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<
+                                        ::std::option::Option<::std::string::String>,
+                                    >(&mut __map)?,
+                                );
+                            }
+                            __Identifier::__Identifier4 => {
+                                if ::core::option::Option::is_some(&__field4) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "s3Prefix",
+                                        ),
+                                    );
+                                }
+                                __field4 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<
+                                        ::std::option::Option<::std::string::String>,
+                                    >(&mut __map)?,
+                                );
+                            }
+                            __Identifier::__Identifier5 => {
+                                if ::core::option::Option::is_some(&__field5) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "s3AccessKeyId",
+                                        ),
+                                    );
+                                }
+                                __field5 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<::std::string::String>(
+                                        &mut __map,
+                                    )?,
+                                );
+                            }
+                            __Identifier::__Identifier6 => {
+                                if ::core::option::Option::is_some(&__field6) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "s3SecretAccessKey",
+                                        ),
+                                    );
+                                }
+                                __field6 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<::std::string::String>(
+                                        &mut __map,
+                                    )?,
+                                );
+                            }
+                            _ => {
+                                __serde::de::MapAccess::next_value::<__serde::de::IgnoredAny>(
+                                    &mut __map,
+                                )?;
+                            }
+                        }
+                    }
+                    let __field0 = match __field0 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                <__A::Error as __serde::de::Error>::missing_field("repositoryId"),
+                            );
+                        }
+                    };
+                    let __field1 = match __field1 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                <__A::Error as __serde::de::Error>::missing_field("s3Endpoint"),
+                            );
+                        }
+                    };
+                    let __field2 = match __field2 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                <__A::Error as __serde::de::Error>::missing_field("s3Bucket"),
+                            );
+                        }
+                    };
+                    let __field3 = match __field3 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => ::core::option::Option::None,
+                    };
+                    let __field4 = match __field4 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => ::core::option::Option::None,
+                    };
+                    let __field5 = match __field5 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                <__A::Error as __serde::de::Error>::missing_field("s3AccessKeyId"),
+                            );
+                        }
+                    };
+                    let __field6 = match __field6 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                <__A::Error as __serde::de::Error>::missing_field(
+                                    "s3SecretAccessKey",
+                                ),
+                            );
+                        }
+                    };
+                    ::core::result::Result::Ok(SetRepositoryS3ConfigAction {
+                        repository_id: __field0,
+                        s3_endpoint: __field1,
+                        s3_bucket: __field2,
+                        s3_region: __field3,
+                        s3_prefix: __field4,
+                        s3_access_key_id: __field5,
+                        s3_secret_access_key: __field6,
+                    })
+                }
+            }
+            #[doc(hidden)]
+            const __FIELDS: &'static [&'static str] = &[
+                "repositoryId",
+                "s3Endpoint",
+                "s3Bucket",
+                "s3Region",
+                "s3Prefix",
+                "s3AccessKeyId",
+                "s3SecretAccessKey",
+            ];
+            __serde::Deserializer::deserialize_struct(
+                __deserializer,
+                "SetRepositoryS3ConfigAction",
+                __FIELDS,
+                __Visitor {
+                    __phantom_vars: ::core::marker::PhantomData,
+                },
+            )
+        }
+    }
+    #[doc = "Get the S3 configuration for the repository.\n"]
+    #[derive(Clone, Debug)]
+    pub struct GetRepositoryS3ConfigAction {
+        #[doc = "ID of the repository.\n"]
+        pub repository_id: RepositoryId,
+    }
+    impl GetRepositoryS3ConfigAction {
+        #[doc = "Creates a new [`GetRepositoryS3ConfigAction`]."]
+        pub fn new(repository_id: RepositoryId) -> Self {
+            Self { repository_id }
+        }
+        #[doc = "Sets the value of `repository_id`."]
+        pub fn set_repository_id(&mut self, repository_id: RepositoryId) -> &mut Self {
+            self.repository_id = repository_id;
+            self
+        }
+        #[doc = "Sets the value of `repository_id`."]
+        pub fn with_repository_id(mut self, repository_id: RepositoryId) -> Self {
+            self.repository_id = repository_id;
+            self
+        }
+    }
+    #[automatically_derived]
+    impl __serde::Serialize for GetRepositoryS3ConfigAction {
+        fn serialize<__S: __serde::Serializer>(
+            &self,
+            __serializer: __S,
+        ) -> ::std::result::Result<__S::Ok, __S::Error> {
+            let mut __record = __sidex_serde::ser::RecordSerializer::new(
+                __serializer,
+                "GetRepositoryS3ConfigAction",
+                1usize,
+            )?;
+            __record.serialize_field("repositoryId", &self.repository_id)?;
+            __record.end()
+        }
+    }
+    #[automatically_derived]
+    impl<'de> __serde::Deserialize<'de> for GetRepositoryS3ConfigAction {
+        fn deserialize<__D: __serde::Deserializer<'de>>(
+            __deserializer: __D,
+        ) -> ::std::result::Result<Self, __D::Error> {
+            #[doc(hidden)]
+            struct __Visitor {
+                __phantom_vars: ::core::marker::PhantomData<fn(&())>,
+            }
+            impl<'de> __serde::de::Visitor<'de> for __Visitor {
+                type Value = GetRepositoryS3ConfigAction;
+                fn expecting(
+                    &self,
+                    __formatter: &mut ::core::fmt::Formatter,
+                ) -> ::core::fmt::Result {
+                    ::core::fmt::Formatter::write_str(
+                        __formatter,
+                        "record GetRepositoryS3ConfigAction",
+                    )
+                }
+                #[inline]
+                fn visit_seq<__A>(
+                    self,
+                    mut __seq: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::SeqAccess<'de>,
+                {
+                    let __field0 =
+                        match __serde::de::SeqAccess::next_element::<RepositoryId>(&mut __seq)? {
+                            ::core::option::Option::Some(__value) => __value,
+                            ::core::option::Option::None => {
+                                return ::core::result::Result::Err(
+                                    __serde::de::Error::invalid_length(
+                                        0usize,
+                                        &"record with 1 fields",
+                                    ),
+                                );
+                            }
+                        };
+                    ::core::result::Result::Ok(GetRepositoryS3ConfigAction {
+                        repository_id: __field0,
+                    })
+                }
+                #[inline]
+                fn visit_map<__A>(
+                    self,
+                    mut __map: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::MapAccess<'de>,
+                {
+                    #[doc(hidden)]
+                    const __IDENTIFIERS: &'static [&'static str] = &["repositoryId"];
+                    #[doc(hidden)]
+                    const __EXPECTING_IDENTIFIERS: &'static str =
+                        "an identifier in [\"repositoryId\"]";
+                    #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
+                    #[doc(hidden)]
+                    enum __Identifier {
+                        __Identifier0,
+                        __Unknown,
+                    }
+                    #[doc(hidden)]
+                    struct __IdentifierVisitor;
+                    impl<'de> __serde::de::Visitor<'de> for __IdentifierVisitor {
+                        type Value = __Identifier;
+                        fn expecting(
+                            &self,
+                            __formatter: &mut ::core::fmt::Formatter,
+                        ) -> ::core::fmt::Result {
+                            ::core::fmt::Formatter::write_str(__formatter, __EXPECTING_IDENTIFIERS)
+                        }
+                        fn visit_u64<__E>(
+                            self,
+                            __value: u64,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                0u64 => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_str<__E>(
+                            self,
+                            __value: &str,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                "repositoryId" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
+                                }
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_bytes<__E>(
+                            self,
+                            __value: &[u8],
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                b"repositoryId" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
+                                }
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                    }
+                    impl<'de> __serde::Deserialize<'de> for __Identifier {
+                        #[inline]
+                        fn deserialize<__D>(
+                            __deserializer: __D,
+                        ) -> ::core::result::Result<Self, __D::Error>
+                        where
+                            __D: __serde::Deserializer<'de>,
+                        {
+                            __serde::Deserializer::deserialize_identifier(
+                                __deserializer,
+                                __IdentifierVisitor,
+                            )
+                        }
+                    }
+                    let mut __field0: ::core::option::Option<RepositoryId> =
+                        ::core::option::Option::None;
+                    while let ::core::option::Option::Some(__key) =
+                        __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
+                    {
+                        match __key {
+                            __Identifier::__Identifier0 => {
+                                if ::core::option::Option::is_some(&__field0) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "repositoryId",
+                                        ),
+                                    );
+                                }
+                                __field0 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<RepositoryId>(&mut __map)?,
+                                );
+                            }
+                            _ => {
+                                __serde::de::MapAccess::next_value::<__serde::de::IgnoredAny>(
+                                    &mut __map,
+                                )?;
+                            }
+                        }
+                    }
+                    let __field0 = match __field0 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                <__A::Error as __serde::de::Error>::missing_field("repositoryId"),
+                            );
+                        }
+                    };
+                    ::core::result::Result::Ok(GetRepositoryS3ConfigAction {
+                        repository_id: __field0,
+                    })
+                }
+            }
+            #[doc(hidden)]
+            const __FIELDS: &'static [&'static str] = &["repositoryId"];
+            __serde::Deserializer::deserialize_struct(
+                __deserializer,
+                "GetRepositoryS3ConfigAction",
+                __FIELDS,
+                __Visitor {
+                    __phantom_vars: ::core::marker::PhantomData,
+                },
+            )
+        }
+    }
+    #[doc = "Output of getting the S3 configuration for the repository.\n\nThis intentionally does not include the secret access key.\n"]
+    #[derive(Clone, Debug)]
+    pub struct GetRepositoryS3ConfigOutput {
+        #[doc = "S3 endpoint (e.g. https://s3.amazonaws.com or https://minio.local:9000).\n"]
+        pub s3_endpoint: ::std::option::Option<::std::string::String>,
+        #[doc = "S3 bucket name.\n"]
+        pub s3_bucket: ::std::option::Option<::std::string::String>,
+        #[doc = "AWS region (required by AWS, may be NULL for MinIO/other providers).\n"]
+        pub s3_region: ::std::option::Option<::std::string::String>,
+        #[doc = "Optional prefix inside the bucket to scope this repository.\n"]
+        pub s3_prefix: ::std::option::Option<::std::string::String>,
+        #[doc = "S3 access key ID (not sensitive, can be plain text).\n"]
+        pub s3_access_key_id: ::std::option::Option<::std::string::String>,
+    }
+    impl GetRepositoryS3ConfigOutput {
+        #[doc = "Creates a new [`GetRepositoryS3ConfigOutput`]."]
+        pub fn new() -> Self {
+            Self {
+                s3_endpoint: ::std::default::Default::default(),
+                s3_bucket: ::std::default::Default::default(),
+                s3_region: ::std::default::Default::default(),
+                s3_prefix: ::std::default::Default::default(),
+                s3_access_key_id: ::std::default::Default::default(),
+            }
+        }
+        #[doc = "Sets the value of `s3_endpoint`."]
+        pub fn set_s3_endpoint(
+            &mut self,
+            s3_endpoint: ::std::option::Option<::std::string::String>,
+        ) -> &mut Self {
+            self.s3_endpoint = s3_endpoint;
+            self
+        }
+        #[doc = "Sets the value of `s3_endpoint`."]
+        pub fn with_s3_endpoint(
+            mut self,
+            s3_endpoint: ::std::option::Option<::std::string::String>,
+        ) -> Self {
+            self.s3_endpoint = s3_endpoint;
+            self
+        }
+        #[doc = "Sets the value of `s3_bucket`."]
+        pub fn set_s3_bucket(
+            &mut self,
+            s3_bucket: ::std::option::Option<::std::string::String>,
+        ) -> &mut Self {
+            self.s3_bucket = s3_bucket;
+            self
+        }
+        #[doc = "Sets the value of `s3_bucket`."]
+        pub fn with_s3_bucket(
+            mut self,
+            s3_bucket: ::std::option::Option<::std::string::String>,
+        ) -> Self {
+            self.s3_bucket = s3_bucket;
+            self
+        }
+        #[doc = "Sets the value of `s3_region`."]
+        pub fn set_s3_region(
+            &mut self,
+            s3_region: ::std::option::Option<::std::string::String>,
+        ) -> &mut Self {
+            self.s3_region = s3_region;
+            self
+        }
+        #[doc = "Sets the value of `s3_region`."]
+        pub fn with_s3_region(
+            mut self,
+            s3_region: ::std::option::Option<::std::string::String>,
+        ) -> Self {
+            self.s3_region = s3_region;
+            self
+        }
+        #[doc = "Sets the value of `s3_prefix`."]
+        pub fn set_s3_prefix(
+            &mut self,
+            s3_prefix: ::std::option::Option<::std::string::String>,
+        ) -> &mut Self {
+            self.s3_prefix = s3_prefix;
+            self
+        }
+        #[doc = "Sets the value of `s3_prefix`."]
+        pub fn with_s3_prefix(
+            mut self,
+            s3_prefix: ::std::option::Option<::std::string::String>,
+        ) -> Self {
+            self.s3_prefix = s3_prefix;
+            self
+        }
+        #[doc = "Sets the value of `s3_access_key_id`."]
+        pub fn set_s3_access_key_id(
+            &mut self,
+            s3_access_key_id: ::std::option::Option<::std::string::String>,
+        ) -> &mut Self {
+            self.s3_access_key_id = s3_access_key_id;
+            self
+        }
+        #[doc = "Sets the value of `s3_access_key_id`."]
+        pub fn with_s3_access_key_id(
+            mut self,
+            s3_access_key_id: ::std::option::Option<::std::string::String>,
+        ) -> Self {
+            self.s3_access_key_id = s3_access_key_id;
+            self
+        }
+    }
+    impl ::std::default::Default for GetRepositoryS3ConfigOutput {
+        fn default() -> Self {
+            Self::new()
+        }
+    }
+    #[automatically_derived]
+    impl __serde::Serialize for GetRepositoryS3ConfigOutput {
+        fn serialize<__S: __serde::Serializer>(
+            &self,
+            __serializer: __S,
+        ) -> ::std::result::Result<__S::Ok, __S::Error> {
+            let mut __record = __sidex_serde::ser::RecordSerializer::new(
+                __serializer,
+                "GetRepositoryS3ConfigOutput",
+                5usize,
+            )?;
+            __record.serialize_optional_field(
+                "s3Endpoint",
+                ::core::option::Option::as_ref(&self.s3_endpoint),
+            )?;
+            __record.serialize_optional_field(
+                "s3Bucket",
+                ::core::option::Option::as_ref(&self.s3_bucket),
+            )?;
+            __record.serialize_optional_field(
+                "s3Region",
+                ::core::option::Option::as_ref(&self.s3_region),
+            )?;
+            __record.serialize_optional_field(
+                "s3Prefix",
+                ::core::option::Option::as_ref(&self.s3_prefix),
+            )?;
+            __record.serialize_optional_field(
+                "s3AccessKeyId",
+                ::core::option::Option::as_ref(&self.s3_access_key_id),
+            )?;
+            __record.end()
+        }
+    }
+    #[automatically_derived]
+    impl<'de> __serde::Deserialize<'de> for GetRepositoryS3ConfigOutput {
+        fn deserialize<__D: __serde::Deserializer<'de>>(
+            __deserializer: __D,
+        ) -> ::std::result::Result<Self, __D::Error> {
+            #[doc(hidden)]
+            struct __Visitor {
+                __phantom_vars: ::core::marker::PhantomData<fn(&())>,
+            }
+            impl<'de> __serde::de::Visitor<'de> for __Visitor {
+                type Value = GetRepositoryS3ConfigOutput;
+                fn expecting(
+                    &self,
+                    __formatter: &mut ::core::fmt::Formatter,
+                ) -> ::core::fmt::Result {
+                    ::core::fmt::Formatter::write_str(
+                        __formatter,
+                        "record GetRepositoryS3ConfigOutput",
+                    )
+                }
+                #[inline]
+                fn visit_seq<__A>(
+                    self,
+                    mut __seq: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::SeqAccess<'de>,
+                {
+                    let __field0 = match __serde::de::SeqAccess::next_element::<
+                        ::std::option::Option<::std::string::String>,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(0usize, &"record with 5 fields"),
+                            );
+                        }
+                    };
+                    let __field1 = match __serde::de::SeqAccess::next_element::<
+                        ::std::option::Option<::std::string::String>,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(1usize, &"record with 5 fields"),
+                            );
+                        }
+                    };
+                    let __field2 = match __serde::de::SeqAccess::next_element::<
+                        ::std::option::Option<::std::string::String>,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(2usize, &"record with 5 fields"),
+                            );
+                        }
+                    };
+                    let __field3 = match __serde::de::SeqAccess::next_element::<
+                        ::std::option::Option<::std::string::String>,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(3usize, &"record with 5 fields"),
+                            );
+                        }
+                    };
+                    let __field4 = match __serde::de::SeqAccess::next_element::<
+                        ::std::option::Option<::std::string::String>,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(4usize, &"record with 5 fields"),
+                            );
+                        }
+                    };
+                    ::core::result::Result::Ok(GetRepositoryS3ConfigOutput {
+                        s3_endpoint: __field0,
+                        s3_bucket: __field1,
+                        s3_region: __field2,
+                        s3_prefix: __field3,
+                        s3_access_key_id: __field4,
+                    })
+                }
+                #[inline]
+                fn visit_map<__A>(
+                    self,
+                    mut __map: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::MapAccess<'de>,
+                {
+                    #[doc(hidden)]
+                    const __IDENTIFIERS: &'static [&'static str] = &[
+                        "s3Endpoint",
+                        "s3Bucket",
+                        "s3Region",
+                        "s3Prefix",
+                        "s3AccessKeyId",
+                    ];
+                    #[doc(hidden)]
+                    const __EXPECTING_IDENTIFIERS: &'static str = "an identifier in [\"s3Endpoint\", \"s3Bucket\", \"s3Region\", \"s3Prefix\", \"s3AccessKeyId\"]";
+                    #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
+                    #[doc(hidden)]
+                    enum __Identifier {
+                        __Identifier0,
+                        __Identifier1,
+                        __Identifier2,
+                        __Identifier3,
+                        __Identifier4,
+                        __Unknown,
+                    }
+                    #[doc(hidden)]
+                    struct __IdentifierVisitor;
+                    impl<'de> __serde::de::Visitor<'de> for __IdentifierVisitor {
+                        type Value = __Identifier;
+                        fn expecting(
+                            &self,
+                            __formatter: &mut ::core::fmt::Formatter,
+                        ) -> ::core::fmt::Result {
+                            ::core::fmt::Formatter::write_str(__formatter, __EXPECTING_IDENTIFIERS)
+                        }
+                        fn visit_u64<__E>(
+                            self,
+                            __value: u64,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                0u64 => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                                1u64 => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                                2u64 => ::core::result::Result::Ok(__Identifier::__Identifier2),
+                                3u64 => ::core::result::Result::Ok(__Identifier::__Identifier3),
+                                4u64 => ::core::result::Result::Ok(__Identifier::__Identifier4),
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_str<__E>(
+                            self,
+                            __value: &str,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                "s3Endpoint" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
+                                }
+                                "s3Bucket" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier1)
+                                }
+                                "s3Region" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier2)
+                                }
+                                "s3Prefix" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier3)
+                                }
+                                "s3AccessKeyId" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier4)
+                                }
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_bytes<__E>(
+                            self,
+                            __value: &[u8],
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                b"s3Endpoint" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
+                                }
+                                b"s3Bucket" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier1)
+                                }
+                                b"s3Region" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier2)
+                                }
+                                b"s3Prefix" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier3)
+                                }
+                                b"s3AccessKeyId" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier4)
+                                }
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                    }
+                    impl<'de> __serde::Deserialize<'de> for __Identifier {
+                        #[inline]
+                        fn deserialize<__D>(
+                            __deserializer: __D,
+                        ) -> ::core::result::Result<Self, __D::Error>
+                        where
+                            __D: __serde::Deserializer<'de>,
+                        {
+                            __serde::Deserializer::deserialize_identifier(
+                                __deserializer,
+                                __IdentifierVisitor,
+                            )
+                        }
+                    }
+                    let mut __field0: ::core::option::Option<
+                        ::std::option::Option<::std::string::String>,
+                    > = ::core::option::Option::None;
+                    let mut __field1: ::core::option::Option<
+                        ::std::option::Option<::std::string::String>,
+                    > = ::core::option::Option::None;
+                    let mut __field2: ::core::option::Option<
+                        ::std::option::Option<::std::string::String>,
+                    > = ::core::option::Option::None;
+                    let mut __field3: ::core::option::Option<
+                        ::std::option::Option<::std::string::String>,
+                    > = ::core::option::Option::None;
+                    let mut __field4: ::core::option::Option<
+                        ::std::option::Option<::std::string::String>,
+                    > = ::core::option::Option::None;
+                    while let ::core::option::Option::Some(__key) =
+                        __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
+                    {
+                        match __key {
+                            __Identifier::__Identifier0 => {
+                                if ::core::option::Option::is_some(&__field0) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "s3Endpoint",
+                                        ),
+                                    );
+                                }
+                                __field0 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<
+                                        ::std::option::Option<::std::string::String>,
+                                    >(&mut __map)?,
+                                );
+                            }
+                            __Identifier::__Identifier1 => {
+                                if ::core::option::Option::is_some(&__field1) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "s3Bucket",
+                                        ),
+                                    );
+                                }
+                                __field1 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<
+                                        ::std::option::Option<::std::string::String>,
+                                    >(&mut __map)?,
+                                );
+                            }
+                            __Identifier::__Identifier2 => {
+                                if ::core::option::Option::is_some(&__field2) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "s3Region",
+                                        ),
+                                    );
+                                }
+                                __field2 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<
+                                        ::std::option::Option<::std::string::String>,
+                                    >(&mut __map)?,
+                                );
+                            }
+                            __Identifier::__Identifier3 => {
+                                if ::core::option::Option::is_some(&__field3) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "s3Prefix",
+                                        ),
+                                    );
+                                }
+                                __field3 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<
+                                        ::std::option::Option<::std::string::String>,
+                                    >(&mut __map)?,
+                                );
+                            }
+                            __Identifier::__Identifier4 => {
+                                if ::core::option::Option::is_some(&__field4) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "s3AccessKeyId",
+                                        ),
+                                    );
+                                }
+                                __field4 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<
+                                        ::std::option::Option<::std::string::String>,
+                                    >(&mut __map)?,
+                                );
+                            }
+                            _ => {
+                                __serde::de::MapAccess::next_value::<__serde::de::IgnoredAny>(
+                                    &mut __map,
+                                )?;
+                            }
+                        }
+                    }
+                    let __field0 = match __field0 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => ::core::option::Option::None,
+                    };
+                    let __field1 = match __field1 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => ::core::option::Option::None,
+                    };
+                    let __field2 = match __field2 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => ::core::option::Option::None,
+                    };
+                    let __field3 = match __field3 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => ::core::option::Option::None,
+                    };
+                    let __field4 = match __field4 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => ::core::option::Option::None,
+                    };
+                    ::core::result::Result::Ok(GetRepositoryS3ConfigOutput {
+                        s3_endpoint: __field0,
+                        s3_bucket: __field1,
+                        s3_region: __field2,
+                        s3_prefix: __field3,
+                        s3_access_key_id: __field4,
+                    })
+                }
+            }
+            #[doc(hidden)]
+            const __FIELDS: &'static [&'static str] = &[
+                "s3Endpoint",
+                "s3Bucket",
+                "s3Region",
+                "s3Prefix",
+                "s3AccessKeyId",
+            ];
+            __serde::Deserializer::deserialize_struct(
+                __deserializer,
+                "GetRepositoryS3ConfigOutput",
+                __FIELDS,
+                __Visitor {
+                    __phantom_vars: ::core::marker::PhantomData,
+                },
+            )
+        }
+    }
     #[doc = "Get information about an asset.\n"]
     #[derive(Clone, Debug)]
     pub struct GetAssetDetailsAction {

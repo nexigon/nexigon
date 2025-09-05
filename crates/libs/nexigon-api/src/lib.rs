@@ -176,6 +176,9 @@ macro_rules! with_actions {
             ("repositories_TagPackageVersion", TagPackageVersion, repositories::TagPackageVersionAction, outputs::Empty),
             ("repositories_UntagPackageVersion", UntagPackageVersion, repositories::UntagPackageVersionAction, outputs::Empty),
             ("repositories_ResolvePackageVersionAssetByPath", ResolvePackageVersionAssetByPath, repositories::ResolvePackageVersionAssetByPathAction, repositories::ResolvePackageVersionAssetByPathOutput),
+            // ## S3 Config
+            ("repositories_SetRepositoryS3Config", SetRepositoryS3Credentials, repositories::SetRepositoryS3ConfigAction, outputs::Empty),
+            ("repositories_GetRepositoryS3Config", GetRepositoryS3Credentials, repositories::GetRepositoryS3ConfigAction, repositories::GetRepositoryS3ConfigOutput),
             // ## Assets
             ("repositories_GetAssetDetails", GetAssetDetails, repositories::GetAssetDetailsAction, repositories::GetAssetDetailsOutput),
             ("repositories_CreateAsset", CreateAsset, repositories::CreateAssetAction, repositories::CreateAssetOutput),
