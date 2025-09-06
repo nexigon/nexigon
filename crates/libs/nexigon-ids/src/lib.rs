@@ -449,6 +449,10 @@ define_types! {
     /// Uniquely identifies an invitation to a project.
     ProjectInvitationId => (FlatRawId, "p_invite", 22, secret = false),
 
+    /// Organization id (globally unique).
+    OrganizationId => (FlatRawId, "org", 22, secret = false),
+    /// Uniquely identifies an invitation to an organization.
+    OrganizationInvitationId => (FlatRawId, "org_invite", 22, secret = false),
 
     /// Deployment token (globally unique).
     ///

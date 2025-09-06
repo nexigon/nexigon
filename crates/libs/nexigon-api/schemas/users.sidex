@@ -3,6 +3,7 @@
 import actor::Actor
 import datetime::Timestamp
 import devices::DeviceId
+import organizations::OrganizationId
 import projects::ProjectId
 import projects::ProjectInvitationId
 import repositories::RepositoryId
@@ -151,26 +152,24 @@ record QueryUserTokensItem {
     name?: string,
 }
 
-/// Query the projects of a user.
-record QueryUserProjectsAction {
+/// Query the organizations of a user.
+record QueryUserOrganizationsAction {
     /// User ID.
     user_id: UserId,
 }
 
-/// Output of querying the projects of a user.
-record QueryUserProjectsOutput {
+/// Output of querying the organizations of a user.
+record QueryUserOrganizationsOutput {
     /// List of projects.
-    projects: [QueryUserProjectsItem],
+    organizations: [QueryUserOrganizationsItem],
 }
 
-/// Project item.
-record QueryUserProjectsItem {
-    /// ID of the project.
-    project_id: ProjectId,
-    /// Name of the project.
+/// Organization item.
+record QueryUserOrganizationsItem {
+    /// ID of the organization.
+    organization_id: OrganizationId,
+    /// Name of the organization.
     name: string,
-    /// Number of devices in the project.
-    devices: u32,
 }
 
 /// Query the project invitations of a user.
@@ -227,32 +226,6 @@ record QueryUserRepositoryInvitationsItemRepository {
     repository_id: RepositoryId,
     /// Name of the repository.
     name: string,
-}
-
-/// Query the repositories of a user.
-record QueryUserRepositoriesAction {
-    /// ID of the user.
-    user_id: UserId,
-}
-
-/// Output of querying the repositories of a user.
-record QueryUserRepositoriesOutput {
-    /// List of repositories.
-    repositories: [QueryUserRepositoriesItem],
-}
-
-/// Repository item.
-record QueryUserRepositoriesItem {
-    /// ID of the repository.
-    repository_id: RepositoryId,
-    /// Public name of the repository.
-    name: string,
-    /// Timestamp when the repository was created.
-    created_at: Timestamp,
-    /// Number of packages in the repository.
-    package_count: u32,
-    /// Indicates whether the user is an owner of the repository.
-    is_owner: bool,
 }
 
 /// Query the sessions of a user.

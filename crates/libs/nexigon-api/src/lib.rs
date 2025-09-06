@@ -72,10 +72,9 @@ macro_rules! with_actions {
             ("users_SetUserDisplayName", SetUserDisplayName, users::SetUserDisplayNameAction, outputs::Empty),
             ("users_SetUserPassword", SetUserPassword, users::SetUserPasswordAction, outputs::Empty),
             ("users_SetUserIsAdmin", SetUserIsAdmin, users::SetUserIsAdminAction, outputs::Empty),
+            ("users_QueryUserOrganizations", QueryUserOrganizations, users::QueryUserOrganizationsAction, users::QueryUserOrganizationsOutput),
             ("users_QueryUserTokens", QueryUserTokens, users::QueryUserTokensAction, users::QueryUserTokensOutput),
-            ("users_QueryUserProjects", QueryUserProjects, users::QueryUserProjectsAction, users::QueryUserProjectsOutput),
             ("users_QueryUserProjectInvitations", QueryUserProjectInvitations, users::QueryUserProjectInvitationsAction, users::QueryUserProjectInvitationsOutput),
-            ("users_QueryUserRepositories", QueryUserRepositories, users::QueryUserRepositoriesAction, users::QueryUserRepositoriesOutput),
             ("users_QueryUserRepositoryInvitations", QueryUserRepositoryInvitations, users::QueryUserRepositoryInvitationsAction, users::QueryUserRepositoryInvitationsOutput),
             ("users_QueryUserSessions", QueryUserSessions, users::QueryUserSessionsAction, users::QueryUserSessionsOutput),
             ("users_AuthenticateWithUserToken", AuthenticateWithUserToken, users::AuthenticateWithUserTokenAction, users::AuthenticateWithUserTokenOutput),
@@ -144,6 +143,20 @@ macro_rules! with_actions {
             // # Device Events
             ("devices_PublishDeviceEvents", PublishDeviceEvents, devices::PublishDeviceEventsAction, outputs::Empty),
             ("devices_QueryDeviceEvents", QueryDeviceEvents, devices::QueryDeviceEventsAction, devices::QueryDeviceEventsOutput),
+
+            // # Organizations
+            ("organizations_QueryOrganizations", QueryOrganizations, organizations::QueryOrganizationsAction, organizations::QueryOrganizationsOutput),
+            ("organizations_GetOrganizationDetails", GetOrganizationDetails, organizations::GetOrganizationDetailsAction, organizations::GetOrganizationDetailsOutput),
+            ("organizations_CreateOrganization", CreateOrganization, organizations::CreateOrganizationAction, organizations::CreateOrganizationOutput),
+            ("organizations_DeleteOrganization", DeleteOrganization, organizations::DeleteOrganizationAction, outputs::Empty),
+            ("organizations_QueryOrganizationProjects", QueryOrganizationProjects, organizations::QueryOrganizationProjectsAction, organizations::QueryOrganizationProjectsOutput),
+            ("organizations_QueryOrganizationRepositories", QueryOrganizationRepositories, organizations::QueryOrganizationRepositoriesAction, organizations::QueryOrganizationRepositoriesOutput),
+            ("organizations_QueryOrganizationMembers", QueryOrganizationMembers, organizations::QueryOrganizationMembersAction, organizations::QueryOrganizationMembersOutput),
+            ("organizations_QueryOrganizationInvitations", QueryOrganizationInvitations, organizations::QueryOrganizationInvitationsAction, organizations::QueryOrganizationInvitationsOutput),
+            ("organizations_AddOrganizationMember", AddOrganizationMember, organizations::AddOrganizationMemberAction, outputs::Empty),
+            ("organizations_RemoveOrganizationMember", RemoveOrganizationMember, organizations::RemoveOrganizationMemberAction, outputs::Empty),
+            ("organizations_InviteOrganizationMember", InviteOrganizationMember, organizations::InviteOrganizationMemberAction, organizations::InviteOrganizationMemberOutput),
+            ("organizations_DeleteOrganizationInvitation", DeleteOrganizationInvitation, organizations::DeleteOrganizationInvitationAction, outputs::Empty),
 
             // # Repositories
             ("repositories_ResolveRepositoryName", ResolveRepositoryName, repositories::ResolveRepositoryNameAction, repositories::ResolveRepositoryNameOutput),

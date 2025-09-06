@@ -1,0 +1,197 @@
+//! Actions and types related to organizations.
+
+import datetime::Timestamp
+import projects::ProjectId
+import repositories::RepositoryId
+import users::UserId
+
+/// Unique ID of an organization.
+#[rust(type = "nexigon_ids::ids::OrganizationId")]
+#[json(type = "string")]
+opaque OrganizationId
+
+/// Unique ID of an invitation to an organization.
+#[rust(type = "nexigon_ids::ids::OrganizationInvitationId")]
+#[json(type = "string")]
+opaque OrganizationInvitationId
+
+/// Query the organizations of the instance.
+record QueryOrganizationsAction { }
+
+/// Output of querying the organizations of the instance.
+record QueryOrganizationsOutput {
+    /// List of organizations.
+    organizations: [QueryOrganizationsItem],
+}
+
+/// Organization item.
+record QueryOrganizationsItem {
+    /// ID of the organization.
+    organization_id: OrganizationId,
+    /// Name of the organization.
+    name: string,
+}
+
+/// Get information about an organization.
+record GetOrganizationDetailsAction {
+    /// ID of the organization.
+    organization_id: OrganizationId,
+}
+
+/// Information about an organization.
+record GetOrganizationDetailsOutput {
+    /// ID of the organization.
+    organization_id: OrganizationId,
+    /// Name of the organization.
+    name: string,
+    /// Timestamp when the organization was created.
+    created_at: Timestamp,
+}
+
+/// Create an organization.
+record CreateOrganizationAction {
+    /// Name of the organization.
+    name: string,
+    /// Owner of the organization.
+    owner?: UserId,
+}
+
+/// Output of creating an organization.
+record CreateOrganizationOutput {
+    /// ID of the organization.
+    organization_id: OrganizationId,
+}
+
+/// Delete an organization.
+record DeleteOrganizationAction {
+    /// ID of the organization.
+    organization_id: OrganizationId,
+}
+
+/// Query the projects of an organization.
+record QueryOrganizationProjectsAction {
+    /// Organization ID.
+    organization_id: OrganizationId,
+}
+
+/// Output of querying the projects of an organization.
+record QueryOrganizationProjectsOutput {
+    /// List of projects.
+    projects: [QueryOrganizationProjectsItem],
+}
+
+/// Project item.
+record QueryOrganizationProjectsItem {
+    /// ID of the project.
+    project_id: ProjectId,
+    /// Name of the project.
+    name: string,
+    /// Number of devices in the project.
+    devices: u32,
+}
+
+/// Query the repositories of an organization.
+record QueryOrganizationRepositoriesAction {
+    /// ID of the organization.
+    organization_id: OrganizationId,
+}
+
+/// Output of querying the repositories of an organization.
+record QueryOrganizationRepositoriesOutput {
+    /// List of repositories.
+    repositories: [QueryOrganizationRepositoriesItem],
+}
+
+/// Repository item.
+record QueryOrganizationRepositoriesItem {
+    /// ID of the repository.
+    repository_id: RepositoryId,
+    /// Public name of the repository.
+    name: string,
+    /// Timestamp when the repository was created.
+    created_at: Timestamp,
+}
+
+/// Query the members of an organization.
+record QueryOrganizationMembersAction {
+    /// ID of the organization.
+    organization_id: OrganizationId,
+}
+
+/// Output of querying the members of an organization.
+record QueryOrganizationMembersOutput {
+    /// List of members.
+    members: [QueryOrganizationMembersItem],
+}
+
+/// Member item.
+record QueryOrganizationMembersItem {
+    /// ID of the user.
+    user_id: UserId,
+    /// Name of the user.
+    display_name?: string,
+    /// Email of the user.
+    email: string,
+    /// Whether the user is an owner of the organization.
+    is_owner: bool,
+}
+
+/// Query the invitations of an organization.
+record QueryOrganizationInvitationsAction {
+    /// ID of the organization.
+    organization_id: OrganizationId,
+}
+
+/// Output of querying the invitations of an organization.
+record QueryOrganizationInvitationsOutput {
+    /// List of invitations.
+    invitations: [QueryOrganizationInvitationsItem],
+}
+
+/// Query organization invitations.
+record QueryOrganizationInvitationsItem {
+    /// ID of the invitation.
+    invitation_id: OrganizationInvitationId,
+    /// Email address of the invitation.
+    email: string,
+    /// ID of the inviting user.
+    inviting_user_id?: UserId,
+}
+
+/// Add a user to an organization.
+record AddOrganizationMemberAction {
+    /// ID of the organization.
+    organization_id: OrganizationId,
+    /// ID of the user to add.
+    user_id: UserId,
+    /// Whether the user should be an owner of the organization.
+    is_owner?: bool,
+}
+
+/// Remove a user from an organization.
+record RemoveOrganizationMemberAction {
+    /// ID of the organization.
+    organization_id: OrganizationId,
+    /// ID of the user.
+    user_id: UserId,
+}
+
+/// Invite a user to an organization.
+record InviteOrganizationMemberAction {
+    /// ID of the organization.
+    organization_id: OrganizationId,
+    /// Email address of the user to invite.
+    email: string,
+}
+
+/// Output of inviting a user to an organization.
+record InviteOrganizationMemberOutput {
+    /// ID of the invitation.
+    invitation_id: OrganizationInvitationId,
+}
+
+/// Delete an invitation to an organization.
+record DeleteOrganizationInvitationAction {
+    /// ID of the invitation.
+    invitation_id: OrganizationInvitationId,
+}

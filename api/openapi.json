@@ -216,6 +216,36 @@
         }
       }
     },
+    "/api/v1/actions/invoke/users_QueryUserOrganizations": {
+      "post": {
+        "tags": [
+          "users"
+        ],
+        "summary": "QueryUserOrganizations",
+        "description": "Query the organizations of a user.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/nexigon_api.users.QueryUserOrganizationsAction"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/nexigon_api.users.QueryUserOrganizationsOutput"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/actions/invoke/users_QueryUserTokens": {
       "post": {
         "tags": [
@@ -246,36 +276,6 @@
         }
       }
     },
-    "/api/v1/actions/invoke/users_QueryUserProjects": {
-      "post": {
-        "tags": [
-          "users"
-        ],
-        "summary": "QueryUserProjects",
-        "description": "Query the projects of a user.",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/nexigon_api.users.QueryUserProjectsAction"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/nexigon_api.users.QueryUserProjectsOutput"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/api/v1/actions/invoke/users_QueryUserProjectInvitations": {
       "post": {
         "tags": [
@@ -299,36 +299,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/nexigon_api.users.QueryUserProjectInvitationsOutput"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v1/actions/invoke/users_QueryUserRepositories": {
-      "post": {
-        "tags": [
-          "users"
-        ],
-        "summary": "QueryUserRepositories",
-        "description": "Query the repositories of a user.",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/nexigon_api.users.QueryUserRepositoriesAction"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/nexigon_api.users.QueryUserRepositoriesOutput"
                 }
               }
             }
@@ -1896,6 +1866,366 @@
         }
       }
     },
+    "/api/v1/actions/invoke/organizations_QueryOrganizations": {
+      "post": {
+        "tags": [
+          "organizations"
+        ],
+        "summary": "QueryOrganizations",
+        "description": "Query the organizations of the instance.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/nexigon_api.organizations.QueryOrganizationsAction"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/nexigon_api.organizations.QueryOrganizationsOutput"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/actions/invoke/organizations_GetOrganizationDetails": {
+      "post": {
+        "tags": [
+          "organizations"
+        ],
+        "summary": "GetOrganizationDetails",
+        "description": "Get information about an organization.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/nexigon_api.organizations.GetOrganizationDetailsAction"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/nexigon_api.organizations.GetOrganizationDetailsOutput"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/actions/invoke/organizations_CreateOrganization": {
+      "post": {
+        "tags": [
+          "organizations"
+        ],
+        "summary": "CreateOrganization",
+        "description": "Create an organization.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/nexigon_api.organizations.CreateOrganizationAction"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/nexigon_api.organizations.CreateOrganizationOutput"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/actions/invoke/organizations_DeleteOrganization": {
+      "post": {
+        "tags": [
+          "organizations"
+        ],
+        "summary": "DeleteOrganization",
+        "description": "Delete an organization.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/nexigon_api.organizations.DeleteOrganizationAction"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/nexigon_api.outputs.Empty"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/actions/invoke/organizations_QueryOrganizationProjects": {
+      "post": {
+        "tags": [
+          "organizations"
+        ],
+        "summary": "QueryOrganizationProjects",
+        "description": "Query the projects of an organization.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/nexigon_api.organizations.QueryOrganizationProjectsAction"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/nexigon_api.organizations.QueryOrganizationProjectsOutput"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/actions/invoke/organizations_QueryOrganizationRepositories": {
+      "post": {
+        "tags": [
+          "organizations"
+        ],
+        "summary": "QueryOrganizationRepositories",
+        "description": "Query the repositories of an organization.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/nexigon_api.organizations.QueryOrganizationRepositoriesAction"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/nexigon_api.organizations.QueryOrganizationRepositoriesOutput"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/actions/invoke/organizations_QueryOrganizationMembers": {
+      "post": {
+        "tags": [
+          "organizations"
+        ],
+        "summary": "QueryOrganizationMembers",
+        "description": "Query the members of an organization.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/nexigon_api.organizations.QueryOrganizationMembersAction"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/nexigon_api.organizations.QueryOrganizationMembersOutput"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/actions/invoke/organizations_QueryOrganizationInvitations": {
+      "post": {
+        "tags": [
+          "organizations"
+        ],
+        "summary": "QueryOrganizationInvitations",
+        "description": "Query the invitations of an organization.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/nexigon_api.organizations.QueryOrganizationInvitationsAction"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/nexigon_api.organizations.QueryOrganizationInvitationsOutput"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/actions/invoke/organizations_AddOrganizationMember": {
+      "post": {
+        "tags": [
+          "organizations"
+        ],
+        "summary": "AddOrganizationMember",
+        "description": "Add a user to an organization.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/nexigon_api.organizations.AddOrganizationMemberAction"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/nexigon_api.outputs.Empty"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/actions/invoke/organizations_RemoveOrganizationMember": {
+      "post": {
+        "tags": [
+          "organizations"
+        ],
+        "summary": "RemoveOrganizationMember",
+        "description": "Remove a user from an organization.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/nexigon_api.organizations.RemoveOrganizationMemberAction"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/nexigon_api.outputs.Empty"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/actions/invoke/organizations_InviteOrganizationMember": {
+      "post": {
+        "tags": [
+          "organizations"
+        ],
+        "summary": "InviteOrganizationMember",
+        "description": "Invite a user to an organization.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/nexigon_api.organizations.InviteOrganizationMemberAction"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/nexigon_api.organizations.InviteOrganizationMemberOutput"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/actions/invoke/organizations_DeleteOrganizationInvitation": {
+      "post": {
+        "tags": [
+          "organizations"
+        ],
+        "summary": "DeleteOrganizationInvitation",
+        "description": "Delete an invitation to an organization.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/nexigon_api.organizations.DeleteOrganizationInvitationAction"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/nexigon_api.outputs.Empty"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/actions/invoke/repositories_ResolveRepositoryName": {
       "post": {
         "tags": [
@@ -2741,7 +3071,7 @@
         "tags": [
           "repositories"
         ],
-        "summary": "SetRepositoryS3Credentials",
+        "summary": "SetRepositoryS3Config",
         "description": "Set the S3 configuration for the repository.",
         "requestBody": {
           "content": {
@@ -2771,7 +3101,7 @@
         "tags": [
           "repositories"
         ],
-        "summary": "GetRepositoryS3Credentials",
+        "summary": "GetRepositoryS3Config",
         "description": "Get the S3 configuration for the repository.",
         "requestBody": {
           "content": {
@@ -4801,6 +5131,401 @@
       },
       "nexigon_api.json.JsonValue": {
         "description": "JSON value."
+      },
+      "nexigon_api.organizations.AddOrganizationMemberAction": {
+        "type": "object",
+        "properties": {
+          "organizationId": {
+            "$ref": "#/components/schemas/nexigon_api.organizations.OrganizationId"
+          },
+          "userId": {
+            "$ref": "#/components/schemas/nexigon_api.users.UserId"
+          },
+          "isOwner": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "organizationId",
+          "userId"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.organizations.CreateOrganizationAction": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "owner": {
+            "$ref": "#/components/schemas/nexigon_api.users.UserId"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.organizations.CreateOrganizationOutput": {
+        "type": "object",
+        "description": "Output of creating an organization.",
+        "properties": {
+          "organizationId": {
+            "$ref": "#/components/schemas/nexigon_api.organizations.OrganizationId"
+          }
+        },
+        "required": [
+          "organizationId"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.organizations.DeleteOrganizationAction": {
+        "type": "object",
+        "properties": {
+          "organizationId": {
+            "$ref": "#/components/schemas/nexigon_api.organizations.OrganizationId"
+          }
+        },
+        "required": [
+          "organizationId"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.organizations.DeleteOrganizationInvitationAction": {
+        "type": "object",
+        "properties": {
+          "invitationId": {
+            "$ref": "#/components/schemas/nexigon_api.organizations.OrganizationInvitationId"
+          }
+        },
+        "required": [
+          "invitationId"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.organizations.GetOrganizationDetailsAction": {
+        "type": "object",
+        "properties": {
+          "organizationId": {
+            "$ref": "#/components/schemas/nexigon_api.organizations.OrganizationId"
+          }
+        },
+        "required": [
+          "organizationId"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.organizations.GetOrganizationDetailsOutput": {
+        "type": "object",
+        "description": "Information about an organization.",
+        "properties": {
+          "organizationId": {
+            "$ref": "#/components/schemas/nexigon_api.organizations.OrganizationId"
+          },
+          "name": {
+            "type": "string"
+          },
+          "createdAt": {
+            "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
+          }
+        },
+        "required": [
+          "organizationId",
+          "name",
+          "createdAt"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.organizations.InviteOrganizationMemberAction": {
+        "type": "object",
+        "properties": {
+          "organizationId": {
+            "$ref": "#/components/schemas/nexigon_api.organizations.OrganizationId"
+          },
+          "email": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "organizationId",
+          "email"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.organizations.InviteOrganizationMemberOutput": {
+        "type": "object",
+        "description": "Output of inviting a user to an organization.",
+        "properties": {
+          "invitationId": {
+            "$ref": "#/components/schemas/nexigon_api.organizations.OrganizationInvitationId"
+          }
+        },
+        "required": [
+          "invitationId"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.organizations.OrganizationId": {
+        "type": "string",
+        "description": "Unique ID of an organization."
+      },
+      "nexigon_api.organizations.OrganizationInvitationId": {
+        "type": "string",
+        "description": "Unique ID of an invitation to an organization."
+      },
+      "nexigon_api.organizations.QueryOrganizationInvitationsAction": {
+        "type": "object",
+        "properties": {
+          "organizationId": {
+            "$ref": "#/components/schemas/nexigon_api.organizations.OrganizationId"
+          }
+        },
+        "required": [
+          "organizationId"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.organizations.QueryOrganizationInvitationsItem": {
+        "type": "object",
+        "description": "Query organization invitations.",
+        "properties": {
+          "invitationId": {
+            "$ref": "#/components/schemas/nexigon_api.organizations.OrganizationInvitationId"
+          },
+          "email": {
+            "type": "string"
+          },
+          "invitingUserId": {
+            "$ref": "#/components/schemas/nexigon_api.users.UserId"
+          }
+        },
+        "required": [
+          "invitationId",
+          "email"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.organizations.QueryOrganizationInvitationsOutput": {
+        "type": "object",
+        "description": "Output of querying the invitations of an organization.",
+        "properties": {
+          "invitations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/nexigon_api.organizations.QueryOrganizationInvitationsItem"
+            }
+          }
+        },
+        "required": [
+          "invitations"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.organizations.QueryOrganizationMembersAction": {
+        "type": "object",
+        "properties": {
+          "organizationId": {
+            "$ref": "#/components/schemas/nexigon_api.organizations.OrganizationId"
+          }
+        },
+        "required": [
+          "organizationId"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.organizations.QueryOrganizationMembersItem": {
+        "type": "object",
+        "description": "Member item.",
+        "properties": {
+          "userId": {
+            "$ref": "#/components/schemas/nexigon_api.users.UserId"
+          },
+          "displayName": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "isOwner": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "userId",
+          "email",
+          "isOwner"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.organizations.QueryOrganizationMembersOutput": {
+        "type": "object",
+        "description": "Output of querying the members of an organization.",
+        "properties": {
+          "members": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/nexigon_api.organizations.QueryOrganizationMembersItem"
+            }
+          }
+        },
+        "required": [
+          "members"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.organizations.QueryOrganizationProjectsAction": {
+        "type": "object",
+        "properties": {
+          "organizationId": {
+            "$ref": "#/components/schemas/nexigon_api.organizations.OrganizationId"
+          }
+        },
+        "required": [
+          "organizationId"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.organizations.QueryOrganizationProjectsItem": {
+        "type": "object",
+        "description": "Project item.",
+        "properties": {
+          "projectId": {
+            "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+          },
+          "name": {
+            "type": "string"
+          },
+          "devices": {
+            "type": "integer",
+            "format": "uint32"
+          }
+        },
+        "required": [
+          "projectId",
+          "name",
+          "devices"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.organizations.QueryOrganizationProjectsOutput": {
+        "type": "object",
+        "description": "Output of querying the projects of an organization.",
+        "properties": {
+          "projects": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/nexigon_api.organizations.QueryOrganizationProjectsItem"
+            }
+          }
+        },
+        "required": [
+          "projects"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.organizations.QueryOrganizationRepositoriesAction": {
+        "type": "object",
+        "properties": {
+          "organizationId": {
+            "$ref": "#/components/schemas/nexigon_api.organizations.OrganizationId"
+          }
+        },
+        "required": [
+          "organizationId"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.organizations.QueryOrganizationRepositoriesItem": {
+        "type": "object",
+        "description": "Repository item.",
+        "properties": {
+          "repositoryId": {
+            "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryId"
+          },
+          "name": {
+            "type": "string"
+          },
+          "createdAt": {
+            "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
+          }
+        },
+        "required": [
+          "repositoryId",
+          "name",
+          "createdAt"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.organizations.QueryOrganizationRepositoriesOutput": {
+        "type": "object",
+        "description": "Output of querying the repositories of an organization.",
+        "properties": {
+          "repositories": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/nexigon_api.organizations.QueryOrganizationRepositoriesItem"
+            }
+          }
+        },
+        "required": [
+          "repositories"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.organizations.QueryOrganizationsAction": {
+        "type": "object",
+        "properties": {},
+        "required": [],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.organizations.QueryOrganizationsItem": {
+        "type": "object",
+        "description": "Organization item.",
+        "properties": {
+          "organizationId": {
+            "$ref": "#/components/schemas/nexigon_api.organizations.OrganizationId"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "organizationId",
+          "name"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.organizations.QueryOrganizationsOutput": {
+        "type": "object",
+        "description": "Output of querying the organizations of the instance.",
+        "properties": {
+          "organizations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/nexigon_api.organizations.QueryOrganizationsItem"
+            }
+          }
+        },
+        "required": [
+          "organizations"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.organizations.RemoveOrganizationMemberAction": {
+        "type": "object",
+        "properties": {
+          "organizationId": {
+            "$ref": "#/components/schemas/nexigon_api.organizations.OrganizationId"
+          },
+          "userId": {
+            "$ref": "#/components/schemas/nexigon_api.users.UserId"
+          }
+        },
+        "required": [
+          "organizationId",
+          "userId"
+        ],
+        "unevaluatedProperties": false
       },
       "nexigon_api.outputs.Empty": {
         "type": "object",
@@ -7533,6 +8258,51 @@
         ],
         "unevaluatedProperties": false
       },
+      "nexigon_api.users.QueryUserOrganizationsAction": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "$ref": "#/components/schemas/nexigon_api.users.UserId"
+          }
+        },
+        "required": [
+          "userId"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.users.QueryUserOrganizationsItem": {
+        "type": "object",
+        "description": "Organization item.",
+        "properties": {
+          "organizationId": {
+            "$ref": "#/components/schemas/nexigon_api.organizations.OrganizationId"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "organizationId",
+          "name"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.users.QueryUserOrganizationsOutput": {
+        "type": "object",
+        "description": "Output of querying the organizations of a user.",
+        "properties": {
+          "organizations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/nexigon_api.users.QueryUserOrganizationsItem"
+            }
+          }
+        },
+        "required": [
+          "organizations"
+        ],
+        "unevaluatedProperties": false
+      },
       "nexigon_api.users.QueryUserProjectInvitationsAction": {
         "type": "object",
         "properties": {
@@ -7592,114 +8362,6 @@
         },
         "required": [
           "invitations"
-        ],
-        "unevaluatedProperties": false
-      },
-      "nexigon_api.users.QueryUserProjectsAction": {
-        "type": "object",
-        "properties": {
-          "userId": {
-            "$ref": "#/components/schemas/nexigon_api.users.UserId"
-          }
-        },
-        "required": [
-          "userId"
-        ],
-        "unevaluatedProperties": false
-      },
-      "nexigon_api.users.QueryUserProjectsItem": {
-        "type": "object",
-        "description": "Project item.",
-        "properties": {
-          "projectId": {
-            "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
-          },
-          "name": {
-            "type": "string"
-          },
-          "devices": {
-            "type": "integer",
-            "format": "uint32"
-          }
-        },
-        "required": [
-          "projectId",
-          "name",
-          "devices"
-        ],
-        "unevaluatedProperties": false
-      },
-      "nexigon_api.users.QueryUserProjectsOutput": {
-        "type": "object",
-        "description": "Output of querying the projects of a user.",
-        "properties": {
-          "projects": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/nexigon_api.users.QueryUserProjectsItem"
-            }
-          }
-        },
-        "required": [
-          "projects"
-        ],
-        "unevaluatedProperties": false
-      },
-      "nexigon_api.users.QueryUserRepositoriesAction": {
-        "type": "object",
-        "properties": {
-          "userId": {
-            "$ref": "#/components/schemas/nexigon_api.users.UserId"
-          }
-        },
-        "required": [
-          "userId"
-        ],
-        "unevaluatedProperties": false
-      },
-      "nexigon_api.users.QueryUserRepositoriesItem": {
-        "type": "object",
-        "description": "Repository item.",
-        "properties": {
-          "repositoryId": {
-            "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryId"
-          },
-          "name": {
-            "type": "string"
-          },
-          "createdAt": {
-            "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
-          },
-          "packageCount": {
-            "type": "integer",
-            "format": "uint32"
-          },
-          "isOwner": {
-            "type": "boolean"
-          }
-        },
-        "required": [
-          "repositoryId",
-          "name",
-          "createdAt",
-          "packageCount",
-          "isOwner"
-        ],
-        "unevaluatedProperties": false
-      },
-      "nexigon_api.users.QueryUserRepositoriesOutput": {
-        "type": "object",
-        "description": "Output of querying the repositories of a user.",
-        "properties": {
-          "repositories": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/nexigon_api.users.QueryUserRepositoriesItem"
-            }
-          }
-        },
-        "required": [
-          "repositories"
         ],
         "unevaluatedProperties": false
       },
