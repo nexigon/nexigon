@@ -394,6 +394,62 @@ variant DeviceEventSeverity {
     Critical,
 }
 
+/// Set a property of a device.
+record SetDevicePropertyAction {
+    /// ID of the device.
+    device_id: DeviceId,
+    /// Name of the property.
+    name: string,
+    /// Value of the property.
+    value: JsonValue,
+    /// Indicates whether the property should be protected.
+    protected?: bool,
+}
+
+/// Get a property of a device.
+record GetDevicePropertyAction {
+    /// ID of the device.
+    device_id: DeviceId,
+    /// Name of the property.
+    name: string,
+}
+
+/// Output of getting a property of a device.
+record GetDevicePropertyOutput {
+    /// Name of the property.
+    name: string,
+    /// Value of the property.
+    value: JsonValue,
+    /// Indicates whether the property is protected.
+    protected: bool,
+    /// Last time the property was updated.
+    last_updated: Timestamp,
+}
+
+/// Query the properties of a device.
+record QueryDevicePropertiesAction {
+    /// ID of the device.
+    device_id: DeviceId,
+}
+
+/// Output of querying the properties of a device.
+record QueryDevicePropertiesOutput {
+    /// List of properties.
+    properties: [string: DeviceProperty],
+}
+
+/// Device property.
+record DeviceProperty {
+    /// Name of the property.
+    name: string,
+    /// Value of the property.
+    value: JsonValue,
+    /// Indicates whether the property is protected.
+    protected: bool,
+    /// Last time the property was updated.
+    last_updated: Timestamp,
+}
+
 /// Device has been created.
 record DeviceCreatedEvent {
     /// ID of the device.

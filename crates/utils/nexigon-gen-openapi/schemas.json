@@ -850,6 +850,31 @@
     ],
     "description": "Unique ID of a device."
   },
+  "nexigon_api.devices.DeviceProperty": {
+    "type": "object",
+    "description": "Device property.",
+    "properties": {
+      "name": {
+        "type": "string"
+      },
+      "value": {
+        "$ref": "#/components/schemas/nexigon_api.json.JsonValue"
+      },
+      "protected": {
+        "type": "boolean"
+      },
+      "lastUpdated": {
+        "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
+      }
+    },
+    "required": [
+      "name",
+      "value",
+      "protected",
+      "lastUpdated"
+    ],
+    "unevaluatedProperties": false
+  },
   "nexigon_api.devices.GetDeviceDetailsAction": {
     "type": "object",
     "description": "Get information about a device.",
@@ -909,6 +934,48 @@
       "metadata",
       "certificates",
       "connections"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.devices.GetDevicePropertyAction": {
+    "type": "object",
+    "description": "Get a property of a device.",
+    "properties": {
+      "deviceId": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceId"
+      },
+      "name": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "deviceId",
+      "name"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.devices.GetDevicePropertyOutput": {
+    "type": "object",
+    "description": "Output of getting a property of a device.",
+    "properties": {
+      "name": {
+        "type": "string"
+      },
+      "value": {
+        "$ref": "#/components/schemas/nexigon_api.json.JsonValue"
+      },
+      "protected": {
+        "type": "boolean"
+      },
+      "lastUpdated": {
+        "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
+      }
+    },
+    "required": [
+      "name",
+      "value",
+      "protected",
+      "lastUpdated"
     ],
     "unevaluatedProperties": false
   },
@@ -1039,6 +1106,35 @@
     ],
     "unevaluatedProperties": false
   },
+  "nexigon_api.devices.QueryDevicePropertiesAction": {
+    "type": "object",
+    "description": "Query the properties of a device.",
+    "properties": {
+      "deviceId": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceId"
+      }
+    },
+    "required": [
+      "deviceId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.devices.QueryDevicePropertiesOutput": {
+    "type": "object",
+    "description": "Output of querying the properties of a device.",
+    "properties": {
+      "properties": {
+        "type": "object",
+        "additionalProperties": {
+          "$ref": "#/components/schemas/nexigon_api.devices.DeviceProperty"
+        }
+      }
+    },
+    "required": [
+      "properties"
+    ],
+    "unevaluatedProperties": false
+  },
   "nexigon_api.devices.QueryDevicesAction": {
     "type": "object",
     "description": "Query the devices of the instance.",
@@ -1159,6 +1255,30 @@
     },
     "required": [
       "deviceId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.devices.SetDevicePropertyAction": {
+    "type": "object",
+    "description": "Set a property of a device.",
+    "properties": {
+      "deviceId": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceId"
+      },
+      "name": {
+        "type": "string"
+      },
+      "value": {
+        "$ref": "#/components/schemas/nexigon_api.json.JsonValue"
+      },
+      "protected": {
+        "type": "boolean"
+      }
+    },
+    "required": [
+      "deviceId",
+      "name",
+      "value"
     ],
     "unevaluatedProperties": false
   },
@@ -2370,6 +2490,117 @@
     "required": [
       "tokenId",
       "flags"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.properties.DiskInfo": {
+    "type": "object",
+    "description": "Disk information.",
+    "properties": {
+      "name": {
+        "type": "string"
+      },
+      "filesystem": {
+        "type": "string"
+      },
+      "mountPoint": {
+        "type": "string"
+      },
+      "totalSpace": {
+        "type": "integer",
+        "format": "uint64"
+      },
+      "availableSpace": {
+        "type": "integer",
+        "format": "uint64"
+      }
+    },
+    "required": [
+      "name",
+      "filesystem",
+      "mountPoint",
+      "totalSpace",
+      "availableSpace"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.properties.MemoryInfo": {
+    "type": "object",
+    "description": "Memory information.",
+    "properties": {
+      "total": {
+        "type": "integer",
+        "format": "uint64"
+      }
+    },
+    "required": [
+      "total"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.properties.NetworkInterfaceInfo": {
+    "type": "object",
+    "description": "Network interface information.",
+    "properties": {
+      "name": {
+        "type": "string"
+      },
+      "macAddress": {
+        "type": "string"
+      },
+      "ipAddresses": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      }
+    },
+    "required": [
+      "name",
+      "macAddress",
+      "ipAddresses"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.properties.SystemInfo": {
+    "type": "object",
+    "description": "System information.",
+    "properties": {
+      "name": {
+        "type": "string"
+      },
+      "version": {
+        "type": "string"
+      },
+      "kernel": {
+        "type": "string"
+      },
+      "hostname": {
+        "type": "string"
+      },
+      "arch": {
+        "type": "string"
+      },
+      "memory": {
+        "$ref": "#/components/schemas/nexigon_api.properties.MemoryInfo"
+      },
+      "networks": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.properties.NetworkInterfaceInfo"
+        }
+      },
+      "disks": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.properties.DiskInfo"
+        }
+      }
+    },
+    "required": [
+      "memory",
+      "networks",
+      "disks"
     ],
     "unevaluatedProperties": false
   },

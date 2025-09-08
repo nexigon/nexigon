@@ -10,6 +10,8 @@ use anyhow::bail;
 use clap::Parser;
 use clap::Subcommand;
 
+use nexigon_api::types::devices::GetDevicePropertyAction;
+use nexigon_api::types::devices::SetDevicePropertyAction;
 use tokio::net::TcpListener;
 use tracing::error;
 use tracing::info;
@@ -340,6 +342,36 @@ async fn main() -> anyhow::Result<()> {
                 }
             }
         },
+        Cmd::Devices(cmd) => match cmd {
+            DevicesCmd::Properties(cmd) => match cmd {
+                DevicePropertiesCmd::Set {
+                    device,
+                    name,
+                    value,
+                    protected,
+                } => {
+                    executor
+                        .execute(
+                            SetDevicePropertyAction::new(
+                                device.clone(),
+                                name.clone(),
+                                serde_json::from_str(value)
+                                    .context("device property value must be valid JSON")?,
+                            )
+                            .with_protected(*protected),
+                        )
+                        .await
+                        .context("unable to set device property")??;
+                }
+                DevicePropertiesCmd::Get { device, name } => {
+                    let output = executor
+                        .execute(GetDevicePropertyAction::new(device.clone(), name.clone()))
+                        .await
+                        .context("unable to get device property")??;
+                    serde_json::to_writer(std::io::stdout(), &output).unwrap();
+                }
+            },
+        },
     }
     Ok(())
 }
@@ -384,6 +416,9 @@ enum Cmd {
     /// Manage repositories.
     #[clap(subcommand)]
     Repositories(RepositoriesCmd),
+    /// Manage devices.
+    #[clap(subcommand)]
+    Devices(DevicesCmd),
 }
 
 /// HTTP reverse proxy command.
@@ -445,6 +480,37 @@ pub enum PackagesCmd {
     Delete {
         /// Package path or ID.
         package: String,
+    },
+}
+
+/// Devices subcommand.
+#[derive(Debug, Parser)]
+pub enum DevicesCmd {
+    /// Properties subcommand.
+    #[clap(subcommand)]
+    Properties(DevicePropertiesCmd),
+}
+
+/// Device properties subcommand.
+#[derive(Debug, Parser)]
+pub enum DevicePropertiesCmd {
+    /// Set a device property.
+    Set {
+        /// Device ID.
+        device: DeviceId,
+        /// Name of the property.
+        name: String,
+        /// Value of the property.
+        value: String,
+        /// Indicates whether the property should be protected.
+        #[clap(long)]
+        protected: Option<bool>,
+    },
+    Get {
+        /// Device ID.
+        device: DeviceId,
+        /// Name of the property.
+        name: String,
     },
 }
 

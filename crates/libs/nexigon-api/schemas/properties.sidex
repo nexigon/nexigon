@@ -1,0 +1,51 @@
+//! Types related to device properties.
+
+/// System information.
+record SystemInfo {
+    /// System name.
+    name?: string,
+    /// System version.
+    version?: string,
+    /// Kernel version.
+    kernel?: string,
+    /// Hostname.
+    hostname?: string,
+    /// Architecture.
+    arch?: string,
+    /// Memory information.
+    memory: MemoryInfo,
+    /// Network information.
+    networks: [NetworkInterfaceInfo],
+    /// Disk information.
+    disks: [DiskInfo],
+}
+
+/// Memory information.
+record MemoryInfo {
+    /// Total memory in bytes.
+    total: u64,
+}
+
+/// Network interface information.
+record NetworkInterfaceInfo {
+    /// Name of the network interface.
+    name: string,
+    /// MAC address of the network interface.
+    mac_address: string,
+    /// IP addresses of the network interface.
+    ip_addresses: [string],
+}
+
+/// Disk information.
+record DiskInfo {
+    /// Name of the disk.
+    name: string,
+    /// Filesystem type.
+    filesystem: string,
+    /// Mount point.
+    mount_point: string,
+    /// Total disk space in bytes.
+    total_space: u64,
+    /// Available disk space in bytes.
+    available_space: u64,
+}

@@ -4,11 +4,14 @@ use std::net::SocketAddr;
 use std::path::Path;
 use std::path::PathBuf;
 use std::process::Stdio;
+use std::time::Duration;
 
 use anyhow::Context;
 use anyhow::bail;
 use clap::Parser;
 use futures::StreamExt;
+use nexigon_api::types::devices::GetDevicePropertyAction;
+use nexigon_api::types::devices::SetDevicePropertyAction;
 use tokio::net::TcpStream;
 use tracing::debug;
 use tracing::info;
@@ -27,10 +30,13 @@ use nexigon_ids::Generate;
 use nexigon_ids::ids::DeviceEventId;
 use nexigon_ids::ids::DeviceFingerprint;
 use nexigon_multiplex::ConnectionEvent;
+use tracing::warn;
 
 use crate::config::Config;
+use crate::system_info::get_system_info;
 
 pub mod config;
+pub mod system_info;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
@@ -71,7 +77,7 @@ async fn main() -> anyhow::Result<()> {
         if key_path.exists() {
             bail!("found SSL key but certificate is missing");
         }
-        info!("generating SSL certificate and key");
+        info!(?cert_path, "generating SSL certificate and key");
         let (certificate, key) = nexigon_cert::generate_self_signed_certificate();
         if let Some(parent) = cert_path.parent() {
             tokio::fs::create_dir_all(parent).await.ok();
@@ -152,7 +158,7 @@ async fn main() -> anyhow::Result<()> {
         anyhow::Result::Ok(())
     });
     let mut executor = connect_executor(&mut connection_ref).await.unwrap();
-    let actor = match executor
+    let (actor, device_id) = match executor
         .execute(GetActorAction::new())
         .await
         .unwrap()
@@ -161,7 +167,8 @@ async fn main() -> anyhow::Result<()> {
     {
         nexigon_api::types::actor::Actor::Device(actor) => {
             info!(device_id = %actor.device_id);
-            actor
+            let device_id = actor.device_id.clone();
+            (actor, device_id)
         }
         _ => {
             bail!("received unexpected actor type");
@@ -169,6 +176,20 @@ async fn main() -> anyhow::Result<()> {
     };
     match &args.cmd {
         Cmd::Run => {
+            tokio::spawn(async move {
+                loop {
+                    let system_info = get_system_info();
+                    executor
+                        .execute(SetDevicePropertyAction::new(
+                            device_id.clone(),
+                            "dev.nexigon.systemInfo".to_owned(),
+                            serde_json::to_value(system_info).unwrap(),
+                        ))
+                        .await
+                        .ok();
+                    tokio::time::sleep(Duration::from_secs(30 * 60)).await;
+                }
+            });
             connection_handle.await??;
         }
         Cmd::Device(cmd) => match cmd {
@@ -194,16 +215,42 @@ async fn main() -> anyhow::Result<()> {
                     println!("{}", serde_json::to_string(&output).unwrap());
                 }
             },
-            DeviceCmd::Metadata(cmd) => match cmd {
-                MetadataCmd::Set { metadata } => {
+            DeviceCmd::Metadata(cmd) => {
+                warn!("device metadata is deprecated, use properties instead");
+                match cmd {
+                    MetadataCmd::Set { metadata } => {
+                        executor
+                            .execute(SetDeviceMetadataAction::new(
+                                actor.device_id.clone(),
+                                serde_json::from_str(metadata)
+                                    .context("device metadata must be valid JSON")?,
+                            ))
+                            .await
+                            .context("unable to set device metadata")??;
+                    }
+                }
+            }
+            DeviceCmd::Properties(cmd) => match cmd {
+                PropertiesCmd::Set { name, value } => {
                     executor
-                        .execute(SetDeviceMetadataAction::new(
+                        .execute(SetDevicePropertyAction::new(
                             actor.device_id.clone(),
-                            serde_json::from_str(metadata)
-                                .context("device metadata must be valid JSON")?,
+                            name.clone(),
+                            serde_json::from_str(value)
+                                .context("device property value must be valid JSON")?,
                         ))
                         .await
-                        .context("unable to set device metadata")??;
+                        .context("unable to set device property")??;
+                }
+                PropertiesCmd::Get { name } => {
+                    let output = executor
+                        .execute(GetDevicePropertyAction::new(
+                            actor.device_id.clone(),
+                            name.clone(),
+                        ))
+                        .await
+                        .context("unable to get device property")??;
+                    println!("{}", serde_json::to_string(&output).unwrap());
                 }
             },
         },
@@ -285,6 +332,9 @@ enum DeviceCmd {
     /// Metadata subcommand.
     #[clap(subcommand)]
     Metadata(MetadataCmd),
+    /// Properties subcommand.
+    #[clap(subcommand)]
+    Properties(PropertiesCmd),
 }
 
 /// Tokens subcommand.
@@ -327,5 +377,21 @@ enum EventsCmd {
         attributes: Vec<String>,
         /// Event body.
         body: String,
+    },
+}
+
+/// Properties subcommand.
+#[derive(Debug, Parser)]
+enum PropertiesCmd {
+    /// Set a device property.
+    Set {
+        /// Name of the property.
+        name: String,
+        /// Value of the property.
+        value: String,
+    },
+    Get {
+        /// Name of the property.
+        name: String,
     },
 }

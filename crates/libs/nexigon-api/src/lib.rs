@@ -138,12 +138,16 @@ macro_rules! with_actions {
             // ## Device Connections
             ("devices_RegisterDeviceConnection", RegisterDeviceConnection, devices::RegisterDeviceConnectionAction, devices::RegisterDeviceConnectionOutput),
             ("devices_UnregisterDeviceConnection", UnregisterDeviceConnection, devices::UnregisterDeviceConnectionAction, outputs::Empty),
-            // # HTTP Proxy
+            // ## HTTP Proxy
             ("devices_IssueDeviceHttpProxyToken", IssueDeviceHttpProxyToken, devices::IssueDeviceHttpProxyTokenAction, devices::IssueDeviceHttpProxyTokenOutput),
             ("devices_ValidateDeviceHttpProxyToken", ValidateDeviceHttpProxyToken, devices::ValidateDeviceHttpProxyTokenAction, devices::ValidateDeviceHttpProxyTokenOutput),
-            // # Device Events
+            // ## Device Events
             ("devices_PublishDeviceEvents", PublishDeviceEvents, devices::PublishDeviceEventsAction, outputs::Empty),
             ("devices_QueryDeviceEvents", QueryDeviceEvents, devices::QueryDeviceEventsAction, devices::QueryDeviceEventsOutput),
+            // ## Device Properties
+            ("devices_SetDeviceProperty", SetDeviceProperty, devices::SetDevicePropertyAction, outputs::Empty),
+            ("devices_GetDeviceProperty", GetDeviceProperty, devices::GetDevicePropertyAction, devices::GetDevicePropertyOutput),
+            ("devices_QueryDeviceProperties", QueryDeviceProperties, devices::QueryDevicePropertiesAction, devices::QueryDevicePropertiesOutput),
 
             // # Repositories
             ("repositories_ResolveRepositoryName", ResolveRepositoryName, repositories::ResolveRepositoryNameAction, repositories::ResolveRepositoryNameOutput),
