@@ -1137,6 +1137,7 @@ dependencies = [
  "nexigon-api",
  "nexigon-cert",
  "nexigon-client",
+ "nexigon-common",
  "nexigon-ids",
  "nexigon-multiplex",
  "serde",
@@ -1214,6 +1215,15 @@ dependencies = [
  "tracing",
  "url",
  "urlencoding",
+]
+
+[[package]]
+name = "nexigon-common"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "nexigon-api",
+ "nexigon-client",
 ]
 
 [[package]]

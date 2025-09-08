@@ -12,6 +12,8 @@ use clap::Parser;
 use futures::StreamExt;
 use nexigon_api::types::devices::GetDevicePropertyAction;
 use nexigon_api::types::devices::SetDevicePropertyAction;
+use nexigon_api::types::repositories::IssueAssetDownloadUrlAction;
+use nexigon_common::resolve_asset;
 use tokio::net::TcpStream;
 use tracing::debug;
 use tracing::info;
@@ -289,6 +291,16 @@ async fn main() -> anyhow::Result<()> {
                     .context("unable to emit event")??;
             }
         },
+        Cmd::Repositories(cmd) => match cmd {
+            RepositoriesCmd::IssueUrl { asset } => {
+                let asset_id = resolve_asset(&mut executor, asset).await?;
+                let output = executor
+                    .execute(IssueAssetDownloadUrlAction::new(asset_id))
+                    .await
+                    .context("unable to issue asset download URL")??;
+                println!("{}", serde_json::to_string(&output).unwrap());
+            }
+        },
     }
     Ok(())
 }
@@ -319,6 +331,9 @@ enum Cmd {
     /// Events subcommand.
     #[clap(subcommand)]
     Events(EventsCmd),
+    /// Repositories subcommand.
+    #[clap(subcommand)]
+    Repositories(RepositoriesCmd),
 }
 
 /// Device subcommand.
@@ -348,6 +363,16 @@ enum TokensCmd {
         /// Additional JSON claims to attach to the token.
         #[clap(long)]
         claims: Option<String>,
+    },
+}
+
+/// Repositories subcommand.
+#[derive(Debug, Parser)]
+enum RepositoriesCmd {
+    /// Request a pre-signed URL for downloading an asset.
+    IssueUrl {
+        /// Asset ID or path.
+        asset: String,
     },
 }
 

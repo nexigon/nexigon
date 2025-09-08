@@ -49,6 +49,7 @@ sidex-types-openapi = { git = "https://github.com/silitics/sidex.git" }
 nexigon-api = { path = "crates/libs/nexigon-api" }
 nexigon-cert = { path = "crates/libs/nexigon-cert" }
 nexigon-client = { path = "crates/libs/nexigon-client" }
+nexigon-common = { path = "crates/libs/nexigon-common" }
 nexigon-ids = { path = "crates/libs/nexigon-ids" }
 nexigon-multiplex = { path = "crates/libs/nexigon-multiplex" }
 nexigon-rpc = { path = "crates/libs/nexigon-rpc" }

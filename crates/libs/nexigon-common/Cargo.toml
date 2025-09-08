@@ -1,0 +1,13 @@
+[package]
+name = "nexigon-common"
+edition = "2024"
+authors.workspace = true
+version.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+
+[dependencies]
+anyhow.workspace = true
+nexigon-api.workspace = true
+nexigon-client.workspace = true

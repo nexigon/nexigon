@@ -14,6 +14,7 @@ futures.workspace = true
 nexigon-api.workspace = true
 nexigon-cert.workspace = true
 nexigon-client.workspace = true
+nexigon-common.workspace = true
 nexigon-ids.workspace = true
 nexigon-multiplex.workspace = true
 serde.workspace = true
