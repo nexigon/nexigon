@@ -4319,29 +4319,47 @@
         "unevaluatedProperties": false
       },
       "nexigon_api.devices.GetDevicePropertyOutput": {
-        "type": "object",
         "description": "Output of getting a property of a device.",
-        "properties": {
-          "name": {
-            "type": "string"
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "result": {
+                "const": "NotFound"
+              }
+            },
+            "required": [
+              "result"
+            ]
           },
-          "value": {
-            "$ref": "#/components/schemas/nexigon_api.json.JsonValue"
-          },
-          "protected": {
-            "type": "boolean"
-          },
-          "lastUpdated": {
-            "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
+          {
+            "type": "object",
+            "properties": {
+              "result": {
+                "const": "Found"
+              },
+              "name": {
+                "type": "string"
+              },
+              "value": {
+                "$ref": "#/components/schemas/nexigon_api.json.JsonValue"
+              },
+              "protected": {
+                "type": "boolean"
+              },
+              "lastUpdated": {
+                "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
+              }
+            },
+            "required": [
+              "result",
+              "name",
+              "value",
+              "protected",
+              "lastUpdated"
+            ]
           }
-        },
-        "required": [
-          "name",
-          "value",
-          "protected",
-          "lastUpdated"
-        ],
-        "unevaluatedProperties": false
+        ]
       },
       "nexigon_api.devices.IssueDeviceHttpProxyTokenAction": {
         "type": "object",

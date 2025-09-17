@@ -17311,71 +17311,11 @@ pub mod devices {
     }
     #[doc = "Output of getting a property of a device.\n"]
     #[derive(Clone, Debug)]
-    pub struct GetDevicePropertyOutput {
-        #[doc = "Name of the property.\n"]
-        pub name: ::std::string::String,
-        #[doc = "Value of the property.\n"]
-        pub value: super::json::JsonValue,
-        #[doc = "Indicates whether the property is protected.\n"]
-        pub protected: bool,
-        #[doc = "Last time the property was updated.\n"]
-        pub last_updated: super::datetime::Timestamp,
-    }
-    impl GetDevicePropertyOutput {
-        #[doc = "Creates a new [`GetDevicePropertyOutput`]."]
-        pub fn new(
-            name: ::std::string::String,
-            value: super::json::JsonValue,
-            protected: bool,
-            last_updated: super::datetime::Timestamp,
-        ) -> Self {
-            Self {
-                name,
-                value,
-                protected,
-                last_updated,
-            }
-        }
-        #[doc = "Sets the value of `name`."]
-        pub fn set_name(&mut self, name: ::std::string::String) -> &mut Self {
-            self.name = name;
-            self
-        }
-        #[doc = "Sets the value of `name`."]
-        pub fn with_name(mut self, name: ::std::string::String) -> Self {
-            self.name = name;
-            self
-        }
-        #[doc = "Sets the value of `value`."]
-        pub fn set_value(&mut self, value: super::json::JsonValue) -> &mut Self {
-            self.value = value;
-            self
-        }
-        #[doc = "Sets the value of `value`."]
-        pub fn with_value(mut self, value: super::json::JsonValue) -> Self {
-            self.value = value;
-            self
-        }
-        #[doc = "Sets the value of `protected`."]
-        pub fn set_protected(&mut self, protected: bool) -> &mut Self {
-            self.protected = protected;
-            self
-        }
-        #[doc = "Sets the value of `protected`."]
-        pub fn with_protected(mut self, protected: bool) -> Self {
-            self.protected = protected;
-            self
-        }
-        #[doc = "Sets the value of `last_updated`."]
-        pub fn set_last_updated(&mut self, last_updated: super::datetime::Timestamp) -> &mut Self {
-            self.last_updated = last_updated;
-            self
-        }
-        #[doc = "Sets the value of `last_updated`."]
-        pub fn with_last_updated(mut self, last_updated: super::datetime::Timestamp) -> Self {
-            self.last_updated = last_updated;
-            self
-        }
+    pub enum GetDevicePropertyOutput {
+        #[doc = "The property was not found.\n"]
+        NotFound,
+        #[doc = "The property was found.\n"]
+        Found(DeviceProperty),
     }
     #[automatically_derived]
     impl __serde::Serialize for GetDevicePropertyOutput {
@@ -17383,16 +17323,14 @@ pub mod devices {
             &self,
             __serializer: __S,
         ) -> ::std::result::Result<__S::Ok, __S::Error> {
-            let mut __record = __sidex_serde::ser::RecordSerializer::new(
-                __serializer,
-                "GetDevicePropertyOutput",
-                4usize,
-            )?;
-            __record.serialize_field("name", &self.name)?;
-            __record.serialize_field("value", &self.value)?;
-            __record.serialize_field("protected", &self.protected)?;
-            __record.serialize_field("lastUpdated", &self.last_updated)?;
-            __record.end()
+            let __serializer =
+                __sidex_serde::ser::VariantSerializer::new(__serializer, "GetDevicePropertyOutput");
+            match self {
+                Self::NotFound => __serializer.serialize_internal_tag("result", "NotFound", 0u32),
+                Self::Found(__value) => {
+                    __serializer.serialize_internally_tagged("result", "Found", 1u32, __value)
+                }
+            }
         }
     }
     #[automatically_derived]
@@ -17401,295 +17339,169 @@ pub mod devices {
             __deserializer: __D,
         ) -> ::std::result::Result<Self, __D::Error> {
             #[doc(hidden)]
-            struct __Visitor {
-                __phantom_vars: ::core::marker::PhantomData<fn(&())>,
+            const __IDENTIFIERS: &'static [&'static str] = &["NotFound", "Found"];
+            #[doc(hidden)]
+            const __EXPECTING_IDENTIFIERS: &'static str =
+                "an identifier in [\"NotFound\", \"Found\"]";
+            #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
+            #[doc(hidden)]
+            enum __Identifier {
+                __Identifier0,
+                __Identifier1,
             }
-            impl<'de> __serde::de::Visitor<'de> for __Visitor {
-                type Value = GetDevicePropertyOutput;
+            #[doc(hidden)]
+            struct __IdentifierVisitor;
+            impl<'de> __serde::de::Visitor<'de> for __IdentifierVisitor {
+                type Value = __Identifier;
                 fn expecting(
                     &self,
                     __formatter: &mut ::core::fmt::Formatter,
                 ) -> ::core::fmt::Result {
-                    ::core::fmt::Formatter::write_str(__formatter, "record GetDevicePropertyOutput")
+                    ::core::fmt::Formatter::write_str(__formatter, __EXPECTING_IDENTIFIERS)
                 }
-                #[inline]
-                fn visit_seq<__A>(
-                    self,
-                    mut __seq: __A,
-                ) -> ::core::result::Result<Self::Value, __A::Error>
+                fn visit_u64<__E>(self, __value: u64) -> ::core::result::Result<Self::Value, __E>
                 where
-                    __A: __serde::de::SeqAccess<'de>,
+                    __E: __serde::de::Error,
                 {
-                    let __field0 = match __serde::de::SeqAccess::next_element::<
-                        ::std::string::String,
-                    >(&mut __seq)?
-                    {
-                        ::core::option::Option::Some(__value) => __value,
-                        ::core::option::Option::None => {
-                            return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(0usize, &"record with 4 fields"),
-                            );
+                    match __value {
+                        0u64 => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                        1u64 => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                        __variant => {
+                            ::core::result::Result::Err(__serde::de::Error::invalid_value(
+                                __serde::de::Unexpected::Unsigned(__variant),
+                                &__EXPECTING_IDENTIFIERS,
+                            ))
                         }
-                    };
-                    let __field1 = match __serde::de::SeqAccess::next_element::<
-                        super::json::JsonValue,
-                    >(&mut __seq)?
-                    {
-                        ::core::option::Option::Some(__value) => __value,
-                        ::core::option::Option::None => {
-                            return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(1usize, &"record with 4 fields"),
-                            );
-                        }
-                    };
-                    let __field2 = match __serde::de::SeqAccess::next_element::<bool>(&mut __seq)? {
-                        ::core::option::Option::Some(__value) => __value,
-                        ::core::option::Option::None => {
-                            return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(2usize, &"record with 4 fields"),
-                            );
-                        }
-                    };
-                    let __field3 = match __serde::de::SeqAccess::next_element::<
-                        super::datetime::Timestamp,
-                    >(&mut __seq)?
-                    {
-                        ::core::option::Option::Some(__value) => __value,
-                        ::core::option::Option::None => {
-                            return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(3usize, &"record with 4 fields"),
-                            );
-                        }
-                    };
-                    ::core::result::Result::Ok(GetDevicePropertyOutput {
-                        name: __field0,
-                        value: __field1,
-                        protected: __field2,
-                        last_updated: __field3,
-                    })
+                    }
                 }
-                #[inline]
-                fn visit_map<__A>(
-                    self,
-                    mut __map: __A,
-                ) -> ::core::result::Result<Self::Value, __A::Error>
+                fn visit_str<__E>(self, __value: &str) -> ::core::result::Result<Self::Value, __E>
                 where
-                    __A: __serde::de::MapAccess<'de>,
+                    __E: __serde::de::Error,
                 {
-                    #[doc(hidden)]
-                    const __IDENTIFIERS: &'static [&'static str] =
-                        &["name", "value", "protected", "lastUpdated"];
-                    #[doc(hidden)]
-                    const __EXPECTING_IDENTIFIERS: &'static str =
-                        "an identifier in [\"name\", \"value\", \"protected\", \"lastUpdated\"]";
-                    #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
-                    #[doc(hidden)]
-                    enum __Identifier {
-                        __Identifier0,
-                        __Identifier1,
-                        __Identifier2,
-                        __Identifier3,
-                        __Unknown,
+                    match __value {
+                        "NotFound" => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                        "Found" => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                        __variant => ::core::result::Result::Err(
+                            __serde::de::Error::unknown_variant(__variant, __IDENTIFIERS),
+                        ),
                     }
-                    #[doc(hidden)]
-                    struct __IdentifierVisitor;
-                    impl<'de> __serde::de::Visitor<'de> for __IdentifierVisitor {
-                        type Value = __Identifier;
-                        fn expecting(
-                            &self,
-                            __formatter: &mut ::core::fmt::Formatter,
-                        ) -> ::core::fmt::Result {
-                            ::core::fmt::Formatter::write_str(__formatter, __EXPECTING_IDENTIFIERS)
-                        }
-                        fn visit_u64<__E>(
-                            self,
-                            __value: u64,
-                        ) -> ::core::result::Result<Self::Value, __E>
-                        where
-                            __E: __serde::de::Error,
-                        {
-                            match __value {
-                                0u64 => ::core::result::Result::Ok(__Identifier::__Identifier0),
-                                1u64 => ::core::result::Result::Ok(__Identifier::__Identifier1),
-                                2u64 => ::core::result::Result::Ok(__Identifier::__Identifier2),
-                                3u64 => ::core::result::Result::Ok(__Identifier::__Identifier3),
-                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
-                            }
-                        }
-                        fn visit_str<__E>(
-                            self,
-                            __value: &str,
-                        ) -> ::core::result::Result<Self::Value, __E>
-                        where
-                            __E: __serde::de::Error,
-                        {
-                            match __value {
-                                "name" => ::core::result::Result::Ok(__Identifier::__Identifier0),
-                                "value" => ::core::result::Result::Ok(__Identifier::__Identifier1),
-                                "protected" => {
-                                    ::core::result::Result::Ok(__Identifier::__Identifier2)
-                                }
-                                "lastUpdated" => {
-                                    ::core::result::Result::Ok(__Identifier::__Identifier3)
-                                }
-                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
-                            }
-                        }
-                        fn visit_bytes<__E>(
-                            self,
-                            __value: &[u8],
-                        ) -> ::core::result::Result<Self::Value, __E>
-                        where
-                            __E: __serde::de::Error,
-                        {
-                            match __value {
-                                b"name" => ::core::result::Result::Ok(__Identifier::__Identifier0),
-                                b"value" => ::core::result::Result::Ok(__Identifier::__Identifier1),
-                                b"protected" => {
-                                    ::core::result::Result::Ok(__Identifier::__Identifier2)
-                                }
-                                b"lastUpdated" => {
-                                    ::core::result::Result::Ok(__Identifier::__Identifier3)
-                                }
-                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
-                            }
+                }
+                fn visit_bytes<__E>(
+                    self,
+                    __value: &[u8],
+                ) -> ::core::result::Result<Self::Value, __E>
+                where
+                    __E: __serde::de::Error,
+                {
+                    match __value {
+                        b"NotFound" => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                        b"Found" => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                        __variant => {
+                            ::core::result::Result::Err(__serde::de::Error::invalid_value(
+                                __serde::de::Unexpected::Bytes(__variant),
+                                &__EXPECTING_IDENTIFIERS,
+                            ))
                         }
                     }
-                    impl<'de> __serde::Deserialize<'de> for __Identifier {
-                        #[inline]
-                        fn deserialize<__D>(
-                            __deserializer: __D,
-                        ) -> ::core::result::Result<Self, __D::Error>
-                        where
-                            __D: __serde::Deserializer<'de>,
-                        {
-                            __serde::Deserializer::deserialize_identifier(
-                                __deserializer,
-                                __IdentifierVisitor,
-                            )
-                        }
-                    }
-                    let mut __field0: ::core::option::Option<::std::string::String> =
-                        ::core::option::Option::None;
-                    let mut __field1: ::core::option::Option<super::json::JsonValue> =
-                        ::core::option::Option::None;
-                    let mut __field2: ::core::option::Option<bool> = ::core::option::Option::None;
-                    let mut __field3: ::core::option::Option<super::datetime::Timestamp> =
-                        ::core::option::Option::None;
-                    while let ::core::option::Option::Some(__key) =
-                        __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
-                    {
-                        match __key {
-                            __Identifier::__Identifier0 => {
-                                if ::core::option::Option::is_some(&__field0) {
-                                    return ::core::result::Result::Err(
-                                        <__A::Error as __serde::de::Error>::duplicate_field("name"),
-                                    );
-                                }
-                                __field0 = ::core::option::Option::Some(
-                                    __serde::de::MapAccess::next_value::<::std::string::String>(
-                                        &mut __map,
-                                    )?,
-                                );
-                            }
-                            __Identifier::__Identifier1 => {
-                                if ::core::option::Option::is_some(&__field1) {
-                                    return ::core::result::Result::Err(
-                                        <__A::Error as __serde::de::Error>::duplicate_field(
-                                            "value",
-                                        ),
-                                    );
-                                }
-                                __field1 = ::core::option::Option::Some(
-                                    __serde::de::MapAccess::next_value::<super::json::JsonValue>(
-                                        &mut __map,
-                                    )?,
-                                );
-                            }
-                            __Identifier::__Identifier2 => {
-                                if ::core::option::Option::is_some(&__field2) {
-                                    return ::core::result::Result::Err(
-                                        <__A::Error as __serde::de::Error>::duplicate_field(
-                                            "protected",
-                                        ),
-                                    );
-                                }
-                                __field2 = ::core::option::Option::Some(
-                                    __serde::de::MapAccess::next_value::<bool>(&mut __map)?,
-                                );
-                            }
-                            __Identifier::__Identifier3 => {
-                                if ::core::option::Option::is_some(&__field3) {
-                                    return ::core::result::Result::Err(
-                                        <__A::Error as __serde::de::Error>::duplicate_field(
-                                            "lastUpdated",
-                                        ),
-                                    );
-                                }
-                                __field3 = ::core::option::Option::Some(
-                                    __serde::de::MapAccess::next_value::<super::datetime::Timestamp>(
-                                        &mut __map,
-                                    )?,
-                                );
-                            }
-                            _ => {
-                                __serde::de::MapAccess::next_value::<__serde::de::IgnoredAny>(
-                                    &mut __map,
-                                )?;
-                            }
-                        }
-                    }
-                    let __field0 = match __field0 {
-                        ::core::option::Option::Some(__value) => __value,
-                        ::core::option::Option::None => {
-                            return ::core::result::Result::Err(
-                                <__A::Error as __serde::de::Error>::missing_field("name"),
-                            );
-                        }
-                    };
-                    let __field1 = match __field1 {
-                        ::core::option::Option::Some(__value) => __value,
-                        ::core::option::Option::None => {
-                            return ::core::result::Result::Err(
-                                <__A::Error as __serde::de::Error>::missing_field("value"),
-                            );
-                        }
-                    };
-                    let __field2 = match __field2 {
-                        ::core::option::Option::Some(__value) => __value,
-                        ::core::option::Option::None => {
-                            return ::core::result::Result::Err(
-                                <__A::Error as __serde::de::Error>::missing_field("protected"),
-                            );
-                        }
-                    };
-                    let __field3 = match __field3 {
-                        ::core::option::Option::Some(__value) => __value,
-                        ::core::option::Option::None => {
-                            return ::core::result::Result::Err(
-                                <__A::Error as __serde::de::Error>::missing_field("lastUpdated"),
-                            );
-                        }
-                    };
-                    ::core::result::Result::Ok(GetDevicePropertyOutput {
-                        name: __field0,
-                        value: __field1,
-                        protected: __field2,
-                        last_updated: __field3,
-                    })
+                }
+            }
+            impl<'de> __serde::Deserialize<'de> for __Identifier {
+                #[inline]
+                fn deserialize<__D>(__deserializer: __D) -> ::core::result::Result<Self, __D::Error>
+                where
+                    __D: __serde::Deserializer<'de>,
+                {
+                    __serde::Deserializer::deserialize_identifier(
+                        __deserializer,
+                        __IdentifierVisitor,
+                    )
                 }
             }
             #[doc(hidden)]
-            const __FIELDS: &'static [&'static str] =
-                &["name", "value", "protected", "lastUpdated"];
-            __serde::Deserializer::deserialize_struct(
-                __deserializer,
-                "GetDevicePropertyOutput",
-                __FIELDS,
-                __Visitor {
-                    __phantom_vars: ::core::marker::PhantomData,
-                },
-            )
+            const __VARIANTS: &'static [&'static str] = &["NotFound", "Found"];
+            if __serde::Deserializer::is_human_readable(&__deserializer) {
+                let __tagged = __sidex_serde::de::tagged::deserialize_tagged_variant::<
+                    __Identifier,
+                    __D,
+                >(__deserializer, "result")?;
+                match __tagged.tag {
+                    __Identifier::__Identifier0 => {
+                        ::core::result::Result::Ok(GetDevicePropertyOutput::NotFound)
+                    }
+                    __Identifier::__Identifier1 => {
+                        ::core::result::Result::Ok(GetDevicePropertyOutput::Found(
+                            __tagged
+                                .deserialize_internally_tagged::<DeviceProperty, __D::Error>()?,
+                        ))
+                    }
+                }
+            } else {
+                #[doc(hidden)]
+                struct __Visitor {
+                    __phantom_vars: ::core::marker::PhantomData<fn(&())>,
+                }
+                impl<'de> __serde::de::Visitor<'de> for __Visitor {
+                    type Value = GetDevicePropertyOutput;
+                    fn expecting(
+                        &self,
+                        __formatter: &mut ::core::fmt::Formatter,
+                    ) -> ::core::fmt::Result {
+                        ::core::fmt::Formatter::write_str(
+                            __formatter,
+                            "enum GetDevicePropertyOutput",
+                        )
+                    }
+                    #[inline]
+                    fn visit_str<__E>(
+                        self,
+                        __value: &str,
+                    ) -> ::core::result::Result<Self::Value, __E>
+                    where
+                        __E: __serde::de::Error,
+                    {
+                        let __identifier = __IdentifierVisitor.visit_str(__value)?;
+                        #[allow(unreachable_patterns)]
+                        match __identifier {
+                            __Identifier::__Identifier0 => {
+                                ::core::result::Result::Ok(GetDevicePropertyOutput::NotFound)
+                            }
+                            _ => Err(__E::invalid_value(
+                                __serde::de::Unexpected::Str(__value),
+                                &self,
+                            )),
+                        }
+                    }
+                    #[inline]
+                    fn visit_enum<__A>(
+                        self,
+                        __data: __A,
+                    ) -> ::core::result::Result<Self::Value, __A::Error>
+                    where
+                        __A: __serde::de::EnumAccess<'de>,
+                    {
+                        match __serde::de::EnumAccess::variant::<__Identifier>(__data)? {
+                            (__Identifier::__Identifier0, __variant) => {
+                                __serde::de::VariantAccess::unit_variant(__variant)?;
+                                ::core::result::Result::Ok(GetDevicePropertyOutput::NotFound)
+                            }
+                            (__Identifier::__Identifier1, __variant) => {
+                                let __value = __serde::de::VariantAccess::newtype_variant::<
+                                    DeviceProperty,
+                                >(__variant)?;
+                                ::core::result::Result::Ok(GetDevicePropertyOutput::Found(__value))
+                            }
+                        }
+                    }
+                }
+                __serde::Deserializer::deserialize_enum(
+                    __deserializer,
+                    "GetDevicePropertyOutput",
+                    __VARIANTS,
+                    __Visitor {
+                        __phantom_vars: ::core::marker::PhantomData,
+                    },
+                )
+            }
         }
     }
     #[doc = "Query the properties of a device.\n"]

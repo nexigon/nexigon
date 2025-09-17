@@ -415,15 +415,12 @@ record GetDevicePropertyAction {
 }
 
 /// Output of getting a property of a device.
-record GetDevicePropertyOutput {
-    /// Name of the property.
-    name: string,
-    /// Value of the property.
-    value: JsonValue,
-    /// Indicates whether the property is protected.
-    protected: bool,
-    /// Last time the property was updated.
-    last_updated: Timestamp,
+#[json(tag = "result")]
+variant GetDevicePropertyOutput {
+    /// The property was not found.
+    NotFound,
+    /// The property was found.
+    Found: DeviceProperty,
 }
 
 /// Query the properties of a device.
