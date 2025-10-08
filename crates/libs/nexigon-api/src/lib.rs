@@ -1,5 +1,6 @@
 use std::any::Any;
 
+use nexigon_ids::ids::OrganizationId;
 use nexigon_ids::ids::ProjectId;
 use nexigon_ids::ids::RepositoryId;
 use serde::Serialize;
@@ -27,6 +28,7 @@ pub enum AuditEntity {
     Project(ProjectId),
     User(UserId),
     Repository(RepositoryId),
+    Organization(OrganizationId),
 }
 
 impl From<ProjectId> for AuditEntity {
@@ -44,6 +46,12 @@ impl From<UserId> for AuditEntity {
 impl From<RepositoryId> for AuditEntity {
     fn from(value: RepositoryId) -> Self {
         Self::Repository(value)
+    }
+}
+
+impl From<OrganizationId> for AuditEntity {
+    fn from(value: OrganizationId) -> Self {
+        Self::Organization(value)
     }
 }
 
@@ -73,10 +81,8 @@ macro_rules! with_actions {
             ("users_SetUserPassword", SetUserPassword, users::SetUserPasswordAction, outputs::Empty),
             ("users_SetUserIsAdmin", SetUserIsAdmin, users::SetUserIsAdminAction, outputs::Empty),
             ("users_QueryUserTokens", QueryUserTokens, users::QueryUserTokensAction, users::QueryUserTokensOutput),
-            ("users_QueryUserProjects", QueryUserProjects, users::QueryUserProjectsAction, users::QueryUserProjectsOutput),
-            ("users_QueryUserProjectInvitations", QueryUserProjectInvitations, users::QueryUserProjectInvitationsAction, users::QueryUserProjectInvitationsOutput),
-            ("users_QueryUserRepositories", QueryUserRepositories, users::QueryUserRepositoriesAction, users::QueryUserRepositoriesOutput),
-            ("users_QueryUserRepositoryInvitations", QueryUserRepositoryInvitations, users::QueryUserRepositoryInvitationsAction, users::QueryUserRepositoryInvitationsOutput),
+            ("users_QueryOrganizations", QueryUserOrganizations, users::QueryUserOrganizationsAction, users::QueryUserOrganizationsOutput),
+            ("users_QueryOrganizationInvitations", QueryUserOrganizationInvitations, users::QueryUserOrganizationInvitationsAction, users::QueryUserOrganizationInvitationsOutput),
             ("users_QueryUserSessions", QueryUserSessions, users::QueryUserSessionsAction, users::QueryUserSessionsOutput),
             ("users_AuthenticateWithUserToken", AuthenticateWithUserToken, users::AuthenticateWithUserTokenAction, users::AuthenticateWithUserTokenOutput),
             ("users_AuthenticateWithSessionToken", AuthenticateWithSessionToken, users::AuthenticateWithSessionTokenAction, users::AuthenticateWithSessionTokenOutput),
@@ -94,8 +100,20 @@ macro_rules! with_actions {
             ("users_ResendRegistrationEmail", ResendRegistrationEmail, users::ResendRegistrationEmailAction, outputs::Empty),
             ("users_CompleteRegistration", CompleteRegistration, users::CompleteRegistrationAction, users::CompleteRegistrationOutput),
             // ## User Invitations
-            ("users_AcceptProjectInvitation", AcceptProjectInvitation, users::AcceptProjectInvitationAction, outputs::Empty),
-            ("users_AcceptRepositoryInvitation", AcceptRepositoryInvitation, users::AcceptRepositoryInvitationAction, outputs::Empty),
+            ("users_AcceptOrganizationInvitation", AcceptOrganizationInvitation, users::AcceptOrganizationInvitationAction, outputs::Empty),
+
+            // # Organizations
+            ("organizations_Query", QueryOrganizations, organizations::QueryOrganizationsAction, organizations::QueryOrganizationsOutput),
+            ("organizations_QueryMembers", QueryOrganizationMembers, organizations::QueryOrganizationMembersAction, organizations::QueryOrganizationMembersOutput),
+            ("organizations_QueryProjects", QueryOrganizationProjects, organizations::QueryOrganizationProjectsAction, organizations::QueryOrganizationProjectsOutput),
+            ("organizations_QueryRepositories", QueryOrganizationRepositories, organizations::QueryOrganizationRepositoriesAction, organizations::QueryOrganizationRepositoriesOutput),
+            ("organizations_QueryInvitations", QueryOrganizationInvitations, organizations::QueryOrganizationInvitationsAction, organizations::QueryOrganizationInvitationsOutput),
+            ("organizations_Create", CreateOrganization, organizations::CreateOrganizationAction, organizations::CreateOrganizationOutput),
+            ("organizations_Delete", DeleteOrganization, organizations::DeleteOrganizationAction, outputs::Empty),
+            ("organizations_AddMember", AddOrganizationMember, organizations::AddOrganizationMemberAction, outputs::Empty),
+            ("organizations_RemoveMember", RemoveOrganizationMember, organizations::RemoveOrganizationMemberAction, outputs::Empty),
+            ("organizations_InviteMember", InviteOrganizationMember, organizations::InviteOrganizationMemberAction, organizations::InviteOrganizationMemberOutput),
+            ("organizations_DeleteInvitation", DeleteOrganizationInvitation, organizations::DeleteOrganizationInvitationAction, outputs::Empty),
 
             // # Projects
             ("projects_QueryProjects", QueryProjects, projects::QueryProjectsAction, projects::QueryProjectsOutput),
@@ -103,14 +121,9 @@ macro_rules! with_actions {
             ("projects_CreateProject", CreateProject, projects::CreateProjectAction, projects::CreateProjectOutput),
             ("projects_DeleteProject", DeleteProject, projects::DeleteProjectAction, outputs::Empty),
             ("projects_QueryProjectDevices", QueryProjectDevices, projects::QueryProjectDevicesAction, projects::QueryProjectDevicesOutput),
-            ("projects_QueryProjectMembers", QueryProjectMembers, projects::QueryProjectMembersAction, projects::QueryProjectMembersOutput),
-            ("projects_QueryProjectInvitations", QueryProjectInvitations, projects::QueryProjectInvitationsAction, projects::QueryProjectInvitationsOutput),
             ("projects_QueryProjectDeploymentTokens", QueryProjectDeploymentTokens, projects::QueryProjectDeploymentTokensAction, projects::QueryProjectDeploymentTokensOutput),
             ("projects_QueryProjectRepositories", QueryProjectRepositories, projects::QueryProjectRepositoriesAction, projects::QueryProjectRepositoriesOutput),
-            ("projects_AddProjectMember", AddProjectMember, projects::AddProjectMemberAction, outputs::Empty),
-            ("projects_RemoveProjectMember", RemoveProjectMember, projects::RemoveProjectMemberAction, outputs::Empty),
-            ("projects_InviteProjectMember", InviteProjectMember, projects::InviteProjectMemberAction, projects::InviteProjectMemberOutput),
-            ("projects_DeleteProjectInvitation", DeleteProjectInvitation, projects::DeleteProjectInvitationAction, outputs::Empty),
+            ("projects_SetProjectOrganization", SetProjectOrganization, projects::SetProjectOrganizationAction, outputs::Empty),
             // ## Deployment Tokens
             ("projects_CreateDeploymentToken", CreateDeploymentToken, projects::CreateDeploymentTokenAction, projects::CreateDeploymentTokenOutput),
             ("projects_DeleteDeploymentToken", DeleteDeploymentToken, projects::DeleteDeploymentTokenAction, outputs::Empty),
@@ -154,16 +167,11 @@ macro_rules! with_actions {
             ("repositories_GetRepositoryDetails", GetRepositoryDetails, repositories::GetRepositoryDetailsAction, repositories::GetRepositoryDetailsOutput),
             ("repositories_CreateRepository", CreateRepository, repositories::CreateRepositoryAction, repositories::CreateRepositoryOutput),
             ("repositories_DeleteRepository", DeleteRepository, repositories::DeleteRepositoryAction, outputs::Empty),
+            ("repositories_SetOrganization", SetRepositoryOrganization, repositories::SetRepositoryOrganizationAction, outputs::Empty),
             ("repositories_SetRepositoryVisibility", SetRepositoryVisibility, repositories::SetRepositoryVisibilityAction, outputs::Empty),
             ("repositories_QueryRepositoryPackages", QueryRepositoryPackages, repositories::QueryRepositoryPackagesAction, repositories::QueryRepositoryPackagesOutput),
             ("repositories_QueryRepositoryAssets", QueryRepositoryAssets, repositories::QueryRepositoryAssetsAction, repositories::QueryRepositoryAssetsOutput),
-            ("repositories_QueryRepositoryMembers", QueryRepositoryMembers, repositories::QueryRepositoryMembersAction, repositories::QueryRepositoryMembersOutput),
-            ("repositories_QueryRepositoryInvitations", QueryRepositoryInvitations, repositories::QueryRepositoryInvitationsAction, repositories::QueryRepositoryInvitationsOutput),
             ("repositories_QueryRepositoryProjects", QueryRepositoryProjects, repositories::QueryRepositoryProjectsAction, repositories::QueryRepositoryProjectsOutput),
-            ("repositories_AddRepositoryMember", AddRepositoryMember, repositories::AddRepositoryMemberAction, outputs::Empty),
-            ("repositories_RemoveRepositoryMember", RemoveRepositoryMember, repositories::RemoveRepositoryMemberAction, outputs::Empty),
-            ("repositories_InviteRepositoryMember", InviteRepositoryMember, repositories::InviteRepositoryMemberAction, repositories::InviteRepositoryMemberOutput),
-            ("repositories_DeleteRepositoryInvitation", DeleteRepositoryInvitation, repositories::DeleteRepositoryInvitationAction, outputs::Empty),
             // ## Packages
             ("repositories_ResolvePackageByPath", ResolvePackageByPath, repositories::ResolvePackageByPathAction, repositories::ResolvePackageByPathOutput),
             ("repositories_GetPackageDetails", GetPackageDetails, repositories::GetPackageDetailsAction, repositories::GetPackageDetailsOutput),
@@ -284,14 +292,18 @@ macro_rules! with_events {
             // # Projects
             ("projects_Created", projects::ProjectCreatedEvent, { project_id }),
             ("projects_Deleted", projects::ProjectDeletedEvent, {}),
-            ("projects_MemberAdded", projects::ProjectMemberAddedEvent, { user_id, project_id }),
-            ("projects_MemberRemoved", projects::ProjectMemberRemovedEvent, { user_id, project_id }),
-            ("projects_InvitationCreated", projects::ProjectInvitationCreatedEvent, { project_id }),
             ("projects_DeploymentTokenCreated", projects::DeploymentTokenCreatedEvent, { project_id }),
             ("projects_DeploymentTokenDeleted", projects::DeploymentTokenDeletedEvent, { project_id }),
             ("projects_DeploymentTokenFlagsChanged", projects::DeploymentTokenFlagsChangedEvent, { project_id }),
             ("projects_RepositoryAdded", projects::ProjectRepositoryAddedEvent, { project_id, repository_id }),
             ("projects_RepositoryRemoved", projects::ProjectRepositoryRemovedEvent, { project_id, repository_id }),
+
+            // # Organizations
+            ("organizations_Created", organizations::OrganizationCreatedEvent, { organization_id }),
+            ("organizations_Deleted", organizations::OrganizationDeletedEvent, { organization_id }),
+            ("organizations_MemberAdded", organizations::OrganizationMemberAddedEvent, { organization_id, user_id }),
+            ("organizations_MemberRemoved", organizations::OrganizationMemberRemovedEvent, { organization_id, user_id }),
+            ("organizations_InvitationCreated", organizations::OrganizationInvitationCreatedEvent, { organization_id }),
 
             // # Devices
             ("devices_Created", devices::DeviceCreatedEvent, { project_id }),
@@ -299,9 +311,6 @@ macro_rules! with_events {
             ("devices_CertificateAdded", devices::DeviceCertificateAddedEvent, { project_id }),
             ("devices_CertificateDeleted", devices::DeviceCertificateDeletedEvent, { project_id }),
             ("devices_CertificateStatusChanged", devices::DeviceCertificateStatusChangedEvent, { project_id }),
-
-            // # Repositories
-            ("repositories_InvitationCreated", repositories::RepositoryInvitationCreatedEvent, { repository_id }),
         ];
     };
 }

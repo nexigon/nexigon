@@ -3,6 +3,7 @@
 import audit::AuditLogEvent
 import datetime::Timestamp
 import digest::Digest
+import organizations::OrganizationId
 import projects::ProjectId
 import users::UserId
 
@@ -10,11 +11,6 @@ import users::UserId
 #[rust(type = "nexigon_ids::ids::RepositoryId")]
 #[json(type = "string")]
 opaque RepositoryId
-
-/// Unique ID of an invitation to a repository.
-#[rust(type = "nexigon_ids::ids::RepositoryInvitationId")]
-#[json(type = "string")]
-opaque RepositoryInvitationId
 
 /// Unique ID of a repository asset.
 #[rust(type = "nexigon_ids::ids::RepositoryAssetId")]
@@ -91,10 +87,10 @@ record GetRepositoryDetailsOutput {
 
 /// Create a new repository.
 record CreateRepositoryAction {
+    /// Organization to create the repository in.
+    organization_id: OrganizationId,
     /// Name of the repository.
     name: string,
-    /// Owner of the repository.
-    owner?: UserId,
     /// Visibility of the repository.
     /// 
     /// Default to private.
@@ -120,6 +116,14 @@ record CreateRepositorySuccess {
 record DeleteRepositoryAction {
     /// ID of the repository.
     repository_id: RepositoryId,
+}
+
+/// Set the organization of a repository.
+record SetRepositoryOrganizationAction {
+    /// ID of the repository.
+    repository_id: RepositoryId,
+    /// ID of the organization.
+    organization_id: OrganizationId,
 }
 
 /// Set the visibility of a repository.
@@ -174,42 +178,6 @@ record QueryRepositoryAssetsItem {
     digest: Digest,
 }
 
-/// Query the members of a repository.
-record QueryRepositoryMembersAction {
-    /// ID of the repository.
-    repository_id: RepositoryId,
-}
-
-/// Output of querying the members of a repository.
-record QueryRepositoryMembersOutput {
-    /// List of members.
-    members: [QueryRepositoryMembersItem],
-}
-
-/// Member query item.
-record QueryRepositoryMembersItem {
-    /// ID of the user.
-    user_id: UserId,
-    /// Email of the user.
-    email: string,
-    /// Display name of the user.
-    display_name?: string,
-    /// Whether the user is an owner of the repository.
-    is_owner: bool,
-}
-
-/// Query the invitations of a repository.
-record QueryRepositoryInvitationsAction {
-    /// ID of the repository.
-    repository_id: RepositoryId,
-}
-
-/// Output of querying the invitations of a repository.
-record QueryRepositoryInvitationsOutput {
-    /// List of invitations.
-    invitations: [QueryRepositoryInvitationsItem],
-}
-
 /// Query repository projects.
 record QueryRepositoryProjectsAction {
     /// ID of the repository.
@@ -228,54 +196,6 @@ record QueryRepositoryProjectsItem {
     project_id: ProjectId,
     /// Name of the project.
     name: string,
-}
-
-/// An invitation to a repository.
-record QueryRepositoryInvitationsItem {
-    /// ID of the invitation.
-    invitation_id: RepositoryInvitationId,
-    /// Email address of the invitation.
-    email: string,
-    /// ID of the inviting user.
-    inviting_user_id?: UserId,
-}
-
-/// Add a user to a repository.
-record AddRepositoryMemberAction {
-    /// ID of the repository.
-    repository_id: RepositoryId,
-    /// ID of the user to add.
-    user_id: UserId,
-    /// Whether the user should be an owner of the repository.
-    is_owner?: bool,
-}
-
-/// Remove a user from a repository.
-record RemoveRepositoryMemberAction {
-    /// ID of the repository.
-    repository_id: RepositoryId,
-    /// ID of the user to remove.
-    user_id: UserId,
-}
-
-/// Invite a user to a repository.
-record InviteRepositoryMemberAction {
-    /// ID of the repository.
-    repository_id: RepositoryId,
-    /// Email address of the user to invite.
-    email: string,
-}
-
-/// Output of inviting a user to a repository.
-record InviteRepositoryMemberOutput {
-    /// ID of the invitation.
-    invitation_id: RepositoryInvitationId,
-}
-
-/// Delete an invitation to a repository.
-record DeleteRepositoryInvitationAction {
-    /// ID of the invitation.
-    invitation_id: RepositoryInvitationId,
 }
 
 /// Resolve a package by its path.
@@ -687,14 +607,4 @@ record QueryAuditLogEventsAction {
 record QueryAuditLogEventsOutput {
    /// List of audit log events.
    events: [AuditLogEvent],
-}
-
-/// Event indicating that a member has been invited to a repository.
-record RepositoryInvitationCreatedEvent {
-    /// ID of the repository.
-    repository_id: RepositoryId,
-    /// ID of the invitation.
-    invitation_id: RepositoryInvitationId,
-    /// Email address of the invitation.
-    email: string,
 }

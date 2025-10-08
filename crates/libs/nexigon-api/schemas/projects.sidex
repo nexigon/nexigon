@@ -3,6 +3,7 @@
 import audit::AuditLogEvent
 import datetime::Timestamp
 import devices::DeviceId
+import organizations::OrganizationId
 import repositories::RepositoryId
 import users::UserId
 
@@ -10,11 +11,6 @@ import users::UserId
 #[rust(type = "nexigon_ids::ids::ProjectId")]
 #[json(type = "string")]
 opaque ProjectId
-
-/// Unique ID of an invitation to a project.
-#[rust(type = "nexigon_ids::ids::ProjectInvitationId")]
-#[json(type = "string")]
-opaque ProjectInvitationId
 
 /// Unique ID of a deployment token.
 #[rust(type = "nexigon_ids::ids::DeploymentTokenId")]
@@ -61,10 +57,10 @@ record GetProjectDetailsOutput {
 
 /// Create a new project.
 record CreateProjectAction {
+    /// Organization to create the project in.
+    organization_id: OrganizationId,
     /// Name of the project.
     name: string,
-    /// Owner of the project.
-    owner?: UserId,
 }
 
 /// Output of creating a project.
@@ -111,52 +107,6 @@ record QueryProjectDevicesItem {
     pending_certificates_count: u32,
 }
 
-/// Query the members of a project.
-record QueryProjectMembersAction {
-    /// ID of the project.
-    project_id: ProjectId,
-}
-
-/// Output of querying the members of a project.
-record QueryProjectMembersOutput {
-    /// List of members.
-    users: [QueryProjectMembersItem],
-}
-
-/// Query the outstanding invitations of a project.
-record QueryProjectInvitationsAction {
-    /// ID of the project.
-    project_id: ProjectId,
-}
-
-/// Output of querying the invitations of a project.
-record QueryProjectInvitationsOutput {
-    /// List of outstanding invitations.
-    invitations: [QueryProjectInvitationsItem],
-}
-
-/// Project invitation item.
-record QueryProjectInvitationsItem {
-    /// ID of the invitation.
-    invitation_id: ProjectInvitationId,
-    /// Email address of the invitation.
-    email: string,
-    /// ID of the inviting user.
-    inviting_user_id?: UserId,
-}
-
-/// Member item.
-record QueryProjectMembersItem {
-    /// ID of the user.
-    user_id: UserId,
-    /// Name of the user.
-    display_name?: string,
-    /// Email of the user.
-    email: string,
-    /// Whether the user is an owner of the project.
-    is_owner: bool,
-}
-
 /// Query the deployment tokens of a project.
 record QueryProjectDeploymentTokensAction {
     /// ID of the project.
@@ -201,42 +151,12 @@ record QueryProjectRepositoriesItem {
     name: string,
 }
 
-/// Add a user to a project.
-record AddProjectMemberAction {
+/// Set the organization of a project.
+record SetProjectOrganizationAction {
     /// ID of the project.
     project_id: ProjectId,
-    /// ID of the user to add.
-    user_id: UserId,
-    /// Whether the user should be an owner of the project.
-    is_owner?: bool,
-}
-
-/// Remove a user from a project.
-record RemoveProjectMemberAction {
-    /// ID of the project.
-    project_id: ProjectId,
-    /// ID of the user.
-    user_id: UserId,
-}
-
-/// Invite a user to a project.
-record InviteProjectMemberAction {
-    /// ID of the project.
-    project_id: ProjectId,
-    /// Email address of the user to invite.
-    email: string,
-}
-
-/// Output of inviting a user to a project.
-record InviteProjectMemberOutput {
-    /// ID of the invitation.
-    invitation_id: ProjectInvitationId,
-}
-
-/// Delete an invitation to a project.
-record DeleteProjectInvitationAction {
-    /// ID of the invitation.
-    invitation_id: ProjectInvitationId,
+    /// ID of the organization.
+    organization_id: OrganizationId,
 }
 
 /// Flags for deployment tokens.
@@ -315,34 +235,6 @@ record ProjectCreatedEvent {
 record ProjectDeletedEvent {
     /// ID of the project.
     project_id: ProjectId,
-}
-
-/// Event indicating that a member has been added to a project.
-record ProjectMemberAddedEvent {
-    /// ID of the project.
-    project_id: ProjectId,
-    /// ID of the user.
-    user_id: UserId,
-    /// Indicates whether the member is an owner of the project.
-    is_owner: bool,
-}
-
-/// Event indicating that a member has been removed from a project.
-record ProjectMemberRemovedEvent {
-    /// ID of the project.
-    project_id: ProjectId,
-    /// ID of the user.
-    user_id: UserId,
-}
-
-/// Event indicating that a member has been invited to a project.
-record ProjectInvitationCreatedEvent {
-    /// ID of the project.
-    project_id: ProjectId,
-    /// ID of the invitation.
-    invitation_id: ProjectInvitationId,
-    /// Email address of the invitation.
-    email: string,
 }
 
 /// Event indicating that a deployment token has been created.

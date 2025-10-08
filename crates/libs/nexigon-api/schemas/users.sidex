@@ -3,10 +3,10 @@
 import actor::Actor
 import datetime::Timestamp
 import devices::DeviceId
+import organizations::OrganizationId
+import organizations::OrganizationInvitationId
 import projects::ProjectId
-import projects::ProjectInvitationId
 import repositories::RepositoryId
-import repositories::RepositoryInvitationId
 
 /// Unique ID of a user.
 #[rust(type = "nexigon_ids::ids::UserId")]
@@ -151,108 +151,52 @@ record QueryUserTokensItem {
     name?: string,
 }
 
-/// Query the projects of a user.
-record QueryUserProjectsAction {
-    /// User ID.
-    user_id: UserId,
-}
-
-/// Output of querying the projects of a user.
-record QueryUserProjectsOutput {
-    /// List of projects.
-    projects: [QueryUserProjectsItem],
-}
-
-/// Project item.
-record QueryUserProjectsItem {
-    /// ID of the project.
-    project_id: ProjectId,
-    /// Name of the project.
-    name: string,
-    /// Number of devices in the project.
-    devices: u32,
-}
-
-/// Query the project invitations of a user.
-record QueryUserProjectInvitationsAction {
+/// Query the organizations of a user.
+record QueryUserOrganizationsAction {
     /// ID of the user.
     user_id: UserId,
 }
 
-/// Output of querying the project invitations of a user.
-record QueryUserProjectInvitationsOutput {
-    /// List of project invitations.
-    invitations: [QueryUserProjectInvitationsItem],
+/// Output of querying the organizations of a user.
+record QueryUserOrganizationsOutput {
+    /// List of organizations.
+    organizations: [QueryUserOrganizationsItem],
 }
 
-/// Project invitation item.
-record QueryUserProjectInvitationsItem {
+/// Organization item.
+record QueryUserOrganizationsItem {
+    /// ID of the organization.
+    organization_id: OrganizationId,
+    /// Name of the organization.
+    name: string,
+}
+
+/// Query the organization invitations of a user.
+record QueryUserOrganizationInvitationsAction {
+    /// ID of the user.
+    user_id: UserId,
+}
+
+/// Output of querying the organization invitations of a user.
+record QueryUserOrganizationInvitationsOutput {
+    /// List of organization invitations.
+    invitations: [QueryUserOrganizationInvitationsItem],
+}
+
+/// Organization invitation item.
+record QueryUserOrganizationInvitationsItem {
     /// ID of the invitation.
-    invitation_id: ProjectInvitationId,
-    /// Information about the project.
-    project: QueryUserProjectInvitationsItemProject,
+    invitation_id: OrganizationInvitationId,
+    /// Information about the organization.
+    organization: QueryUserOrganizationInvitationsItemOrganization,
 }
 
-/// Project invitation item project.
-record QueryUserProjectInvitationsItemProject {
-    /// ID of the project.
-    project_id: ProjectId,
-    /// Name of the project.
+/// Organization invitation item organization.
+record QueryUserOrganizationInvitationsItemOrganization {
+    /// ID of the organization.
+    organization_id: OrganizationId,
+    /// Name of the organization.
     name: string,
-}
-
-/// Query the repository invitations of a user.
-record QueryUserRepositoryInvitationsAction {
-    /// ID of the user.
-    user_id: UserId,
-}
-
-/// Output of querying the repository invitations of a user.
-record QueryUserRepositoryInvitationsOutput {
-    /// List of repository invitations.
-    invitations: [QueryUserRepositoryInvitationsItem],
-}
-
-/// Repository invitation item.
-record QueryUserRepositoryInvitationsItem {
-    /// ID of the invitation.
-    invitation_id: RepositoryInvitationId,
-    /// Information about the repository.
-    repository: QueryUserRepositoryInvitationsItemRepository,
-}
-
-/// Repository invitation item repository.
-record QueryUserRepositoryInvitationsItemRepository {
-    /// ID of the repository.
-    repository_id: RepositoryId,
-    /// Name of the repository.
-    name: string,
-}
-
-/// Query the repositories of a user.
-record QueryUserRepositoriesAction {
-    /// ID of the user.
-    user_id: UserId,
-}
-
-/// Output of querying the repositories of a user.
-record QueryUserRepositoriesOutput {
-    /// List of repositories.
-    repositories: [QueryUserRepositoriesItem],
-}
-
-/// Repository item.
-record QueryUserRepositoriesItem {
-    /// ID of the repository.
-    repository_id: RepositoryId,
-    /// Public name of the repository.
-    name: string,
-    /// Timestamp when the repository was created.
-    created_at: Timestamp,
-    /// Number of packages in the repository.
-    package_count: u32,
-    /// Indicates whether the user is an owner of the repository.
-    is_owner: bool,
 }
 
 /// Query the sessions of a user.
@@ -473,16 +417,10 @@ variant CompleteRegistrationOutput {
     Failed,
 }
 
-/// Accept a project invitation.
-record AcceptProjectInvitationAction {
+/// Accept a organization invitation.
+record AcceptOrganizationInvitationAction {
     /// ID of the invitation.
-    invitation_id: ProjectInvitationId,
-}
-
-/// Accept a repository invitation.
-record AcceptRepositoryInvitationAction {
-    /// ID of the repository.
-    invitation_id: RepositoryInvitationId,
+    invitation_id: OrganizationInvitationId,
 }
 
 /// Event indicating that a user has been created.
