@@ -34,6 +34,7 @@ fn main() {
         [
             ("actor", "Actor"),
             ("users", "Users"),
+            ("organizations", "Organizations"),
             ("projects", "Projects"),
             ("devices", "Devices"),
             ("repositories", "Repositories"),

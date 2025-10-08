@@ -8471,6 +8471,10 @@
       "x-displayName": "Users"
     },
     {
+      "name": "organizations",
+      "x-displayName": "Organizations"
+    },
+    {
       "name": "projects",
       "x-displayName": "Projects"
     },
