@@ -6,12 +6,12 @@
     "description": "Welcome to the Nexigon Hub API documentation!\n\nNexigon Hub offers an RPC-style HTTP API.\n"
   },
   "paths": {
-    "/api/v1/actions/invoke/users_QueryUsers": {
+    "/api/v1/actions/invoke/users_Query": {
       "post": {
         "tags": [
           "users"
         ],
-        "summary": "QueryUsers",
+        "summary": "Query",
         "description": "Query the users of the instance.",
         "requestBody": {
           "content": {
@@ -36,12 +36,12 @@
         }
       }
     },
-    "/api/v1/actions/invoke/users_GetUserDetails": {
+    "/api/v1/actions/invoke/users_GetDetails": {
       "post": {
         "tags": [
           "users"
         ],
-        "summary": "GetUserDetails",
+        "summary": "GetDetails",
         "description": "Get information about a user.",
         "requestBody": {
           "content": {
@@ -126,12 +126,12 @@
         }
       }
     },
-    "/api/v1/actions/invoke/users_SetUserDisplayName": {
+    "/api/v1/actions/invoke/users_SetDisplayName": {
       "post": {
         "tags": [
           "users"
         ],
-        "summary": "SetUserDisplayName",
+        "summary": "SetDisplayName",
         "description": "Set the display name of a user.",
         "requestBody": {
           "content": {
@@ -156,12 +156,12 @@
         }
       }
     },
-    "/api/v1/actions/invoke/users_SetUserPassword": {
+    "/api/v1/actions/invoke/users_SetPassword": {
       "post": {
         "tags": [
           "users"
         ],
-        "summary": "SetUserPassword",
+        "summary": "SetPassword",
         "description": "Set the password of a user.",
         "requestBody": {
           "content": {
@@ -186,12 +186,12 @@
         }
       }
     },
-    "/api/v1/actions/invoke/users_SetUserIsAdmin": {
+    "/api/v1/actions/invoke/users_SetIsAdmin": {
       "post": {
         "tags": [
           "users"
         ],
-        "summary": "SetUserIsAdmin",
+        "summary": "SetIsAdmin",
         "description": "Set whether the user is an instance administrator.",
         "requestBody": {
           "content": {
@@ -216,12 +216,12 @@
         }
       }
     },
-    "/api/v1/actions/invoke/users_QueryUserTokens": {
+    "/api/v1/actions/invoke/users_QueryTokens": {
       "post": {
         "tags": [
           "users"
         ],
-        "summary": "QueryUserTokens",
+        "summary": "QueryTokens",
         "description": "Query the tokens of a user.",
         "requestBody": {
           "content": {
@@ -306,12 +306,12 @@
         }
       }
     },
-    "/api/v1/actions/invoke/users_QueryUserSessions": {
+    "/api/v1/actions/invoke/users_QuerySessions": {
       "post": {
         "tags": [
           "users"
         ],
-        "summary": "QueryUserSessions",
+        "summary": "QuerySessions",
         "description": "Query the sessions of a user.",
         "requestBody": {
           "content": {
@@ -336,12 +336,12 @@
         }
       }
     },
-    "/api/v1/actions/invoke/users_AuthenticateWithUserToken": {
+    "/api/v1/actions/invoke/users_AuthenticateWithToken": {
       "post": {
         "tags": [
           "users"
         ],
-        "summary": "AuthenticateWithUserToken",
+        "summary": "AuthenticateWithToken",
         "description": "Authenticate a user with a token.",
         "requestBody": {
           "content": {
@@ -426,12 +426,12 @@
         }
       }
     },
-    "/api/v1/actions/invoke/users_CreateUserToken": {
+    "/api/v1/actions/invoke/users_CreateToken": {
       "post": {
         "tags": [
           "users"
         ],
-        "summary": "CreateUserToken",
+        "summary": "CreateToken",
         "description": "Create a user token.",
         "requestBody": {
           "content": {
@@ -456,12 +456,12 @@
         }
       }
     },
-    "/api/v1/actions/invoke/users_DeleteUserToken": {
+    "/api/v1/actions/invoke/users_DeleteToken": {
       "post": {
         "tags": [
           "users"
         ],
-        "summary": "DeleteUserToken",
+        "summary": "DeleteToken",
         "description": "Delete a user token.",
         "requestBody": {
           "content": {
@@ -486,12 +486,12 @@
         }
       }
     },
-    "/api/v1/actions/invoke/users_InitiateUserSession": {
+    "/api/v1/actions/invoke/users_InitiateSession": {
       "post": {
         "tags": [
           "users"
         ],
-        "summary": "InitiateUserSession",
+        "summary": "InitiateSession",
         "description": "Initiate a user session.",
         "requestBody": {
           "content": {
@@ -516,12 +516,12 @@
         }
       }
     },
-    "/api/v1/actions/invoke/users_TerminateUserSession": {
+    "/api/v1/actions/invoke/users_TerminateSession": {
       "post": {
         "tags": [
           "users"
         ],
-        "summary": "TerminateUserSession",
+        "summary": "TerminateSession",
         "description": "Terminate a user session.",
         "requestBody": {
           "content": {
@@ -546,12 +546,12 @@
         }
       }
     },
-    "/api/v1/actions/invoke/users_CleanupExpiredUserSessions": {
+    "/api/v1/actions/invoke/users_CleanupExpiredSessions": {
       "post": {
         "tags": [
           "users"
         ],
-        "summary": "CleanupExpiredUserSessions",
+        "summary": "CleanupExpiredSessions",
         "description": "Cleanup expired user sessions.",
         "requestBody": {
           "content": {
@@ -576,12 +576,12 @@
         }
       }
     },
-    "/api/v1/actions/invoke/users_RegisterUser": {
+    "/api/v1/actions/invoke/users_Register": {
       "post": {
         "tags": [
           "users"
         ],
-        "summary": "RegisterUser",
+        "summary": "Register",
         "description": "Register a new user with an email and password.",
         "requestBody": {
           "content": {
@@ -1026,12 +1026,12 @@
         }
       }
     },
-    "/api/v1/actions/invoke/projects_QueryProjects": {
+    "/api/v1/actions/invoke/projects_Query": {
       "post": {
         "tags": [
           "projects"
         ],
-        "summary": "QueryProjects",
+        "summary": "Query",
         "description": "Query the projects of the instance.",
         "requestBody": {
           "content": {
@@ -1056,12 +1056,12 @@
         }
       }
     },
-    "/api/v1/actions/invoke/projects_GetProjectDetails": {
+    "/api/v1/actions/invoke/projects_GetDetails": {
       "post": {
         "tags": [
           "projects"
         ],
-        "summary": "GetProjectDetails",
+        "summary": "GetDetails",
         "description": "Get information about a project.",
         "requestBody": {
           "content": {
@@ -1086,12 +1086,12 @@
         }
       }
     },
-    "/api/v1/actions/invoke/projects_CreateProject": {
+    "/api/v1/actions/invoke/projects_Create": {
       "post": {
         "tags": [
           "projects"
         ],
-        "summary": "CreateProject",
+        "summary": "Create",
         "description": "Create a new project.",
         "requestBody": {
           "content": {
@@ -1116,12 +1116,12 @@
         }
       }
     },
-    "/api/v1/actions/invoke/projects_DeleteProject": {
+    "/api/v1/actions/invoke/projects_Delete": {
       "post": {
         "tags": [
           "projects"
         ],
-        "summary": "DeleteProject",
+        "summary": "Delete",
         "description": "Delete a project.",
         "requestBody": {
           "content": {
@@ -1146,12 +1146,12 @@
         }
       }
     },
-    "/api/v1/actions/invoke/projects_QueryProjectDevices": {
+    "/api/v1/actions/invoke/projects_QueryDevices": {
       "post": {
         "tags": [
           "projects"
         ],
-        "summary": "QueryProjectDevices",
+        "summary": "QueryDevices",
         "description": "Query the devices of a project.",
         "requestBody": {
           "content": {
@@ -1176,12 +1176,12 @@
         }
       }
     },
-    "/api/v1/actions/invoke/projects_QueryProjectDeploymentTokens": {
+    "/api/v1/actions/invoke/projects_QueryDeploymentTokens": {
       "post": {
         "tags": [
           "projects"
         ],
-        "summary": "QueryProjectDeploymentTokens",
+        "summary": "QueryDeploymentTokens",
         "description": "Query the deployment tokens of a project.",
         "requestBody": {
           "content": {
@@ -1206,12 +1206,12 @@
         }
       }
     },
-    "/api/v1/actions/invoke/projects_QueryProjectRepositories": {
+    "/api/v1/actions/invoke/projects_QueryLinkedRepositories": {
       "post": {
         "tags": [
           "projects"
         ],
-        "summary": "QueryProjectRepositories",
+        "summary": "QueryLinkedRepositories",
         "description": "Query repositories of a project.",
         "requestBody": {
           "content": {
@@ -1236,12 +1236,12 @@
         }
       }
     },
-    "/api/v1/actions/invoke/projects_SetProjectOrganization": {
+    "/api/v1/actions/invoke/projects_SetOrganization": {
       "post": {
         "tags": [
           "projects"
         ],
-        "summary": "SetProjectOrganization",
+        "summary": "SetOrganization",
         "description": "Set the organization of a project.",
         "requestBody": {
           "content": {
@@ -1386,12 +1386,12 @@
         }
       }
     },
-    "/api/v1/actions/invoke/projects_AddProjectRepository": {
+    "/api/v1/actions/invoke/projects_LinkRepository": {
       "post": {
         "tags": [
           "projects"
         ],
-        "summary": "AddProjectRepository",
+        "summary": "LinkRepository",
         "description": "Add a repository to the project.",
         "requestBody": {
           "content": {
@@ -1416,12 +1416,12 @@
         }
       }
     },
-    "/api/v1/actions/invoke/projects_RemoveProjectRepository": {
+    "/api/v1/actions/invoke/projects_UnlinkRepository": {
       "post": {
         "tags": [
           "projects"
         ],
-        "summary": "RemoveProjectRepository",
+        "summary": "UnlinkRepository",
         "description": "Remove a repository from the project.",
         "requestBody": {
           "content": {
@@ -1446,12 +1446,12 @@
         }
       }
     },
-    "/api/v1/actions/invoke/devices_QueryDevices": {
+    "/api/v1/actions/invoke/devices_Devices": {
       "post": {
         "tags": [
           "devices"
         ],
-        "summary": "QueryDevices",
+        "summary": "Devices",
         "description": "Query the devices of the instance.",
         "requestBody": {
           "content": {
@@ -1476,12 +1476,12 @@
         }
       }
     },
-    "/api/v1/actions/invoke/devices_GetDeviceDetails": {
+    "/api/v1/actions/invoke/devices_GetDetails": {
       "post": {
         "tags": [
           "devices"
         ],
-        "summary": "GetDeviceDetails",
+        "summary": "GetDetails",
         "description": "Get information about a device.",
         "requestBody": {
           "content": {
@@ -1506,12 +1506,12 @@
         }
       }
     },
-    "/api/v1/actions/invoke/devices_CreateDevice": {
+    "/api/v1/actions/invoke/devices_Create": {
       "post": {
         "tags": [
           "devices"
         ],
-        "summary": "CreateDevice",
+        "summary": "Create",
         "description": "Create a new device.",
         "requestBody": {
           "content": {
@@ -1536,12 +1536,12 @@
         }
       }
     },
-    "/api/v1/actions/invoke/devices_DeleteDevice": {
+    "/api/v1/actions/invoke/devices_Delete": {
       "post": {
         "tags": [
           "devices"
         ],
-        "summary": "DeleteDevice",
+        "summary": "Delete",
         "description": "Delete a device.",
         "requestBody": {
           "content": {
@@ -1566,12 +1566,12 @@
         }
       }
     },
-    "/api/v1/actions/invoke/devices_SetDeviceName": {
+    "/api/v1/actions/invoke/devices_SetName": {
       "post": {
         "tags": [
           "devices"
         ],
-        "summary": "SetDeviceName",
+        "summary": "SetName",
         "description": "Set the name of a device.",
         "requestBody": {
           "content": {
@@ -1686,12 +1686,12 @@
         }
       }
     },
-    "/api/v1/actions/invoke/devices_AuthenticateDevice": {
+    "/api/v1/actions/invoke/devices_Authenticate": {
       "post": {
         "tags": [
           "devices"
         ],
-        "summary": "AuthenticateDevice",
+        "summary": "Authenticate",
         "description": "Authenticate a device.\n\n**Note: The certificate fingerprint must be externally verified (mutual TLS).**",
         "requestBody": {
           "content": {
@@ -1716,12 +1716,12 @@
         }
       }
     },
-    "/api/v1/actions/invoke/devices_AddDeviceCertificate": {
+    "/api/v1/actions/invoke/devices_AddCertificate": {
       "post": {
         "tags": [
           "devices"
         ],
-        "summary": "AddDeviceCertificate",
+        "summary": "AddCertificate",
         "description": "Add a device certificate.",
         "requestBody": {
           "content": {
@@ -1746,12 +1746,12 @@
         }
       }
     },
-    "/api/v1/actions/invoke/devices_DeleteDeviceCertificate": {
+    "/api/v1/actions/invoke/devices_DeleteCertificate": {
       "post": {
         "tags": [
           "devices"
         ],
-        "summary": "DeleteDeviceCertificate",
+        "summary": "DeleteCertificate",
         "description": "Delete a device certificate.",
         "requestBody": {
           "content": {
@@ -1776,12 +1776,12 @@
         }
       }
     },
-    "/api/v1/actions/invoke/devices_SetDeviceCertificateStatus": {
+    "/api/v1/actions/invoke/devices_SetCertificateStatus": {
       "post": {
         "tags": [
           "devices"
         ],
-        "summary": "SetDeviceCertificateStatus",
+        "summary": "SetCertificateStatus",
         "description": "Set the status of a device certificate.",
         "requestBody": {
           "content": {
@@ -1806,12 +1806,12 @@
         }
       }
     },
-    "/api/v1/actions/invoke/devices_RegisterDeviceConnection": {
+    "/api/v1/actions/invoke/devices_RegisterConnection": {
       "post": {
         "tags": [
           "devices"
         ],
-        "summary": "RegisterDeviceConnection",
+        "summary": "RegisterConnection",
         "description": "Register a connection of a device to a cluster node.",
         "requestBody": {
           "content": {
@@ -1836,12 +1836,12 @@
         }
       }
     },
-    "/api/v1/actions/invoke/devices_UnregisterDeviceConnection": {
+    "/api/v1/actions/invoke/devices_UnregisterConnection": {
       "post": {
         "tags": [
           "devices"
         ],
-        "summary": "UnregisterDeviceConnection",
+        "summary": "UnregisterConnection",
         "description": "Unregister a connection of a device to a cluster node.",
         "requestBody": {
           "content": {
@@ -1866,12 +1866,12 @@
         }
       }
     },
-    "/api/v1/actions/invoke/devices_IssueDeviceHttpProxyToken": {
+    "/api/v1/actions/invoke/devices_IssueHttpProxyToken": {
       "post": {
         "tags": [
           "devices"
         ],
-        "summary": "IssueDeviceHttpProxyToken",
+        "summary": "IssueHttpProxyToken",
         "description": "Issue a HTTP proxy JWT.",
         "requestBody": {
           "content": {
@@ -1896,12 +1896,12 @@
         }
       }
     },
-    "/api/v1/actions/invoke/devices_ValidateDeviceHttpProxyToken": {
+    "/api/v1/actions/invoke/devices_ValidateHttpProxyToken": {
       "post": {
         "tags": [
           "devices"
         ],
-        "summary": "ValidateDeviceHttpProxyToken",
+        "summary": "ValidateHttpProxyToken",
         "description": "Validate a HTTP proxy JWT.",
         "requestBody": {
           "content": {
@@ -1926,12 +1926,12 @@
         }
       }
     },
-    "/api/v1/actions/invoke/devices_PublishDeviceEvents": {
+    "/api/v1/actions/invoke/devices_PublishEvents": {
       "post": {
         "tags": [
           "devices"
         ],
-        "summary": "PublishDeviceEvents",
+        "summary": "PublishEvents",
         "description": "Publish device events.",
         "requestBody": {
           "content": {
@@ -1956,12 +1956,12 @@
         }
       }
     },
-    "/api/v1/actions/invoke/devices_QueryDeviceEvents": {
+    "/api/v1/actions/invoke/devices_QueryEvents": {
       "post": {
         "tags": [
           "devices"
         ],
-        "summary": "QueryDeviceEvents",
+        "summary": "QueryEvents",
         "description": "Query device events.",
         "requestBody": {
           "content": {
@@ -1986,12 +1986,12 @@
         }
       }
     },
-    "/api/v1/actions/invoke/devices_SetDeviceProperty": {
+    "/api/v1/actions/invoke/devices_SetProperty": {
       "post": {
         "tags": [
           "devices"
         ],
-        "summary": "SetDeviceProperty",
+        "summary": "SetProperty",
         "description": "Set a property of a device.",
         "requestBody": {
           "content": {
@@ -2016,12 +2016,12 @@
         }
       }
     },
-    "/api/v1/actions/invoke/devices_GetDeviceProperty": {
+    "/api/v1/actions/invoke/devices_GetProperty": {
       "post": {
         "tags": [
           "devices"
         ],
-        "summary": "GetDeviceProperty",
+        "summary": "GetProperty",
         "description": "Get a property of a device.",
         "requestBody": {
           "content": {
@@ -2046,12 +2046,12 @@
         }
       }
     },
-    "/api/v1/actions/invoke/devices_QueryDeviceProperties": {
+    "/api/v1/actions/invoke/devices_QueryProperties": {
       "post": {
         "tags": [
           "devices"
         ],
-        "summary": "QueryDeviceProperties",
+        "summary": "QueryProperties",
         "description": "Query the properties of a device.",
         "requestBody": {
           "content": {
@@ -2076,12 +2076,12 @@
         }
       }
     },
-    "/api/v1/actions/invoke/repositories_ResolveRepositoryName": {
+    "/api/v1/actions/invoke/repositories_ResolveName": {
       "post": {
         "tags": [
           "repositories"
         ],
-        "summary": "ResolveRepositoryName",
+        "summary": "ResolveName",
         "description": "Resolve a repository by its name.",
         "requestBody": {
           "content": {
@@ -2106,12 +2106,12 @@
         }
       }
     },
-    "/api/v1/actions/invoke/repositories_GetRepositoryDetails": {
+    "/api/v1/actions/invoke/repositories_GetDetails": {
       "post": {
         "tags": [
           "repositories"
         ],
-        "summary": "GetRepositoryDetails",
+        "summary": "GetDetails",
         "description": "Get information about a repository.",
         "requestBody": {
           "content": {
@@ -2136,12 +2136,12 @@
         }
       }
     },
-    "/api/v1/actions/invoke/repositories_CreateRepository": {
+    "/api/v1/actions/invoke/repositories_Create": {
       "post": {
         "tags": [
           "repositories"
         ],
-        "summary": "CreateRepository",
+        "summary": "Create",
         "description": "Create a new repository.",
         "requestBody": {
           "content": {
@@ -2166,12 +2166,12 @@
         }
       }
     },
-    "/api/v1/actions/invoke/repositories_DeleteRepository": {
+    "/api/v1/actions/invoke/repositories_Delete": {
       "post": {
         "tags": [
           "repositories"
         ],
-        "summary": "DeleteRepository",
+        "summary": "Delete",
         "description": "Delete a repository.",
         "requestBody": {
           "content": {
@@ -2226,12 +2226,12 @@
         }
       }
     },
-    "/api/v1/actions/invoke/repositories_SetRepositoryVisibility": {
+    "/api/v1/actions/invoke/repositories_SetVisibility": {
       "post": {
         "tags": [
           "repositories"
         ],
-        "summary": "SetRepositoryVisibility",
+        "summary": "SetVisibility",
         "description": "Set the visibility of a repository.",
         "requestBody": {
           "content": {
@@ -2256,12 +2256,12 @@
         }
       }
     },
-    "/api/v1/actions/invoke/repositories_QueryRepositoryPackages": {
+    "/api/v1/actions/invoke/repositories_QueryPackages": {
       "post": {
         "tags": [
           "repositories"
         ],
-        "summary": "QueryRepositoryPackages",
+        "summary": "QueryPackages",
         "description": "Query the packages of a repository.",
         "requestBody": {
           "content": {
@@ -2286,12 +2286,12 @@
         }
       }
     },
-    "/api/v1/actions/invoke/repositories_QueryRepositoryAssets": {
+    "/api/v1/actions/invoke/repositories_QueryAssets": {
       "post": {
         "tags": [
           "repositories"
         ],
-        "summary": "QueryRepositoryAssets",
+        "summary": "QueryAssets",
         "description": "Query the assets of a repository.",
         "requestBody": {
           "content": {
@@ -2316,12 +2316,12 @@
         }
       }
     },
-    "/api/v1/actions/invoke/repositories_QueryRepositoryProjects": {
+    "/api/v1/actions/invoke/repositories_QueryLinkedProjects": {
       "post": {
         "tags": [
           "repositories"
         ],
-        "summary": "QueryRepositoryProjects",
+        "summary": "QueryLinkedProjects",
         "description": "Query repository projects.",
         "requestBody": {
           "content": {
@@ -2766,12 +2766,12 @@
         }
       }
     },
-    "/api/v1/actions/invoke/repositories_SetRepositoryS3Config": {
+    "/api/v1/actions/invoke/repositories_SetS3Config": {
       "post": {
         "tags": [
           "repositories"
         ],
-        "summary": "SetRepositoryS3Config",
+        "summary": "SetS3Config",
         "description": "Set the S3 configuration for the repository.",
         "requestBody": {
           "content": {
@@ -2796,12 +2796,12 @@
         }
       }
     },
-    "/api/v1/actions/invoke/repositories_GetRepositoryS3Config": {
+    "/api/v1/actions/invoke/repositories_GetS3Config": {
       "post": {
         "tags": [
           "repositories"
         ],
-        "summary": "GetRepositoryS3Config",
+        "summary": "GetS3Config",
         "description": "Get the S3 configuration for the repository.",
         "requestBody": {
           "content": {
@@ -2976,12 +2976,12 @@
         }
       }
     },
-    "/api/v1/actions/invoke/repositories_QueryAuditLogEvents": {
+    "/api/v1/actions/invoke/repositories_QueryAuditLog": {
       "post": {
         "tags": [
           "repositories"
         ],
-        "summary": "QueryAuditLogEvents",
+        "summary": "QueryAuditLog",
         "description": "Query the audit log of the repository.",
         "requestBody": {
           "content": {
@@ -3066,12 +3066,12 @@
         }
       }
     },
-    "/api/v1/actions/invoke/jobs_QueryJobs": {
+    "/api/v1/actions/invoke/jobs_Query": {
       "post": {
         "tags": [
           "jobs"
         ],
-        "summary": "QueryJobs",
+        "summary": "Query",
         "description": "Query the jobs of the instance.",
         "requestBody": {
           "content": {
@@ -3096,12 +3096,12 @@
         }
       }
     },
-    "/api/v1/actions/invoke/instance_GetInstanceStatistics": {
+    "/api/v1/actions/invoke/instance_GetStatistics": {
       "post": {
         "tags": [
           "instance"
         ],
-        "summary": "GetInstanceStatistics",
+        "summary": "GetStatistics",
         "description": "Get instance statistics.",
         "requestBody": {
           "content": {
@@ -3126,12 +3126,12 @@
         }
       }
     },
-    "/api/v1/actions/invoke/instance_GetInstanceSettingsRaw": {
+    "/api/v1/actions/invoke/instance_GetSettingsRaw": {
       "post": {
         "tags": [
           "instance"
         ],
-        "summary": "GetInstanceSettingsRaw",
+        "summary": "GetSettingsRaw",
         "description": "Get the settings of the instance.",
         "requestBody": {
           "content": {
@@ -3156,12 +3156,12 @@
         }
       }
     },
-    "/api/v1/actions/invoke/instance_SetInstanceSettingRaw": {
+    "/api/v1/actions/invoke/instance_SetSettingRaw": {
       "post": {
         "tags": [
           "instance"
         ],
-        "summary": "SetInstanceSettingRaw",
+        "summary": "SetSettingRaw",
         "description": "Set a setting of the instance.",
         "requestBody": {
           "content": {
@@ -3186,12 +3186,12 @@
         }
       }
     },
-    "/api/v1/actions/invoke/cluster_GetClusterDetails": {
+    "/api/v1/actions/invoke/cluster_GetDetails": {
       "post": {
         "tags": [
           "cluster"
         ],
-        "summary": "GetClusterDetails",
+        "summary": "GetDetails",
         "description": "Get information about the cluster.",
         "requestBody": {
           "content": {
@@ -3216,12 +3216,12 @@
         }
       }
     },
-    "/api/v1/actions/invoke/cluster_RegisterClusterNode": {
+    "/api/v1/actions/invoke/cluster_RegisterNode": {
       "post": {
         "tags": [
           "cluster"
         ],
-        "summary": "RegisterClusterNode",
+        "summary": "RegisterNode",
         "description": "Register a new cluster node.",
         "requestBody": {
           "content": {
@@ -3246,12 +3246,12 @@
         }
       }
     },
-    "/api/v1/actions/invoke/cluster_ReportClusterNodeHeartbeat": {
+    "/api/v1/actions/invoke/cluster_ReportNodeHeartbeat": {
       "post": {
         "tags": [
           "cluster"
         ],
-        "summary": "ReportClusterNodeHeartbeat",
+        "summary": "ReportNodeHeartbeat",
         "description": "Report the heartbeat of a cluster node.",
         "requestBody": {
           "content": {
@@ -3276,12 +3276,12 @@
         }
       }
     },
-    "/api/v1/actions/invoke/cluster_CleanupInactiveClusterNodes": {
+    "/api/v1/actions/invoke/cluster_CleanupInactiveNodes": {
       "post": {
         "tags": [
           "cluster"
         ],
-        "summary": "CleanupInactiveClusterNodes",
+        "summary": "CleanupInactiveNodes",
         "description": "Cleanup inactive cluster nodes.",
         "requestBody": {
           "content": {
