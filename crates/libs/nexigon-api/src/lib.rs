@@ -136,7 +136,7 @@ macro_rules! with_actions {
             ("projects_UnlinkRepository", RemoveProjectRepository, projects::RemoveProjectRepositoryAction, outputs::Empty),
 
             // # Devices
-            ("devices_Devices", QueryDevices, devices::QueryDevicesAction, devices::QueryDevicesOutput),
+            ("devices_Query", QueryDevices, devices::QueryDevicesAction, devices::QueryDevicesOutput),
             ("devices_GetDetails", GetDeviceDetails, devices::GetDeviceDetailsAction, devices::GetDeviceDetailsOutput),
             ("devices_Create", CreateDevice, devices::CreateDeviceAction, devices::CreateDeviceOutput),
             ("devices_Delete", DeleteDevice, devices::DeleteDeviceAction, outputs::Empty),
@@ -182,15 +182,15 @@ macro_rules! with_actions {
             ("repositories_DeletePackage", DeletePackage, repositories::DeletePackageAction, outputs::Empty),
             ("repositories_QueryPackageVersions", QueryPackageVersions, repositories::QueryPackageVersionsAction, repositories::QueryPackageVersionsOutput),
             // ## Package Versions
-            ("repositories_ResolvePackageVersionByPath", ResolvePackageVersionByPath, repositories::ResolvePackageVersionByPathAction, repositories::ResolvePackageVersionByPathOutput),
-            ("repositories_GetPackageVersionDetails", GetPackageVersionDetails, repositories::GetPackageVersionDetailsAction, repositories::GetPackageVersionDetailsOutput),
-            ("repositories_CreatePackageVersion", CreatePackageVersion, repositories::CreatePackageVersionAction, repositories::CreatePackageVersionOutput),
-            ("repositories_DeletePackageVersion", DeletePackageVersion, repositories::DeletePackageVersionAction, outputs::Empty),
-            ("repositories_AddPackageVersionAsset", AddPackageVersionAsset, repositories::AddPackageVersionAssetAction, repositories::AddPackageVersionAssetOutput),
-            ("repositories_RemovePackageVersionAsset", RemovePackageVersionAsset, repositories::RemovePackageVersionAssetAction, outputs::Empty),
-            ("repositories_TagPackageVersion", TagPackageVersion, repositories::TagPackageVersionAction, outputs::Empty),
-            ("repositories_UntagPackageVersion", UntagPackageVersion, repositories::UntagPackageVersionAction, outputs::Empty),
-            ("repositories_ResolvePackageVersionAssetByPath", ResolvePackageVersionAssetByPath, repositories::ResolvePackageVersionAssetByPathAction, repositories::ResolvePackageVersionAssetByPathOutput),
+            ("repositories_ResolveVersionByPath", ResolvePackageVersionByPath, repositories::ResolvePackageVersionByPathAction, repositories::ResolvePackageVersionByPathOutput),
+            ("repositories_GetVersionDetails", GetPackageVersionDetails, repositories::GetPackageVersionDetailsAction, repositories::GetPackageVersionDetailsOutput),
+            ("repositories_CreateVersion", CreatePackageVersion, repositories::CreatePackageVersionAction, repositories::CreatePackageVersionOutput),
+            ("repositories_DeleteVersion", DeletePackageVersion, repositories::DeletePackageVersionAction, outputs::Empty),
+            ("repositories_AddVersionAsset", AddPackageVersionAsset, repositories::AddPackageVersionAssetAction, repositories::AddPackageVersionAssetOutput),
+            ("repositories_RemoveVersionAsset", RemovePackageVersionAsset, repositories::RemovePackageVersionAssetAction, outputs::Empty),
+            ("repositories_TagVersion", TagPackageVersion, repositories::TagPackageVersionAction, outputs::Empty),
+            ("repositories_UntagVersion", UntagPackageVersion, repositories::UntagPackageVersionAction, outputs::Empty),
+            ("repositories_ResolveVersionAssetByPath", ResolvePackageVersionAssetByPath, repositories::ResolvePackageVersionAssetByPathAction, repositories::ResolvePackageVersionAssetByPathOutput),
             // ## S3 Config
             ("repositories_SetS3Config", SetRepositoryS3Credentials, repositories::SetRepositoryS3ConfigAction, outputs::Empty),
             ("repositories_GetS3Config", GetRepositoryS3Credentials, repositories::GetRepositoryS3ConfigAction, repositories::GetRepositoryS3ConfigOutput),

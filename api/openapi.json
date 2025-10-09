@@ -1494,12 +1494,12 @@
         }
       }
     },
-    "/api/v1/actions/invoke/devices_Devices": {
+    "/api/v1/actions/invoke/devices_Query": {
       "post": {
         "tags": [
           "devices"
         ],
-        "summary": "Devices",
+        "summary": "Query",
         "description": "Query the devices of the instance.",
         "operationId": "devices_QueryDevices",
         "requestBody": {
@@ -2579,12 +2579,12 @@
         }
       }
     },
-    "/api/v1/actions/invoke/repositories_ResolvePackageVersionByPath": {
+    "/api/v1/actions/invoke/repositories_ResolveVersionByPath": {
       "post": {
         "tags": [
           "repositories"
         ],
-        "summary": "ResolvePackageVersionByPath",
+        "summary": "ResolveVersionByPath",
         "description": "Resolve a package version by its path.",
         "operationId": "repositories_ResolvePackageVersionByPath",
         "requestBody": {
@@ -2610,12 +2610,12 @@
         }
       }
     },
-    "/api/v1/actions/invoke/repositories_GetPackageVersionDetails": {
+    "/api/v1/actions/invoke/repositories_GetVersionDetails": {
       "post": {
         "tags": [
           "repositories"
         ],
-        "summary": "GetPackageVersionDetails",
+        "summary": "GetVersionDetails",
         "description": "Get information about a package version.",
         "operationId": "repositories_GetPackageVersionDetails",
         "requestBody": {
@@ -2641,12 +2641,12 @@
         }
       }
     },
-    "/api/v1/actions/invoke/repositories_CreatePackageVersion": {
+    "/api/v1/actions/invoke/repositories_CreateVersion": {
       "post": {
         "tags": [
           "repositories"
         ],
-        "summary": "CreatePackageVersion",
+        "summary": "CreateVersion",
         "description": "Create a new package version.",
         "operationId": "repositories_CreatePackageVersion",
         "requestBody": {
@@ -2672,12 +2672,12 @@
         }
       }
     },
-    "/api/v1/actions/invoke/repositories_DeletePackageVersion": {
+    "/api/v1/actions/invoke/repositories_DeleteVersion": {
       "post": {
         "tags": [
           "repositories"
         ],
-        "summary": "DeletePackageVersion",
+        "summary": "DeleteVersion",
         "description": "Delete a package version.",
         "operationId": "repositories_DeletePackageVersion",
         "requestBody": {
@@ -2703,12 +2703,12 @@
         }
       }
     },
-    "/api/v1/actions/invoke/repositories_AddPackageVersionAsset": {
+    "/api/v1/actions/invoke/repositories_AddVersionAsset": {
       "post": {
         "tags": [
           "repositories"
         ],
-        "summary": "AddPackageVersionAsset",
+        "summary": "AddVersionAsset",
         "description": "Add an assert to a package version.",
         "operationId": "repositories_AddPackageVersionAsset",
         "requestBody": {
@@ -2734,12 +2734,12 @@
         }
       }
     },
-    "/api/v1/actions/invoke/repositories_RemovePackageVersionAsset": {
+    "/api/v1/actions/invoke/repositories_RemoveVersionAsset": {
       "post": {
         "tags": [
           "repositories"
         ],
-        "summary": "RemovePackageVersionAsset",
+        "summary": "RemoveVersionAsset",
         "description": "Remove an asset from a package version.",
         "operationId": "repositories_RemovePackageVersionAsset",
         "requestBody": {
@@ -2765,12 +2765,12 @@
         }
       }
     },
-    "/api/v1/actions/invoke/repositories_TagPackageVersion": {
+    "/api/v1/actions/invoke/repositories_TagVersion": {
       "post": {
         "tags": [
           "repositories"
         ],
-        "summary": "TagPackageVersion",
+        "summary": "TagVersion",
         "description": "Add tags to a version.",
         "operationId": "repositories_TagPackageVersion",
         "requestBody": {
@@ -2796,12 +2796,12 @@
         }
       }
     },
-    "/api/v1/actions/invoke/repositories_UntagPackageVersion": {
+    "/api/v1/actions/invoke/repositories_UntagVersion": {
       "post": {
         "tags": [
           "repositories"
         ],
-        "summary": "UntagPackageVersion",
+        "summary": "UntagVersion",
         "description": "Remove tags from a version.",
         "operationId": "repositories_UntagPackageVersion",
         "requestBody": {
@@ -2827,12 +2827,12 @@
         }
       }
     },
-    "/api/v1/actions/invoke/repositories_ResolvePackageVersionAssetByPath": {
+    "/api/v1/actions/invoke/repositories_ResolveVersionAssetByPath": {
       "post": {
         "tags": [
           "repositories"
         ],
-        "summary": "ResolvePackageVersionAssetByPath",
+        "summary": "ResolveVersionAssetByPath",
         "description": "Resolve a version asset by its path.",
         "operationId": "repositories_ResolvePackageVersionAssetByPath",
         "requestBody": {
