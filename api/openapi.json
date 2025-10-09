@@ -13,6 +13,7 @@
         ],
         "summary": "Query",
         "description": "Query the users of the instance.",
+        "operationId": "users_QueryUsers",
         "requestBody": {
           "content": {
             "application/json": {
@@ -43,6 +44,7 @@
         ],
         "summary": "GetDetails",
         "description": "Get information about a user.",
+        "operationId": "users_GetUserDetails",
         "requestBody": {
           "content": {
             "application/json": {
@@ -73,6 +75,7 @@
         ],
         "summary": "CreateUser",
         "description": "Create a new user.",
+        "operationId": "users_CreateUser",
         "requestBody": {
           "content": {
             "application/json": {
@@ -103,6 +106,7 @@
         ],
         "summary": "DeleteUser",
         "description": "Delete a user.",
+        "operationId": "users_DeleteUser",
         "requestBody": {
           "content": {
             "application/json": {
@@ -133,6 +137,7 @@
         ],
         "summary": "SetDisplayName",
         "description": "Set the display name of a user.",
+        "operationId": "users_SetUserDisplayName",
         "requestBody": {
           "content": {
             "application/json": {
@@ -163,6 +168,7 @@
         ],
         "summary": "SetPassword",
         "description": "Set the password of a user.",
+        "operationId": "users_SetUserPassword",
         "requestBody": {
           "content": {
             "application/json": {
@@ -193,6 +199,7 @@
         ],
         "summary": "SetIsAdmin",
         "description": "Set whether the user is an instance administrator.",
+        "operationId": "users_SetUserIsAdmin",
         "requestBody": {
           "content": {
             "application/json": {
@@ -223,6 +230,7 @@
         ],
         "summary": "QueryTokens",
         "description": "Query the tokens of a user.",
+        "operationId": "users_QueryUserTokens",
         "requestBody": {
           "content": {
             "application/json": {
@@ -253,6 +261,7 @@
         ],
         "summary": "QueryOrganizations",
         "description": "Query the organizations of a user.",
+        "operationId": "users_QueryOrganizations",
         "requestBody": {
           "content": {
             "application/json": {
@@ -283,6 +292,7 @@
         ],
         "summary": "QueryOrganizationInvitations",
         "description": "Query the organization invitations of a user.",
+        "operationId": "users_QueryOrganizationInvitations",
         "requestBody": {
           "content": {
             "application/json": {
@@ -313,6 +323,7 @@
         ],
         "summary": "QuerySessions",
         "description": "Query the sessions of a user.",
+        "operationId": "users_QueryUserSessions",
         "requestBody": {
           "content": {
             "application/json": {
@@ -343,6 +354,7 @@
         ],
         "summary": "AuthenticateWithToken",
         "description": "Authenticate a user with a token.",
+        "operationId": "users_AuthenticateWithUserToken",
         "requestBody": {
           "content": {
             "application/json": {
@@ -373,6 +385,7 @@
         ],
         "summary": "AuthenticateWithSessionToken",
         "description": "Authenticate a user with a session token.",
+        "operationId": "users_AuthenticateWithSessionToken",
         "requestBody": {
           "content": {
             "application/json": {
@@ -403,6 +416,7 @@
         ],
         "summary": "GetDevicePermissions",
         "description": "Check the permissions of a user for a given device.",
+        "operationId": "users_GetDevicePermissions",
         "requestBody": {
           "content": {
             "application/json": {
@@ -433,6 +447,7 @@
         ],
         "summary": "CreateToken",
         "description": "Create a user token.",
+        "operationId": "users_CreateUserToken",
         "requestBody": {
           "content": {
             "application/json": {
@@ -463,6 +478,7 @@
         ],
         "summary": "DeleteToken",
         "description": "Delete a user token.",
+        "operationId": "users_DeleteUserToken",
         "requestBody": {
           "content": {
             "application/json": {
@@ -493,6 +509,7 @@
         ],
         "summary": "InitiateSession",
         "description": "Initiate a user session.",
+        "operationId": "users_InitiateUserSession",
         "requestBody": {
           "content": {
             "application/json": {
@@ -523,6 +540,7 @@
         ],
         "summary": "TerminateSession",
         "description": "Terminate a user session.",
+        "operationId": "users_TerminateUserSession",
         "requestBody": {
           "content": {
             "application/json": {
@@ -553,6 +571,7 @@
         ],
         "summary": "CleanupExpiredSessions",
         "description": "Cleanup expired user sessions.",
+        "operationId": "users_CleanupExpiredUserSessions",
         "requestBody": {
           "content": {
             "application/json": {
@@ -583,6 +602,7 @@
         ],
         "summary": "Register",
         "description": "Register a new user with an email and password.",
+        "operationId": "users_RegisterUser",
         "requestBody": {
           "content": {
             "application/json": {
@@ -613,6 +633,7 @@
         ],
         "summary": "ResendRegistrationEmail",
         "description": "",
+        "operationId": "users_ResendRegistrationEmail",
         "requestBody": {
           "content": {
             "application/json": {
@@ -643,6 +664,7 @@
         ],
         "summary": "CompleteRegistration",
         "description": "Complete the registration of a user.",
+        "operationId": "users_CompleteRegistration",
         "requestBody": {
           "content": {
             "application/json": {
@@ -673,6 +695,7 @@
         ],
         "summary": "AcceptOrganizationInvitation",
         "description": "Accept a organization invitation.",
+        "operationId": "users_AcceptOrganizationInvitation",
         "requestBody": {
           "content": {
             "application/json": {
@@ -703,6 +726,7 @@
         ],
         "summary": "Query",
         "description": "Query the organizations of the instance.",
+        "operationId": "organizations_Query",
         "requestBody": {
           "content": {
             "application/json": {
@@ -733,6 +757,7 @@
         ],
         "summary": "QueryMembers",
         "description": "Query the members of an organization.",
+        "operationId": "organizations_QueryMembers",
         "requestBody": {
           "content": {
             "application/json": {
@@ -763,6 +788,7 @@
         ],
         "summary": "QueryProjects",
         "description": "Query the projects of an organization.",
+        "operationId": "organizations_QueryProjects",
         "requestBody": {
           "content": {
             "application/json": {
@@ -793,6 +819,7 @@
         ],
         "summary": "QueryRepositories",
         "description": "Query the repositories of an organization.",
+        "operationId": "organizations_QueryRepositories",
         "requestBody": {
           "content": {
             "application/json": {
@@ -823,6 +850,7 @@
         ],
         "summary": "QueryInvitations",
         "description": "Query the invitations of an organization.",
+        "operationId": "organizations_QueryInvitations",
         "requestBody": {
           "content": {
             "application/json": {
@@ -853,6 +881,7 @@
         ],
         "summary": "Create",
         "description": "Create an organization.",
+        "operationId": "organizations_Create",
         "requestBody": {
           "content": {
             "application/json": {
@@ -883,6 +912,7 @@
         ],
         "summary": "Delete",
         "description": "Delete an organization.",
+        "operationId": "organizations_Delete",
         "requestBody": {
           "content": {
             "application/json": {
@@ -913,6 +943,7 @@
         ],
         "summary": "AddMember",
         "description": "Add a user to an organization.",
+        "operationId": "organizations_AddMember",
         "requestBody": {
           "content": {
             "application/json": {
@@ -943,6 +974,7 @@
         ],
         "summary": "RemoveMember",
         "description": "Remove a user from an organization.",
+        "operationId": "organizations_RemoveMember",
         "requestBody": {
           "content": {
             "application/json": {
@@ -973,6 +1005,7 @@
         ],
         "summary": "InviteMember",
         "description": "Invite a user to an organization.",
+        "operationId": "organizations_InviteMember",
         "requestBody": {
           "content": {
             "application/json": {
@@ -1003,6 +1036,7 @@
         ],
         "summary": "DeleteInvitation",
         "description": "Delete an invitation to an organization.",
+        "operationId": "organizations_DeleteInvitation",
         "requestBody": {
           "content": {
             "application/json": {
@@ -1033,6 +1067,7 @@
         ],
         "summary": "Query",
         "description": "Query the projects of the instance.",
+        "operationId": "projects_QueryProjects",
         "requestBody": {
           "content": {
             "application/json": {
@@ -1063,6 +1098,7 @@
         ],
         "summary": "GetDetails",
         "description": "Get information about a project.",
+        "operationId": "projects_GetProjectDetails",
         "requestBody": {
           "content": {
             "application/json": {
@@ -1093,6 +1129,7 @@
         ],
         "summary": "Create",
         "description": "Create a new project.",
+        "operationId": "projects_CreateProject",
         "requestBody": {
           "content": {
             "application/json": {
@@ -1123,6 +1160,7 @@
         ],
         "summary": "Delete",
         "description": "Delete a project.",
+        "operationId": "projects_DeleteProject",
         "requestBody": {
           "content": {
             "application/json": {
@@ -1153,6 +1191,7 @@
         ],
         "summary": "QueryDevices",
         "description": "Query the devices of a project.",
+        "operationId": "projects_QueryProjectDevices",
         "requestBody": {
           "content": {
             "application/json": {
@@ -1183,6 +1222,7 @@
         ],
         "summary": "QueryDeploymentTokens",
         "description": "Query the deployment tokens of a project.",
+        "operationId": "projects_QueryProjectDeploymentTokens",
         "requestBody": {
           "content": {
             "application/json": {
@@ -1213,6 +1253,7 @@
         ],
         "summary": "QueryLinkedRepositories",
         "description": "Query repositories of a project.",
+        "operationId": "projects_QueryProjectRepositories",
         "requestBody": {
           "content": {
             "application/json": {
@@ -1243,6 +1284,7 @@
         ],
         "summary": "SetOrganization",
         "description": "Set the organization of a project.",
+        "operationId": "projects_SetProjectOrganization",
         "requestBody": {
           "content": {
             "application/json": {
@@ -1273,6 +1315,7 @@
         ],
         "summary": "CreateDeploymentToken",
         "description": "Create a deployment token.",
+        "operationId": "projects_CreateDeploymentToken",
         "requestBody": {
           "content": {
             "application/json": {
@@ -1303,6 +1346,7 @@
         ],
         "summary": "DeleteDeploymentToken",
         "description": "Delete a deployment token.",
+        "operationId": "projects_DeleteDeploymentToken",
         "requestBody": {
           "content": {
             "application/json": {
@@ -1333,6 +1377,7 @@
         ],
         "summary": "SetDeploymentTokenFlags",
         "description": "Set the flags of a deployment token.",
+        "operationId": "projects_SetDeploymentTokenFlags",
         "requestBody": {
           "content": {
             "application/json": {
@@ -1363,6 +1408,7 @@
         ],
         "summary": "QueryAuditLog",
         "description": "Query the audit log of the project.",
+        "operationId": "projects_QueryAuditLog",
         "requestBody": {
           "content": {
             "application/json": {
@@ -1393,6 +1439,7 @@
         ],
         "summary": "LinkRepository",
         "description": "Add a repository to the project.",
+        "operationId": "projects_AddProjectRepository",
         "requestBody": {
           "content": {
             "application/json": {
@@ -1423,6 +1470,7 @@
         ],
         "summary": "UnlinkRepository",
         "description": "Remove a repository from the project.",
+        "operationId": "projects_RemoveProjectRepository",
         "requestBody": {
           "content": {
             "application/json": {
@@ -1453,6 +1501,7 @@
         ],
         "summary": "Devices",
         "description": "Query the devices of the instance.",
+        "operationId": "devices_QueryDevices",
         "requestBody": {
           "content": {
             "application/json": {
@@ -1483,6 +1532,7 @@
         ],
         "summary": "GetDetails",
         "description": "Get information about a device.",
+        "operationId": "devices_GetDeviceDetails",
         "requestBody": {
           "content": {
             "application/json": {
@@ -1513,6 +1563,7 @@
         ],
         "summary": "Create",
         "description": "Create a new device.",
+        "operationId": "devices_CreateDevice",
         "requestBody": {
           "content": {
             "application/json": {
@@ -1543,6 +1594,7 @@
         ],
         "summary": "Delete",
         "description": "Delete a device.",
+        "operationId": "devices_DeleteDevice",
         "requestBody": {
           "content": {
             "application/json": {
@@ -1573,6 +1625,7 @@
         ],
         "summary": "SetName",
         "description": "Set the name of a device.",
+        "operationId": "devices_SetDeviceName",
         "requestBody": {
           "content": {
             "application/json": {
@@ -1603,6 +1656,7 @@
         ],
         "summary": "SetDeviceMetadata",
         "description": "Set the metadata of a device.",
+        "operationId": "devices_SetDeviceMetadata",
         "requestBody": {
           "content": {
             "application/json": {
@@ -1633,6 +1687,7 @@
         ],
         "summary": "IssueDeviceToken",
         "description": "Issue a JWT for a device with user-defined claims.\n\n**Note: Only use this action for integration with external systems.**",
+        "operationId": "devices_IssueDeviceToken",
         "requestBody": {
           "content": {
             "application/json": {
@@ -1663,6 +1718,7 @@
         ],
         "summary": "ValidateDeviceToken",
         "description": "Validate a device JWT.\n\n**Note: Only use this action for integration with external systems.**",
+        "operationId": "devices_ValidateDeviceToken",
         "requestBody": {
           "content": {
             "application/json": {
@@ -1693,6 +1749,7 @@
         ],
         "summary": "Authenticate",
         "description": "Authenticate a device.\n\n**Note: The certificate fingerprint must be externally verified (mutual TLS).**",
+        "operationId": "devices_AuthenticateDevice",
         "requestBody": {
           "content": {
             "application/json": {
@@ -1723,6 +1780,7 @@
         ],
         "summary": "AddCertificate",
         "description": "Add a device certificate.",
+        "operationId": "devices_AddDeviceCertificate",
         "requestBody": {
           "content": {
             "application/json": {
@@ -1753,6 +1811,7 @@
         ],
         "summary": "DeleteCertificate",
         "description": "Delete a device certificate.",
+        "operationId": "devices_DeleteDeviceCertificate",
         "requestBody": {
           "content": {
             "application/json": {
@@ -1783,6 +1842,7 @@
         ],
         "summary": "SetCertificateStatus",
         "description": "Set the status of a device certificate.",
+        "operationId": "devices_SetDeviceCertificateStatus",
         "requestBody": {
           "content": {
             "application/json": {
@@ -1813,6 +1873,7 @@
         ],
         "summary": "RegisterConnection",
         "description": "Register a connection of a device to a cluster node.",
+        "operationId": "devices_RegisterDeviceConnection",
         "requestBody": {
           "content": {
             "application/json": {
@@ -1843,6 +1904,7 @@
         ],
         "summary": "UnregisterConnection",
         "description": "Unregister a connection of a device to a cluster node.",
+        "operationId": "devices_UnregisterDeviceConnection",
         "requestBody": {
           "content": {
             "application/json": {
@@ -1873,6 +1935,7 @@
         ],
         "summary": "IssueHttpProxyToken",
         "description": "Issue a HTTP proxy JWT.",
+        "operationId": "devices_IssueDeviceHttpProxyToken",
         "requestBody": {
           "content": {
             "application/json": {
@@ -1903,6 +1966,7 @@
         ],
         "summary": "ValidateHttpProxyToken",
         "description": "Validate a HTTP proxy JWT.",
+        "operationId": "devices_ValidateDeviceHttpProxyToken",
         "requestBody": {
           "content": {
             "application/json": {
@@ -1933,6 +1997,7 @@
         ],
         "summary": "PublishEvents",
         "description": "Publish device events.",
+        "operationId": "devices_PublishDeviceEvents",
         "requestBody": {
           "content": {
             "application/json": {
@@ -1963,6 +2028,7 @@
         ],
         "summary": "QueryEvents",
         "description": "Query device events.",
+        "operationId": "devices_QueryDeviceEvents",
         "requestBody": {
           "content": {
             "application/json": {
@@ -1993,6 +2059,7 @@
         ],
         "summary": "SetProperty",
         "description": "Set a property of a device.",
+        "operationId": "devices_SetDeviceProperty",
         "requestBody": {
           "content": {
             "application/json": {
@@ -2023,6 +2090,7 @@
         ],
         "summary": "GetProperty",
         "description": "Get a property of a device.",
+        "operationId": "devices_GetDeviceProperty",
         "requestBody": {
           "content": {
             "application/json": {
@@ -2053,6 +2121,7 @@
         ],
         "summary": "QueryProperties",
         "description": "Query the properties of a device.",
+        "operationId": "devices_QueryDeviceProperties",
         "requestBody": {
           "content": {
             "application/json": {
@@ -2083,6 +2152,7 @@
         ],
         "summary": "ResolveName",
         "description": "Resolve a repository by its name.",
+        "operationId": "repositories_ResolveRepositoryName",
         "requestBody": {
           "content": {
             "application/json": {
@@ -2113,6 +2183,7 @@
         ],
         "summary": "GetDetails",
         "description": "Get information about a repository.",
+        "operationId": "repositories_GetRepositoryDetails",
         "requestBody": {
           "content": {
             "application/json": {
@@ -2143,6 +2214,7 @@
         ],
         "summary": "Create",
         "description": "Create a new repository.",
+        "operationId": "repositories_CreateRepository",
         "requestBody": {
           "content": {
             "application/json": {
@@ -2173,6 +2245,7 @@
         ],
         "summary": "Delete",
         "description": "Delete a repository.",
+        "operationId": "repositories_DeleteRepository",
         "requestBody": {
           "content": {
             "application/json": {
@@ -2203,6 +2276,7 @@
         ],
         "summary": "SetOrganization",
         "description": "Set the organization of a repository.",
+        "operationId": "repositories_SetOrganization",
         "requestBody": {
           "content": {
             "application/json": {
@@ -2233,6 +2307,7 @@
         ],
         "summary": "SetVisibility",
         "description": "Set the visibility of a repository.",
+        "operationId": "repositories_SetRepositoryVisibility",
         "requestBody": {
           "content": {
             "application/json": {
@@ -2263,6 +2338,7 @@
         ],
         "summary": "QueryPackages",
         "description": "Query the packages of a repository.",
+        "operationId": "repositories_QueryRepositoryPackages",
         "requestBody": {
           "content": {
             "application/json": {
@@ -2293,6 +2369,7 @@
         ],
         "summary": "QueryAssets",
         "description": "Query the assets of a repository.",
+        "operationId": "repositories_QueryRepositoryAssets",
         "requestBody": {
           "content": {
             "application/json": {
@@ -2323,6 +2400,7 @@
         ],
         "summary": "QueryLinkedProjects",
         "description": "Query repository projects.",
+        "operationId": "repositories_QueryRepositoryProjects",
         "requestBody": {
           "content": {
             "application/json": {
@@ -2353,6 +2431,7 @@
         ],
         "summary": "ResolvePackageByPath",
         "description": "Resolve a package by its path.",
+        "operationId": "repositories_ResolvePackageByPath",
         "requestBody": {
           "content": {
             "application/json": {
@@ -2383,6 +2462,7 @@
         ],
         "summary": "GetPackageDetails",
         "description": "Get information about a package.",
+        "operationId": "repositories_GetPackageDetails",
         "requestBody": {
           "content": {
             "application/json": {
@@ -2413,6 +2493,7 @@
         ],
         "summary": "CreatePackage",
         "description": "Create a new package.",
+        "operationId": "repositories_CreatePackage",
         "requestBody": {
           "content": {
             "application/json": {
@@ -2443,6 +2524,7 @@
         ],
         "summary": "DeletePackage",
         "description": "Delete a package.",
+        "operationId": "repositories_DeletePackage",
         "requestBody": {
           "content": {
             "application/json": {
@@ -2473,6 +2555,7 @@
         ],
         "summary": "QueryPackageVersions",
         "description": "Query the versions of a package.",
+        "operationId": "repositories_QueryPackageVersions",
         "requestBody": {
           "content": {
             "application/json": {
@@ -2503,6 +2586,7 @@
         ],
         "summary": "ResolvePackageVersionByPath",
         "description": "Resolve a package version by its path.",
+        "operationId": "repositories_ResolvePackageVersionByPath",
         "requestBody": {
           "content": {
             "application/json": {
@@ -2533,6 +2617,7 @@
         ],
         "summary": "GetPackageVersionDetails",
         "description": "Get information about a package version.",
+        "operationId": "repositories_GetPackageVersionDetails",
         "requestBody": {
           "content": {
             "application/json": {
@@ -2563,6 +2648,7 @@
         ],
         "summary": "CreatePackageVersion",
         "description": "Create a new package version.",
+        "operationId": "repositories_CreatePackageVersion",
         "requestBody": {
           "content": {
             "application/json": {
@@ -2593,6 +2679,7 @@
         ],
         "summary": "DeletePackageVersion",
         "description": "Delete a package version.",
+        "operationId": "repositories_DeletePackageVersion",
         "requestBody": {
           "content": {
             "application/json": {
@@ -2623,6 +2710,7 @@
         ],
         "summary": "AddPackageVersionAsset",
         "description": "Add an assert to a package version.",
+        "operationId": "repositories_AddPackageVersionAsset",
         "requestBody": {
           "content": {
             "application/json": {
@@ -2653,6 +2741,7 @@
         ],
         "summary": "RemovePackageVersionAsset",
         "description": "Remove an asset from a package version.",
+        "operationId": "repositories_RemovePackageVersionAsset",
         "requestBody": {
           "content": {
             "application/json": {
@@ -2683,6 +2772,7 @@
         ],
         "summary": "TagPackageVersion",
         "description": "Add tags to a version.",
+        "operationId": "repositories_TagPackageVersion",
         "requestBody": {
           "content": {
             "application/json": {
@@ -2713,6 +2803,7 @@
         ],
         "summary": "UntagPackageVersion",
         "description": "Remove tags from a version.",
+        "operationId": "repositories_UntagPackageVersion",
         "requestBody": {
           "content": {
             "application/json": {
@@ -2743,6 +2834,7 @@
         ],
         "summary": "ResolvePackageVersionAssetByPath",
         "description": "Resolve a version asset by its path.",
+        "operationId": "repositories_ResolvePackageVersionAssetByPath",
         "requestBody": {
           "content": {
             "application/json": {
@@ -2773,6 +2865,7 @@
         ],
         "summary": "SetS3Config",
         "description": "Set the S3 configuration for the repository.",
+        "operationId": "repositories_SetRepositoryS3Config",
         "requestBody": {
           "content": {
             "application/json": {
@@ -2803,6 +2896,7 @@
         ],
         "summary": "GetS3Config",
         "description": "Get the S3 configuration for the repository.",
+        "operationId": "repositories_GetRepositoryS3Config",
         "requestBody": {
           "content": {
             "application/json": {
@@ -2833,6 +2927,7 @@
         ],
         "summary": "GetAssetDetails",
         "description": "Get information about an asset.",
+        "operationId": "repositories_GetAssetDetails",
         "requestBody": {
           "content": {
             "application/json": {
@@ -2863,6 +2958,7 @@
         ],
         "summary": "CreateAsset",
         "description": "Create an asset.",
+        "operationId": "repositories_CreateAsset",
         "requestBody": {
           "content": {
             "application/json": {
@@ -2893,6 +2989,7 @@
         ],
         "summary": "DeleteAsset",
         "description": "Delete an asset.",
+        "operationId": "repositories_DeleteAsset",
         "requestBody": {
           "content": {
             "application/json": {
@@ -2923,6 +3020,7 @@
         ],
         "summary": "IssueAssetDownloadUrl",
         "description": "Issue a URL for downloading an asset.",
+        "operationId": "repositories_IssueAssetDownloadUrl",
         "requestBody": {
           "content": {
             "application/json": {
@@ -2953,6 +3051,7 @@
         ],
         "summary": "IssueAssetUploadUrl",
         "description": "Issue a URL for uploading an asset.",
+        "operationId": "repositories_IssueAssetUploadUrl",
         "requestBody": {
           "content": {
             "application/json": {
@@ -2983,6 +3082,7 @@
         ],
         "summary": "QueryAuditLog",
         "description": "Query the audit log of the repository.",
+        "operationId": "repositories_QueryAuditLogEvents",
         "requestBody": {
           "content": {
             "application/json": {
@@ -3013,6 +3113,7 @@
         ],
         "summary": "QueryAuditLogEvents",
         "description": "Query the events recorded in the audit log.\n\nRequires administrator permissions.",
+        "operationId": "audit_QueryAuditLogEvents",
         "requestBody": {
           "content": {
             "application/json": {
@@ -3043,6 +3144,7 @@
         ],
         "summary": "QueryAuditLogActions",
         "description": "Query the actions recorded in the audit log.\n\nRequires administrator permissions.",
+        "operationId": "audit_QueryAuditLogActions",
         "requestBody": {
           "content": {
             "application/json": {
@@ -3073,6 +3175,7 @@
         ],
         "summary": "Query",
         "description": "Query the jobs of the instance.",
+        "operationId": "jobs_QueryJobs",
         "requestBody": {
           "content": {
             "application/json": {
@@ -3103,6 +3206,7 @@
         ],
         "summary": "GetStatistics",
         "description": "Get instance statistics.",
+        "operationId": "instance_GetInstanceStatistics",
         "requestBody": {
           "content": {
             "application/json": {
@@ -3133,6 +3237,7 @@
         ],
         "summary": "GetSettingsRaw",
         "description": "Get the settings of the instance.",
+        "operationId": "instance_GetInstanceSettingsRaw",
         "requestBody": {
           "content": {
             "application/json": {
@@ -3163,6 +3268,7 @@
         ],
         "summary": "SetSettingRaw",
         "description": "Set a setting of the instance.",
+        "operationId": "instance_SetInstanceSettingRaw",
         "requestBody": {
           "content": {
             "application/json": {
@@ -3193,6 +3299,7 @@
         ],
         "summary": "GetDetails",
         "description": "Get information about the cluster.",
+        "operationId": "cluster_GetClusterDetails",
         "requestBody": {
           "content": {
             "application/json": {
@@ -3223,6 +3330,7 @@
         ],
         "summary": "RegisterNode",
         "description": "Register a new cluster node.",
+        "operationId": "cluster_RegisterClusterNode",
         "requestBody": {
           "content": {
             "application/json": {
@@ -3253,6 +3361,7 @@
         ],
         "summary": "ReportNodeHeartbeat",
         "description": "Report the heartbeat of a cluster node.",
+        "operationId": "cluster_ReportClusterNodeHeartbeat",
         "requestBody": {
           "content": {
             "application/json": {
@@ -3283,6 +3392,7 @@
         ],
         "summary": "CleanupInactiveNodes",
         "description": "Cleanup inactive cluster nodes.",
+        "operationId": "cluster_CleanupInactiveClusterNodes",
         "requestBody": {
           "content": {
             "application/json": {
@@ -3313,6 +3423,7 @@
         ],
         "summary": "GetActor",
         "description": "Get the actor.\n\nThis action is used to get the actor that is used to invoke the action.",
+        "operationId": "actor_GetActor",
         "requestBody": {
           "content": {
             "application/json": {

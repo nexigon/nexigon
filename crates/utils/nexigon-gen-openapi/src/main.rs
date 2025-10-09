@@ -77,6 +77,7 @@ pub fn add_action(
         path,
         openapi::PathItem::new().with_post(Some(
             openapi::Operation::new()
+                .with_operation_id(Some(name.to_owned()))
                 .with_summary(Some(name.rsplit_once("_").unwrap().1.to_owned()))
                 .with_description(Some(openapi::Markdown::new(docs)))
                 .with_request_body(Some(openapi::MaybeRef::Value(openapi::RequestBody::new({
