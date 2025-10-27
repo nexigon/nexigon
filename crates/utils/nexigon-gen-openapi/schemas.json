@@ -1223,6 +1223,34 @@
     ],
     "unevaluatedProperties": false
   },
+  "nexigon_api.devices.RemoveDevicePropertyAction": {
+    "type": "object",
+    "description": "Remove a property from a device.",
+    "properties": {
+      "deviceId": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceId"
+      },
+      "name": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "deviceId",
+      "name"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.devices.RemoveDevicePropertyOutput": {
+    "enum": [
+      {
+        "result": "NotFound"
+      },
+      {
+        "result": "Removed"
+      }
+    ],
+    "description": "Output of removing a property from a device."
+  },
   "nexigon_api.devices.SetDeviceCertificateStatusAction": {
     "type": "object",
     "description": "Set the status of a device certificate.",

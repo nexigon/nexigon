@@ -423,6 +423,23 @@ variant GetDevicePropertyOutput {
     Found: DeviceProperty,
 }
 
+/// Remove a property from a device.
+record RemoveDevicePropertyAction {
+    /// ID of the device.
+    device_id: DeviceId,
+    /// Name of the property.
+    name: string,
+}
+
+/// Output of removing a property from a device.
+#[json(tag = "result")]
+variant RemoveDevicePropertyOutput {
+    /// The property was not found.
+    NotFound,
+    /// The property was removed.
+    Removed,
+}
+
 /// Query the properties of a device.
 record QueryDevicePropertiesAction {
     /// ID of the device.

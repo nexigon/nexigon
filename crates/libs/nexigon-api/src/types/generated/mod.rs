@@ -17504,6 +17504,466 @@ pub mod devices {
             }
         }
     }
+    #[doc = "Remove a property from a device.\n"]
+    #[derive(Clone, Debug)]
+    pub struct RemoveDevicePropertyAction {
+        #[doc = "ID of the device.\n"]
+        pub device_id: DeviceId,
+        #[doc = "Name of the property.\n"]
+        pub name: ::std::string::String,
+    }
+    impl RemoveDevicePropertyAction {
+        #[doc = "Creates a new [`RemoveDevicePropertyAction`]."]
+        pub fn new(device_id: DeviceId, name: ::std::string::String) -> Self {
+            Self { device_id, name }
+        }
+        #[doc = "Sets the value of `device_id`."]
+        pub fn set_device_id(&mut self, device_id: DeviceId) -> &mut Self {
+            self.device_id = device_id;
+            self
+        }
+        #[doc = "Sets the value of `device_id`."]
+        pub fn with_device_id(mut self, device_id: DeviceId) -> Self {
+            self.device_id = device_id;
+            self
+        }
+        #[doc = "Sets the value of `name`."]
+        pub fn set_name(&mut self, name: ::std::string::String) -> &mut Self {
+            self.name = name;
+            self
+        }
+        #[doc = "Sets the value of `name`."]
+        pub fn with_name(mut self, name: ::std::string::String) -> Self {
+            self.name = name;
+            self
+        }
+    }
+    #[automatically_derived]
+    impl __serde::Serialize for RemoveDevicePropertyAction {
+        fn serialize<__S: __serde::Serializer>(
+            &self,
+            __serializer: __S,
+        ) -> ::std::result::Result<__S::Ok, __S::Error> {
+            let mut __record = __sidex_serde::ser::RecordSerializer::new(
+                __serializer,
+                "RemoveDevicePropertyAction",
+                2usize,
+            )?;
+            __record.serialize_field("deviceId", &self.device_id)?;
+            __record.serialize_field("name", &self.name)?;
+            __record.end()
+        }
+    }
+    #[automatically_derived]
+    impl<'de> __serde::Deserialize<'de> for RemoveDevicePropertyAction {
+        fn deserialize<__D: __serde::Deserializer<'de>>(
+            __deserializer: __D,
+        ) -> ::std::result::Result<Self, __D::Error> {
+            #[doc(hidden)]
+            struct __Visitor {
+                __phantom_vars: ::core::marker::PhantomData<fn(&())>,
+            }
+            impl<'de> __serde::de::Visitor<'de> for __Visitor {
+                type Value = RemoveDevicePropertyAction;
+                fn expecting(
+                    &self,
+                    __formatter: &mut ::core::fmt::Formatter,
+                ) -> ::core::fmt::Result {
+                    ::core::fmt::Formatter::write_str(
+                        __formatter,
+                        "record RemoveDevicePropertyAction",
+                    )
+                }
+                #[inline]
+                fn visit_seq<__A>(
+                    self,
+                    mut __seq: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::SeqAccess<'de>,
+                {
+                    let __field0 =
+                        match __serde::de::SeqAccess::next_element::<DeviceId>(&mut __seq)? {
+                            ::core::option::Option::Some(__value) => __value,
+                            ::core::option::Option::None => {
+                                return ::core::result::Result::Err(
+                                    __serde::de::Error::invalid_length(
+                                        0usize,
+                                        &"record with 2 fields",
+                                    ),
+                                );
+                            }
+                        };
+                    let __field1 = match __serde::de::SeqAccess::next_element::<
+                        ::std::string::String,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(1usize, &"record with 2 fields"),
+                            );
+                        }
+                    };
+                    ::core::result::Result::Ok(RemoveDevicePropertyAction {
+                        device_id: __field0,
+                        name: __field1,
+                    })
+                }
+                #[inline]
+                fn visit_map<__A>(
+                    self,
+                    mut __map: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::MapAccess<'de>,
+                {
+                    #[doc(hidden)]
+                    const __IDENTIFIERS: &'static [&'static str] = &["deviceId", "name"];
+                    #[doc(hidden)]
+                    const __EXPECTING_IDENTIFIERS: &'static str =
+                        "an identifier in [\"deviceId\", \"name\"]";
+                    #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
+                    #[doc(hidden)]
+                    enum __Identifier {
+                        __Identifier0,
+                        __Identifier1,
+                        __Unknown,
+                    }
+                    #[doc(hidden)]
+                    struct __IdentifierVisitor;
+                    impl<'de> __serde::de::Visitor<'de> for __IdentifierVisitor {
+                        type Value = __Identifier;
+                        fn expecting(
+                            &self,
+                            __formatter: &mut ::core::fmt::Formatter,
+                        ) -> ::core::fmt::Result {
+                            ::core::fmt::Formatter::write_str(__formatter, __EXPECTING_IDENTIFIERS)
+                        }
+                        fn visit_u64<__E>(
+                            self,
+                            __value: u64,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                0u64 => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                                1u64 => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_str<__E>(
+                            self,
+                            __value: &str,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                "deviceId" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
+                                }
+                                "name" => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_bytes<__E>(
+                            self,
+                            __value: &[u8],
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                b"deviceId" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
+                                }
+                                b"name" => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                    }
+                    impl<'de> __serde::Deserialize<'de> for __Identifier {
+                        #[inline]
+                        fn deserialize<__D>(
+                            __deserializer: __D,
+                        ) -> ::core::result::Result<Self, __D::Error>
+                        where
+                            __D: __serde::Deserializer<'de>,
+                        {
+                            __serde::Deserializer::deserialize_identifier(
+                                __deserializer,
+                                __IdentifierVisitor,
+                            )
+                        }
+                    }
+                    let mut __field0: ::core::option::Option<DeviceId> =
+                        ::core::option::Option::None;
+                    let mut __field1: ::core::option::Option<::std::string::String> =
+                        ::core::option::Option::None;
+                    while let ::core::option::Option::Some(__key) =
+                        __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
+                    {
+                        match __key {
+                            __Identifier::__Identifier0 => {
+                                if ::core::option::Option::is_some(&__field0) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "deviceId",
+                                        ),
+                                    );
+                                }
+                                __field0 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<DeviceId>(&mut __map)?,
+                                );
+                            }
+                            __Identifier::__Identifier1 => {
+                                if ::core::option::Option::is_some(&__field1) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field("name"),
+                                    );
+                                }
+                                __field1 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<::std::string::String>(
+                                        &mut __map,
+                                    )?,
+                                );
+                            }
+                            _ => {
+                                __serde::de::MapAccess::next_value::<__serde::de::IgnoredAny>(
+                                    &mut __map,
+                                )?;
+                            }
+                        }
+                    }
+                    let __field0 = match __field0 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                <__A::Error as __serde::de::Error>::missing_field("deviceId"),
+                            );
+                        }
+                    };
+                    let __field1 = match __field1 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                <__A::Error as __serde::de::Error>::missing_field("name"),
+                            );
+                        }
+                    };
+                    ::core::result::Result::Ok(RemoveDevicePropertyAction {
+                        device_id: __field0,
+                        name: __field1,
+                    })
+                }
+            }
+            #[doc(hidden)]
+            const __FIELDS: &'static [&'static str] = &["deviceId", "name"];
+            __serde::Deserializer::deserialize_struct(
+                __deserializer,
+                "RemoveDevicePropertyAction",
+                __FIELDS,
+                __Visitor {
+                    __phantom_vars: ::core::marker::PhantomData,
+                },
+            )
+        }
+    }
+    #[doc = "Output of removing a property from a device.\n"]
+    #[derive(Clone, Debug)]
+    pub enum RemoveDevicePropertyOutput {
+        #[doc = "The property was not found.\n"]
+        NotFound,
+        #[doc = "The property was removed.\n"]
+        Removed,
+    }
+    #[automatically_derived]
+    impl __serde::Serialize for RemoveDevicePropertyOutput {
+        fn serialize<__S: __serde::Serializer>(
+            &self,
+            __serializer: __S,
+        ) -> ::std::result::Result<__S::Ok, __S::Error> {
+            let __serializer = __sidex_serde::ser::VariantSerializer::new(
+                __serializer,
+                "RemoveDevicePropertyOutput",
+            );
+            match self {
+                Self::NotFound => __serializer.serialize_internal_tag("result", "NotFound", 0u32),
+                Self::Removed => __serializer.serialize_internal_tag("result", "Removed", 1u32),
+            }
+        }
+    }
+    #[automatically_derived]
+    impl<'de> __serde::Deserialize<'de> for RemoveDevicePropertyOutput {
+        fn deserialize<__D: __serde::Deserializer<'de>>(
+            __deserializer: __D,
+        ) -> ::std::result::Result<Self, __D::Error> {
+            #[doc(hidden)]
+            const __IDENTIFIERS: &'static [&'static str] = &["NotFound", "Removed"];
+            #[doc(hidden)]
+            const __EXPECTING_IDENTIFIERS: &'static str =
+                "an identifier in [\"NotFound\", \"Removed\"]";
+            #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
+            #[doc(hidden)]
+            enum __Identifier {
+                __Identifier0,
+                __Identifier1,
+            }
+            #[doc(hidden)]
+            struct __IdentifierVisitor;
+            impl<'de> __serde::de::Visitor<'de> for __IdentifierVisitor {
+                type Value = __Identifier;
+                fn expecting(
+                    &self,
+                    __formatter: &mut ::core::fmt::Formatter,
+                ) -> ::core::fmt::Result {
+                    ::core::fmt::Formatter::write_str(__formatter, __EXPECTING_IDENTIFIERS)
+                }
+                fn visit_u64<__E>(self, __value: u64) -> ::core::result::Result<Self::Value, __E>
+                where
+                    __E: __serde::de::Error,
+                {
+                    match __value {
+                        0u64 => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                        1u64 => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                        __variant => {
+                            ::core::result::Result::Err(__serde::de::Error::invalid_value(
+                                __serde::de::Unexpected::Unsigned(__variant),
+                                &__EXPECTING_IDENTIFIERS,
+                            ))
+                        }
+                    }
+                }
+                fn visit_str<__E>(self, __value: &str) -> ::core::result::Result<Self::Value, __E>
+                where
+                    __E: __serde::de::Error,
+                {
+                    match __value {
+                        "NotFound" => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                        "Removed" => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                        __variant => ::core::result::Result::Err(
+                            __serde::de::Error::unknown_variant(__variant, __IDENTIFIERS),
+                        ),
+                    }
+                }
+                fn visit_bytes<__E>(
+                    self,
+                    __value: &[u8],
+                ) -> ::core::result::Result<Self::Value, __E>
+                where
+                    __E: __serde::de::Error,
+                {
+                    match __value {
+                        b"NotFound" => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                        b"Removed" => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                        __variant => {
+                            ::core::result::Result::Err(__serde::de::Error::invalid_value(
+                                __serde::de::Unexpected::Bytes(__variant),
+                                &__EXPECTING_IDENTIFIERS,
+                            ))
+                        }
+                    }
+                }
+            }
+            impl<'de> __serde::Deserialize<'de> for __Identifier {
+                #[inline]
+                fn deserialize<__D>(__deserializer: __D) -> ::core::result::Result<Self, __D::Error>
+                where
+                    __D: __serde::Deserializer<'de>,
+                {
+                    __serde::Deserializer::deserialize_identifier(
+                        __deserializer,
+                        __IdentifierVisitor,
+                    )
+                }
+            }
+            #[doc(hidden)]
+            const __VARIANTS: &'static [&'static str] = &["NotFound", "Removed"];
+            if __serde::Deserializer::is_human_readable(&__deserializer) {
+                let __tagged = __sidex_serde::de::tagged::deserialize_tagged_variant::<
+                    __Identifier,
+                    __D,
+                >(__deserializer, "result")?;
+                match __tagged.tag {
+                    __Identifier::__Identifier0 => {
+                        ::core::result::Result::Ok(RemoveDevicePropertyOutput::NotFound)
+                    }
+                    __Identifier::__Identifier1 => {
+                        ::core::result::Result::Ok(RemoveDevicePropertyOutput::Removed)
+                    }
+                }
+            } else {
+                #[doc(hidden)]
+                struct __Visitor {
+                    __phantom_vars: ::core::marker::PhantomData<fn(&())>,
+                }
+                impl<'de> __serde::de::Visitor<'de> for __Visitor {
+                    type Value = RemoveDevicePropertyOutput;
+                    fn expecting(
+                        &self,
+                        __formatter: &mut ::core::fmt::Formatter,
+                    ) -> ::core::fmt::Result {
+                        ::core::fmt::Formatter::write_str(
+                            __formatter,
+                            "enum RemoveDevicePropertyOutput",
+                        )
+                    }
+                    #[inline]
+                    fn visit_str<__E>(
+                        self,
+                        __value: &str,
+                    ) -> ::core::result::Result<Self::Value, __E>
+                    where
+                        __E: __serde::de::Error,
+                    {
+                        let __identifier = __IdentifierVisitor.visit_str(__value)?;
+                        #[allow(unreachable_patterns)]
+                        match __identifier {
+                            __Identifier::__Identifier0 => {
+                                ::core::result::Result::Ok(RemoveDevicePropertyOutput::NotFound)
+                            }
+                            __Identifier::__Identifier1 => {
+                                ::core::result::Result::Ok(RemoveDevicePropertyOutput::Removed)
+                            }
+                            _ => Err(__E::invalid_value(
+                                __serde::de::Unexpected::Str(__value),
+                                &self,
+                            )),
+                        }
+                    }
+                    #[inline]
+                    fn visit_enum<__A>(
+                        self,
+                        __data: __A,
+                    ) -> ::core::result::Result<Self::Value, __A::Error>
+                    where
+                        __A: __serde::de::EnumAccess<'de>,
+                    {
+                        match __serde::de::EnumAccess::variant::<__Identifier>(__data)? {
+                            (__Identifier::__Identifier0, __variant) => {
+                                __serde::de::VariantAccess::unit_variant(__variant)?;
+                                ::core::result::Result::Ok(RemoveDevicePropertyOutput::NotFound)
+                            }
+                            (__Identifier::__Identifier1, __variant) => {
+                                __serde::de::VariantAccess::unit_variant(__variant)?;
+                                ::core::result::Result::Ok(RemoveDevicePropertyOutput::Removed)
+                            }
+                        }
+                    }
+                }
+                __serde::Deserializer::deserialize_enum(
+                    __deserializer,
+                    "RemoveDevicePropertyOutput",
+                    __VARIANTS,
+                    __Visitor {
+                        __phantom_vars: ::core::marker::PhantomData,
+                    },
+                )
+            }
+        }
+    }
     #[doc = "Query the properties of a device.\n"]
     #[derive(Clone, Debug)]
     pub struct QueryDevicePropertiesAction {

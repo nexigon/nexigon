@@ -2114,6 +2114,37 @@
         }
       }
     },
+    "/api/v1/actions/invoke/devices_RemoveProperty": {
+      "post": {
+        "tags": [
+          "devices"
+        ],
+        "summary": "RemoveProperty",
+        "description": "Remove a property from a device.",
+        "operationId": "devices_RemoveProperty",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/nexigon_api.devices.RemoveDevicePropertyAction"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/nexigon_api.devices.RemoveDevicePropertyOutput"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/actions/invoke/devices_QueryProperties": {
       "post": {
         "tags": [
@@ -4630,6 +4661,33 @@
           "connectionId"
         ],
         "unevaluatedProperties": false
+      },
+      "nexigon_api.devices.RemoveDevicePropertyAction": {
+        "type": "object",
+        "properties": {
+          "deviceId": {
+            "$ref": "#/components/schemas/nexigon_api.devices.DeviceId"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "deviceId",
+          "name"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.devices.RemoveDevicePropertyOutput": {
+        "enum": [
+          {
+            "result": "NotFound"
+          },
+          {
+            "result": "Removed"
+          }
+        ],
+        "description": "Output of removing a property from a device."
       },
       "nexigon_api.devices.SetDeviceCertificateStatusAction": {
         "type": "object",

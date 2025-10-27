@@ -11,6 +11,7 @@ use clap::Parser;
 use clap::Subcommand;
 
 use nexigon_api::types::devices::GetDevicePropertyAction;
+use nexigon_api::types::devices::RemoveDevicePropertyAction;
 use nexigon_api::types::devices::SetDevicePropertyAction;
 use tokio::net::TcpListener;
 use tracing::error;
@@ -369,6 +370,16 @@ async fn main() -> anyhow::Result<()> {
                         .context("unable to get device property")??;
                     serde_json::to_writer(std::io::stdout(), &output).unwrap();
                 }
+                DevicePropertiesCmd::Remove { device, name } => {
+                    let output = executor
+                        .execute(RemoveDevicePropertyAction::new(
+                            device.clone(),
+                            name.clone(),
+                        ))
+                        .await
+                        .context("unable to remove device property")??;
+                    serde_json::to_writer(std::io::stdout(), &output).unwrap();
+                }
             },
         },
     }
@@ -506,6 +517,12 @@ pub enum DevicePropertiesCmd {
         protected: Option<bool>,
     },
     Get {
+        /// Device ID.
+        device: DeviceId,
+        /// Name of the property.
+        name: String,
+    },
+    Remove {
         /// Device ID.
         device: DeviceId,
         /// Name of the property.
