@@ -907,12 +907,6 @@
       "isConnected": {
         "type": "boolean"
       },
-      "metadata": {
-        "type": "object",
-        "additionalProperties": {
-          "$ref": "#/components/schemas/nexigon_api.json.JsonValue"
-        }
-      },
       "certificates": {
         "type": "array",
         "items": {
@@ -931,7 +925,6 @@
       "projectId",
       "fingerprintId",
       "isConnected",
-      "metadata",
       "certificates",
       "connections"
     ],
@@ -1265,26 +1258,6 @@
     "required": [
       "certificateId",
       "status"
-    ],
-    "unevaluatedProperties": false
-  },
-  "nexigon_api.devices.SetDeviceMetadataAction": {
-    "type": "object",
-    "description": "Set the metadata of a device.",
-    "properties": {
-      "deviceId": {
-        "$ref": "#/components/schemas/nexigon_api.devices.DeviceId"
-      },
-      "metadata": {
-        "type": "object",
-        "additionalProperties": {
-          "$ref": "#/components/schemas/nexigon_api.json.JsonValue"
-        }
-      }
-    },
-    "required": [
-      "deviceId",
-      "metadata"
     ],
     "unevaluatedProperties": false
   },

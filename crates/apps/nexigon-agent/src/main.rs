@@ -24,7 +24,6 @@ use nexigon_api::types::devices::DeviceEvent;
 use nexigon_api::types::devices::DeviceEventSeverity;
 use nexigon_api::types::devices::IssueDeviceTokenAction;
 use nexigon_api::types::devices::PublishDeviceEventsAction;
-use nexigon_api::types::devices::SetDeviceMetadataAction;
 use nexigon_client::ClientIdentity;
 use nexigon_client::ClientToken;
 use nexigon_client::connect_executor;
@@ -32,7 +31,6 @@ use nexigon_ids::Generate;
 use nexigon_ids::ids::DeviceEventId;
 use nexigon_ids::ids::DeviceFingerprint;
 use nexigon_multiplex::ConnectionEvent;
-use tracing::warn;
 
 use crate::config::Config;
 use crate::system_info::get_system_info;
@@ -217,21 +215,6 @@ async fn main() -> anyhow::Result<()> {
                     println!("{}", serde_json::to_string(&output).unwrap());
                 }
             },
-            DeviceCmd::Metadata(cmd) => {
-                warn!("device metadata is deprecated, use properties instead");
-                match cmd {
-                    MetadataCmd::Set { metadata } => {
-                        executor
-                            .execute(SetDeviceMetadataAction::new(
-                                actor.device_id.clone(),
-                                serde_json::from_str(metadata)
-                                    .context("device metadata must be valid JSON")?,
-                            ))
-                            .await
-                            .context("unable to set device metadata")??;
-                    }
-                }
-            }
             DeviceCmd::Properties(cmd) => match cmd {
                 PropertiesCmd::Set { name, value } => {
                     executor
@@ -344,9 +327,6 @@ enum DeviceCmd {
     /// Tokens subcommand.
     #[clap(subcommand)]
     Tokens(TokensCmd),
-    /// Metadata subcommand.
-    #[clap(subcommand)]
-    Metadata(MetadataCmd),
     /// Properties subcommand.
     #[clap(subcommand)]
     Properties(PropertiesCmd),

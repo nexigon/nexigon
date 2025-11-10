@@ -141,9 +141,6 @@ macro_rules! with_actions {
             ("devices_Create", CreateDevice, devices::CreateDeviceAction, devices::CreateDeviceOutput),
             ("devices_Delete", DeleteDevice, devices::DeleteDeviceAction, outputs::Empty),
             ("devices_SetName", SetDeviceName, devices::SetDeviceNameAction, outputs::Empty),
-            // <--- DEPRECATED
-            ("devices_SetDeviceMetadata", SetDeviceMetadata, devices::SetDeviceMetadataAction, outputs::Empty),
-            // -->
             ("devices_IssueDeviceToken", IssueDeviceToken, devices::IssueDeviceTokenAction, devices::IssueDeviceTokenOutput),
             ("devices_ValidateDeviceToken", ValidateDeviceToken, devices::ValidateDeviceTokenAction, devices::ValidateDeviceTokenOutput),
             ("devices_Authenticate", AuthenticateDevice, devices::AuthenticateDeviceAction, devices::AuthenticateDeviceOutput),

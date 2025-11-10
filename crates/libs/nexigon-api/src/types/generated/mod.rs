@@ -6781,8 +6781,6 @@ pub mod devices {
         pub name: ::std::option::Option<::std::string::String>,
         #[doc = "Indicates whether the device is online.\n"]
         pub is_connected: bool,
-        #[doc = "Metadata of the device.\n"]
-        pub metadata: ::std::collections::HashMap<::std::string::String, super::json::JsonValue>,
         #[doc = "Certificates of the device.\n"]
         pub certificates: ::std::vec::Vec<DeviceCertificate>,
         #[doc = "Connections of the device.\n"]
@@ -6795,7 +6793,6 @@ pub mod devices {
             project_id: super::projects::ProjectId,
             fingerprint_id: DeviceFingerprintId,
             is_connected: bool,
-            metadata: ::std::collections::HashMap<::std::string::String, super::json::JsonValue>,
             certificates: ::std::vec::Vec<DeviceCertificate>,
             connections: ::std::vec::Vec<DeviceConnection>,
         ) -> Self {
@@ -6804,7 +6801,6 @@ pub mod devices {
                 project_id,
                 fingerprint_id,
                 is_connected,
-                metadata,
                 certificates,
                 connections,
                 name: ::std::default::Default::default(),
@@ -6863,22 +6859,6 @@ pub mod devices {
             self.is_connected = is_connected;
             self
         }
-        #[doc = "Sets the value of `metadata`."]
-        pub fn set_metadata(
-            &mut self,
-            metadata: ::std::collections::HashMap<::std::string::String, super::json::JsonValue>,
-        ) -> &mut Self {
-            self.metadata = metadata;
-            self
-        }
-        #[doc = "Sets the value of `metadata`."]
-        pub fn with_metadata(
-            mut self,
-            metadata: ::std::collections::HashMap<::std::string::String, super::json::JsonValue>,
-        ) -> Self {
-            self.metadata = metadata;
-            self
-        }
         #[doc = "Sets the value of `certificates`."]
         pub fn set_certificates(
             &mut self,
@@ -6918,7 +6898,7 @@ pub mod devices {
             let mut __record = __sidex_serde::ser::RecordSerializer::new(
                 __serializer,
                 "GetDeviceDetailsOutput",
-                8usize,
+                7usize,
             )?;
             __record.serialize_field("deviceId", &self.device_id)?;
             __record.serialize_field("projectId", &self.project_id)?;
@@ -6926,7 +6906,6 @@ pub mod devices {
             __record
                 .serialize_optional_field("name", ::core::option::Option::as_ref(&self.name))?;
             __record.serialize_field("isConnected", &self.is_connected)?;
-            __record.serialize_field("metadata", &self.metadata)?;
             __record.serialize_field("certificates", &self.certificates)?;
             __record.serialize_field("connections", &self.connections)?;
             __record.end()
@@ -6964,7 +6943,7 @@ pub mod devices {
                                 return ::core::result::Result::Err(
                                     __serde::de::Error::invalid_length(
                                         0usize,
-                                        &"record with 8 fields",
+                                        &"record with 7 fields",
                                     ),
                                 );
                             }
@@ -6976,7 +6955,7 @@ pub mod devices {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(1usize, &"record with 8 fields"),
+                                __serde::de::Error::invalid_length(1usize, &"record with 7 fields"),
                             );
                         }
                     };
@@ -6986,7 +6965,7 @@ pub mod devices {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(2usize, &"record with 8 fields"),
+                                __serde::de::Error::invalid_length(2usize, &"record with 7 fields"),
                             );
                         }
                     };
@@ -6997,7 +6976,7 @@ pub mod devices {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(3usize, &"record with 8 fields"),
+                                __serde::de::Error::invalid_length(3usize, &"record with 7 fields"),
                             );
                         }
                     };
@@ -7005,40 +6984,29 @@ pub mod devices {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(4usize, &"record with 8 fields"),
+                                __serde::de::Error::invalid_length(4usize, &"record with 7 fields"),
                             );
                         }
                     };
                     let __field5 = match __serde::de::SeqAccess::next_element::<
-                        ::std::collections::HashMap<::std::string::String, super::json::JsonValue>,
-                    >(&mut __seq)?
-                    {
-                        ::core::option::Option::Some(__value) => __value,
-                        ::core::option::Option::None => {
-                            return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(5usize, &"record with 8 fields"),
-                            );
-                        }
-                    };
-                    let __field6 = match __serde::de::SeqAccess::next_element::<
                         ::std::vec::Vec<DeviceCertificate>,
                     >(&mut __seq)?
                     {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(6usize, &"record with 8 fields"),
+                                __serde::de::Error::invalid_length(5usize, &"record with 7 fields"),
                             );
                         }
                     };
-                    let __field7 = match __serde::de::SeqAccess::next_element::<
+                    let __field6 = match __serde::de::SeqAccess::next_element::<
                         ::std::vec::Vec<DeviceConnection>,
                     >(&mut __seq)?
                     {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(7usize, &"record with 8 fields"),
+                                __serde::de::Error::invalid_length(6usize, &"record with 7 fields"),
                             );
                         }
                     };
@@ -7048,9 +7016,8 @@ pub mod devices {
                         fingerprint_id: __field2,
                         name: __field3,
                         is_connected: __field4,
-                        metadata: __field5,
-                        certificates: __field6,
-                        connections: __field7,
+                        certificates: __field5,
+                        connections: __field6,
                     })
                 }
                 #[inline]
@@ -7068,12 +7035,11 @@ pub mod devices {
                         "fingerprintId",
                         "name",
                         "isConnected",
-                        "metadata",
                         "certificates",
                         "connections",
                     ];
                     #[doc(hidden)]
-                    const __EXPECTING_IDENTIFIERS: &'static str = "an identifier in [\"deviceId\", \"projectId\", \"fingerprintId\", \"name\", \"isConnected\", \"metadata\", \"certificates\", \"connections\"]";
+                    const __EXPECTING_IDENTIFIERS: &'static str = "an identifier in [\"deviceId\", \"projectId\", \"fingerprintId\", \"name\", \"isConnected\", \"certificates\", \"connections\"]";
                     #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
                     #[doc(hidden)]
                     enum __Identifier {
@@ -7084,7 +7050,6 @@ pub mod devices {
                         __Identifier4,
                         __Identifier5,
                         __Identifier6,
-                        __Identifier7,
                         __Unknown,
                     }
                     #[doc(hidden)]
@@ -7112,7 +7077,6 @@ pub mod devices {
                                 4u64 => ::core::result::Result::Ok(__Identifier::__Identifier4),
                                 5u64 => ::core::result::Result::Ok(__Identifier::__Identifier5),
                                 6u64 => ::core::result::Result::Ok(__Identifier::__Identifier6),
-                                7u64 => ::core::result::Result::Ok(__Identifier::__Identifier7),
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
                         }
@@ -7137,14 +7101,11 @@ pub mod devices {
                                 "isConnected" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier4)
                                 }
-                                "metadata" => {
+                                "certificates" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier5)
                                 }
-                                "certificates" => {
-                                    ::core::result::Result::Ok(__Identifier::__Identifier6)
-                                }
                                 "connections" => {
-                                    ::core::result::Result::Ok(__Identifier::__Identifier7)
+                                    ::core::result::Result::Ok(__Identifier::__Identifier6)
                                 }
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
@@ -7170,14 +7131,11 @@ pub mod devices {
                                 b"isConnected" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier4)
                                 }
-                                b"metadata" => {
+                                b"certificates" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier5)
                                 }
-                                b"certificates" => {
-                                    ::core::result::Result::Ok(__Identifier::__Identifier6)
-                                }
                                 b"connections" => {
-                                    ::core::result::Result::Ok(__Identifier::__Identifier7)
+                                    ::core::result::Result::Ok(__Identifier::__Identifier6)
                                 }
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
@@ -7207,12 +7165,9 @@ pub mod devices {
                         ::std::option::Option<::std::string::String>,
                     > = ::core::option::Option::None;
                     let mut __field4: ::core::option::Option<bool> = ::core::option::Option::None;
-                    let mut __field5: ::core::option::Option<
-                        ::std::collections::HashMap<::std::string::String, super::json::JsonValue>,
-                    > = ::core::option::Option::None;
-                    let mut __field6: ::core::option::Option<::std::vec::Vec<DeviceCertificate>> =
+                    let mut __field5: ::core::option::Option<::std::vec::Vec<DeviceCertificate>> =
                         ::core::option::Option::None;
-                    let mut __field7: ::core::option::Option<::std::vec::Vec<DeviceConnection>> =
+                    let mut __field6: ::core::option::Option<::std::vec::Vec<DeviceConnection>> =
                         ::core::option::Option::None;
                     while let ::core::option::Option::Some(__key) =
                         __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
@@ -7286,16 +7241,13 @@ pub mod devices {
                                 if ::core::option::Option::is_some(&__field5) {
                                     return ::core::result::Result::Err(
                                         <__A::Error as __serde::de::Error>::duplicate_field(
-                                            "metadata",
+                                            "certificates",
                                         ),
                                     );
                                 }
                                 __field5 = ::core::option::Option::Some(
                                     __serde::de::MapAccess::next_value::<
-                                        ::std::collections::HashMap<
-                                            ::std::string::String,
-                                            super::json::JsonValue,
-                                        >,
+                                        ::std::vec::Vec<DeviceCertificate>,
                                     >(&mut __map)?,
                                 );
                             }
@@ -7303,25 +7255,11 @@ pub mod devices {
                                 if ::core::option::Option::is_some(&__field6) {
                                     return ::core::result::Result::Err(
                                         <__A::Error as __serde::de::Error>::duplicate_field(
-                                            "certificates",
-                                        ),
-                                    );
-                                }
-                                __field6 = ::core::option::Option::Some(
-                                    __serde::de::MapAccess::next_value::<
-                                        ::std::vec::Vec<DeviceCertificate>,
-                                    >(&mut __map)?,
-                                );
-                            }
-                            __Identifier::__Identifier7 => {
-                                if ::core::option::Option::is_some(&__field7) {
-                                    return ::core::result::Result::Err(
-                                        <__A::Error as __serde::de::Error>::duplicate_field(
                                             "connections",
                                         ),
                                     );
                                 }
-                                __field7 = ::core::option::Option::Some(
+                                __field6 = ::core::option::Option::Some(
                                     __serde::de::MapAccess::next_value::<
                                         ::std::vec::Vec<DeviceConnection>,
                                     >(&mut __map)?,
@@ -7374,19 +7312,11 @@ pub mod devices {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                <__A::Error as __serde::de::Error>::missing_field("metadata"),
-                            );
-                        }
-                    };
-                    let __field6 = match __field6 {
-                        ::core::option::Option::Some(__value) => __value,
-                        ::core::option::Option::None => {
-                            return ::core::result::Result::Err(
                                 <__A::Error as __serde::de::Error>::missing_field("certificates"),
                             );
                         }
                     };
-                    let __field7 = match __field7 {
+                    let __field6 = match __field6 {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
@@ -7400,9 +7330,8 @@ pub mod devices {
                         fingerprint_id: __field2,
                         name: __field3,
                         is_connected: __field4,
-                        metadata: __field5,
-                        certificates: __field6,
-                        connections: __field7,
+                        certificates: __field5,
+                        connections: __field6,
                     })
                 }
             }
@@ -7413,7 +7342,6 @@ pub mod devices {
                 "fingerprintId",
                 "name",
                 "isConnected",
-                "metadata",
                 "certificates",
                 "connections",
             ];
@@ -9369,292 +9297,6 @@ pub mod devices {
             __serde::Deserializer::deserialize_struct(
                 __deserializer,
                 "SetDeviceNameAction",
-                __FIELDS,
-                __Visitor {
-                    __phantom_vars: ::core::marker::PhantomData,
-                },
-            )
-        }
-    }
-    #[doc = "Set the metadata of a device.\n"]
-    #[derive(Clone, Debug)]
-    pub struct SetDeviceMetadataAction {
-        #[doc = "ID of the device.\n"]
-        pub device_id: DeviceId,
-        #[doc = "New metadata of the device.\n"]
-        pub metadata: ::std::collections::HashMap<::std::string::String, super::json::JsonValue>,
-    }
-    impl SetDeviceMetadataAction {
-        #[doc = "Creates a new [`SetDeviceMetadataAction`]."]
-        pub fn new(
-            device_id: DeviceId,
-            metadata: ::std::collections::HashMap<::std::string::String, super::json::JsonValue>,
-        ) -> Self {
-            Self {
-                device_id,
-                metadata,
-            }
-        }
-        #[doc = "Sets the value of `device_id`."]
-        pub fn set_device_id(&mut self, device_id: DeviceId) -> &mut Self {
-            self.device_id = device_id;
-            self
-        }
-        #[doc = "Sets the value of `device_id`."]
-        pub fn with_device_id(mut self, device_id: DeviceId) -> Self {
-            self.device_id = device_id;
-            self
-        }
-        #[doc = "Sets the value of `metadata`."]
-        pub fn set_metadata(
-            &mut self,
-            metadata: ::std::collections::HashMap<::std::string::String, super::json::JsonValue>,
-        ) -> &mut Self {
-            self.metadata = metadata;
-            self
-        }
-        #[doc = "Sets the value of `metadata`."]
-        pub fn with_metadata(
-            mut self,
-            metadata: ::std::collections::HashMap<::std::string::String, super::json::JsonValue>,
-        ) -> Self {
-            self.metadata = metadata;
-            self
-        }
-    }
-    #[automatically_derived]
-    impl __serde::Serialize for SetDeviceMetadataAction {
-        fn serialize<__S: __serde::Serializer>(
-            &self,
-            __serializer: __S,
-        ) -> ::std::result::Result<__S::Ok, __S::Error> {
-            let mut __record = __sidex_serde::ser::RecordSerializer::new(
-                __serializer,
-                "SetDeviceMetadataAction",
-                2usize,
-            )?;
-            __record.serialize_field("deviceId", &self.device_id)?;
-            __record.serialize_field("metadata", &self.metadata)?;
-            __record.end()
-        }
-    }
-    #[automatically_derived]
-    impl<'de> __serde::Deserialize<'de> for SetDeviceMetadataAction {
-        fn deserialize<__D: __serde::Deserializer<'de>>(
-            __deserializer: __D,
-        ) -> ::std::result::Result<Self, __D::Error> {
-            #[doc(hidden)]
-            struct __Visitor {
-                __phantom_vars: ::core::marker::PhantomData<fn(&())>,
-            }
-            impl<'de> __serde::de::Visitor<'de> for __Visitor {
-                type Value = SetDeviceMetadataAction;
-                fn expecting(
-                    &self,
-                    __formatter: &mut ::core::fmt::Formatter,
-                ) -> ::core::fmt::Result {
-                    ::core::fmt::Formatter::write_str(__formatter, "record SetDeviceMetadataAction")
-                }
-                #[inline]
-                fn visit_seq<__A>(
-                    self,
-                    mut __seq: __A,
-                ) -> ::core::result::Result<Self::Value, __A::Error>
-                where
-                    __A: __serde::de::SeqAccess<'de>,
-                {
-                    let __field0 =
-                        match __serde::de::SeqAccess::next_element::<DeviceId>(&mut __seq)? {
-                            ::core::option::Option::Some(__value) => __value,
-                            ::core::option::Option::None => {
-                                return ::core::result::Result::Err(
-                                    __serde::de::Error::invalid_length(
-                                        0usize,
-                                        &"record with 2 fields",
-                                    ),
-                                );
-                            }
-                        };
-                    let __field1 = match __serde::de::SeqAccess::next_element::<
-                        ::std::collections::HashMap<::std::string::String, super::json::JsonValue>,
-                    >(&mut __seq)?
-                    {
-                        ::core::option::Option::Some(__value) => __value,
-                        ::core::option::Option::None => {
-                            return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(1usize, &"record with 2 fields"),
-                            );
-                        }
-                    };
-                    ::core::result::Result::Ok(SetDeviceMetadataAction {
-                        device_id: __field0,
-                        metadata: __field1,
-                    })
-                }
-                #[inline]
-                fn visit_map<__A>(
-                    self,
-                    mut __map: __A,
-                ) -> ::core::result::Result<Self::Value, __A::Error>
-                where
-                    __A: __serde::de::MapAccess<'de>,
-                {
-                    #[doc(hidden)]
-                    const __IDENTIFIERS: &'static [&'static str] = &["deviceId", "metadata"];
-                    #[doc(hidden)]
-                    const __EXPECTING_IDENTIFIERS: &'static str =
-                        "an identifier in [\"deviceId\", \"metadata\"]";
-                    #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
-                    #[doc(hidden)]
-                    enum __Identifier {
-                        __Identifier0,
-                        __Identifier1,
-                        __Unknown,
-                    }
-                    #[doc(hidden)]
-                    struct __IdentifierVisitor;
-                    impl<'de> __serde::de::Visitor<'de> for __IdentifierVisitor {
-                        type Value = __Identifier;
-                        fn expecting(
-                            &self,
-                            __formatter: &mut ::core::fmt::Formatter,
-                        ) -> ::core::fmt::Result {
-                            ::core::fmt::Formatter::write_str(__formatter, __EXPECTING_IDENTIFIERS)
-                        }
-                        fn visit_u64<__E>(
-                            self,
-                            __value: u64,
-                        ) -> ::core::result::Result<Self::Value, __E>
-                        where
-                            __E: __serde::de::Error,
-                        {
-                            match __value {
-                                0u64 => ::core::result::Result::Ok(__Identifier::__Identifier0),
-                                1u64 => ::core::result::Result::Ok(__Identifier::__Identifier1),
-                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
-                            }
-                        }
-                        fn visit_str<__E>(
-                            self,
-                            __value: &str,
-                        ) -> ::core::result::Result<Self::Value, __E>
-                        where
-                            __E: __serde::de::Error,
-                        {
-                            match __value {
-                                "deviceId" => {
-                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
-                                }
-                                "metadata" => {
-                                    ::core::result::Result::Ok(__Identifier::__Identifier1)
-                                }
-                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
-                            }
-                        }
-                        fn visit_bytes<__E>(
-                            self,
-                            __value: &[u8],
-                        ) -> ::core::result::Result<Self::Value, __E>
-                        where
-                            __E: __serde::de::Error,
-                        {
-                            match __value {
-                                b"deviceId" => {
-                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
-                                }
-                                b"metadata" => {
-                                    ::core::result::Result::Ok(__Identifier::__Identifier1)
-                                }
-                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
-                            }
-                        }
-                    }
-                    impl<'de> __serde::Deserialize<'de> for __Identifier {
-                        #[inline]
-                        fn deserialize<__D>(
-                            __deserializer: __D,
-                        ) -> ::core::result::Result<Self, __D::Error>
-                        where
-                            __D: __serde::Deserializer<'de>,
-                        {
-                            __serde::Deserializer::deserialize_identifier(
-                                __deserializer,
-                                __IdentifierVisitor,
-                            )
-                        }
-                    }
-                    let mut __field0: ::core::option::Option<DeviceId> =
-                        ::core::option::Option::None;
-                    let mut __field1: ::core::option::Option<
-                        ::std::collections::HashMap<::std::string::String, super::json::JsonValue>,
-                    > = ::core::option::Option::None;
-                    while let ::core::option::Option::Some(__key) =
-                        __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
-                    {
-                        match __key {
-                            __Identifier::__Identifier0 => {
-                                if ::core::option::Option::is_some(&__field0) {
-                                    return ::core::result::Result::Err(
-                                        <__A::Error as __serde::de::Error>::duplicate_field(
-                                            "deviceId",
-                                        ),
-                                    );
-                                }
-                                __field0 = ::core::option::Option::Some(
-                                    __serde::de::MapAccess::next_value::<DeviceId>(&mut __map)?,
-                                );
-                            }
-                            __Identifier::__Identifier1 => {
-                                if ::core::option::Option::is_some(&__field1) {
-                                    return ::core::result::Result::Err(
-                                        <__A::Error as __serde::de::Error>::duplicate_field(
-                                            "metadata",
-                                        ),
-                                    );
-                                }
-                                __field1 = ::core::option::Option::Some(
-                                    __serde::de::MapAccess::next_value::<
-                                        ::std::collections::HashMap<
-                                            ::std::string::String,
-                                            super::json::JsonValue,
-                                        >,
-                                    >(&mut __map)?,
-                                );
-                            }
-                            _ => {
-                                __serde::de::MapAccess::next_value::<__serde::de::IgnoredAny>(
-                                    &mut __map,
-                                )?;
-                            }
-                        }
-                    }
-                    let __field0 = match __field0 {
-                        ::core::option::Option::Some(__value) => __value,
-                        ::core::option::Option::None => {
-                            return ::core::result::Result::Err(
-                                <__A::Error as __serde::de::Error>::missing_field("deviceId"),
-                            );
-                        }
-                    };
-                    let __field1 = match __field1 {
-                        ::core::option::Option::Some(__value) => __value,
-                        ::core::option::Option::None => {
-                            return ::core::result::Result::Err(
-                                <__A::Error as __serde::de::Error>::missing_field("metadata"),
-                            );
-                        }
-                    };
-                    ::core::result::Result::Ok(SetDeviceMetadataAction {
-                        device_id: __field0,
-                        metadata: __field1,
-                    })
-                }
-            }
-            #[doc(hidden)]
-            const __FIELDS: &'static [&'static str] = &["deviceId", "metadata"];
-            __serde::Deserializer::deserialize_struct(
-                __deserializer,
-                "SetDeviceMetadataAction",
                 __FIELDS,
                 __Visitor {
                     __phantom_vars: ::core::marker::PhantomData,

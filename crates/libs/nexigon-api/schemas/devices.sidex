@@ -76,8 +76,6 @@ record GetDeviceDetailsOutput {
     name?: string,
     /// Indicates whether the device is online.
     is_connected: bool,
-    /// Metadata of the device.
-    metadata: [string: JsonValue],
     /// Certificates of the device.
     certificates: [DeviceCertificate],
     /// Connections of the device.
@@ -147,14 +145,6 @@ record SetDeviceNameAction {
     device_id: DeviceId,
     /// New name of the device.
     name?: string,
-}
-
-/// Set the metadata of a device.
-record SetDeviceMetadataAction {
-    /// ID of the device.
-    device_id: DeviceId,
-    /// New metadata of the device.
-    metadata: [string: JsonValue],
 }
 
 /// Issue a JWT for a device with user-defined claims.
