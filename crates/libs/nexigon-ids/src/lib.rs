@@ -438,14 +438,6 @@ define_types! {
     ///
     /// Uniquely identifies a project within the system.
     ProjectId => (FlatRawId, "p", 22, secret = false),
-    /// Project secret access token (globally unique).
-    ///
-    /// Used by devices to connect to the project.
-    ProjectToken => (FlatRawId, "p_sk", 44, secret = true),
-    /// Project access token id (globally unique).
-    ///
-    /// The first 22 characters of the respective secret access token.
-    ProjectTokenId => (FlatRawId, "p_pk", 22, secret = false),
 
     /// Deployment token (globally unique).
     ///
@@ -535,16 +527,7 @@ impl ids::DeploymentToken {
     /// Id of the token.
     pub fn token_id(&self) -> ids::DeploymentTokenId {
         ids::DeploymentTokenId::from_raw_unchecked(RawId::new(
-            &self.raw().as_str()[..Tag::ProjectTokenId.raw_size()],
-        ))
-    }
-}
-
-impl ids::ProjectToken {
-    /// Id of the token.
-    pub fn token_id(&self) -> ids::ProjectTokenId {
-        ids::ProjectTokenId::from_raw_unchecked(RawId::new(
-            &self.raw().as_str()[..Tag::ProjectTokenId.raw_size()],
+            &self.raw().as_str()[..Tag::DeploymentTokenId.raw_size()],
         ))
     }
 }
