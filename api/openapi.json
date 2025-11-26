@@ -68,12 +68,12 @@
         }
       }
     },
-    "/api/v1/actions/invoke/users_CreateUser": {
+    "/api/v1/actions/invoke/users_Create": {
       "post": {
         "tags": [
           "users"
         ],
-        "summary": "CreateUser",
+        "summary": "Create",
         "description": "Create a new user.",
         "operationId": "users_Create",
         "requestBody": {
@@ -99,12 +99,12 @@
         }
       }
     },
-    "/api/v1/actions/invoke/users_DeleteUser": {
+    "/api/v1/actions/invoke/users_Delete": {
       "post": {
         "tags": [
           "users"
         ],
-        "summary": "DeleteUser",
+        "summary": "Delete",
         "description": "Delete a user.",
         "operationId": "users_Delete",
         "requestBody": {
