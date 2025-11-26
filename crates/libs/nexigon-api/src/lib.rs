@@ -75,8 +75,8 @@ macro_rules! with_actions {
             // # Users
             ("users_Query", QueryUsers, users::QueryUsersAction, users::QueryUsersOutput),
             ("users_GetDetails", GetUserDetails, users::GetUserDetailsAction, users::GetUserDetailsOutput),
-            ("users_CreateUser", CreateUser, users::CreateUserAction, users::CreateUserOutput),
-            ("users_DeleteUser", DeleteUser, users::DeleteUserAction, outputs::Empty),
+            ("users_Create", CreateUser, users::CreateUserAction, users::CreateUserOutput),
+            ("users_Delete", DeleteUser, users::DeleteUserAction, outputs::Empty),
             ("users_SetDisplayName", SetUserDisplayName, users::SetUserDisplayNameAction, outputs::Empty),
             ("users_SetPassword", SetUserPassword, users::SetUserPasswordAction, outputs::Empty),
             ("users_SetIsAdmin", SetUserIsAdmin, users::SetUserIsAdminAction, outputs::Empty),
@@ -115,6 +115,8 @@ macro_rules! with_actions {
             ("organizations_RemoveMember", RemoveOrganizationMember, organizations::RemoveOrganizationMemberAction, outputs::Empty),
             ("organizations_InviteMember", InviteOrganizationMember, organizations::InviteOrganizationMemberAction, organizations::InviteOrganizationMemberOutput),
             ("organizations_DeleteInvitation", DeleteOrganizationInvitation, organizations::DeleteOrganizationInvitationAction, outputs::Empty),
+            // ## Organization Resources
+            ("organizations_GetResourceUsage", GetOrganizationResourceUsage, organizations::GetOrganizationResourceUsageAction, organizations::GetOrganizationResourceUsageOutput),
 
             // # Projects
             ("projects_Query", QueryProjects, projects::QueryProjectsAction, projects::QueryProjectsOutput),
@@ -162,6 +164,9 @@ macro_rules! with_actions {
             ("devices_GetProperty", GetDeviceProperty, devices::GetDevicePropertyAction, devices::GetDevicePropertyOutput),
             ("devices_RemoveProperty", RemoveDeviceProperty, devices::RemoveDevicePropertyAction, devices::RemoveDevicePropertyOutput),
             ("devices_QueryProperties", QueryDeviceProperties, devices::QueryDevicePropertiesAction, devices::QueryDevicePropertiesOutput),
+            // ## Device Resources
+            ("devices_GetResourceUsage", GetDeviceResourceUsage, devices::GetDeviceResourceUsageAction, devices::GetDeviceResourceUsageOutput),
+            ("devices_GetConsumption", GetDeviceConsumption, devices::GetDeviceConsumptionAction, devices::GetDeviceConsumptionOutput),
 
             // # Repositories
             ("repositories_ResolveName", ResolveRepositoryName, repositories::ResolveRepositoryNameAction, repositories::ResolveRepositoryNameOutput),

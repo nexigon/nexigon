@@ -370,6 +370,10 @@ impl<T: ConnectionTransport> Connection<T> {
                 let local_id = frame.receiver_id();
                 trace!(channel.local_id = local_id.0, "received data");
                 if let Some(handle) = self.channels.get_mut(&local_id) {
+                    handle
+                        .statistics
+                        .bytes_received
+                        .fetch_add(frame.payload().len() as u64, atomic::Ordering::Relaxed);
                     let mut shared = handle.receiver_shared.lock();
                     if shared.remaining_frame_credit == 0 {
                         return Err(ProtocolViolation("no frame credit remaining"));
@@ -695,6 +699,27 @@ impl Drop for ChannelRequest {
     }
 }
 
+/// Channel statistics.
+#[derive(Debug, Default)]
+pub struct ChannelStatistics {
+    /// Number of bytes sent over the channel.
+    bytes_sent: AtomicU64,
+    /// Number of bytes received over the channel.
+    bytes_received: AtomicU64,
+}
+
+impl ChannelStatistics {
+    /// Estimate the number of bytes sent over the channel.
+    pub fn estimate_bytes_sent(&self) -> u64 {
+        self.bytes_sent.load(atomic::Ordering::Relaxed)
+    }
+
+    /// Estimate the number of bytes received over the channel.
+    pub fn estimate_bytes_received(&self) -> u64 {
+        self.bytes_received.load(atomic::Ordering::Relaxed)
+    }
+}
+
 /// Channel handle to be stored in the connection.
 #[derive(Debug)]
 struct ChannelHandle {
@@ -708,6 +733,8 @@ struct ChannelHandle {
     sender_shared: Arc<Mutex<SenderShared>>,
     /// Shared receiver state.
     receiver_shared: Arc<Mutex<ReceiverShared>>,
+    /// Shared channel statistics.
+    statistics: Arc<ChannelStatistics>,
 }
 
 /// Bi-directional channel.
@@ -720,6 +747,8 @@ pub struct Channel {
     /// Receiver.
     #[pin]
     receiver: Receiver,
+    /// Channel statistics.
+    statistics: Arc<ChannelStatistics>,
 }
 
 impl Channel {
@@ -729,12 +758,14 @@ impl Channel {
         remote_id: ChannelId,
         connection: ConnectionRef,
     ) -> (Self, ChannelHandle) {
+        let statistics = Arc::new(ChannelStatistics::default());
         let channel = Self {
             sender: Sender {
                 shared: Arc::new(Mutex::new(SenderShared::new(128, (16 * KIB) as u32))),
                 remote_id,
                 connection: connection.clone(),
                 pending: None,
+                statistics: statistics.clone(),
             },
             receiver: Receiver {
                 shared: Arc::new(Mutex::new(ReceiverShared::new())),
@@ -744,12 +775,14 @@ impl Channel {
                 pending: None,
                 offset: 0,
             },
+            statistics: statistics.clone(),
         };
         let handle = ChannelHandle {
             local_id,
             remote_id,
             receiver_shared: channel.receiver.shared.clone(),
             sender_shared: channel.sender.shared.clone(),
+            statistics,
         };
         (channel, handle)
     }
@@ -768,7 +801,11 @@ impl Channel {
             sender.remote_id == receiver.remote_id,
             "sender and receiver belong to different channels"
         );
-        Self { sender, receiver }
+        Self {
+            statistics: sender.statistics.clone(),
+            sender,
+            receiver,
+        }
     }
 
     /// Split the channel into sender and receiver.
@@ -779,6 +816,11 @@ impl Channel {
     /// Split the channel into a mutable sender and a mutable receiver.
     pub fn split_mut(&mut self) -> (&mut Sender, &mut Receiver) {
         (&mut self.sender, &mut self.receiver)
+    }
+
+    /// Obtain the channel statistics.
+    pub fn statistics(&self) -> Arc<ChannelStatistics> {
+        self.statistics.clone()
     }
 }
 
@@ -966,6 +1008,8 @@ pub struct Sender {
     connection: ConnectionRef,
     /// Pending chunk.
     pending: Option<Chunk>,
+    /// Channel statistics.
+    statistics: Arc<ChannelStatistics>,
 }
 
 impl Sender {
@@ -1004,6 +1048,9 @@ impl Sender {
             shared.used_frame_credit += 1;
             shared.used_byte_credit += byte_credit;
             let mut frame = self.pending.take().unwrap().frame;
+            self.statistics
+                .bytes_sent
+                .fetch_add(frame.payload().len() as u64, atomic::Ordering::Relaxed);
             frame.set_receiver_id(self.remote_id);
             self.connection.send_frame(frame.into());
             Poll::Ready(Ok(()))

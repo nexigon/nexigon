@@ -75,7 +75,7 @@
         ],
         "summary": "CreateUser",
         "description": "Create a new user.",
-        "operationId": "users_CreateUser",
+        "operationId": "users_Create",
         "requestBody": {
           "content": {
             "application/json": {
@@ -106,7 +106,7 @@
         ],
         "summary": "DeleteUser",
         "description": "Delete a user.",
-        "operationId": "users_DeleteUser",
+        "operationId": "users_Delete",
         "requestBody": {
           "content": {
             "application/json": {
@@ -1053,6 +1053,37 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/nexigon_api.outputs.Empty"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/actions/invoke/organizations_GetResourceUsage": {
+      "post": {
+        "tags": [
+          "organizations"
+        ],
+        "summary": "GetResourceUsage",
+        "description": "Get the resources used by the organization and their limits.",
+        "operationId": "organizations_GetResourceUsage",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/nexigon_api.organizations.GetOrganizationResourceUsageAction"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/nexigon_api.organizations.GetOrganizationResourceUsageOutput"
                 }
               }
             }
@@ -2138,6 +2169,68 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/nexigon_api.devices.QueryDevicePropertiesOutput"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/actions/invoke/devices_GetResourceUsage": {
+      "post": {
+        "tags": [
+          "devices"
+        ],
+        "summary": "GetResourceUsage",
+        "description": "Get the resource usage of a device.",
+        "operationId": "devices_GetResourceUsage",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/nexigon_api.devices.GetDeviceResourceUsageAction"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/nexigon_api.devices.GetDeviceResourceUsageOutput"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/actions/invoke/devices_GetConsumption": {
+      "post": {
+        "tags": [
+          "devices"
+        ],
+        "summary": "GetConsumption",
+        "description": "Get the consumption of a device for the given period.",
+        "operationId": "devices_GetConsumption",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/nexigon_api.devices.GetDeviceConsumptionAction"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/nexigon_api.devices.GetDeviceConsumptionOutput"
                 }
               }
             }
@@ -4292,6 +4385,47 @@
         ],
         "unevaluatedProperties": false
       },
+      "nexigon_api.devices.GetDeviceConsumptionAction": {
+        "type": "object",
+        "properties": {
+          "deviceId": {
+            "$ref": "#/components/schemas/nexigon_api.devices.DeviceId"
+          }
+        },
+        "required": [
+          "deviceId"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.devices.GetDeviceConsumptionOutput": {
+        "type": "object",
+        "description": "Output of getting the consumption of a device for the given period.",
+        "properties": {
+          "readOps": {
+            "type": "integer",
+            "format": "uint64"
+          },
+          "writeOps": {
+            "type": "integer",
+            "format": "uint64"
+          },
+          "trafficIn": {
+            "type": "integer",
+            "format": "uint64"
+          },
+          "trafficOut": {
+            "type": "integer",
+            "format": "uint64"
+          }
+        },
+        "required": [
+          "readOps",
+          "writeOps",
+          "trafficIn",
+          "trafficOut"
+        ],
+        "unevaluatedProperties": false
+      },
       "nexigon_api.devices.GetDeviceDetailsAction": {
         "type": "object",
         "properties": {
@@ -4404,6 +4538,31 @@
             ]
           }
         ]
+      },
+      "nexigon_api.devices.GetDeviceResourceUsageAction": {
+        "type": "object",
+        "properties": {
+          "deviceId": {
+            "$ref": "#/components/schemas/nexigon_api.devices.DeviceId"
+          }
+        },
+        "required": [
+          "deviceId"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.devices.GetDeviceResourceUsageOutput": {
+        "type": "object",
+        "description": "Output of getting the resource usage of a device.",
+        "properties": {
+          "deviceProperties": {
+            "$ref": "#/components/schemas/nexigon_api.resources.ResourceUsage"
+          }
+        },
+        "required": [
+          "deviceProperties"
+        ],
+        "unevaluatedProperties": false
       },
       "nexigon_api.devices.IssueDeviceHttpProxyTokenAction": {
         "type": "object",
@@ -5150,6 +5309,43 @@
         },
         "required": [
           "invitationId"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.organizations.GetOrganizationResourceUsageAction": {
+        "type": "object",
+        "properties": {
+          "organizationId": {
+            "$ref": "#/components/schemas/nexigon_api.organizations.OrganizationId"
+          }
+        },
+        "required": [
+          "organizationId"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.organizations.GetOrganizationResourceUsageOutput": {
+        "type": "object",
+        "description": "Output of getting the resources used by the organization.",
+        "properties": {
+          "seats": {
+            "$ref": "#/components/schemas/nexigon_api.resources.ResourceUsage"
+          },
+          "projects": {
+            "$ref": "#/components/schemas/nexigon_api.resources.ResourceUsage"
+          },
+          "repositories": {
+            "$ref": "#/components/schemas/nexigon_api.resources.ResourceUsage"
+          },
+          "devices": {
+            "$ref": "#/components/schemas/nexigon_api.resources.ResourceUsage"
+          }
+        },
+        "required": [
+          "seats",
+          "projects",
+          "repositories",
+          "devices"
         ],
         "unevaluatedProperties": false
       },
@@ -7494,6 +7690,24 @@
         "required": [
           "versionId",
           "tags"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.resources.ResourceUsage": {
+        "type": "object",
+        "description": "",
+        "properties": {
+          "current": {
+            "type": "integer",
+            "format": "uint64"
+          },
+          "limit": {
+            "type": "integer",
+            "format": "uint64"
+          }
+        },
+        "required": [
+          "current"
         ],
         "unevaluatedProperties": false
       },

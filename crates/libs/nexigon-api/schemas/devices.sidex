@@ -5,6 +5,7 @@ import cluster::ClusterNodeId
 import datetime::Timestamp
 import json::JsonValue
 import projects::{ProjectId, DeploymentToken, DeploymentTokenId}
+import resources::ResourceUsage
 
 /// Unique ID of a device.
 #[rust(type = "nexigon_ids::ids::DeviceId")]
@@ -452,6 +453,37 @@ record DeviceProperty {
     protected: bool,
     /// Last time the property was updated.
     last_updated: Timestamp,
+}
+
+/// Get the resource usage of a device.
+record GetDeviceResourceUsageAction {
+    /// ID of the device.
+    device_id: DeviceId,
+}
+
+/// Output of getting the resource usage of a device.
+#[rust(derive(Default))]
+record GetDeviceResourceUsageOutput {
+    device_properties: ResourceUsage,
+}
+
+/// Get the consumption of a device for the given period.
+record GetDeviceConsumptionAction {
+    /// ID of the device.
+    device_id: DeviceId,
+}
+
+/// Output of getting the consumption of a device for the given period.
+#[rust(derive(Default))]
+record GetDeviceConsumptionOutput {
+    /// Read operations.
+    read_ops: u64,
+    /// Write operations.
+    write_ops: u64,
+    /// Traffic to the device in bytes.
+    traffic_in: u64,
+    /// Traffic from the device in bytes.
+    traffic_out: u64,
 }
 
 /// Device has been created.

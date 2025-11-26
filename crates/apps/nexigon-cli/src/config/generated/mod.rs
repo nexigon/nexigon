@@ -1,7 +1,5 @@
 /* GENERATED WITH SIDEX. DO NOT MODIFY! */
 
-#![allow(warnings)]
-
 pub mod config {
     #![doc = ""]
     #[allow(unused)]

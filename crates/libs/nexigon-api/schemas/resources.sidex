@@ -1,0 +1,5 @@
+#[rust(derive(Default))]
+record ResourceUsage {
+    current: u64,
+    limit?: u64,
+}
