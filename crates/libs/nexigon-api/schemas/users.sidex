@@ -129,6 +129,31 @@ record SetUserIsAdminAction {
     is_admin: bool,
 }
 
+/// Reset the password of a user.
+/// 
+/// This will send an email to the user with a link to reset their password.
+record ResetUserPasswordAction {
+    /// Email of the user.
+    email: string,
+}
+
+/// Complete the password reset of a user.
+record CompleteUserPasswordResetAction {
+    /// Token to use for password reset.
+   reset_token: string,
+   /// New password of the user.
+   password: string,
+}
+
+/// Output of completing the password reset of a user.
+#[json(tag = "result")]
+variant CompleteUserPasswordResetOutput {
+    /// Password has been reset.
+    Completed,
+    /// Password reset failed due to the token being invalid.
+    InvalidToken,
+}
+
 /// Query the tokens of a user.
 record QueryUserTokensAction {
     /// ID of the user.

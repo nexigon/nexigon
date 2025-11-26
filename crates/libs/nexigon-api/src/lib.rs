@@ -80,6 +80,8 @@ macro_rules! with_actions {
             ("users_SetDisplayName", SetUserDisplayName, users::SetUserDisplayNameAction, outputs::Empty),
             ("users_SetPassword", SetUserPassword, users::SetUserPasswordAction, outputs::Empty),
             ("users_SetIsAdmin", SetUserIsAdmin, users::SetUserIsAdminAction, outputs::Empty),
+            ("users_ResetPassword", ResetUserPassword, users::ResetUserPasswordAction, outputs::Empty),
+            ("users_CompletePasswordReset", CompleteUserPasswordReset, users::CompleteUserPasswordResetAction, users::CompleteUserPasswordResetOutput),
             ("users_QueryTokens", QueryUserTokens, users::QueryUserTokensAction, users::QueryUserTokensOutput),
             ("users_QueryOrganizations", QueryUserOrganizations, users::QueryUserOrganizationsAction, users::QueryUserOrganizationsOutput),
             ("users_QueryOrganizationInvitations", QueryUserOrganizationInvitations, users::QueryUserOrganizationInvitationsAction, users::QueryUserOrganizationInvitationsOutput),

@@ -223,6 +223,68 @@
         }
       }
     },
+    "/api/v1/actions/invoke/users_ResetPassword": {
+      "post": {
+        "tags": [
+          "users"
+        ],
+        "summary": "ResetPassword",
+        "description": "Reset the password of a user.\n\nThis will send an email to the user with a link to reset their password.",
+        "operationId": "users_ResetPassword",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/nexigon_api.users.ResetUserPasswordAction"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/nexigon_api.outputs.Empty"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/actions/invoke/users_CompletePasswordReset": {
+      "post": {
+        "tags": [
+          "users"
+        ],
+        "summary": "CompletePasswordReset",
+        "description": "Complete the password reset of a user.",
+        "operationId": "users_CompletePasswordReset",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/nexigon_api.users.CompleteUserPasswordResetAction"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/nexigon_api.users.CompleteUserPasswordResetOutput"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/actions/invoke/users_QueryTokens": {
       "post": {
         "tags": [
@@ -7888,6 +7950,33 @@
         ],
         "description": "Output of completing the registration of a user."
       },
+      "nexigon_api.users.CompleteUserPasswordResetAction": {
+        "type": "object",
+        "properties": {
+          "resetToken": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "resetToken",
+          "password"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.users.CompleteUserPasswordResetOutput": {
+        "enum": [
+          {
+            "result": "Completed"
+          },
+          {
+            "result": "InvalidToken"
+          }
+        ],
+        "description": "Output of completing the password reset of a user."
+      },
       "nexigon_api.users.CreateUserAction": {
         "type": "object",
         "properties": {
@@ -8474,6 +8563,18 @@
         ]
       },
       "nexigon_api.users.ResendRegistrationEmailAction": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "email"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.users.ResetUserPasswordAction": {
         "type": "object",
         "properties": {
           "email": {
