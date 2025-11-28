@@ -6424,6 +6424,35 @@
         ],
         "unevaluatedProperties": false
       },
+      "nexigon_api.properties.OtaUpdateState": {
+        "enum": [
+          "installing",
+          "completed",
+          "failed",
+          "rebooting"
+        ],
+        "description": "OTA update state."
+      },
+      "nexigon_api.properties.OtaUpdateStatus": {
+        "type": "object",
+        "description": "OTA update status.",
+        "properties": {
+          "currentVersion": {
+            "type": "string"
+          },
+          "targetVersion": {
+            "type": "string"
+          },
+          "state": {
+            "$ref": "#/components/schemas/nexigon_api.properties.OtaUpdateState"
+          },
+          "active": {
+            "type": "boolean"
+          }
+        },
+        "required": [],
+        "unevaluatedProperties": false
+      },
       "nexigon_api.properties.SystemInfo": {
         "type": "object",
         "description": "System information.",

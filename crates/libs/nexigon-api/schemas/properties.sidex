@@ -49,3 +49,28 @@ record DiskInfo {
     /// Available disk space in bytes.
     available_space: u64,
 }
+
+/// OTA update status.
+record OtaUpdateStatus {
+    /// Current version.
+    current_version?: string,
+    /// Target version.
+    target_version?: string,
+    /// State of the update.
+    state?: OtaUpdateState,
+    /// Whether the device is currently performing an OTA update.
+    active?: bool,
+}
+
+/// OTA update state.
+#[json(tagged = externally, rename_all = "lowercase")]
+variant OtaUpdateState {
+    /// Update is currently being installed.
+    Installing,
+    /// Update has been completed.
+    Completed,
+    /// Update failed.
+    Failed,
+    /// Device is rebooting.
+    Rebooting,
+}
