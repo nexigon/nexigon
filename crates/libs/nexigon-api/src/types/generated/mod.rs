@@ -9643,20 +9643,20 @@ pub mod devices {
     #[derive(Clone, Debug)]
     pub struct IssueDeviceTokenOutput {
         #[doc = "Issued JWT.\n"]
-        pub jwt: ::std::string::String,
+        pub jwt: super::jwt::Jwt,
     }
     impl IssueDeviceTokenOutput {
         #[doc = "Creates a new [`IssueDeviceTokenOutput`]."]
-        pub fn new(jwt: ::std::string::String) -> Self {
+        pub fn new(jwt: super::jwt::Jwt) -> Self {
             Self { jwt }
         }
         #[doc = "Sets the value of `jwt`."]
-        pub fn set_jwt(&mut self, jwt: ::std::string::String) -> &mut Self {
+        pub fn set_jwt(&mut self, jwt: super::jwt::Jwt) -> &mut Self {
             self.jwt = jwt;
             self
         }
         #[doc = "Sets the value of `jwt`."]
-        pub fn with_jwt(mut self, jwt: ::std::string::String) -> Self {
+        pub fn with_jwt(mut self, jwt: super::jwt::Jwt) -> Self {
             self.jwt = jwt;
             self
         }
@@ -9701,10 +9701,9 @@ pub mod devices {
                 where
                     __A: __serde::de::SeqAccess<'de>,
                 {
-                    let __field0 = match __serde::de::SeqAccess::next_element::<
-                        ::std::string::String,
-                    >(&mut __seq)?
-                    {
+                    let __field0 = match __serde::de::SeqAccess::next_element::<super::jwt::Jwt>(
+                        &mut __seq,
+                    )? {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
@@ -9793,7 +9792,7 @@ pub mod devices {
                             )
                         }
                     }
-                    let mut __field0: ::core::option::Option<::std::string::String> =
+                    let mut __field0: ::core::option::Option<super::jwt::Jwt> =
                         ::core::option::Option::None;
                     while let ::core::option::Option::Some(__key) =
                         __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
@@ -9806,7 +9805,7 @@ pub mod devices {
                                     );
                                 }
                                 __field0 = ::core::option::Option::Some(
-                                    __serde::de::MapAccess::next_value::<::std::string::String>(
+                                    __serde::de::MapAccess::next_value::<super::jwt::Jwt>(
                                         &mut __map,
                                     )?,
                                 );
@@ -9845,20 +9844,20 @@ pub mod devices {
     #[derive(Clone, Debug)]
     pub struct ValidateDeviceTokenAction {
         #[doc = "JWT to validate.\n"]
-        pub jwt: ::std::string::String,
+        pub jwt: super::jwt::Jwt,
     }
     impl ValidateDeviceTokenAction {
         #[doc = "Creates a new [`ValidateDeviceTokenAction`]."]
-        pub fn new(jwt: ::std::string::String) -> Self {
+        pub fn new(jwt: super::jwt::Jwt) -> Self {
             Self { jwt }
         }
         #[doc = "Sets the value of `jwt`."]
-        pub fn set_jwt(&mut self, jwt: ::std::string::String) -> &mut Self {
+        pub fn set_jwt(&mut self, jwt: super::jwt::Jwt) -> &mut Self {
             self.jwt = jwt;
             self
         }
         #[doc = "Sets the value of `jwt`."]
-        pub fn with_jwt(mut self, jwt: ::std::string::String) -> Self {
+        pub fn with_jwt(mut self, jwt: super::jwt::Jwt) -> Self {
             self.jwt = jwt;
             self
         }
@@ -9906,10 +9905,9 @@ pub mod devices {
                 where
                     __A: __serde::de::SeqAccess<'de>,
                 {
-                    let __field0 = match __serde::de::SeqAccess::next_element::<
-                        ::std::string::String,
-                    >(&mut __seq)?
-                    {
+                    let __field0 = match __serde::de::SeqAccess::next_element::<super::jwt::Jwt>(
+                        &mut __seq,
+                    )? {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
@@ -9998,7 +9996,7 @@ pub mod devices {
                             )
                         }
                     }
-                    let mut __field0: ::core::option::Option<::std::string::String> =
+                    let mut __field0: ::core::option::Option<super::jwt::Jwt> =
                         ::core::option::Option::None;
                     while let ::core::option::Option::Some(__key) =
                         __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
@@ -10011,7 +10009,7 @@ pub mod devices {
                                     );
                                 }
                                 __field0 = ::core::option::Option::Some(
-                                    __serde::de::MapAccess::next_value::<::std::string::String>(
+                                    __serde::de::MapAccess::next_value::<super::jwt::Jwt>(
                                         &mut __map,
                                     )?,
                                 );
@@ -13511,22 +13509,22 @@ pub mod devices {
     #[derive(Clone, Debug)]
     pub struct IssueDeviceHttpProxyTokenOutput {
         #[doc = "JWT proxy token.\n"]
-        pub jwt: ::std::string::String,
+        pub jwt: super::jwt::Jwt,
         #[doc = "Proxy URL.\n"]
         pub url: ::std::string::String,
     }
     impl IssueDeviceHttpProxyTokenOutput {
         #[doc = "Creates a new [`IssueDeviceHttpProxyTokenOutput`]."]
-        pub fn new(jwt: ::std::string::String, url: ::std::string::String) -> Self {
+        pub fn new(jwt: super::jwt::Jwt, url: ::std::string::String) -> Self {
             Self { jwt, url }
         }
         #[doc = "Sets the value of `jwt`."]
-        pub fn set_jwt(&mut self, jwt: ::std::string::String) -> &mut Self {
+        pub fn set_jwt(&mut self, jwt: super::jwt::Jwt) -> &mut Self {
             self.jwt = jwt;
             self
         }
         #[doc = "Sets the value of `jwt`."]
-        pub fn with_jwt(mut self, jwt: ::std::string::String) -> Self {
+        pub fn with_jwt(mut self, jwt: super::jwt::Jwt) -> Self {
             self.jwt = jwt;
             self
         }
@@ -13585,10 +13583,9 @@ pub mod devices {
                 where
                     __A: __serde::de::SeqAccess<'de>,
                 {
-                    let __field0 = match __serde::de::SeqAccess::next_element::<
-                        ::std::string::String,
-                    >(&mut __seq)?
-                    {
+                    let __field0 = match __serde::de::SeqAccess::next_element::<super::jwt::Jwt>(
+                        &mut __seq,
+                    )? {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
@@ -13696,7 +13693,7 @@ pub mod devices {
                             )
                         }
                     }
-                    let mut __field0: ::core::option::Option<::std::string::String> =
+                    let mut __field0: ::core::option::Option<super::jwt::Jwt> =
                         ::core::option::Option::None;
                     let mut __field1: ::core::option::Option<::std::string::String> =
                         ::core::option::Option::None;
@@ -13711,7 +13708,7 @@ pub mod devices {
                                     );
                                 }
                                 __field0 = ::core::option::Option::Some(
-                                    __serde::de::MapAccess::next_value::<::std::string::String>(
+                                    __serde::de::MapAccess::next_value::<super::jwt::Jwt>(
                                         &mut __map,
                                     )?,
                                 );
@@ -13773,20 +13770,20 @@ pub mod devices {
     #[derive(Clone, Debug)]
     pub struct ValidateDeviceHttpProxyTokenAction {
         #[doc = "JWT to validate.\n"]
-        pub jwt: ::std::string::String,
+        pub jwt: super::jwt::Jwt,
     }
     impl ValidateDeviceHttpProxyTokenAction {
         #[doc = "Creates a new [`ValidateDeviceHttpProxyTokenAction`]."]
-        pub fn new(jwt: ::std::string::String) -> Self {
+        pub fn new(jwt: super::jwt::Jwt) -> Self {
             Self { jwt }
         }
         #[doc = "Sets the value of `jwt`."]
-        pub fn set_jwt(&mut self, jwt: ::std::string::String) -> &mut Self {
+        pub fn set_jwt(&mut self, jwt: super::jwt::Jwt) -> &mut Self {
             self.jwt = jwt;
             self
         }
         #[doc = "Sets the value of `jwt`."]
-        pub fn with_jwt(mut self, jwt: ::std::string::String) -> Self {
+        pub fn with_jwt(mut self, jwt: super::jwt::Jwt) -> Self {
             self.jwt = jwt;
             self
         }
@@ -13834,10 +13831,9 @@ pub mod devices {
                 where
                     __A: __serde::de::SeqAccess<'de>,
                 {
-                    let __field0 = match __serde::de::SeqAccess::next_element::<
-                        ::std::string::String,
-                    >(&mut __seq)?
-                    {
+                    let __field0 = match __serde::de::SeqAccess::next_element::<super::jwt::Jwt>(
+                        &mut __seq,
+                    )? {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
@@ -13926,7 +13922,7 @@ pub mod devices {
                             )
                         }
                     }
-                    let mut __field0: ::core::option::Option<::std::string::String> =
+                    let mut __field0: ::core::option::Option<super::jwt::Jwt> =
                         ::core::option::Option::None;
                     while let ::core::option::Option::Some(__key) =
                         __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
@@ -13939,7 +13935,7 @@ pub mod devices {
                                     );
                                 }
                                 __field0 = ::core::option::Option::Some(
-                                    __serde::de::MapAccess::next_value::<::std::string::String>(
+                                    __serde::de::MapAccess::next_value::<super::jwt::Jwt>(
                                         &mut __map,
                                     )?,
                                 );
@@ -24248,6 +24244,38 @@ pub mod json {
     use :: sidex_serde as __sidex_serde;
     #[doc = "JSON value.\n"]
     pub type JsonValue = serde_json::Value;
+}
+pub mod jwt {
+    #![doc = ""]
+    #[allow(unused)]
+    use :: serde as __serde;
+    #[allow(unused)]
+    use :: sidex_serde as __sidex_serde;
+    #[doc = "JSON Web Token (JWT).\n"]
+    #[derive(Clone, Debug)]
+    pub struct Jwt(pub(crate) ::std::string::String);
+    impl ::std::convert::From<Jwt> for ::std::string::String {
+        fn from(wrapped: Jwt) -> Self {
+            wrapped.0
+        }
+    }
+    #[automatically_derived]
+    impl __serde::Serialize for Jwt {
+        fn serialize<__S: __serde::Serializer>(
+            &self,
+            __serializer: __S,
+        ) -> ::std::result::Result<__S::Ok, __S::Error> {
+            self.0.serialize(__serializer)
+        }
+    }
+    #[automatically_derived]
+    impl<'de> __serde::Deserialize<'de> for Jwt {
+        fn deserialize<__D: __serde::Deserializer<'de>>(
+            __deserializer: __D,
+        ) -> ::std::result::Result<Self, __D::Error> {
+            Ok(Jwt(__serde::Deserialize::deserialize(__deserializer)?))
+        }
+    }
 }
 pub mod organizations {
     #![doc = "Actions and types related to organizations.\n"]
@@ -65084,25 +65112,25 @@ pub mod users {
     #[derive(Clone, Debug)]
     pub struct CompleteUserPasswordResetAction {
         #[doc = "Token to use for password reset.\n"]
-        pub reset_token: ::std::string::String,
+        pub reset_token: super::jwt::Jwt,
         #[doc = "New password of the user.\n"]
         pub password: ::std::string::String,
     }
     impl CompleteUserPasswordResetAction {
         #[doc = "Creates a new [`CompleteUserPasswordResetAction`]."]
-        pub fn new(reset_token: ::std::string::String, password: ::std::string::String) -> Self {
+        pub fn new(reset_token: super::jwt::Jwt, password: ::std::string::String) -> Self {
             Self {
                 reset_token,
                 password,
             }
         }
         #[doc = "Sets the value of `reset_token`."]
-        pub fn set_reset_token(&mut self, reset_token: ::std::string::String) -> &mut Self {
+        pub fn set_reset_token(&mut self, reset_token: super::jwt::Jwt) -> &mut Self {
             self.reset_token = reset_token;
             self
         }
         #[doc = "Sets the value of `reset_token`."]
-        pub fn with_reset_token(mut self, reset_token: ::std::string::String) -> Self {
+        pub fn with_reset_token(mut self, reset_token: super::jwt::Jwt) -> Self {
             self.reset_token = reset_token;
             self
         }
@@ -65161,10 +65189,9 @@ pub mod users {
                 where
                     __A: __serde::de::SeqAccess<'de>,
                 {
-                    let __field0 = match __serde::de::SeqAccess::next_element::<
-                        ::std::string::String,
-                    >(&mut __seq)?
-                    {
+                    let __field0 = match __serde::de::SeqAccess::next_element::<super::jwt::Jwt>(
+                        &mut __seq,
+                    )? {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
@@ -65280,7 +65307,7 @@ pub mod users {
                             )
                         }
                     }
-                    let mut __field0: ::core::option::Option<::std::string::String> =
+                    let mut __field0: ::core::option::Option<super::jwt::Jwt> =
                         ::core::option::Option::None;
                     let mut __field1: ::core::option::Option<::std::string::String> =
                         ::core::option::Option::None;
@@ -65297,7 +65324,7 @@ pub mod users {
                                     );
                                 }
                                 __field0 = ::core::option::Option::Some(
-                                    __serde::de::MapAccess::next_value::<::std::string::String>(
+                                    __serde::de::MapAccess::next_value::<super::jwt::Jwt>(
                                         &mut __map,
                                     )?,
                                 );
@@ -74187,23 +74214,20 @@ pub mod users {
     #[derive(Clone, Debug)]
     pub struct CompleteRegistrationAction {
         #[doc = "Token to use for account activation.\n"]
-        pub activation_token: ::std::string::String,
+        pub activation_token: super::jwt::Jwt,
     }
     impl CompleteRegistrationAction {
         #[doc = "Creates a new [`CompleteRegistrationAction`]."]
-        pub fn new(activation_token: ::std::string::String) -> Self {
+        pub fn new(activation_token: super::jwt::Jwt) -> Self {
             Self { activation_token }
         }
         #[doc = "Sets the value of `activation_token`."]
-        pub fn set_activation_token(
-            &mut self,
-            activation_token: ::std::string::String,
-        ) -> &mut Self {
+        pub fn set_activation_token(&mut self, activation_token: super::jwt::Jwt) -> &mut Self {
             self.activation_token = activation_token;
             self
         }
         #[doc = "Sets the value of `activation_token`."]
-        pub fn with_activation_token(mut self, activation_token: ::std::string::String) -> Self {
+        pub fn with_activation_token(mut self, activation_token: super::jwt::Jwt) -> Self {
             self.activation_token = activation_token;
             self
         }
@@ -74251,10 +74275,9 @@ pub mod users {
                 where
                     __A: __serde::de::SeqAccess<'de>,
                 {
-                    let __field0 = match __serde::de::SeqAccess::next_element::<
-                        ::std::string::String,
-                    >(&mut __seq)?
-                    {
+                    let __field0 = match __serde::de::SeqAccess::next_element::<super::jwt::Jwt>(
+                        &mut __seq,
+                    )? {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
@@ -74350,7 +74373,7 @@ pub mod users {
                             )
                         }
                     }
-                    let mut __field0: ::core::option::Option<::std::string::String> =
+                    let mut __field0: ::core::option::Option<super::jwt::Jwt> =
                         ::core::option::Option::None;
                     while let ::core::option::Option::Some(__key) =
                         __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
@@ -74365,7 +74388,7 @@ pub mod users {
                                     );
                                 }
                                 __field0 = ::core::option::Option::Some(
-                                    __serde::de::MapAccess::next_value::<::std::string::String>(
+                                    __serde::de::MapAccess::next_value::<super::jwt::Jwt>(
                                         &mut __map,
                                     )?,
                                 );

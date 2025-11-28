@@ -6,6 +6,7 @@ use nexigon_ids::ids::RepositoryId;
 use serde::Serialize;
 use serde::de::DeserializeOwned;
 
+use crate::types::jwt::Jwt;
 use crate::types::users::UserId;
 
 pub mod types;
@@ -353,4 +354,14 @@ pub trait Executor {
         &self,
         action: A,
     ) -> impl Future<Output = Result<A::Output, Self::Error>> + Send;
+}
+
+impl Jwt {
+    pub fn from_string_unchecked(jwt: String) -> Self {
+        Self(jwt)
+    }
+
+    pub fn as_str(&self) -> &str {
+        &self.0
+    }
 }

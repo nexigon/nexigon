@@ -1087,7 +1087,7 @@
     "description": "Output of issuing a HTTP proxy JWT.",
     "properties": {
       "jwt": {
-        "type": "string"
+        "$ref": "#/components/schemas/nexigon_api.jwt.Jwt"
       },
       "url": {
         "type": "string"
@@ -1124,7 +1124,7 @@
     "description": "Output of issuing a JWT for a device.",
     "properties": {
       "jwt": {
-        "type": "string"
+        "$ref": "#/components/schemas/nexigon_api.jwt.Jwt"
       }
     },
     "required": [
@@ -1387,7 +1387,7 @@
     "description": "Validate a HTTP proxy JWT.",
     "properties": {
       "jwt": {
-        "type": "string"
+        "$ref": "#/components/schemas/nexigon_api.jwt.Jwt"
       }
     },
     "required": [
@@ -1466,7 +1466,7 @@
     "description": "Validate a device JWT.\n\n**Note: Only use this action for integration with external systems.**",
     "properties": {
       "jwt": {
-        "type": "string"
+        "$ref": "#/components/schemas/nexigon_api.jwt.Jwt"
       }
     },
     "required": [
@@ -1753,6 +1753,10 @@
   },
   "nexigon_api.json.JsonValue": {
     "description": "JSON value."
+  },
+  "nexigon_api.jwt.Jwt": {
+    "type": "string",
+    "description": "JSON Web Token (JWT)."
   },
   "nexigon_api.organizations.AddOrganizationMemberAction": {
     "type": "object",
@@ -4494,7 +4498,7 @@
     "description": "Complete the registration of a user.",
     "properties": {
       "activationToken": {
-        "type": "string"
+        "$ref": "#/components/schemas/nexigon_api.jwt.Jwt"
       }
     },
     "required": [
@@ -4518,7 +4522,7 @@
     "description": "Complete the password reset of a user.",
     "properties": {
       "resetToken": {
-        "type": "string"
+        "$ref": "#/components/schemas/nexigon_api.jwt.Jwt"
       },
       "password": {
         "type": "string"

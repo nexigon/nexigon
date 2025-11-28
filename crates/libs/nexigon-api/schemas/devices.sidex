@@ -4,7 +4,10 @@ import actor::Actor
 import cluster::ClusterNodeId
 import datetime::Timestamp
 import json::JsonValue
-import projects::{ProjectId, DeploymentToken, DeploymentTokenId}
+import jwt::Jwt
+import projects::DeploymentToken
+import projects::DeploymentTokenId
+import projects::ProjectId
 import resources::ResourceUsage
 
 /// Unique ID of a device.
@@ -163,7 +166,7 @@ record IssueDeviceTokenAction {
 /// Output of issuing a JWT for a device.
 record IssueDeviceTokenOutput {
     /// Issued JWT.
-    jwt: string,
+    jwt: Jwt,
 }
 
 /// Validate a device JWT.
@@ -171,7 +174,7 @@ record IssueDeviceTokenOutput {
 /// **Note: Only use this action for integration with external systems.**
 record ValidateDeviceTokenAction {
     /// JWT to validate.
-    jwt: string,
+    jwt: Jwt,
 }
 
 /// Output of validating a device JWT.
@@ -290,7 +293,7 @@ record IssueDeviceHttpProxyTokenAction {
 /// Output of issuing a HTTP proxy JWT.
 record IssueDeviceHttpProxyTokenOutput {
     /// JWT proxy token.
-    jwt: string,
+    jwt: Jwt,
     /// Proxy URL.
     url: string,
 }
@@ -298,7 +301,7 @@ record IssueDeviceHttpProxyTokenOutput {
 /// Validate a HTTP proxy JWT.
 record ValidateDeviceHttpProxyTokenAction {
     /// JWT to validate.
-    jwt: string,
+    jwt: Jwt,
 }
 
 /// Output of validating a HTTP proxy JWT.

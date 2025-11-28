@@ -3,6 +3,7 @@
 import actor::Actor
 import datetime::Timestamp
 import devices::DeviceId
+import jwt::Jwt
 import organizations::OrganizationId
 import organizations::OrganizationInvitationId
 import projects::ProjectId
@@ -140,7 +141,7 @@ record ResetUserPasswordAction {
 /// Complete the password reset of a user.
 record CompleteUserPasswordResetAction {
     /// Token to use for password reset.
-   reset_token: string,
+   reset_token: Jwt,
    /// New password of the user.
    password: string,
 }
@@ -430,7 +431,7 @@ record ResendRegistrationEmailAction {
 /// Complete the registration of a user.
 record CompleteRegistrationAction {
     /// Token to use for account activation.
-    activation_token: string,
+    activation_token: Jwt,
 }
 
 /// Output of completing the registration of a user.
