@@ -357,7 +357,7 @@ pub trait Executor {
 }
 
 impl Jwt {
-    pub fn from_string_unchecked(jwt: String) -> Self {
+    pub fn from_string(jwt: String) -> Self {
         Self(jwt)
     }
 
