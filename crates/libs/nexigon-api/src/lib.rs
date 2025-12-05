@@ -18,9 +18,6 @@ pub trait Action: Any + Serialize + DeserializeOwned + Send + std::fmt::Debug {
 
     /// Unique name of the action.
     const NAME: &'static str;
-
-    /// Convert the action to [`AnyAction`].
-    fn into_any(self) -> AnyAction;
 }
 
 /// A resource that can be audited.
@@ -235,6 +232,7 @@ macro_rules! with_actions {
 }
 
 /// Auxiliary macro for implementing [`Action`] for all actions.
+#[macro_export]
 macro_rules! impl_actions {
     ($(($name:literal, $variant:ident, $input:path, $output:path),)*) => {
         use types::*;
@@ -244,23 +242,8 @@ macro_rules! impl_actions {
                 type Output = $output;
 
                 const NAME: &'static str = $name;
-
-                fn into_any(self) -> AnyAction {
-                    AnyAction::$variant(self)
-                }
             }
         )*
-
-        /// Any action.
-        #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
-        #[serde(tag = "action", content = "parameters")]
-        pub enum AnyAction {
-            $(
-                #[doc = concat!("Action `", $name, "`.")]
-                #[serde(rename = $name)]
-                $variant($input),
-            )*
-        }
 
         // Ensure that all action names are unique.
         const _: () = {
