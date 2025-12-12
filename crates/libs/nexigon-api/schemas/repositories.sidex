@@ -5,6 +5,7 @@ import datetime::Timestamp
 import digest::Digest
 import organizations::OrganizationId
 import projects::ProjectId
+import resources::ResourceUsage
 import users::UserId
 
 /// Unique ID of a repository.
@@ -607,4 +608,16 @@ record QueryAuditLogEventsAction {
 record QueryAuditLogEventsOutput {
    /// List of audit log events.
    events: [AuditLogEvent],
+}
+
+/// Get the resources used by the repository and their limits.
+record GetRepositoryResourceUsageAction {
+    /// ID of the repository.
+    repository_id: RepositoryId,
+}
+
+/// Output of getting the resources used by a repository
+#[rust(derive(Default))]
+record GetRepositoryResourceUsageOutput {
+    packages: ResourceUsage,
 }

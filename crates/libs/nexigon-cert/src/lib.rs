@@ -4,6 +4,7 @@
 use std::fmt::Write;
 use std::str::FromStr;
 
+use x509_cert::der::Decode;
 use x509_cert::der::DecodePem;
 use x509_cert::der::Encode;
 use x509_cert::der::EncodePem;
@@ -19,6 +20,13 @@ impl Certificate {
     /// Parse a certificate in PEM format.
     pub fn parse_pem(pem: &str) -> Result<Self, InvalidCertificateError> {
         x509_cert::Certificate::from_pem(pem)
+            .map_err(InvalidCertificateError::new)
+            .map(|inner| Self { inner })
+    }
+
+    /// Parse a certificate in DER format.
+    pub fn parse_der(der: &[u8]) -> Result<Self, InvalidCertificateError> {
+        x509_cert::Certificate::from_der(der)
             .map_err(InvalidCertificateError::new)
             .map(|inner| Self { inner })
     }

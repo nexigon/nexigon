@@ -205,6 +205,8 @@ macro_rules! with_actions {
             ("repositories_IssueAssetUploadUrl", IssueAssetUploadUrl, repositories::IssueAssetUploadUrlAction, repositories::IssueAssetUploadUrlOutput),
             // # Audit Log
             ("repositories_QueryAuditLog", QueryRepositoryAuditLogEvents, repositories::QueryAuditLogEventsAction, repositories::QueryAuditLogEventsOutput),
+            // # Resource Usage
+            ("repositories_GetResourceUsage", GetRepositoryResourceUsage, repositories::GetRepositoryResourceUsageAction, repositories::GetRepositoryResourceUsageOutput),
 
             // # Audit Log
             ("audit_QueryAuditLogEvents", QueryAuditLogEvents, audit::QueryAuditLogEventsAction, audit::QueryAuditLogEventsOutput),

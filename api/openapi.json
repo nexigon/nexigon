@@ -3261,6 +3261,37 @@
         }
       }
     },
+    "/api/v1/actions/invoke/repositories_GetResourceUsage": {
+      "post": {
+        "tags": [
+          "repositories"
+        ],
+        "summary": "GetResourceUsage",
+        "description": "Get the resources used by the repository and their limits.",
+        "operationId": "repositories_GetResourceUsage",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/nexigon_api.repositories.GetRepositoryResourceUsageAction"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/nexigon_api.repositories.GetRepositoryResourceUsageOutput"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/actions/invoke/audit_QueryAuditLogEvents": {
       "post": {
         "tags": [
@@ -6983,6 +7014,31 @@
           "visibility",
           "packageCount",
           "assetCount"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.repositories.GetRepositoryResourceUsageAction": {
+        "type": "object",
+        "properties": {
+          "repositoryId": {
+            "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryId"
+          }
+        },
+        "required": [
+          "repositoryId"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.repositories.GetRepositoryResourceUsageOutput": {
+        "type": "object",
+        "description": "Output of getting the resources used by a repository",
+        "properties": {
+          "packages": {
+            "$ref": "#/components/schemas/nexigon_api.resources.ResourceUsage"
+          }
+        },
+        "required": [
+          "packages"
         ],
         "unevaluatedProperties": false
       },
