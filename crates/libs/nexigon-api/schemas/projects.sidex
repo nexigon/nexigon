@@ -147,8 +147,10 @@ record QueryProjectRepositoriesOutput {
 record QueryProjectRepositoriesItem {
     /// ID of the repository.
     repository_id: RepositoryId,
-    /// Name of the repository.
-    name: string,
+    /// Public name of the repository.
+    public_name: string,
+    /// Display name of the repository (if any).
+    display_name?: string,
 }
 
 /// Set the organization of a project.

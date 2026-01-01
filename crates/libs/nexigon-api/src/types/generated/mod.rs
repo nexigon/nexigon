@@ -26919,18 +26919,21 @@ pub mod organizations {
     pub struct QueryOrganizationRepositoriesItem {
         #[doc = "ID of the repository.\n"]
         pub repository_id: super::repositories::RepositoryId,
-        #[doc = "Name of the repository.\n"]
-        pub name: ::std::string::String,
+        #[doc = "Public name of the repository.\n"]
+        pub public_name: ::std::string::String,
+        #[doc = "Display name of the repository (if any).\n"]
+        pub display_name: ::std::option::Option<::std::string::String>,
     }
     impl QueryOrganizationRepositoriesItem {
         #[doc = "Creates a new [`QueryOrganizationRepositoriesItem`]."]
         pub fn new(
             repository_id: super::repositories::RepositoryId,
-            name: ::std::string::String,
+            public_name: ::std::string::String,
         ) -> Self {
             Self {
                 repository_id,
-                name,
+                public_name,
+                display_name: ::std::default::Default::default(),
             }
         }
         #[doc = "Sets the value of `repository_id`."]
@@ -26949,14 +26952,30 @@ pub mod organizations {
             self.repository_id = repository_id;
             self
         }
-        #[doc = "Sets the value of `name`."]
-        pub fn set_name(&mut self, name: ::std::string::String) -> &mut Self {
-            self.name = name;
+        #[doc = "Sets the value of `public_name`."]
+        pub fn set_public_name(&mut self, public_name: ::std::string::String) -> &mut Self {
+            self.public_name = public_name;
             self
         }
-        #[doc = "Sets the value of `name`."]
-        pub fn with_name(mut self, name: ::std::string::String) -> Self {
-            self.name = name;
+        #[doc = "Sets the value of `public_name`."]
+        pub fn with_public_name(mut self, public_name: ::std::string::String) -> Self {
+            self.public_name = public_name;
+            self
+        }
+        #[doc = "Sets the value of `display_name`."]
+        pub fn set_display_name(
+            &mut self,
+            display_name: ::std::option::Option<::std::string::String>,
+        ) -> &mut Self {
+            self.display_name = display_name;
+            self
+        }
+        #[doc = "Sets the value of `display_name`."]
+        pub fn with_display_name(
+            mut self,
+            display_name: ::std::option::Option<::std::string::String>,
+        ) -> Self {
+            self.display_name = display_name;
             self
         }
     }
@@ -26969,10 +26988,14 @@ pub mod organizations {
             let mut __record = __sidex_serde::ser::RecordSerializer::new(
                 __serializer,
                 "QueryOrganizationRepositoriesItem",
-                2usize,
+                3usize,
             )?;
             __record.serialize_field("repositoryId", &self.repository_id)?;
-            __record.serialize_field("name", &self.name)?;
+            __record.serialize_field("publicName", &self.public_name)?;
+            __record.serialize_optional_field(
+                "displayName",
+                ::core::option::Option::as_ref(&self.display_name),
+            )?;
             __record.end()
         }
     }
@@ -27011,7 +27034,7 @@ pub mod organizations {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(0usize, &"record with 2 fields"),
+                                __serde::de::Error::invalid_length(0usize, &"record with 3 fields"),
                             );
                         }
                     };
@@ -27022,13 +27045,25 @@ pub mod organizations {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(1usize, &"record with 2 fields"),
+                                __serde::de::Error::invalid_length(1usize, &"record with 3 fields"),
+                            );
+                        }
+                    };
+                    let __field2 = match __serde::de::SeqAccess::next_element::<
+                        ::std::option::Option<::std::string::String>,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(2usize, &"record with 3 fields"),
                             );
                         }
                     };
                     ::core::result::Result::Ok(QueryOrganizationRepositoriesItem {
                         repository_id: __field0,
-                        name: __field1,
+                        public_name: __field1,
+                        display_name: __field2,
                     })
                 }
                 #[inline]
@@ -27040,15 +27075,17 @@ pub mod organizations {
                     __A: __serde::de::MapAccess<'de>,
                 {
                     #[doc(hidden)]
-                    const __IDENTIFIERS: &'static [&'static str] = &["repositoryId", "name"];
+                    const __IDENTIFIERS: &'static [&'static str] =
+                        &["repositoryId", "publicName", "displayName"];
                     #[doc(hidden)]
                     const __EXPECTING_IDENTIFIERS: &'static str =
-                        "an identifier in [\"repositoryId\", \"name\"]";
+                        "an identifier in [\"repositoryId\", \"publicName\", \"displayName\"]";
                     #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
                     #[doc(hidden)]
                     enum __Identifier {
                         __Identifier0,
                         __Identifier1,
+                        __Identifier2,
                         __Unknown,
                     }
                     #[doc(hidden)]
@@ -27071,6 +27108,7 @@ pub mod organizations {
                             match __value {
                                 0u64 => ::core::result::Result::Ok(__Identifier::__Identifier0),
                                 1u64 => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                                2u64 => ::core::result::Result::Ok(__Identifier::__Identifier2),
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
                         }
@@ -27085,7 +27123,12 @@ pub mod organizations {
                                 "repositoryId" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier0)
                                 }
-                                "name" => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                                "publicName" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier1)
+                                }
+                                "displayName" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier2)
+                                }
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
                         }
@@ -27100,7 +27143,12 @@ pub mod organizations {
                                 b"repositoryId" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier0)
                                 }
-                                b"name" => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                                b"publicName" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier1)
+                                }
+                                b"displayName" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier2)
+                                }
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
                         }
@@ -27123,6 +27171,9 @@ pub mod organizations {
                         ::core::option::Option::None;
                     let mut __field1: ::core::option::Option<::std::string::String> =
                         ::core::option::Option::None;
+                    let mut __field2: ::core::option::Option<
+                        ::std::option::Option<::std::string::String>,
+                    > = ::core::option::Option::None;
                     while let ::core::option::Option::Some(__key) =
                         __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
                     {
@@ -27144,13 +27195,29 @@ pub mod organizations {
                             __Identifier::__Identifier1 => {
                                 if ::core::option::Option::is_some(&__field1) {
                                     return ::core::result::Result::Err(
-                                        <__A::Error as __serde::de::Error>::duplicate_field("name"),
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "publicName",
+                                        ),
                                     );
                                 }
                                 __field1 = ::core::option::Option::Some(
                                     __serde::de::MapAccess::next_value::<::std::string::String>(
                                         &mut __map,
                                     )?,
+                                );
+                            }
+                            __Identifier::__Identifier2 => {
+                                if ::core::option::Option::is_some(&__field2) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "displayName",
+                                        ),
+                                    );
+                                }
+                                __field2 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<
+                                        ::std::option::Option<::std::string::String>,
+                                    >(&mut __map)?,
                                 );
                             }
                             _ => {
@@ -27172,18 +27239,24 @@ pub mod organizations {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                <__A::Error as __serde::de::Error>::missing_field("name"),
+                                <__A::Error as __serde::de::Error>::missing_field("publicName"),
                             );
                         }
                     };
+                    let __field2 = match __field2 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => ::core::option::Option::None,
+                    };
                     ::core::result::Result::Ok(QueryOrganizationRepositoriesItem {
                         repository_id: __field0,
-                        name: __field1,
+                        public_name: __field1,
+                        display_name: __field2,
                     })
                 }
             }
             #[doc(hidden)]
-            const __FIELDS: &'static [&'static str] = &["repositoryId", "name"];
+            const __FIELDS: &'static [&'static str] =
+                &["repositoryId", "publicName", "displayName"];
             __serde::Deserializer::deserialize_struct(
                 __deserializer,
                 "QueryOrganizationRepositoriesItem",
@@ -30222,23 +30295,27 @@ pub mod organizations {
         #[doc = ""]
         pub projects: super::resources::ResourceUsage,
         #[doc = ""]
+        pub devices: super::resources::ResourceUsage,
+        #[doc = ""]
         pub repositories: super::resources::ResourceUsage,
         #[doc = ""]
-        pub devices: super::resources::ResourceUsage,
+        pub packages: super::resources::ResourceUsage,
     }
     impl GetOrganizationResourceUsageOutput {
         #[doc = "Creates a new [`GetOrganizationResourceUsageOutput`]."]
         pub fn new(
             seats: super::resources::ResourceUsage,
             projects: super::resources::ResourceUsage,
-            repositories: super::resources::ResourceUsage,
             devices: super::resources::ResourceUsage,
+            repositories: super::resources::ResourceUsage,
+            packages: super::resources::ResourceUsage,
         ) -> Self {
             Self {
                 seats,
                 projects,
-                repositories,
                 devices,
+                repositories,
+                packages,
             }
         }
         #[doc = "Sets the value of `seats`."]
@@ -30261,6 +30338,16 @@ pub mod organizations {
             self.projects = projects;
             self
         }
+        #[doc = "Sets the value of `devices`."]
+        pub fn set_devices(&mut self, devices: super::resources::ResourceUsage) -> &mut Self {
+            self.devices = devices;
+            self
+        }
+        #[doc = "Sets the value of `devices`."]
+        pub fn with_devices(mut self, devices: super::resources::ResourceUsage) -> Self {
+            self.devices = devices;
+            self
+        }
         #[doc = "Sets the value of `repositories`."]
         pub fn set_repositories(
             &mut self,
@@ -30274,14 +30361,14 @@ pub mod organizations {
             self.repositories = repositories;
             self
         }
-        #[doc = "Sets the value of `devices`."]
-        pub fn set_devices(&mut self, devices: super::resources::ResourceUsage) -> &mut Self {
-            self.devices = devices;
+        #[doc = "Sets the value of `packages`."]
+        pub fn set_packages(&mut self, packages: super::resources::ResourceUsage) -> &mut Self {
+            self.packages = packages;
             self
         }
-        #[doc = "Sets the value of `devices`."]
-        pub fn with_devices(mut self, devices: super::resources::ResourceUsage) -> Self {
-            self.devices = devices;
+        #[doc = "Sets the value of `packages`."]
+        pub fn with_packages(mut self, packages: super::resources::ResourceUsage) -> Self {
+            self.packages = packages;
             self
         }
     }
@@ -30294,12 +30381,13 @@ pub mod organizations {
             let mut __record = __sidex_serde::ser::RecordSerializer::new(
                 __serializer,
                 "GetOrganizationResourceUsageOutput",
-                4usize,
+                5usize,
             )?;
             __record.serialize_field("seats", &self.seats)?;
             __record.serialize_field("projects", &self.projects)?;
-            __record.serialize_field("repositories", &self.repositories)?;
             __record.serialize_field("devices", &self.devices)?;
+            __record.serialize_field("repositories", &self.repositories)?;
+            __record.serialize_field("packages", &self.packages)?;
             __record.end()
         }
     }
@@ -30338,7 +30426,7 @@ pub mod organizations {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(0usize, &"record with 4 fields"),
+                                __serde::de::Error::invalid_length(0usize, &"record with 5 fields"),
                             );
                         }
                     };
@@ -30349,7 +30437,7 @@ pub mod organizations {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(1usize, &"record with 4 fields"),
+                                __serde::de::Error::invalid_length(1usize, &"record with 5 fields"),
                             );
                         }
                     };
@@ -30360,7 +30448,7 @@ pub mod organizations {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(2usize, &"record with 4 fields"),
+                                __serde::de::Error::invalid_length(2usize, &"record with 5 fields"),
                             );
                         }
                     };
@@ -30371,15 +30459,27 @@ pub mod organizations {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(3usize, &"record with 4 fields"),
+                                __serde::de::Error::invalid_length(3usize, &"record with 5 fields"),
+                            );
+                        }
+                    };
+                    let __field4 = match __serde::de::SeqAccess::next_element::<
+                        super::resources::ResourceUsage,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(4usize, &"record with 5 fields"),
                             );
                         }
                     };
                     ::core::result::Result::Ok(GetOrganizationResourceUsageOutput {
                         seats: __field0,
                         projects: __field1,
-                        repositories: __field2,
-                        devices: __field3,
+                        devices: __field2,
+                        repositories: __field3,
+                        packages: __field4,
                     })
                 }
                 #[inline]
@@ -30392,10 +30492,9 @@ pub mod organizations {
                 {
                     #[doc(hidden)]
                     const __IDENTIFIERS: &'static [&'static str] =
-                        &["seats", "projects", "repositories", "devices"];
+                        &["seats", "projects", "devices", "repositories", "packages"];
                     #[doc(hidden)]
-                    const __EXPECTING_IDENTIFIERS: &'static str =
-                        "an identifier in [\"seats\", \"projects\", \"repositories\", \"devices\"]";
+                    const __EXPECTING_IDENTIFIERS: &'static str = "an identifier in [\"seats\", \"projects\", \"devices\", \"repositories\", \"packages\"]";
                     #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
                     #[doc(hidden)]
                     enum __Identifier {
@@ -30403,6 +30502,7 @@ pub mod organizations {
                         __Identifier1,
                         __Identifier2,
                         __Identifier3,
+                        __Identifier4,
                         __Unknown,
                     }
                     #[doc(hidden)]
@@ -30427,6 +30527,7 @@ pub mod organizations {
                                 1u64 => ::core::result::Result::Ok(__Identifier::__Identifier1),
                                 2u64 => ::core::result::Result::Ok(__Identifier::__Identifier2),
                                 3u64 => ::core::result::Result::Ok(__Identifier::__Identifier3),
+                                4u64 => ::core::result::Result::Ok(__Identifier::__Identifier4),
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
                         }
@@ -30442,11 +30543,14 @@ pub mod organizations {
                                 "projects" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier1)
                                 }
-                                "repositories" => {
+                                "devices" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier2)
                                 }
-                                "devices" => {
+                                "repositories" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier3)
+                                }
+                                "packages" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier4)
                                 }
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
@@ -30463,11 +30567,14 @@ pub mod organizations {
                                 b"projects" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier1)
                                 }
-                                b"repositories" => {
+                                b"devices" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier2)
                                 }
-                                b"devices" => {
+                                b"repositories" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier3)
+                                }
+                                b"packages" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier4)
                                 }
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
@@ -30494,6 +30601,8 @@ pub mod organizations {
                     let mut __field2: ::core::option::Option<super::resources::ResourceUsage> =
                         ::core::option::Option::None;
                     let mut __field3: ::core::option::Option<super::resources::ResourceUsage> =
+                        ::core::option::Option::None;
+                    let mut __field4: ::core::option::Option<super::resources::ResourceUsage> =
                         ::core::option::Option::None;
                     while let ::core::option::Option::Some(__key) =
                         __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
@@ -30531,7 +30640,7 @@ pub mod organizations {
                                 if ::core::option::Option::is_some(&__field2) {
                                     return ::core::result::Result::Err(
                                         <__A::Error as __serde::de::Error>::duplicate_field(
-                                            "repositories",
+                                            "devices",
                                         ),
                                     );
                                 }
@@ -30545,11 +30654,25 @@ pub mod organizations {
                                 if ::core::option::Option::is_some(&__field3) {
                                     return ::core::result::Result::Err(
                                         <__A::Error as __serde::de::Error>::duplicate_field(
-                                            "devices",
+                                            "repositories",
                                         ),
                                     );
                                 }
                                 __field3 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<
+                                        super::resources::ResourceUsage,
+                                    >(&mut __map)?,
+                                );
+                            }
+                            __Identifier::__Identifier4 => {
+                                if ::core::option::Option::is_some(&__field4) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "packages",
+                                        ),
+                                    );
+                                }
+                                __field4 = ::core::option::Option::Some(
                                     __serde::de::MapAccess::next_value::<
                                         super::resources::ResourceUsage,
                                     >(&mut __map)?,
@@ -30582,7 +30705,7 @@ pub mod organizations {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                <__A::Error as __serde::de::Error>::missing_field("repositories"),
+                                <__A::Error as __serde::de::Error>::missing_field("devices"),
                             );
                         }
                     };
@@ -30590,21 +30713,30 @@ pub mod organizations {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                <__A::Error as __serde::de::Error>::missing_field("devices"),
+                                <__A::Error as __serde::de::Error>::missing_field("repositories"),
+                            );
+                        }
+                    };
+                    let __field4 = match __field4 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                <__A::Error as __serde::de::Error>::missing_field("packages"),
                             );
                         }
                     };
                     ::core::result::Result::Ok(GetOrganizationResourceUsageOutput {
                         seats: __field0,
                         projects: __field1,
-                        repositories: __field2,
-                        devices: __field3,
+                        devices: __field2,
+                        repositories: __field3,
+                        packages: __field4,
                     })
                 }
             }
             #[doc(hidden)]
             const __FIELDS: &'static [&'static str] =
-                &["seats", "projects", "repositories", "devices"];
+                &["seats", "projects", "devices", "repositories", "packages"];
             __serde::Deserializer::deserialize_struct(
                 __deserializer,
                 "GetOrganizationResourceUsageOutput",
@@ -36358,18 +36490,21 @@ pub mod projects {
     pub struct QueryProjectRepositoriesItem {
         #[doc = "ID of the repository.\n"]
         pub repository_id: super::repositories::RepositoryId,
-        #[doc = "Name of the repository.\n"]
-        pub name: ::std::string::String,
+        #[doc = "Public name of the repository.\n"]
+        pub public_name: ::std::string::String,
+        #[doc = "Display name of the repository (if any).\n"]
+        pub display_name: ::std::option::Option<::std::string::String>,
     }
     impl QueryProjectRepositoriesItem {
         #[doc = "Creates a new [`QueryProjectRepositoriesItem`]."]
         pub fn new(
             repository_id: super::repositories::RepositoryId,
-            name: ::std::string::String,
+            public_name: ::std::string::String,
         ) -> Self {
             Self {
                 repository_id,
-                name,
+                public_name,
+                display_name: ::std::default::Default::default(),
             }
         }
         #[doc = "Sets the value of `repository_id`."]
@@ -36388,14 +36523,30 @@ pub mod projects {
             self.repository_id = repository_id;
             self
         }
-        #[doc = "Sets the value of `name`."]
-        pub fn set_name(&mut self, name: ::std::string::String) -> &mut Self {
-            self.name = name;
+        #[doc = "Sets the value of `public_name`."]
+        pub fn set_public_name(&mut self, public_name: ::std::string::String) -> &mut Self {
+            self.public_name = public_name;
             self
         }
-        #[doc = "Sets the value of `name`."]
-        pub fn with_name(mut self, name: ::std::string::String) -> Self {
-            self.name = name;
+        #[doc = "Sets the value of `public_name`."]
+        pub fn with_public_name(mut self, public_name: ::std::string::String) -> Self {
+            self.public_name = public_name;
+            self
+        }
+        #[doc = "Sets the value of `display_name`."]
+        pub fn set_display_name(
+            &mut self,
+            display_name: ::std::option::Option<::std::string::String>,
+        ) -> &mut Self {
+            self.display_name = display_name;
+            self
+        }
+        #[doc = "Sets the value of `display_name`."]
+        pub fn with_display_name(
+            mut self,
+            display_name: ::std::option::Option<::std::string::String>,
+        ) -> Self {
+            self.display_name = display_name;
             self
         }
     }
@@ -36408,10 +36559,14 @@ pub mod projects {
             let mut __record = __sidex_serde::ser::RecordSerializer::new(
                 __serializer,
                 "QueryProjectRepositoriesItem",
-                2usize,
+                3usize,
             )?;
             __record.serialize_field("repositoryId", &self.repository_id)?;
-            __record.serialize_field("name", &self.name)?;
+            __record.serialize_field("publicName", &self.public_name)?;
+            __record.serialize_optional_field(
+                "displayName",
+                ::core::option::Option::as_ref(&self.display_name),
+            )?;
             __record.end()
         }
     }
@@ -36450,7 +36605,7 @@ pub mod projects {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(0usize, &"record with 2 fields"),
+                                __serde::de::Error::invalid_length(0usize, &"record with 3 fields"),
                             );
                         }
                     };
@@ -36461,13 +36616,25 @@ pub mod projects {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(1usize, &"record with 2 fields"),
+                                __serde::de::Error::invalid_length(1usize, &"record with 3 fields"),
+                            );
+                        }
+                    };
+                    let __field2 = match __serde::de::SeqAccess::next_element::<
+                        ::std::option::Option<::std::string::String>,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(2usize, &"record with 3 fields"),
                             );
                         }
                     };
                     ::core::result::Result::Ok(QueryProjectRepositoriesItem {
                         repository_id: __field0,
-                        name: __field1,
+                        public_name: __field1,
+                        display_name: __field2,
                     })
                 }
                 #[inline]
@@ -36479,15 +36646,17 @@ pub mod projects {
                     __A: __serde::de::MapAccess<'de>,
                 {
                     #[doc(hidden)]
-                    const __IDENTIFIERS: &'static [&'static str] = &["repositoryId", "name"];
+                    const __IDENTIFIERS: &'static [&'static str] =
+                        &["repositoryId", "publicName", "displayName"];
                     #[doc(hidden)]
                     const __EXPECTING_IDENTIFIERS: &'static str =
-                        "an identifier in [\"repositoryId\", \"name\"]";
+                        "an identifier in [\"repositoryId\", \"publicName\", \"displayName\"]";
                     #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
                     #[doc(hidden)]
                     enum __Identifier {
                         __Identifier0,
                         __Identifier1,
+                        __Identifier2,
                         __Unknown,
                     }
                     #[doc(hidden)]
@@ -36510,6 +36679,7 @@ pub mod projects {
                             match __value {
                                 0u64 => ::core::result::Result::Ok(__Identifier::__Identifier0),
                                 1u64 => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                                2u64 => ::core::result::Result::Ok(__Identifier::__Identifier2),
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
                         }
@@ -36524,7 +36694,12 @@ pub mod projects {
                                 "repositoryId" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier0)
                                 }
-                                "name" => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                                "publicName" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier1)
+                                }
+                                "displayName" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier2)
+                                }
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
                         }
@@ -36539,7 +36714,12 @@ pub mod projects {
                                 b"repositoryId" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier0)
                                 }
-                                b"name" => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                                b"publicName" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier1)
+                                }
+                                b"displayName" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier2)
+                                }
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
                         }
@@ -36562,6 +36742,9 @@ pub mod projects {
                         ::core::option::Option::None;
                     let mut __field1: ::core::option::Option<::std::string::String> =
                         ::core::option::Option::None;
+                    let mut __field2: ::core::option::Option<
+                        ::std::option::Option<::std::string::String>,
+                    > = ::core::option::Option::None;
                     while let ::core::option::Option::Some(__key) =
                         __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
                     {
@@ -36583,13 +36766,29 @@ pub mod projects {
                             __Identifier::__Identifier1 => {
                                 if ::core::option::Option::is_some(&__field1) {
                                     return ::core::result::Result::Err(
-                                        <__A::Error as __serde::de::Error>::duplicate_field("name"),
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "publicName",
+                                        ),
                                     );
                                 }
                                 __field1 = ::core::option::Option::Some(
                                     __serde::de::MapAccess::next_value::<::std::string::String>(
                                         &mut __map,
                                     )?,
+                                );
+                            }
+                            __Identifier::__Identifier2 => {
+                                if ::core::option::Option::is_some(&__field2) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "displayName",
+                                        ),
+                                    );
+                                }
+                                __field2 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<
+                                        ::std::option::Option<::std::string::String>,
+                                    >(&mut __map)?,
                                 );
                             }
                             _ => {
@@ -36611,18 +36810,24 @@ pub mod projects {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                <__A::Error as __serde::de::Error>::missing_field("name"),
+                                <__A::Error as __serde::de::Error>::missing_field("publicName"),
                             );
                         }
                     };
+                    let __field2 = match __field2 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => ::core::option::Option::None,
+                    };
                     ::core::result::Result::Ok(QueryProjectRepositoriesItem {
                         repository_id: __field0,
-                        name: __field1,
+                        public_name: __field1,
+                        display_name: __field2,
                     })
                 }
             }
             #[doc(hidden)]
-            const __FIELDS: &'static [&'static str] = &["repositoryId", "name"];
+            const __FIELDS: &'static [&'static str] =
+                &["repositoryId", "publicName", "displayName"];
             __serde::Deserializer::deserialize_struct(
                 __deserializer,
                 "QueryProjectRepositoriesItem",
@@ -43722,6 +43927,535 @@ pub mod repositories {
                 __deserializer,
                 "RepositoryVisibility",
                 __VARIANTS,
+                __Visitor {
+                    __phantom_vars: ::core::marker::PhantomData,
+                },
+            )
+        }
+    }
+    #[doc = "Repository S3 config.\n"]
+    #[derive(Clone, Debug)]
+    pub struct RepositoryS3Config {
+        #[doc = "S3 endpoint (e.g., https://s3.amazonaws.com or https://minio.local:9000).\n"]
+        pub endpoint: ::std::string::String,
+        #[doc = "S3 bucket name.\n"]
+        pub bucket: ::std::string::String,
+        #[doc = "AWS region (required by AWS, may be NULL for MinIO/other providers).\n"]
+        pub region: ::std::option::Option<::std::string::String>,
+        #[doc = "Optional prefix inside the bucket to scope this repository.\n"]
+        pub prefix: ::std::option::Option<::std::string::String>,
+        #[doc = "S3 access key ID (not sensitive, can be plain text).\n"]
+        pub access_key_id: ::std::string::String,
+        #[doc = "S3 secret access key (sensitive, will be stored encrypted).\n"]
+        pub secret_access_key: ::std::option::Option<::std::string::String>,
+    }
+    impl RepositoryS3Config {
+        #[doc = "Creates a new [`RepositoryS3Config`]."]
+        pub fn new(
+            endpoint: ::std::string::String,
+            bucket: ::std::string::String,
+            access_key_id: ::std::string::String,
+        ) -> Self {
+            Self {
+                endpoint,
+                bucket,
+                access_key_id,
+                region: ::std::default::Default::default(),
+                prefix: ::std::default::Default::default(),
+                secret_access_key: ::std::default::Default::default(),
+            }
+        }
+        #[doc = "Sets the value of `endpoint`."]
+        pub fn set_endpoint(&mut self, endpoint: ::std::string::String) -> &mut Self {
+            self.endpoint = endpoint;
+            self
+        }
+        #[doc = "Sets the value of `endpoint`."]
+        pub fn with_endpoint(mut self, endpoint: ::std::string::String) -> Self {
+            self.endpoint = endpoint;
+            self
+        }
+        #[doc = "Sets the value of `bucket`."]
+        pub fn set_bucket(&mut self, bucket: ::std::string::String) -> &mut Self {
+            self.bucket = bucket;
+            self
+        }
+        #[doc = "Sets the value of `bucket`."]
+        pub fn with_bucket(mut self, bucket: ::std::string::String) -> Self {
+            self.bucket = bucket;
+            self
+        }
+        #[doc = "Sets the value of `region`."]
+        pub fn set_region(
+            &mut self,
+            region: ::std::option::Option<::std::string::String>,
+        ) -> &mut Self {
+            self.region = region;
+            self
+        }
+        #[doc = "Sets the value of `region`."]
+        pub fn with_region(mut self, region: ::std::option::Option<::std::string::String>) -> Self {
+            self.region = region;
+            self
+        }
+        #[doc = "Sets the value of `prefix`."]
+        pub fn set_prefix(
+            &mut self,
+            prefix: ::std::option::Option<::std::string::String>,
+        ) -> &mut Self {
+            self.prefix = prefix;
+            self
+        }
+        #[doc = "Sets the value of `prefix`."]
+        pub fn with_prefix(mut self, prefix: ::std::option::Option<::std::string::String>) -> Self {
+            self.prefix = prefix;
+            self
+        }
+        #[doc = "Sets the value of `access_key_id`."]
+        pub fn set_access_key_id(&mut self, access_key_id: ::std::string::String) -> &mut Self {
+            self.access_key_id = access_key_id;
+            self
+        }
+        #[doc = "Sets the value of `access_key_id`."]
+        pub fn with_access_key_id(mut self, access_key_id: ::std::string::String) -> Self {
+            self.access_key_id = access_key_id;
+            self
+        }
+        #[doc = "Sets the value of `secret_access_key`."]
+        pub fn set_secret_access_key(
+            &mut self,
+            secret_access_key: ::std::option::Option<::std::string::String>,
+        ) -> &mut Self {
+            self.secret_access_key = secret_access_key;
+            self
+        }
+        #[doc = "Sets the value of `secret_access_key`."]
+        pub fn with_secret_access_key(
+            mut self,
+            secret_access_key: ::std::option::Option<::std::string::String>,
+        ) -> Self {
+            self.secret_access_key = secret_access_key;
+            self
+        }
+    }
+    #[automatically_derived]
+    impl __serde::Serialize for RepositoryS3Config {
+        fn serialize<__S: __serde::Serializer>(
+            &self,
+            __serializer: __S,
+        ) -> ::std::result::Result<__S::Ok, __S::Error> {
+            let mut __record = __sidex_serde::ser::RecordSerializer::new(
+                __serializer,
+                "RepositoryS3Config",
+                6usize,
+            )?;
+            __record.serialize_field("endpoint", &self.endpoint)?;
+            __record.serialize_field("bucket", &self.bucket)?;
+            __record
+                .serialize_optional_field("region", ::core::option::Option::as_ref(&self.region))?;
+            __record
+                .serialize_optional_field("prefix", ::core::option::Option::as_ref(&self.prefix))?;
+            __record.serialize_field("accessKeyId", &self.access_key_id)?;
+            __record.serialize_optional_field(
+                "secretAccessKey",
+                ::core::option::Option::as_ref(&self.secret_access_key),
+            )?;
+            __record.end()
+        }
+    }
+    #[automatically_derived]
+    impl<'de> __serde::Deserialize<'de> for RepositoryS3Config {
+        fn deserialize<__D: __serde::Deserializer<'de>>(
+            __deserializer: __D,
+        ) -> ::std::result::Result<Self, __D::Error> {
+            #[doc(hidden)]
+            struct __Visitor {
+                __phantom_vars: ::core::marker::PhantomData<fn(&())>,
+            }
+            impl<'de> __serde::de::Visitor<'de> for __Visitor {
+                type Value = RepositoryS3Config;
+                fn expecting(
+                    &self,
+                    __formatter: &mut ::core::fmt::Formatter,
+                ) -> ::core::fmt::Result {
+                    ::core::fmt::Formatter::write_str(__formatter, "record RepositoryS3Config")
+                }
+                #[inline]
+                fn visit_seq<__A>(
+                    self,
+                    mut __seq: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::SeqAccess<'de>,
+                {
+                    let __field0 = match __serde::de::SeqAccess::next_element::<
+                        ::std::string::String,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(0usize, &"record with 6 fields"),
+                            );
+                        }
+                    };
+                    let __field1 = match __serde::de::SeqAccess::next_element::<
+                        ::std::string::String,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(1usize, &"record with 6 fields"),
+                            );
+                        }
+                    };
+                    let __field2 = match __serde::de::SeqAccess::next_element::<
+                        ::std::option::Option<::std::string::String>,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(2usize, &"record with 6 fields"),
+                            );
+                        }
+                    };
+                    let __field3 = match __serde::de::SeqAccess::next_element::<
+                        ::std::option::Option<::std::string::String>,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(3usize, &"record with 6 fields"),
+                            );
+                        }
+                    };
+                    let __field4 = match __serde::de::SeqAccess::next_element::<
+                        ::std::string::String,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(4usize, &"record with 6 fields"),
+                            );
+                        }
+                    };
+                    let __field5 = match __serde::de::SeqAccess::next_element::<
+                        ::std::option::Option<::std::string::String>,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(5usize, &"record with 6 fields"),
+                            );
+                        }
+                    };
+                    ::core::result::Result::Ok(RepositoryS3Config {
+                        endpoint: __field0,
+                        bucket: __field1,
+                        region: __field2,
+                        prefix: __field3,
+                        access_key_id: __field4,
+                        secret_access_key: __field5,
+                    })
+                }
+                #[inline]
+                fn visit_map<__A>(
+                    self,
+                    mut __map: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::MapAccess<'de>,
+                {
+                    #[doc(hidden)]
+                    const __IDENTIFIERS: &'static [&'static str] = &[
+                        "endpoint",
+                        "bucket",
+                        "region",
+                        "prefix",
+                        "accessKeyId",
+                        "secretAccessKey",
+                    ];
+                    #[doc(hidden)]
+                    const __EXPECTING_IDENTIFIERS: &'static str = "an identifier in [\"endpoint\", \"bucket\", \"region\", \"prefix\", \"accessKeyId\", \"secretAccessKey\"]";
+                    #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
+                    #[doc(hidden)]
+                    enum __Identifier {
+                        __Identifier0,
+                        __Identifier1,
+                        __Identifier2,
+                        __Identifier3,
+                        __Identifier4,
+                        __Identifier5,
+                        __Unknown,
+                    }
+                    #[doc(hidden)]
+                    struct __IdentifierVisitor;
+                    impl<'de> __serde::de::Visitor<'de> for __IdentifierVisitor {
+                        type Value = __Identifier;
+                        fn expecting(
+                            &self,
+                            __formatter: &mut ::core::fmt::Formatter,
+                        ) -> ::core::fmt::Result {
+                            ::core::fmt::Formatter::write_str(__formatter, __EXPECTING_IDENTIFIERS)
+                        }
+                        fn visit_u64<__E>(
+                            self,
+                            __value: u64,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                0u64 => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                                1u64 => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                                2u64 => ::core::result::Result::Ok(__Identifier::__Identifier2),
+                                3u64 => ::core::result::Result::Ok(__Identifier::__Identifier3),
+                                4u64 => ::core::result::Result::Ok(__Identifier::__Identifier4),
+                                5u64 => ::core::result::Result::Ok(__Identifier::__Identifier5),
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_str<__E>(
+                            self,
+                            __value: &str,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                "endpoint" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
+                                }
+                                "bucket" => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                                "region" => ::core::result::Result::Ok(__Identifier::__Identifier2),
+                                "prefix" => ::core::result::Result::Ok(__Identifier::__Identifier3),
+                                "accessKeyId" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier4)
+                                }
+                                "secretAccessKey" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier5)
+                                }
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_bytes<__E>(
+                            self,
+                            __value: &[u8],
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                b"endpoint" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
+                                }
+                                b"bucket" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier1)
+                                }
+                                b"region" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier2)
+                                }
+                                b"prefix" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier3)
+                                }
+                                b"accessKeyId" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier4)
+                                }
+                                b"secretAccessKey" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier5)
+                                }
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                    }
+                    impl<'de> __serde::Deserialize<'de> for __Identifier {
+                        #[inline]
+                        fn deserialize<__D>(
+                            __deserializer: __D,
+                        ) -> ::core::result::Result<Self, __D::Error>
+                        where
+                            __D: __serde::Deserializer<'de>,
+                        {
+                            __serde::Deserializer::deserialize_identifier(
+                                __deserializer,
+                                __IdentifierVisitor,
+                            )
+                        }
+                    }
+                    let mut __field0: ::core::option::Option<::std::string::String> =
+                        ::core::option::Option::None;
+                    let mut __field1: ::core::option::Option<::std::string::String> =
+                        ::core::option::Option::None;
+                    let mut __field2: ::core::option::Option<
+                        ::std::option::Option<::std::string::String>,
+                    > = ::core::option::Option::None;
+                    let mut __field3: ::core::option::Option<
+                        ::std::option::Option<::std::string::String>,
+                    > = ::core::option::Option::None;
+                    let mut __field4: ::core::option::Option<::std::string::String> =
+                        ::core::option::Option::None;
+                    let mut __field5: ::core::option::Option<
+                        ::std::option::Option<::std::string::String>,
+                    > = ::core::option::Option::None;
+                    while let ::core::option::Option::Some(__key) =
+                        __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
+                    {
+                        match __key {
+                            __Identifier::__Identifier0 => {
+                                if ::core::option::Option::is_some(&__field0) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "endpoint",
+                                        ),
+                                    );
+                                }
+                                __field0 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<::std::string::String>(
+                                        &mut __map,
+                                    )?,
+                                );
+                            }
+                            __Identifier::__Identifier1 => {
+                                if ::core::option::Option::is_some(&__field1) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "bucket",
+                                        ),
+                                    );
+                                }
+                                __field1 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<::std::string::String>(
+                                        &mut __map,
+                                    )?,
+                                );
+                            }
+                            __Identifier::__Identifier2 => {
+                                if ::core::option::Option::is_some(&__field2) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "region",
+                                        ),
+                                    );
+                                }
+                                __field2 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<
+                                        ::std::option::Option<::std::string::String>,
+                                    >(&mut __map)?,
+                                );
+                            }
+                            __Identifier::__Identifier3 => {
+                                if ::core::option::Option::is_some(&__field3) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "prefix",
+                                        ),
+                                    );
+                                }
+                                __field3 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<
+                                        ::std::option::Option<::std::string::String>,
+                                    >(&mut __map)?,
+                                );
+                            }
+                            __Identifier::__Identifier4 => {
+                                if ::core::option::Option::is_some(&__field4) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "accessKeyId",
+                                        ),
+                                    );
+                                }
+                                __field4 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<::std::string::String>(
+                                        &mut __map,
+                                    )?,
+                                );
+                            }
+                            __Identifier::__Identifier5 => {
+                                if ::core::option::Option::is_some(&__field5) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "secretAccessKey",
+                                        ),
+                                    );
+                                }
+                                __field5 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<
+                                        ::std::option::Option<::std::string::String>,
+                                    >(&mut __map)?,
+                                );
+                            }
+                            _ => {
+                                __serde::de::MapAccess::next_value::<__serde::de::IgnoredAny>(
+                                    &mut __map,
+                                )?;
+                            }
+                        }
+                    }
+                    let __field0 = match __field0 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                <__A::Error as __serde::de::Error>::missing_field("endpoint"),
+                            );
+                        }
+                    };
+                    let __field1 = match __field1 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                <__A::Error as __serde::de::Error>::missing_field("bucket"),
+                            );
+                        }
+                    };
+                    let __field2 = match __field2 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => ::core::option::Option::None,
+                    };
+                    let __field3 = match __field3 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => ::core::option::Option::None,
+                    };
+                    let __field4 = match __field4 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                <__A::Error as __serde::de::Error>::missing_field("accessKeyId"),
+                            );
+                        }
+                    };
+                    let __field5 = match __field5 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => ::core::option::Option::None,
+                    };
+                    ::core::result::Result::Ok(RepositoryS3Config {
+                        endpoint: __field0,
+                        bucket: __field1,
+                        region: __field2,
+                        prefix: __field3,
+                        access_key_id: __field4,
+                        secret_access_key: __field5,
+                    })
+                }
+            }
+            #[doc(hidden)]
+            const __FIELDS: &'static [&'static str] = &[
+                "endpoint",
+                "bucket",
+                "region",
+                "prefix",
+                "accessKeyId",
+                "secretAccessKey",
+            ];
+            __serde::Deserializer::deserialize_struct(
+                __deserializer,
+                "RepositoryS3Config",
+                __FIELDS,
                 __Visitor {
                     __phantom_vars: ::core::marker::PhantomData,
                 },
@@ -57473,36 +58207,15 @@ pub mod repositories {
     pub struct SetRepositoryS3ConfigAction {
         #[doc = "ID of the repository.\n"]
         pub repository_id: RepositoryId,
-        #[doc = "S3 endpoint (e.g. https://s3.amazonaws.com or https://minio.local:9000).\n"]
-        pub s3_endpoint: ::std::string::String,
-        #[doc = "S3 bucket name.\n"]
-        pub s3_bucket: ::std::string::String,
-        #[doc = "AWS region (required by AWS, may be NULL for MinIO/other providers).\n"]
-        pub s3_region: ::std::option::Option<::std::string::String>,
-        #[doc = "Optional prefix inside the bucket to scope this repository.\n"]
-        pub s3_prefix: ::std::option::Option<::std::string::String>,
-        #[doc = "S3 access key ID (not sensitive, can be plain text).\n"]
-        pub s3_access_key_id: ::std::string::String,
-        #[doc = "S3 secret access key (sensitive, will be stored encrypted).\n"]
-        pub s3_secret_access_key: ::std::string::String,
+        #[doc = "S3 config for the repository.\n"]
+        pub s3_config: RepositoryS3Config,
     }
     impl SetRepositoryS3ConfigAction {
         #[doc = "Creates a new [`SetRepositoryS3ConfigAction`]."]
-        pub fn new(
-            repository_id: RepositoryId,
-            s3_endpoint: ::std::string::String,
-            s3_bucket: ::std::string::String,
-            s3_access_key_id: ::std::string::String,
-            s3_secret_access_key: ::std::string::String,
-        ) -> Self {
+        pub fn new(repository_id: RepositoryId, s3_config: RepositoryS3Config) -> Self {
             Self {
                 repository_id,
-                s3_endpoint,
-                s3_bucket,
-                s3_access_key_id,
-                s3_secret_access_key,
-                s3_region: ::std::default::Default::default(),
-                s3_prefix: ::std::default::Default::default(),
+                s3_config,
             }
         }
         #[doc = "Sets the value of `repository_id`."]
@@ -57515,85 +58228,14 @@ pub mod repositories {
             self.repository_id = repository_id;
             self
         }
-        #[doc = "Sets the value of `s3_endpoint`."]
-        pub fn set_s3_endpoint(&mut self, s3_endpoint: ::std::string::String) -> &mut Self {
-            self.s3_endpoint = s3_endpoint;
+        #[doc = "Sets the value of `s3_config`."]
+        pub fn set_s3_config(&mut self, s3_config: RepositoryS3Config) -> &mut Self {
+            self.s3_config = s3_config;
             self
         }
-        #[doc = "Sets the value of `s3_endpoint`."]
-        pub fn with_s3_endpoint(mut self, s3_endpoint: ::std::string::String) -> Self {
-            self.s3_endpoint = s3_endpoint;
-            self
-        }
-        #[doc = "Sets the value of `s3_bucket`."]
-        pub fn set_s3_bucket(&mut self, s3_bucket: ::std::string::String) -> &mut Self {
-            self.s3_bucket = s3_bucket;
-            self
-        }
-        #[doc = "Sets the value of `s3_bucket`."]
-        pub fn with_s3_bucket(mut self, s3_bucket: ::std::string::String) -> Self {
-            self.s3_bucket = s3_bucket;
-            self
-        }
-        #[doc = "Sets the value of `s3_region`."]
-        pub fn set_s3_region(
-            &mut self,
-            s3_region: ::std::option::Option<::std::string::String>,
-        ) -> &mut Self {
-            self.s3_region = s3_region;
-            self
-        }
-        #[doc = "Sets the value of `s3_region`."]
-        pub fn with_s3_region(
-            mut self,
-            s3_region: ::std::option::Option<::std::string::String>,
-        ) -> Self {
-            self.s3_region = s3_region;
-            self
-        }
-        #[doc = "Sets the value of `s3_prefix`."]
-        pub fn set_s3_prefix(
-            &mut self,
-            s3_prefix: ::std::option::Option<::std::string::String>,
-        ) -> &mut Self {
-            self.s3_prefix = s3_prefix;
-            self
-        }
-        #[doc = "Sets the value of `s3_prefix`."]
-        pub fn with_s3_prefix(
-            mut self,
-            s3_prefix: ::std::option::Option<::std::string::String>,
-        ) -> Self {
-            self.s3_prefix = s3_prefix;
-            self
-        }
-        #[doc = "Sets the value of `s3_access_key_id`."]
-        pub fn set_s3_access_key_id(
-            &mut self,
-            s3_access_key_id: ::std::string::String,
-        ) -> &mut Self {
-            self.s3_access_key_id = s3_access_key_id;
-            self
-        }
-        #[doc = "Sets the value of `s3_access_key_id`."]
-        pub fn with_s3_access_key_id(mut self, s3_access_key_id: ::std::string::String) -> Self {
-            self.s3_access_key_id = s3_access_key_id;
-            self
-        }
-        #[doc = "Sets the value of `s3_secret_access_key`."]
-        pub fn set_s3_secret_access_key(
-            &mut self,
-            s3_secret_access_key: ::std::string::String,
-        ) -> &mut Self {
-            self.s3_secret_access_key = s3_secret_access_key;
-            self
-        }
-        #[doc = "Sets the value of `s3_secret_access_key`."]
-        pub fn with_s3_secret_access_key(
-            mut self,
-            s3_secret_access_key: ::std::string::String,
-        ) -> Self {
-            self.s3_secret_access_key = s3_secret_access_key;
+        #[doc = "Sets the value of `s3_config`."]
+        pub fn with_s3_config(mut self, s3_config: RepositoryS3Config) -> Self {
+            self.s3_config = s3_config;
             self
         }
     }
@@ -57606,21 +58248,10 @@ pub mod repositories {
             let mut __record = __sidex_serde::ser::RecordSerializer::new(
                 __serializer,
                 "SetRepositoryS3ConfigAction",
-                7usize,
+                2usize,
             )?;
             __record.serialize_field("repositoryId", &self.repository_id)?;
-            __record.serialize_field("s3Endpoint", &self.s3_endpoint)?;
-            __record.serialize_field("s3Bucket", &self.s3_bucket)?;
-            __record.serialize_optional_field(
-                "s3Region",
-                ::core::option::Option::as_ref(&self.s3_region),
-            )?;
-            __record.serialize_optional_field(
-                "s3Prefix",
-                ::core::option::Option::as_ref(&self.s3_prefix),
-            )?;
-            __record.serialize_field("s3AccessKeyId", &self.s3_access_key_id)?;
-            __record.serialize_field("s3SecretAccessKey", &self.s3_secret_access_key)?;
+            __record.serialize_field("s3Config", &self.s3_config)?;
             __record.end()
         }
     }
@@ -57659,85 +58290,24 @@ pub mod repositories {
                                 return ::core::result::Result::Err(
                                     __serde::de::Error::invalid_length(
                                         0usize,
-                                        &"record with 7 fields",
+                                        &"record with 2 fields",
                                     ),
                                 );
                             }
                         };
-                    let __field1 = match __serde::de::SeqAccess::next_element::<
-                        ::std::string::String,
-                    >(&mut __seq)?
-                    {
+                    let __field1 = match __serde::de::SeqAccess::next_element::<RepositoryS3Config>(
+                        &mut __seq,
+                    )? {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(1usize, &"record with 7 fields"),
-                            );
-                        }
-                    };
-                    let __field2 = match __serde::de::SeqAccess::next_element::<
-                        ::std::string::String,
-                    >(&mut __seq)?
-                    {
-                        ::core::option::Option::Some(__value) => __value,
-                        ::core::option::Option::None => {
-                            return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(2usize, &"record with 7 fields"),
-                            );
-                        }
-                    };
-                    let __field3 = match __serde::de::SeqAccess::next_element::<
-                        ::std::option::Option<::std::string::String>,
-                    >(&mut __seq)?
-                    {
-                        ::core::option::Option::Some(__value) => __value,
-                        ::core::option::Option::None => {
-                            return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(3usize, &"record with 7 fields"),
-                            );
-                        }
-                    };
-                    let __field4 = match __serde::de::SeqAccess::next_element::<
-                        ::std::option::Option<::std::string::String>,
-                    >(&mut __seq)?
-                    {
-                        ::core::option::Option::Some(__value) => __value,
-                        ::core::option::Option::None => {
-                            return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(4usize, &"record with 7 fields"),
-                            );
-                        }
-                    };
-                    let __field5 = match __serde::de::SeqAccess::next_element::<
-                        ::std::string::String,
-                    >(&mut __seq)?
-                    {
-                        ::core::option::Option::Some(__value) => __value,
-                        ::core::option::Option::None => {
-                            return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(5usize, &"record with 7 fields"),
-                            );
-                        }
-                    };
-                    let __field6 = match __serde::de::SeqAccess::next_element::<
-                        ::std::string::String,
-                    >(&mut __seq)?
-                    {
-                        ::core::option::Option::Some(__value) => __value,
-                        ::core::option::Option::None => {
-                            return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(6usize, &"record with 7 fields"),
+                                __serde::de::Error::invalid_length(1usize, &"record with 2 fields"),
                             );
                         }
                     };
                     ::core::result::Result::Ok(SetRepositoryS3ConfigAction {
                         repository_id: __field0,
-                        s3_endpoint: __field1,
-                        s3_bucket: __field2,
-                        s3_region: __field3,
-                        s3_prefix: __field4,
-                        s3_access_key_id: __field5,
-                        s3_secret_access_key: __field6,
+                        s3_config: __field1,
                     })
                 }
                 #[inline]
@@ -57749,27 +58319,15 @@ pub mod repositories {
                     __A: __serde::de::MapAccess<'de>,
                 {
                     #[doc(hidden)]
-                    const __IDENTIFIERS: &'static [&'static str] = &[
-                        "repositoryId",
-                        "s3Endpoint",
-                        "s3Bucket",
-                        "s3Region",
-                        "s3Prefix",
-                        "s3AccessKeyId",
-                        "s3SecretAccessKey",
-                    ];
+                    const __IDENTIFIERS: &'static [&'static str] = &["repositoryId", "s3Config"];
                     #[doc(hidden)]
-                    const __EXPECTING_IDENTIFIERS: &'static str = "an identifier in [\"repositoryId\", \"s3Endpoint\", \"s3Bucket\", \"s3Region\", \"s3Prefix\", \"s3AccessKeyId\", \"s3SecretAccessKey\"]";
+                    const __EXPECTING_IDENTIFIERS: &'static str =
+                        "an identifier in [\"repositoryId\", \"s3Config\"]";
                     #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
                     #[doc(hidden)]
                     enum __Identifier {
                         __Identifier0,
                         __Identifier1,
-                        __Identifier2,
-                        __Identifier3,
-                        __Identifier4,
-                        __Identifier5,
-                        __Identifier6,
                         __Unknown,
                     }
                     #[doc(hidden)]
@@ -57792,11 +58350,6 @@ pub mod repositories {
                             match __value {
                                 0u64 => ::core::result::Result::Ok(__Identifier::__Identifier0),
                                 1u64 => ::core::result::Result::Ok(__Identifier::__Identifier1),
-                                2u64 => ::core::result::Result::Ok(__Identifier::__Identifier2),
-                                3u64 => ::core::result::Result::Ok(__Identifier::__Identifier3),
-                                4u64 => ::core::result::Result::Ok(__Identifier::__Identifier4),
-                                5u64 => ::core::result::Result::Ok(__Identifier::__Identifier5),
-                                6u64 => ::core::result::Result::Ok(__Identifier::__Identifier6),
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
                         }
@@ -57811,23 +58364,8 @@ pub mod repositories {
                                 "repositoryId" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier0)
                                 }
-                                "s3Endpoint" => {
+                                "s3Config" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier1)
-                                }
-                                "s3Bucket" => {
-                                    ::core::result::Result::Ok(__Identifier::__Identifier2)
-                                }
-                                "s3Region" => {
-                                    ::core::result::Result::Ok(__Identifier::__Identifier3)
-                                }
-                                "s3Prefix" => {
-                                    ::core::result::Result::Ok(__Identifier::__Identifier4)
-                                }
-                                "s3AccessKeyId" => {
-                                    ::core::result::Result::Ok(__Identifier::__Identifier5)
-                                }
-                                "s3SecretAccessKey" => {
-                                    ::core::result::Result::Ok(__Identifier::__Identifier6)
                                 }
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
@@ -57843,23 +58381,8 @@ pub mod repositories {
                                 b"repositoryId" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier0)
                                 }
-                                b"s3Endpoint" => {
+                                b"s3Config" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier1)
-                                }
-                                b"s3Bucket" => {
-                                    ::core::result::Result::Ok(__Identifier::__Identifier2)
-                                }
-                                b"s3Region" => {
-                                    ::core::result::Result::Ok(__Identifier::__Identifier3)
-                                }
-                                b"s3Prefix" => {
-                                    ::core::result::Result::Ok(__Identifier::__Identifier4)
-                                }
-                                b"s3AccessKeyId" => {
-                                    ::core::result::Result::Ok(__Identifier::__Identifier5)
-                                }
-                                b"s3SecretAccessKey" => {
-                                    ::core::result::Result::Ok(__Identifier::__Identifier6)
                                 }
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
@@ -57881,19 +58404,7 @@ pub mod repositories {
                     }
                     let mut __field0: ::core::option::Option<RepositoryId> =
                         ::core::option::Option::None;
-                    let mut __field1: ::core::option::Option<::std::string::String> =
-                        ::core::option::Option::None;
-                    let mut __field2: ::core::option::Option<::std::string::String> =
-                        ::core::option::Option::None;
-                    let mut __field3: ::core::option::Option<
-                        ::std::option::Option<::std::string::String>,
-                    > = ::core::option::Option::None;
-                    let mut __field4: ::core::option::Option<
-                        ::std::option::Option<::std::string::String>,
-                    > = ::core::option::Option::None;
-                    let mut __field5: ::core::option::Option<::std::string::String> =
-                        ::core::option::Option::None;
-                    let mut __field6: ::core::option::Option<::std::string::String> =
+                    let mut __field1: ::core::option::Option<RepositoryS3Config> =
                         ::core::option::Option::None;
                     while let ::core::option::Option::Some(__key) =
                         __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
@@ -57915,82 +58426,12 @@ pub mod repositories {
                                 if ::core::option::Option::is_some(&__field1) {
                                     return ::core::result::Result::Err(
                                         <__A::Error as __serde::de::Error>::duplicate_field(
-                                            "s3Endpoint",
+                                            "s3Config",
                                         ),
                                     );
                                 }
                                 __field1 = ::core::option::Option::Some(
-                                    __serde::de::MapAccess::next_value::<::std::string::String>(
-                                        &mut __map,
-                                    )?,
-                                );
-                            }
-                            __Identifier::__Identifier2 => {
-                                if ::core::option::Option::is_some(&__field2) {
-                                    return ::core::result::Result::Err(
-                                        <__A::Error as __serde::de::Error>::duplicate_field(
-                                            "s3Bucket",
-                                        ),
-                                    );
-                                }
-                                __field2 = ::core::option::Option::Some(
-                                    __serde::de::MapAccess::next_value::<::std::string::String>(
-                                        &mut __map,
-                                    )?,
-                                );
-                            }
-                            __Identifier::__Identifier3 => {
-                                if ::core::option::Option::is_some(&__field3) {
-                                    return ::core::result::Result::Err(
-                                        <__A::Error as __serde::de::Error>::duplicate_field(
-                                            "s3Region",
-                                        ),
-                                    );
-                                }
-                                __field3 = ::core::option::Option::Some(
-                                    __serde::de::MapAccess::next_value::<
-                                        ::std::option::Option<::std::string::String>,
-                                    >(&mut __map)?,
-                                );
-                            }
-                            __Identifier::__Identifier4 => {
-                                if ::core::option::Option::is_some(&__field4) {
-                                    return ::core::result::Result::Err(
-                                        <__A::Error as __serde::de::Error>::duplicate_field(
-                                            "s3Prefix",
-                                        ),
-                                    );
-                                }
-                                __field4 = ::core::option::Option::Some(
-                                    __serde::de::MapAccess::next_value::<
-                                        ::std::option::Option<::std::string::String>,
-                                    >(&mut __map)?,
-                                );
-                            }
-                            __Identifier::__Identifier5 => {
-                                if ::core::option::Option::is_some(&__field5) {
-                                    return ::core::result::Result::Err(
-                                        <__A::Error as __serde::de::Error>::duplicate_field(
-                                            "s3AccessKeyId",
-                                        ),
-                                    );
-                                }
-                                __field5 = ::core::option::Option::Some(
-                                    __serde::de::MapAccess::next_value::<::std::string::String>(
-                                        &mut __map,
-                                    )?,
-                                );
-                            }
-                            __Identifier::__Identifier6 => {
-                                if ::core::option::Option::is_some(&__field6) {
-                                    return ::core::result::Result::Err(
-                                        <__A::Error as __serde::de::Error>::duplicate_field(
-                                            "s3SecretAccessKey",
-                                        ),
-                                    );
-                                }
-                                __field6 = ::core::option::Option::Some(
-                                    __serde::de::MapAccess::next_value::<::std::string::String>(
+                                    __serde::de::MapAccess::next_value::<RepositoryS3Config>(
                                         &mut __map,
                                     )?,
                                 );
@@ -58014,65 +58455,18 @@ pub mod repositories {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                <__A::Error as __serde::de::Error>::missing_field("s3Endpoint"),
-                            );
-                        }
-                    };
-                    let __field2 = match __field2 {
-                        ::core::option::Option::Some(__value) => __value,
-                        ::core::option::Option::None => {
-                            return ::core::result::Result::Err(
-                                <__A::Error as __serde::de::Error>::missing_field("s3Bucket"),
-                            );
-                        }
-                    };
-                    let __field3 = match __field3 {
-                        ::core::option::Option::Some(__value) => __value,
-                        ::core::option::Option::None => ::core::option::Option::None,
-                    };
-                    let __field4 = match __field4 {
-                        ::core::option::Option::Some(__value) => __value,
-                        ::core::option::Option::None => ::core::option::Option::None,
-                    };
-                    let __field5 = match __field5 {
-                        ::core::option::Option::Some(__value) => __value,
-                        ::core::option::Option::None => {
-                            return ::core::result::Result::Err(
-                                <__A::Error as __serde::de::Error>::missing_field("s3AccessKeyId"),
-                            );
-                        }
-                    };
-                    let __field6 = match __field6 {
-                        ::core::option::Option::Some(__value) => __value,
-                        ::core::option::Option::None => {
-                            return ::core::result::Result::Err(
-                                <__A::Error as __serde::de::Error>::missing_field(
-                                    "s3SecretAccessKey",
-                                ),
+                                <__A::Error as __serde::de::Error>::missing_field("s3Config"),
                             );
                         }
                     };
                     ::core::result::Result::Ok(SetRepositoryS3ConfigAction {
                         repository_id: __field0,
-                        s3_endpoint: __field1,
-                        s3_bucket: __field2,
-                        s3_region: __field3,
-                        s3_prefix: __field4,
-                        s3_access_key_id: __field5,
-                        s3_secret_access_key: __field6,
+                        s3_config: __field1,
                     })
                 }
             }
             #[doc(hidden)]
-            const __FIELDS: &'static [&'static str] = &[
-                "repositoryId",
-                "s3Endpoint",
-                "s3Bucket",
-                "s3Region",
-                "s3Prefix",
-                "s3AccessKeyId",
-                "s3SecretAccessKey",
-            ];
+            const __FIELDS: &'static [&'static str] = &["repositoryId", "s3Config"];
             __serde::Deserializer::deserialize_struct(
                 __deserializer,
                 "SetRepositoryS3ConfigAction",
@@ -58301,112 +58695,23 @@ pub mod repositories {
     #[doc = "Output of getting the S3 configuration for the repository.\n\nThis intentionally does not include the secret access key.\n"]
     #[derive(Clone, Debug)]
     pub struct GetRepositoryS3ConfigOutput {
-        #[doc = "S3 endpoint (e.g. https://s3.amazonaws.com or https://minio.local:9000).\n"]
-        pub s3_endpoint: ::std::option::Option<::std::string::String>,
-        #[doc = "S3 bucket name.\n"]
-        pub s3_bucket: ::std::option::Option<::std::string::String>,
-        #[doc = "AWS region (required by AWS, may be NULL for MinIO/other providers).\n"]
-        pub s3_region: ::std::option::Option<::std::string::String>,
-        #[doc = "Optional prefix inside the bucket to scope this repository.\n"]
-        pub s3_prefix: ::std::option::Option<::std::string::String>,
-        #[doc = "S3 access key ID (not sensitive, can be plain text).\n"]
-        pub s3_access_key_id: ::std::option::Option<::std::string::String>,
+        #[doc = "S3 config for the repository.\n"]
+        pub s3_config: RepositoryS3Config,
     }
     impl GetRepositoryS3ConfigOutput {
         #[doc = "Creates a new [`GetRepositoryS3ConfigOutput`]."]
-        pub fn new() -> Self {
-            Self {
-                s3_endpoint: ::std::default::Default::default(),
-                s3_bucket: ::std::default::Default::default(),
-                s3_region: ::std::default::Default::default(),
-                s3_prefix: ::std::default::Default::default(),
-                s3_access_key_id: ::std::default::Default::default(),
-            }
+        pub fn new(s3_config: RepositoryS3Config) -> Self {
+            Self { s3_config }
         }
-        #[doc = "Sets the value of `s3_endpoint`."]
-        pub fn set_s3_endpoint(
-            &mut self,
-            s3_endpoint: ::std::option::Option<::std::string::String>,
-        ) -> &mut Self {
-            self.s3_endpoint = s3_endpoint;
+        #[doc = "Sets the value of `s3_config`."]
+        pub fn set_s3_config(&mut self, s3_config: RepositoryS3Config) -> &mut Self {
+            self.s3_config = s3_config;
             self
         }
-        #[doc = "Sets the value of `s3_endpoint`."]
-        pub fn with_s3_endpoint(
-            mut self,
-            s3_endpoint: ::std::option::Option<::std::string::String>,
-        ) -> Self {
-            self.s3_endpoint = s3_endpoint;
+        #[doc = "Sets the value of `s3_config`."]
+        pub fn with_s3_config(mut self, s3_config: RepositoryS3Config) -> Self {
+            self.s3_config = s3_config;
             self
-        }
-        #[doc = "Sets the value of `s3_bucket`."]
-        pub fn set_s3_bucket(
-            &mut self,
-            s3_bucket: ::std::option::Option<::std::string::String>,
-        ) -> &mut Self {
-            self.s3_bucket = s3_bucket;
-            self
-        }
-        #[doc = "Sets the value of `s3_bucket`."]
-        pub fn with_s3_bucket(
-            mut self,
-            s3_bucket: ::std::option::Option<::std::string::String>,
-        ) -> Self {
-            self.s3_bucket = s3_bucket;
-            self
-        }
-        #[doc = "Sets the value of `s3_region`."]
-        pub fn set_s3_region(
-            &mut self,
-            s3_region: ::std::option::Option<::std::string::String>,
-        ) -> &mut Self {
-            self.s3_region = s3_region;
-            self
-        }
-        #[doc = "Sets the value of `s3_region`."]
-        pub fn with_s3_region(
-            mut self,
-            s3_region: ::std::option::Option<::std::string::String>,
-        ) -> Self {
-            self.s3_region = s3_region;
-            self
-        }
-        #[doc = "Sets the value of `s3_prefix`."]
-        pub fn set_s3_prefix(
-            &mut self,
-            s3_prefix: ::std::option::Option<::std::string::String>,
-        ) -> &mut Self {
-            self.s3_prefix = s3_prefix;
-            self
-        }
-        #[doc = "Sets the value of `s3_prefix`."]
-        pub fn with_s3_prefix(
-            mut self,
-            s3_prefix: ::std::option::Option<::std::string::String>,
-        ) -> Self {
-            self.s3_prefix = s3_prefix;
-            self
-        }
-        #[doc = "Sets the value of `s3_access_key_id`."]
-        pub fn set_s3_access_key_id(
-            &mut self,
-            s3_access_key_id: ::std::option::Option<::std::string::String>,
-        ) -> &mut Self {
-            self.s3_access_key_id = s3_access_key_id;
-            self
-        }
-        #[doc = "Sets the value of `s3_access_key_id`."]
-        pub fn with_s3_access_key_id(
-            mut self,
-            s3_access_key_id: ::std::option::Option<::std::string::String>,
-        ) -> Self {
-            self.s3_access_key_id = s3_access_key_id;
-            self
-        }
-    }
-    impl ::std::default::Default for GetRepositoryS3ConfigOutput {
-        fn default() -> Self {
-            Self::new()
         }
     }
     #[automatically_derived]
@@ -58418,28 +58723,9 @@ pub mod repositories {
             let mut __record = __sidex_serde::ser::RecordSerializer::new(
                 __serializer,
                 "GetRepositoryS3ConfigOutput",
-                5usize,
+                1usize,
             )?;
-            __record.serialize_optional_field(
-                "s3Endpoint",
-                ::core::option::Option::as_ref(&self.s3_endpoint),
-            )?;
-            __record.serialize_optional_field(
-                "s3Bucket",
-                ::core::option::Option::as_ref(&self.s3_bucket),
-            )?;
-            __record.serialize_optional_field(
-                "s3Region",
-                ::core::option::Option::as_ref(&self.s3_region),
-            )?;
-            __record.serialize_optional_field(
-                "s3Prefix",
-                ::core::option::Option::as_ref(&self.s3_prefix),
-            )?;
-            __record.serialize_optional_field(
-                "s3AccessKeyId",
-                ::core::option::Option::as_ref(&self.s3_access_key_id),
-            )?;
+            __record.serialize_field("s3Config", &self.s3_config)?;
             __record.end()
         }
     }
@@ -58471,67 +58757,18 @@ pub mod repositories {
                 where
                     __A: __serde::de::SeqAccess<'de>,
                 {
-                    let __field0 = match __serde::de::SeqAccess::next_element::<
-                        ::std::option::Option<::std::string::String>,
-                    >(&mut __seq)?
-                    {
+                    let __field0 = match __serde::de::SeqAccess::next_element::<RepositoryS3Config>(
+                        &mut __seq,
+                    )? {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(0usize, &"record with 5 fields"),
-                            );
-                        }
-                    };
-                    let __field1 = match __serde::de::SeqAccess::next_element::<
-                        ::std::option::Option<::std::string::String>,
-                    >(&mut __seq)?
-                    {
-                        ::core::option::Option::Some(__value) => __value,
-                        ::core::option::Option::None => {
-                            return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(1usize, &"record with 5 fields"),
-                            );
-                        }
-                    };
-                    let __field2 = match __serde::de::SeqAccess::next_element::<
-                        ::std::option::Option<::std::string::String>,
-                    >(&mut __seq)?
-                    {
-                        ::core::option::Option::Some(__value) => __value,
-                        ::core::option::Option::None => {
-                            return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(2usize, &"record with 5 fields"),
-                            );
-                        }
-                    };
-                    let __field3 = match __serde::de::SeqAccess::next_element::<
-                        ::std::option::Option<::std::string::String>,
-                    >(&mut __seq)?
-                    {
-                        ::core::option::Option::Some(__value) => __value,
-                        ::core::option::Option::None => {
-                            return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(3usize, &"record with 5 fields"),
-                            );
-                        }
-                    };
-                    let __field4 = match __serde::de::SeqAccess::next_element::<
-                        ::std::option::Option<::std::string::String>,
-                    >(&mut __seq)?
-                    {
-                        ::core::option::Option::Some(__value) => __value,
-                        ::core::option::Option::None => {
-                            return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(4usize, &"record with 5 fields"),
+                                __serde::de::Error::invalid_length(0usize, &"record with 1 fields"),
                             );
                         }
                     };
                     ::core::result::Result::Ok(GetRepositoryS3ConfigOutput {
-                        s3_endpoint: __field0,
-                        s3_bucket: __field1,
-                        s3_region: __field2,
-                        s3_prefix: __field3,
-                        s3_access_key_id: __field4,
+                        s3_config: __field0,
                     })
                 }
                 #[inline]
@@ -58543,23 +58780,13 @@ pub mod repositories {
                     __A: __serde::de::MapAccess<'de>,
                 {
                     #[doc(hidden)]
-                    const __IDENTIFIERS: &'static [&'static str] = &[
-                        "s3Endpoint",
-                        "s3Bucket",
-                        "s3Region",
-                        "s3Prefix",
-                        "s3AccessKeyId",
-                    ];
+                    const __IDENTIFIERS: &'static [&'static str] = &["s3Config"];
                     #[doc(hidden)]
-                    const __EXPECTING_IDENTIFIERS: &'static str = "an identifier in [\"s3Endpoint\", \"s3Bucket\", \"s3Region\", \"s3Prefix\", \"s3AccessKeyId\"]";
+                    const __EXPECTING_IDENTIFIERS: &'static str = "an identifier in [\"s3Config\"]";
                     #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
                     #[doc(hidden)]
                     enum __Identifier {
                         __Identifier0,
-                        __Identifier1,
-                        __Identifier2,
-                        __Identifier3,
-                        __Identifier4,
                         __Unknown,
                     }
                     #[doc(hidden)]
@@ -58581,10 +58808,6 @@ pub mod repositories {
                         {
                             match __value {
                                 0u64 => ::core::result::Result::Ok(__Identifier::__Identifier0),
-                                1u64 => ::core::result::Result::Ok(__Identifier::__Identifier1),
-                                2u64 => ::core::result::Result::Ok(__Identifier::__Identifier2),
-                                3u64 => ::core::result::Result::Ok(__Identifier::__Identifier3),
-                                4u64 => ::core::result::Result::Ok(__Identifier::__Identifier4),
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
                         }
@@ -58596,20 +58819,8 @@ pub mod repositories {
                             __E: __serde::de::Error,
                         {
                             match __value {
-                                "s3Endpoint" => {
+                                "s3Config" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier0)
-                                }
-                                "s3Bucket" => {
-                                    ::core::result::Result::Ok(__Identifier::__Identifier1)
-                                }
-                                "s3Region" => {
-                                    ::core::result::Result::Ok(__Identifier::__Identifier2)
-                                }
-                                "s3Prefix" => {
-                                    ::core::result::Result::Ok(__Identifier::__Identifier3)
-                                }
-                                "s3AccessKeyId" => {
-                                    ::core::result::Result::Ok(__Identifier::__Identifier4)
                                 }
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
@@ -58622,20 +58833,8 @@ pub mod repositories {
                             __E: __serde::de::Error,
                         {
                             match __value {
-                                b"s3Endpoint" => {
+                                b"s3Config" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier0)
-                                }
-                                b"s3Bucket" => {
-                                    ::core::result::Result::Ok(__Identifier::__Identifier1)
-                                }
-                                b"s3Region" => {
-                                    ::core::result::Result::Ok(__Identifier::__Identifier2)
-                                }
-                                b"s3Prefix" => {
-                                    ::core::result::Result::Ok(__Identifier::__Identifier3)
-                                }
-                                b"s3AccessKeyId" => {
-                                    ::core::result::Result::Ok(__Identifier::__Identifier4)
                                 }
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
@@ -58655,21 +58854,8 @@ pub mod repositories {
                             )
                         }
                     }
-                    let mut __field0: ::core::option::Option<
-                        ::std::option::Option<::std::string::String>,
-                    > = ::core::option::Option::None;
-                    let mut __field1: ::core::option::Option<
-                        ::std::option::Option<::std::string::String>,
-                    > = ::core::option::Option::None;
-                    let mut __field2: ::core::option::Option<
-                        ::std::option::Option<::std::string::String>,
-                    > = ::core::option::Option::None;
-                    let mut __field3: ::core::option::Option<
-                        ::std::option::Option<::std::string::String>,
-                    > = ::core::option::Option::None;
-                    let mut __field4: ::core::option::Option<
-                        ::std::option::Option<::std::string::String>,
-                    > = ::core::option::Option::None;
+                    let mut __field0: ::core::option::Option<RepositoryS3Config> =
+                        ::core::option::Option::None;
                     while let ::core::option::Option::Some(__key) =
                         __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
                     {
@@ -58678,70 +58864,14 @@ pub mod repositories {
                                 if ::core::option::Option::is_some(&__field0) {
                                     return ::core::result::Result::Err(
                                         <__A::Error as __serde::de::Error>::duplicate_field(
-                                            "s3Endpoint",
+                                            "s3Config",
                                         ),
                                     );
                                 }
                                 __field0 = ::core::option::Option::Some(
-                                    __serde::de::MapAccess::next_value::<
-                                        ::std::option::Option<::std::string::String>,
-                                    >(&mut __map)?,
-                                );
-                            }
-                            __Identifier::__Identifier1 => {
-                                if ::core::option::Option::is_some(&__field1) {
-                                    return ::core::result::Result::Err(
-                                        <__A::Error as __serde::de::Error>::duplicate_field(
-                                            "s3Bucket",
-                                        ),
-                                    );
-                                }
-                                __field1 = ::core::option::Option::Some(
-                                    __serde::de::MapAccess::next_value::<
-                                        ::std::option::Option<::std::string::String>,
-                                    >(&mut __map)?,
-                                );
-                            }
-                            __Identifier::__Identifier2 => {
-                                if ::core::option::Option::is_some(&__field2) {
-                                    return ::core::result::Result::Err(
-                                        <__A::Error as __serde::de::Error>::duplicate_field(
-                                            "s3Region",
-                                        ),
-                                    );
-                                }
-                                __field2 = ::core::option::Option::Some(
-                                    __serde::de::MapAccess::next_value::<
-                                        ::std::option::Option<::std::string::String>,
-                                    >(&mut __map)?,
-                                );
-                            }
-                            __Identifier::__Identifier3 => {
-                                if ::core::option::Option::is_some(&__field3) {
-                                    return ::core::result::Result::Err(
-                                        <__A::Error as __serde::de::Error>::duplicate_field(
-                                            "s3Prefix",
-                                        ),
-                                    );
-                                }
-                                __field3 = ::core::option::Option::Some(
-                                    __serde::de::MapAccess::next_value::<
-                                        ::std::option::Option<::std::string::String>,
-                                    >(&mut __map)?,
-                                );
-                            }
-                            __Identifier::__Identifier4 => {
-                                if ::core::option::Option::is_some(&__field4) {
-                                    return ::core::result::Result::Err(
-                                        <__A::Error as __serde::de::Error>::duplicate_field(
-                                            "s3AccessKeyId",
-                                        ),
-                                    );
-                                }
-                                __field4 = ::core::option::Option::Some(
-                                    __serde::de::MapAccess::next_value::<
-                                        ::std::option::Option<::std::string::String>,
-                                    >(&mut __map)?,
+                                    __serde::de::MapAccess::next_value::<RepositoryS3Config>(
+                                        &mut __map,
+                                    )?,
                                 );
                             }
                             _ => {
@@ -58753,41 +58883,19 @@ pub mod repositories {
                     }
                     let __field0 = match __field0 {
                         ::core::option::Option::Some(__value) => __value,
-                        ::core::option::Option::None => ::core::option::Option::None,
-                    };
-                    let __field1 = match __field1 {
-                        ::core::option::Option::Some(__value) => __value,
-                        ::core::option::Option::None => ::core::option::Option::None,
-                    };
-                    let __field2 = match __field2 {
-                        ::core::option::Option::Some(__value) => __value,
-                        ::core::option::Option::None => ::core::option::Option::None,
-                    };
-                    let __field3 = match __field3 {
-                        ::core::option::Option::Some(__value) => __value,
-                        ::core::option::Option::None => ::core::option::Option::None,
-                    };
-                    let __field4 = match __field4 {
-                        ::core::option::Option::Some(__value) => __value,
-                        ::core::option::Option::None => ::core::option::Option::None,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                <__A::Error as __serde::de::Error>::missing_field("s3Config"),
+                            );
+                        }
                     };
                     ::core::result::Result::Ok(GetRepositoryS3ConfigOutput {
-                        s3_endpoint: __field0,
-                        s3_bucket: __field1,
-                        s3_region: __field2,
-                        s3_prefix: __field3,
-                        s3_access_key_id: __field4,
+                        s3_config: __field0,
                     })
                 }
             }
             #[doc(hidden)]
-            const __FIELDS: &'static [&'static str] = &[
-                "s3Endpoint",
-                "s3Bucket",
-                "s3Region",
-                "s3Prefix",
-                "s3AccessKeyId",
-            ];
+            const __FIELDS: &'static [&'static str] = &["s3Config"];
             __serde::Deserializer::deserialize_struct(
                 __deserializer,
                 "GetRepositoryS3ConfigOutput",
@@ -61498,436 +61606,6 @@ pub mod repositories {
             __serde::Deserializer::deserialize_struct(
                 __deserializer,
                 "QueryAuditLogEventsOutput",
-                __FIELDS,
-                __Visitor {
-                    __phantom_vars: ::core::marker::PhantomData,
-                },
-            )
-        }
-    }
-    #[doc = "Get the resources used by the repository and their limits.\n"]
-    #[derive(Clone, Debug)]
-    pub struct GetRepositoryResourceUsageAction {
-        #[doc = "ID of the repository.\n"]
-        pub repository_id: RepositoryId,
-    }
-    impl GetRepositoryResourceUsageAction {
-        #[doc = "Creates a new [`GetRepositoryResourceUsageAction`]."]
-        pub fn new(repository_id: RepositoryId) -> Self {
-            Self { repository_id }
-        }
-        #[doc = "Sets the value of `repository_id`."]
-        pub fn set_repository_id(&mut self, repository_id: RepositoryId) -> &mut Self {
-            self.repository_id = repository_id;
-            self
-        }
-        #[doc = "Sets the value of `repository_id`."]
-        pub fn with_repository_id(mut self, repository_id: RepositoryId) -> Self {
-            self.repository_id = repository_id;
-            self
-        }
-    }
-    #[automatically_derived]
-    impl __serde::Serialize for GetRepositoryResourceUsageAction {
-        fn serialize<__S: __serde::Serializer>(
-            &self,
-            __serializer: __S,
-        ) -> ::std::result::Result<__S::Ok, __S::Error> {
-            let mut __record = __sidex_serde::ser::RecordSerializer::new(
-                __serializer,
-                "GetRepositoryResourceUsageAction",
-                1usize,
-            )?;
-            __record.serialize_field("repositoryId", &self.repository_id)?;
-            __record.end()
-        }
-    }
-    #[automatically_derived]
-    impl<'de> __serde::Deserialize<'de> for GetRepositoryResourceUsageAction {
-        fn deserialize<__D: __serde::Deserializer<'de>>(
-            __deserializer: __D,
-        ) -> ::std::result::Result<Self, __D::Error> {
-            #[doc(hidden)]
-            struct __Visitor {
-                __phantom_vars: ::core::marker::PhantomData<fn(&())>,
-            }
-            impl<'de> __serde::de::Visitor<'de> for __Visitor {
-                type Value = GetRepositoryResourceUsageAction;
-                fn expecting(
-                    &self,
-                    __formatter: &mut ::core::fmt::Formatter,
-                ) -> ::core::fmt::Result {
-                    ::core::fmt::Formatter::write_str(
-                        __formatter,
-                        "record GetRepositoryResourceUsageAction",
-                    )
-                }
-                #[inline]
-                fn visit_seq<__A>(
-                    self,
-                    mut __seq: __A,
-                ) -> ::core::result::Result<Self::Value, __A::Error>
-                where
-                    __A: __serde::de::SeqAccess<'de>,
-                {
-                    let __field0 =
-                        match __serde::de::SeqAccess::next_element::<RepositoryId>(&mut __seq)? {
-                            ::core::option::Option::Some(__value) => __value,
-                            ::core::option::Option::None => {
-                                return ::core::result::Result::Err(
-                                    __serde::de::Error::invalid_length(
-                                        0usize,
-                                        &"record with 1 fields",
-                                    ),
-                                );
-                            }
-                        };
-                    ::core::result::Result::Ok(GetRepositoryResourceUsageAction {
-                        repository_id: __field0,
-                    })
-                }
-                #[inline]
-                fn visit_map<__A>(
-                    self,
-                    mut __map: __A,
-                ) -> ::core::result::Result<Self::Value, __A::Error>
-                where
-                    __A: __serde::de::MapAccess<'de>,
-                {
-                    #[doc(hidden)]
-                    const __IDENTIFIERS: &'static [&'static str] = &["repositoryId"];
-                    #[doc(hidden)]
-                    const __EXPECTING_IDENTIFIERS: &'static str =
-                        "an identifier in [\"repositoryId\"]";
-                    #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
-                    #[doc(hidden)]
-                    enum __Identifier {
-                        __Identifier0,
-                        __Unknown,
-                    }
-                    #[doc(hidden)]
-                    struct __IdentifierVisitor;
-                    impl<'de> __serde::de::Visitor<'de> for __IdentifierVisitor {
-                        type Value = __Identifier;
-                        fn expecting(
-                            &self,
-                            __formatter: &mut ::core::fmt::Formatter,
-                        ) -> ::core::fmt::Result {
-                            ::core::fmt::Formatter::write_str(__formatter, __EXPECTING_IDENTIFIERS)
-                        }
-                        fn visit_u64<__E>(
-                            self,
-                            __value: u64,
-                        ) -> ::core::result::Result<Self::Value, __E>
-                        where
-                            __E: __serde::de::Error,
-                        {
-                            match __value {
-                                0u64 => ::core::result::Result::Ok(__Identifier::__Identifier0),
-                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
-                            }
-                        }
-                        fn visit_str<__E>(
-                            self,
-                            __value: &str,
-                        ) -> ::core::result::Result<Self::Value, __E>
-                        where
-                            __E: __serde::de::Error,
-                        {
-                            match __value {
-                                "repositoryId" => {
-                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
-                                }
-                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
-                            }
-                        }
-                        fn visit_bytes<__E>(
-                            self,
-                            __value: &[u8],
-                        ) -> ::core::result::Result<Self::Value, __E>
-                        where
-                            __E: __serde::de::Error,
-                        {
-                            match __value {
-                                b"repositoryId" => {
-                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
-                                }
-                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
-                            }
-                        }
-                    }
-                    impl<'de> __serde::Deserialize<'de> for __Identifier {
-                        #[inline]
-                        fn deserialize<__D>(
-                            __deserializer: __D,
-                        ) -> ::core::result::Result<Self, __D::Error>
-                        where
-                            __D: __serde::Deserializer<'de>,
-                        {
-                            __serde::Deserializer::deserialize_identifier(
-                                __deserializer,
-                                __IdentifierVisitor,
-                            )
-                        }
-                    }
-                    let mut __field0: ::core::option::Option<RepositoryId> =
-                        ::core::option::Option::None;
-                    while let ::core::option::Option::Some(__key) =
-                        __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
-                    {
-                        match __key {
-                            __Identifier::__Identifier0 => {
-                                if ::core::option::Option::is_some(&__field0) {
-                                    return ::core::result::Result::Err(
-                                        <__A::Error as __serde::de::Error>::duplicate_field(
-                                            "repositoryId",
-                                        ),
-                                    );
-                                }
-                                __field0 = ::core::option::Option::Some(
-                                    __serde::de::MapAccess::next_value::<RepositoryId>(&mut __map)?,
-                                );
-                            }
-                            _ => {
-                                __serde::de::MapAccess::next_value::<__serde::de::IgnoredAny>(
-                                    &mut __map,
-                                )?;
-                            }
-                        }
-                    }
-                    let __field0 = match __field0 {
-                        ::core::option::Option::Some(__value) => __value,
-                        ::core::option::Option::None => {
-                            return ::core::result::Result::Err(
-                                <__A::Error as __serde::de::Error>::missing_field("repositoryId"),
-                            );
-                        }
-                    };
-                    ::core::result::Result::Ok(GetRepositoryResourceUsageAction {
-                        repository_id: __field0,
-                    })
-                }
-            }
-            #[doc(hidden)]
-            const __FIELDS: &'static [&'static str] = &["repositoryId"];
-            __serde::Deserializer::deserialize_struct(
-                __deserializer,
-                "GetRepositoryResourceUsageAction",
-                __FIELDS,
-                __Visitor {
-                    __phantom_vars: ::core::marker::PhantomData,
-                },
-            )
-        }
-    }
-    #[doc = "Output of getting the resources used by a repository\n"]
-    #[derive(Clone, Debug, Default)]
-    pub struct GetRepositoryResourceUsageOutput {
-        #[doc = ""]
-        pub packages: super::resources::ResourceUsage,
-    }
-    impl GetRepositoryResourceUsageOutput {
-        #[doc = "Creates a new [`GetRepositoryResourceUsageOutput`]."]
-        pub fn new(packages: super::resources::ResourceUsage) -> Self {
-            Self { packages }
-        }
-        #[doc = "Sets the value of `packages`."]
-        pub fn set_packages(&mut self, packages: super::resources::ResourceUsage) -> &mut Self {
-            self.packages = packages;
-            self
-        }
-        #[doc = "Sets the value of `packages`."]
-        pub fn with_packages(mut self, packages: super::resources::ResourceUsage) -> Self {
-            self.packages = packages;
-            self
-        }
-    }
-    #[automatically_derived]
-    impl __serde::Serialize for GetRepositoryResourceUsageOutput {
-        fn serialize<__S: __serde::Serializer>(
-            &self,
-            __serializer: __S,
-        ) -> ::std::result::Result<__S::Ok, __S::Error> {
-            let mut __record = __sidex_serde::ser::RecordSerializer::new(
-                __serializer,
-                "GetRepositoryResourceUsageOutput",
-                1usize,
-            )?;
-            __record.serialize_field("packages", &self.packages)?;
-            __record.end()
-        }
-    }
-    #[automatically_derived]
-    impl<'de> __serde::Deserialize<'de> for GetRepositoryResourceUsageOutput {
-        fn deserialize<__D: __serde::Deserializer<'de>>(
-            __deserializer: __D,
-        ) -> ::std::result::Result<Self, __D::Error> {
-            #[doc(hidden)]
-            struct __Visitor {
-                __phantom_vars: ::core::marker::PhantomData<fn(&())>,
-            }
-            impl<'de> __serde::de::Visitor<'de> for __Visitor {
-                type Value = GetRepositoryResourceUsageOutput;
-                fn expecting(
-                    &self,
-                    __formatter: &mut ::core::fmt::Formatter,
-                ) -> ::core::fmt::Result {
-                    ::core::fmt::Formatter::write_str(
-                        __formatter,
-                        "record GetRepositoryResourceUsageOutput",
-                    )
-                }
-                #[inline]
-                fn visit_seq<__A>(
-                    self,
-                    mut __seq: __A,
-                ) -> ::core::result::Result<Self::Value, __A::Error>
-                where
-                    __A: __serde::de::SeqAccess<'de>,
-                {
-                    let __field0 = match __serde::de::SeqAccess::next_element::<
-                        super::resources::ResourceUsage,
-                    >(&mut __seq)?
-                    {
-                        ::core::option::Option::Some(__value) => __value,
-                        ::core::option::Option::None => {
-                            return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(0usize, &"record with 1 fields"),
-                            );
-                        }
-                    };
-                    ::core::result::Result::Ok(GetRepositoryResourceUsageOutput {
-                        packages: __field0,
-                    })
-                }
-                #[inline]
-                fn visit_map<__A>(
-                    self,
-                    mut __map: __A,
-                ) -> ::core::result::Result<Self::Value, __A::Error>
-                where
-                    __A: __serde::de::MapAccess<'de>,
-                {
-                    #[doc(hidden)]
-                    const __IDENTIFIERS: &'static [&'static str] = &["packages"];
-                    #[doc(hidden)]
-                    const __EXPECTING_IDENTIFIERS: &'static str = "an identifier in [\"packages\"]";
-                    #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
-                    #[doc(hidden)]
-                    enum __Identifier {
-                        __Identifier0,
-                        __Unknown,
-                    }
-                    #[doc(hidden)]
-                    struct __IdentifierVisitor;
-                    impl<'de> __serde::de::Visitor<'de> for __IdentifierVisitor {
-                        type Value = __Identifier;
-                        fn expecting(
-                            &self,
-                            __formatter: &mut ::core::fmt::Formatter,
-                        ) -> ::core::fmt::Result {
-                            ::core::fmt::Formatter::write_str(__formatter, __EXPECTING_IDENTIFIERS)
-                        }
-                        fn visit_u64<__E>(
-                            self,
-                            __value: u64,
-                        ) -> ::core::result::Result<Self::Value, __E>
-                        where
-                            __E: __serde::de::Error,
-                        {
-                            match __value {
-                                0u64 => ::core::result::Result::Ok(__Identifier::__Identifier0),
-                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
-                            }
-                        }
-                        fn visit_str<__E>(
-                            self,
-                            __value: &str,
-                        ) -> ::core::result::Result<Self::Value, __E>
-                        where
-                            __E: __serde::de::Error,
-                        {
-                            match __value {
-                                "packages" => {
-                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
-                                }
-                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
-                            }
-                        }
-                        fn visit_bytes<__E>(
-                            self,
-                            __value: &[u8],
-                        ) -> ::core::result::Result<Self::Value, __E>
-                        where
-                            __E: __serde::de::Error,
-                        {
-                            match __value {
-                                b"packages" => {
-                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
-                                }
-                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
-                            }
-                        }
-                    }
-                    impl<'de> __serde::Deserialize<'de> for __Identifier {
-                        #[inline]
-                        fn deserialize<__D>(
-                            __deserializer: __D,
-                        ) -> ::core::result::Result<Self, __D::Error>
-                        where
-                            __D: __serde::Deserializer<'de>,
-                        {
-                            __serde::Deserializer::deserialize_identifier(
-                                __deserializer,
-                                __IdentifierVisitor,
-                            )
-                        }
-                    }
-                    let mut __field0: ::core::option::Option<super::resources::ResourceUsage> =
-                        ::core::option::Option::None;
-                    while let ::core::option::Option::Some(__key) =
-                        __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
-                    {
-                        match __key {
-                            __Identifier::__Identifier0 => {
-                                if ::core::option::Option::is_some(&__field0) {
-                                    return ::core::result::Result::Err(
-                                        <__A::Error as __serde::de::Error>::duplicate_field(
-                                            "packages",
-                                        ),
-                                    );
-                                }
-                                __field0 = ::core::option::Option::Some(
-                                    __serde::de::MapAccess::next_value::<
-                                        super::resources::ResourceUsage,
-                                    >(&mut __map)?,
-                                );
-                            }
-                            _ => {
-                                __serde::de::MapAccess::next_value::<__serde::de::IgnoredAny>(
-                                    &mut __map,
-                                )?;
-                            }
-                        }
-                    }
-                    let __field0 = match __field0 {
-                        ::core::option::Option::Some(__value) => __value,
-                        ::core::option::Option::None => {
-                            return ::core::result::Result::Err(
-                                <__A::Error as __serde::de::Error>::missing_field("packages"),
-                            );
-                        }
-                    };
-                    ::core::result::Result::Ok(GetRepositoryResourceUsageOutput {
-                        packages: __field0,
-                    })
-                }
-            }
-            #[doc(hidden)]
-            const __FIELDS: &'static [&'static str] = &["packages"];
-            __serde::Deserializer::deserialize_struct(
-                __deserializer,
-                "GetRepositoryResourceUsageOutput",
                 __FIELDS,
                 __Visitor {
                     __phantom_vars: ::core::marker::PhantomData,

@@ -20,7 +20,7 @@ check:
 
 # Format all files.
 fmt:
-    cargo +nightly fmt
+    cargo fmt
     taplo fmt
 
 # Generate documentation.

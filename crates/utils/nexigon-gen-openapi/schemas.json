@@ -1859,18 +1859,22 @@
       "projects": {
         "$ref": "#/components/schemas/nexigon_api.resources.ResourceUsage"
       },
+      "devices": {
+        "$ref": "#/components/schemas/nexigon_api.resources.ResourceUsage"
+      },
       "repositories": {
         "$ref": "#/components/schemas/nexigon_api.resources.ResourceUsage"
       },
-      "devices": {
+      "packages": {
         "$ref": "#/components/schemas/nexigon_api.resources.ResourceUsage"
       }
     },
     "required": [
       "seats",
       "projects",
+      "devices",
       "repositories",
-      "devices"
+      "packages"
     ],
     "unevaluatedProperties": false
   },
@@ -2169,13 +2173,16 @@
       "repositoryId": {
         "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryId"
       },
-      "name": {
+      "publicName": {
+        "type": "string"
+      },
+      "displayName": {
         "type": "string"
       }
     },
     "required": [
       "repositoryId",
-      "name"
+      "publicName"
     ],
     "unevaluatedProperties": false
   },
@@ -2732,13 +2739,16 @@
       "repositoryId": {
         "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryId"
       },
-      "name": {
+      "publicName": {
+        "type": "string"
+      },
+      "displayName": {
         "type": "string"
       }
     },
     "required": [
       "repositoryId",
-      "name"
+      "publicName"
     ],
     "unevaluatedProperties": false
   },
@@ -3489,32 +3499,6 @@
     ],
     "unevaluatedProperties": false
   },
-  "nexigon_api.repositories.GetRepositoryResourceUsageAction": {
-    "type": "object",
-    "description": "Get the resources used by the repository and their limits.",
-    "properties": {
-      "repositoryId": {
-        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryId"
-      }
-    },
-    "required": [
-      "repositoryId"
-    ],
-    "unevaluatedProperties": false
-  },
-  "nexigon_api.repositories.GetRepositoryResourceUsageOutput": {
-    "type": "object",
-    "description": "Output of getting the resources used by a repository",
-    "properties": {
-      "packages": {
-        "$ref": "#/components/schemas/nexigon_api.resources.ResourceUsage"
-      }
-    },
-    "required": [
-      "packages"
-    ],
-    "unevaluatedProperties": false
-  },
   "nexigon_api.repositories.GetRepositoryS3ConfigAction": {
     "type": "object",
     "description": "Get the S3 configuration for the repository.",
@@ -3532,23 +3516,13 @@
     "type": "object",
     "description": "Output of getting the S3 configuration for the repository.\n\nThis intentionally does not include the secret access key.",
     "properties": {
-      "s3Endpoint": {
-        "type": "string"
-      },
-      "s3Bucket": {
-        "type": "string"
-      },
-      "s3Region": {
-        "type": "string"
-      },
-      "s3Prefix": {
-        "type": "string"
-      },
-      "s3AccessKeyId": {
-        "type": "string"
+      "s3Config": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryS3Config"
       }
     },
-    "required": [],
+    "required": [
+      "s3Config"
+    ],
     "unevaluatedProperties": false
   },
   "nexigon_api.repositories.IssueAssetDownloadUrlAction": {
@@ -3944,6 +3918,36 @@
     ],
     "description": "Unique ID of a repository."
   },
+  "nexigon_api.repositories.RepositoryS3Config": {
+    "type": "object",
+    "description": "Repository S3 config.",
+    "properties": {
+      "endpoint": {
+        "type": "string"
+      },
+      "bucket": {
+        "type": "string"
+      },
+      "region": {
+        "type": "string"
+      },
+      "prefix": {
+        "type": "string"
+      },
+      "accessKeyId": {
+        "type": "string"
+      },
+      "secretAccessKey": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "endpoint",
+      "bucket",
+      "accessKeyId"
+    ],
+    "unevaluatedProperties": false
+  },
   "nexigon_api.repositories.RepositoryVisibility": {
     "enum": [
       "Public",
@@ -4258,31 +4262,13 @@
       "repositoryId": {
         "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryId"
       },
-      "s3Endpoint": {
-        "type": "string"
-      },
-      "s3Bucket": {
-        "type": "string"
-      },
-      "s3Region": {
-        "type": "string"
-      },
-      "s3Prefix": {
-        "type": "string"
-      },
-      "s3AccessKeyId": {
-        "type": "string"
-      },
-      "s3SecretAccessKey": {
-        "type": "string"
+      "s3Config": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryS3Config"
       }
     },
     "required": [
       "repositoryId",
-      "s3Endpoint",
-      "s3Bucket",
-      "s3AccessKeyId",
-      "s3SecretAccessKey"
+      "s3Config"
     ],
     "unevaluatedProperties": false
   },
