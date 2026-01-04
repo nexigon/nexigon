@@ -32890,6 +32890,4142 @@ pub mod organizations {
             )
         }
     }
+    #[doc = "Effective and maximal limit for a resource.\n"]
+    #[derive(Clone, Debug, Default)]
+    pub struct ResourceLimit {
+        #[doc = "The effective limit set by the organization administrator.\n"]
+        pub effective: u64,
+        #[doc = "The maximal limit defined by the subscription plan.\n"]
+        pub max: u64,
+    }
+    impl ResourceLimit {
+        #[doc = "Creates a new [`ResourceLimit`]."]
+        pub fn new(effective: u64, max: u64) -> Self {
+            Self { effective, max }
+        }
+        #[doc = "Sets the value of `effective`."]
+        pub fn set_effective(&mut self, effective: u64) -> &mut Self {
+            self.effective = effective;
+            self
+        }
+        #[doc = "Sets the value of `effective`."]
+        pub fn with_effective(mut self, effective: u64) -> Self {
+            self.effective = effective;
+            self
+        }
+        #[doc = "Sets the value of `max`."]
+        pub fn set_max(&mut self, max: u64) -> &mut Self {
+            self.max = max;
+            self
+        }
+        #[doc = "Sets the value of `max`."]
+        pub fn with_max(mut self, max: u64) -> Self {
+            self.max = max;
+            self
+        }
+    }
+    #[automatically_derived]
+    impl __serde::Serialize for ResourceLimit {
+        fn serialize<__S: __serde::Serializer>(
+            &self,
+            __serializer: __S,
+        ) -> ::std::result::Result<__S::Ok, __S::Error> {
+            let mut __record =
+                __sidex_serde::ser::RecordSerializer::new(__serializer, "ResourceLimit", 2usize)?;
+            __record.serialize_field("effective", &self.effective)?;
+            __record.serialize_field("max", &self.max)?;
+            __record.end()
+        }
+    }
+    #[automatically_derived]
+    impl<'de> __serde::Deserialize<'de> for ResourceLimit {
+        fn deserialize<__D: __serde::Deserializer<'de>>(
+            __deserializer: __D,
+        ) -> ::std::result::Result<Self, __D::Error> {
+            #[doc(hidden)]
+            struct __Visitor {
+                __phantom_vars: ::core::marker::PhantomData<fn(&())>,
+            }
+            impl<'de> __serde::de::Visitor<'de> for __Visitor {
+                type Value = ResourceLimit;
+                fn expecting(
+                    &self,
+                    __formatter: &mut ::core::fmt::Formatter,
+                ) -> ::core::fmt::Result {
+                    ::core::fmt::Formatter::write_str(__formatter, "record ResourceLimit")
+                }
+                #[inline]
+                fn visit_seq<__A>(
+                    self,
+                    mut __seq: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::SeqAccess<'de>,
+                {
+                    let __field0 = match __serde::de::SeqAccess::next_element::<u64>(&mut __seq)? {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(0usize, &"record with 2 fields"),
+                            );
+                        }
+                    };
+                    let __field1 = match __serde::de::SeqAccess::next_element::<u64>(&mut __seq)? {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(1usize, &"record with 2 fields"),
+                            );
+                        }
+                    };
+                    ::core::result::Result::Ok(ResourceLimit {
+                        effective: __field0,
+                        max: __field1,
+                    })
+                }
+                #[inline]
+                fn visit_map<__A>(
+                    self,
+                    mut __map: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::MapAccess<'de>,
+                {
+                    #[doc(hidden)]
+                    const __IDENTIFIERS: &'static [&'static str] = &["effective", "max"];
+                    #[doc(hidden)]
+                    const __EXPECTING_IDENTIFIERS: &'static str =
+                        "an identifier in [\"effective\", \"max\"]";
+                    #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
+                    #[doc(hidden)]
+                    enum __Identifier {
+                        __Identifier0,
+                        __Identifier1,
+                        __Unknown,
+                    }
+                    #[doc(hidden)]
+                    struct __IdentifierVisitor;
+                    impl<'de> __serde::de::Visitor<'de> for __IdentifierVisitor {
+                        type Value = __Identifier;
+                        fn expecting(
+                            &self,
+                            __formatter: &mut ::core::fmt::Formatter,
+                        ) -> ::core::fmt::Result {
+                            ::core::fmt::Formatter::write_str(__formatter, __EXPECTING_IDENTIFIERS)
+                        }
+                        fn visit_u64<__E>(
+                            self,
+                            __value: u64,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                0u64 => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                                1u64 => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_str<__E>(
+                            self,
+                            __value: &str,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                "effective" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
+                                }
+                                "max" => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_bytes<__E>(
+                            self,
+                            __value: &[u8],
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                b"effective" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
+                                }
+                                b"max" => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                    }
+                    impl<'de> __serde::Deserialize<'de> for __Identifier {
+                        #[inline]
+                        fn deserialize<__D>(
+                            __deserializer: __D,
+                        ) -> ::core::result::Result<Self, __D::Error>
+                        where
+                            __D: __serde::Deserializer<'de>,
+                        {
+                            __serde::Deserializer::deserialize_identifier(
+                                __deserializer,
+                                __IdentifierVisitor,
+                            )
+                        }
+                    }
+                    let mut __field0: ::core::option::Option<u64> = ::core::option::Option::None;
+                    let mut __field1: ::core::option::Option<u64> = ::core::option::Option::None;
+                    while let ::core::option::Option::Some(__key) =
+                        __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
+                    {
+                        match __key {
+                            __Identifier::__Identifier0 => {
+                                if ::core::option::Option::is_some(&__field0) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "effective",
+                                        ),
+                                    );
+                                }
+                                __field0 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<u64>(&mut __map)?,
+                                );
+                            }
+                            __Identifier::__Identifier1 => {
+                                if ::core::option::Option::is_some(&__field1) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field("max"),
+                                    );
+                                }
+                                __field1 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<u64>(&mut __map)?,
+                                );
+                            }
+                            _ => {
+                                __serde::de::MapAccess::next_value::<__serde::de::IgnoredAny>(
+                                    &mut __map,
+                                )?;
+                            }
+                        }
+                    }
+                    let __field0 = match __field0 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                <__A::Error as __serde::de::Error>::missing_field("effective"),
+                            );
+                        }
+                    };
+                    let __field1 = match __field1 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                <__A::Error as __serde::de::Error>::missing_field("max"),
+                            );
+                        }
+                    };
+                    ::core::result::Result::Ok(ResourceLimit {
+                        effective: __field0,
+                        max: __field1,
+                    })
+                }
+            }
+            #[doc(hidden)]
+            const __FIELDS: &'static [&'static str] = &["effective", "max"];
+            __serde::Deserializer::deserialize_struct(
+                __deserializer,
+                "ResourceLimit",
+                __FIELDS,
+                __Visitor {
+                    __phantom_vars: ::core::marker::PhantomData,
+                },
+            )
+        }
+    }
+    #[doc = "Resource limits for an organization.\n"]
+    #[derive(Clone, Debug, Default)]
+    pub struct OrganizationLimits {
+        #[doc = "Seat limits.\n"]
+        pub seats: ResourceLimit,
+        #[doc = "Project limits.\n"]
+        pub projects: ResourceLimit,
+        #[doc = "Device limits.\n"]
+        pub devices: ResourceLimit,
+        #[doc = "Repository limits.\n"]
+        pub repositories: ResourceLimit,
+        #[doc = "Package limits.\n"]
+        pub packages: ResourceLimit,
+        #[doc = "Per-device limits.\n"]
+        pub per_device: OrganizationPerDeviceLimits,
+    }
+    impl OrganizationLimits {
+        #[doc = "Creates a new [`OrganizationLimits`]."]
+        pub fn new(
+            seats: ResourceLimit,
+            projects: ResourceLimit,
+            devices: ResourceLimit,
+            repositories: ResourceLimit,
+            packages: ResourceLimit,
+            per_device: OrganizationPerDeviceLimits,
+        ) -> Self {
+            Self {
+                seats,
+                projects,
+                devices,
+                repositories,
+                packages,
+                per_device,
+            }
+        }
+        #[doc = "Sets the value of `seats`."]
+        pub fn set_seats(&mut self, seats: ResourceLimit) -> &mut Self {
+            self.seats = seats;
+            self
+        }
+        #[doc = "Sets the value of `seats`."]
+        pub fn with_seats(mut self, seats: ResourceLimit) -> Self {
+            self.seats = seats;
+            self
+        }
+        #[doc = "Sets the value of `projects`."]
+        pub fn set_projects(&mut self, projects: ResourceLimit) -> &mut Self {
+            self.projects = projects;
+            self
+        }
+        #[doc = "Sets the value of `projects`."]
+        pub fn with_projects(mut self, projects: ResourceLimit) -> Self {
+            self.projects = projects;
+            self
+        }
+        #[doc = "Sets the value of `devices`."]
+        pub fn set_devices(&mut self, devices: ResourceLimit) -> &mut Self {
+            self.devices = devices;
+            self
+        }
+        #[doc = "Sets the value of `devices`."]
+        pub fn with_devices(mut self, devices: ResourceLimit) -> Self {
+            self.devices = devices;
+            self
+        }
+        #[doc = "Sets the value of `repositories`."]
+        pub fn set_repositories(&mut self, repositories: ResourceLimit) -> &mut Self {
+            self.repositories = repositories;
+            self
+        }
+        #[doc = "Sets the value of `repositories`."]
+        pub fn with_repositories(mut self, repositories: ResourceLimit) -> Self {
+            self.repositories = repositories;
+            self
+        }
+        #[doc = "Sets the value of `packages`."]
+        pub fn set_packages(&mut self, packages: ResourceLimit) -> &mut Self {
+            self.packages = packages;
+            self
+        }
+        #[doc = "Sets the value of `packages`."]
+        pub fn with_packages(mut self, packages: ResourceLimit) -> Self {
+            self.packages = packages;
+            self
+        }
+        #[doc = "Sets the value of `per_device`."]
+        pub fn set_per_device(&mut self, per_device: OrganizationPerDeviceLimits) -> &mut Self {
+            self.per_device = per_device;
+            self
+        }
+        #[doc = "Sets the value of `per_device`."]
+        pub fn with_per_device(mut self, per_device: OrganizationPerDeviceLimits) -> Self {
+            self.per_device = per_device;
+            self
+        }
+    }
+    #[automatically_derived]
+    impl __serde::Serialize for OrganizationLimits {
+        fn serialize<__S: __serde::Serializer>(
+            &self,
+            __serializer: __S,
+        ) -> ::std::result::Result<__S::Ok, __S::Error> {
+            let mut __record = __sidex_serde::ser::RecordSerializer::new(
+                __serializer,
+                "OrganizationLimits",
+                6usize,
+            )?;
+            __record.serialize_field("seats", &self.seats)?;
+            __record.serialize_field("projects", &self.projects)?;
+            __record.serialize_field("devices", &self.devices)?;
+            __record.serialize_field("repositories", &self.repositories)?;
+            __record.serialize_field("packages", &self.packages)?;
+            __record.serialize_field("perDevice", &self.per_device)?;
+            __record.end()
+        }
+    }
+    #[automatically_derived]
+    impl<'de> __serde::Deserialize<'de> for OrganizationLimits {
+        fn deserialize<__D: __serde::Deserializer<'de>>(
+            __deserializer: __D,
+        ) -> ::std::result::Result<Self, __D::Error> {
+            #[doc(hidden)]
+            struct __Visitor {
+                __phantom_vars: ::core::marker::PhantomData<fn(&())>,
+            }
+            impl<'de> __serde::de::Visitor<'de> for __Visitor {
+                type Value = OrganizationLimits;
+                fn expecting(
+                    &self,
+                    __formatter: &mut ::core::fmt::Formatter,
+                ) -> ::core::fmt::Result {
+                    ::core::fmt::Formatter::write_str(__formatter, "record OrganizationLimits")
+                }
+                #[inline]
+                fn visit_seq<__A>(
+                    self,
+                    mut __seq: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::SeqAccess<'de>,
+                {
+                    let __field0 =
+                        match __serde::de::SeqAccess::next_element::<ResourceLimit>(&mut __seq)? {
+                            ::core::option::Option::Some(__value) => __value,
+                            ::core::option::Option::None => {
+                                return ::core::result::Result::Err(
+                                    __serde::de::Error::invalid_length(
+                                        0usize,
+                                        &"record with 6 fields",
+                                    ),
+                                );
+                            }
+                        };
+                    let __field1 =
+                        match __serde::de::SeqAccess::next_element::<ResourceLimit>(&mut __seq)? {
+                            ::core::option::Option::Some(__value) => __value,
+                            ::core::option::Option::None => {
+                                return ::core::result::Result::Err(
+                                    __serde::de::Error::invalid_length(
+                                        1usize,
+                                        &"record with 6 fields",
+                                    ),
+                                );
+                            }
+                        };
+                    let __field2 =
+                        match __serde::de::SeqAccess::next_element::<ResourceLimit>(&mut __seq)? {
+                            ::core::option::Option::Some(__value) => __value,
+                            ::core::option::Option::None => {
+                                return ::core::result::Result::Err(
+                                    __serde::de::Error::invalid_length(
+                                        2usize,
+                                        &"record with 6 fields",
+                                    ),
+                                );
+                            }
+                        };
+                    let __field3 =
+                        match __serde::de::SeqAccess::next_element::<ResourceLimit>(&mut __seq)? {
+                            ::core::option::Option::Some(__value) => __value,
+                            ::core::option::Option::None => {
+                                return ::core::result::Result::Err(
+                                    __serde::de::Error::invalid_length(
+                                        3usize,
+                                        &"record with 6 fields",
+                                    ),
+                                );
+                            }
+                        };
+                    let __field4 =
+                        match __serde::de::SeqAccess::next_element::<ResourceLimit>(&mut __seq)? {
+                            ::core::option::Option::Some(__value) => __value,
+                            ::core::option::Option::None => {
+                                return ::core::result::Result::Err(
+                                    __serde::de::Error::invalid_length(
+                                        4usize,
+                                        &"record with 6 fields",
+                                    ),
+                                );
+                            }
+                        };
+                    let __field5 = match __serde::de::SeqAccess::next_element::<
+                        OrganizationPerDeviceLimits,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(5usize, &"record with 6 fields"),
+                            );
+                        }
+                    };
+                    ::core::result::Result::Ok(OrganizationLimits {
+                        seats: __field0,
+                        projects: __field1,
+                        devices: __field2,
+                        repositories: __field3,
+                        packages: __field4,
+                        per_device: __field5,
+                    })
+                }
+                #[inline]
+                fn visit_map<__A>(
+                    self,
+                    mut __map: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::MapAccess<'de>,
+                {
+                    #[doc(hidden)]
+                    const __IDENTIFIERS: &'static [&'static str] = &[
+                        "seats",
+                        "projects",
+                        "devices",
+                        "repositories",
+                        "packages",
+                        "perDevice",
+                    ];
+                    #[doc(hidden)]
+                    const __EXPECTING_IDENTIFIERS: &'static str = "an identifier in [\"seats\", \"projects\", \"devices\", \"repositories\", \"packages\", \"perDevice\"]";
+                    #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
+                    #[doc(hidden)]
+                    enum __Identifier {
+                        __Identifier0,
+                        __Identifier1,
+                        __Identifier2,
+                        __Identifier3,
+                        __Identifier4,
+                        __Identifier5,
+                        __Unknown,
+                    }
+                    #[doc(hidden)]
+                    struct __IdentifierVisitor;
+                    impl<'de> __serde::de::Visitor<'de> for __IdentifierVisitor {
+                        type Value = __Identifier;
+                        fn expecting(
+                            &self,
+                            __formatter: &mut ::core::fmt::Formatter,
+                        ) -> ::core::fmt::Result {
+                            ::core::fmt::Formatter::write_str(__formatter, __EXPECTING_IDENTIFIERS)
+                        }
+                        fn visit_u64<__E>(
+                            self,
+                            __value: u64,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                0u64 => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                                1u64 => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                                2u64 => ::core::result::Result::Ok(__Identifier::__Identifier2),
+                                3u64 => ::core::result::Result::Ok(__Identifier::__Identifier3),
+                                4u64 => ::core::result::Result::Ok(__Identifier::__Identifier4),
+                                5u64 => ::core::result::Result::Ok(__Identifier::__Identifier5),
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_str<__E>(
+                            self,
+                            __value: &str,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                "seats" => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                                "projects" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier1)
+                                }
+                                "devices" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier2)
+                                }
+                                "repositories" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier3)
+                                }
+                                "packages" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier4)
+                                }
+                                "perDevice" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier5)
+                                }
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_bytes<__E>(
+                            self,
+                            __value: &[u8],
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                b"seats" => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                                b"projects" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier1)
+                                }
+                                b"devices" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier2)
+                                }
+                                b"repositories" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier3)
+                                }
+                                b"packages" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier4)
+                                }
+                                b"perDevice" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier5)
+                                }
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                    }
+                    impl<'de> __serde::Deserialize<'de> for __Identifier {
+                        #[inline]
+                        fn deserialize<__D>(
+                            __deserializer: __D,
+                        ) -> ::core::result::Result<Self, __D::Error>
+                        where
+                            __D: __serde::Deserializer<'de>,
+                        {
+                            __serde::Deserializer::deserialize_identifier(
+                                __deserializer,
+                                __IdentifierVisitor,
+                            )
+                        }
+                    }
+                    let mut __field0: ::core::option::Option<ResourceLimit> =
+                        ::core::option::Option::None;
+                    let mut __field1: ::core::option::Option<ResourceLimit> =
+                        ::core::option::Option::None;
+                    let mut __field2: ::core::option::Option<ResourceLimit> =
+                        ::core::option::Option::None;
+                    let mut __field3: ::core::option::Option<ResourceLimit> =
+                        ::core::option::Option::None;
+                    let mut __field4: ::core::option::Option<ResourceLimit> =
+                        ::core::option::Option::None;
+                    let mut __field5: ::core::option::Option<OrganizationPerDeviceLimits> =
+                        ::core::option::Option::None;
+                    while let ::core::option::Option::Some(__key) =
+                        __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
+                    {
+                        match __key {
+                            __Identifier::__Identifier0 => {
+                                if ::core::option::Option::is_some(&__field0) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "seats",
+                                        ),
+                                    );
+                                }
+                                __field0 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<ResourceLimit>(
+                                        &mut __map,
+                                    )?,
+                                );
+                            }
+                            __Identifier::__Identifier1 => {
+                                if ::core::option::Option::is_some(&__field1) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "projects",
+                                        ),
+                                    );
+                                }
+                                __field1 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<ResourceLimit>(
+                                        &mut __map,
+                                    )?,
+                                );
+                            }
+                            __Identifier::__Identifier2 => {
+                                if ::core::option::Option::is_some(&__field2) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "devices",
+                                        ),
+                                    );
+                                }
+                                __field2 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<ResourceLimit>(
+                                        &mut __map,
+                                    )?,
+                                );
+                            }
+                            __Identifier::__Identifier3 => {
+                                if ::core::option::Option::is_some(&__field3) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "repositories",
+                                        ),
+                                    );
+                                }
+                                __field3 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<ResourceLimit>(
+                                        &mut __map,
+                                    )?,
+                                );
+                            }
+                            __Identifier::__Identifier4 => {
+                                if ::core::option::Option::is_some(&__field4) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "packages",
+                                        ),
+                                    );
+                                }
+                                __field4 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<ResourceLimit>(
+                                        &mut __map,
+                                    )?,
+                                );
+                            }
+                            __Identifier::__Identifier5 => {
+                                if ::core::option::Option::is_some(&__field5) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "perDevice",
+                                        ),
+                                    );
+                                }
+                                __field5 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<
+                                        OrganizationPerDeviceLimits,
+                                    >(&mut __map)?,
+                                );
+                            }
+                            _ => {
+                                __serde::de::MapAccess::next_value::<__serde::de::IgnoredAny>(
+                                    &mut __map,
+                                )?;
+                            }
+                        }
+                    }
+                    let __field0 = match __field0 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                <__A::Error as __serde::de::Error>::missing_field("seats"),
+                            );
+                        }
+                    };
+                    let __field1 = match __field1 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                <__A::Error as __serde::de::Error>::missing_field("projects"),
+                            );
+                        }
+                    };
+                    let __field2 = match __field2 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                <__A::Error as __serde::de::Error>::missing_field("devices"),
+                            );
+                        }
+                    };
+                    let __field3 = match __field3 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                <__A::Error as __serde::de::Error>::missing_field("repositories"),
+                            );
+                        }
+                    };
+                    let __field4 = match __field4 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                <__A::Error as __serde::de::Error>::missing_field("packages"),
+                            );
+                        }
+                    };
+                    let __field5 = match __field5 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                <__A::Error as __serde::de::Error>::missing_field("perDevice"),
+                            );
+                        }
+                    };
+                    ::core::result::Result::Ok(OrganizationLimits {
+                        seats: __field0,
+                        projects: __field1,
+                        devices: __field2,
+                        repositories: __field3,
+                        packages: __field4,
+                        per_device: __field5,
+                    })
+                }
+            }
+            #[doc(hidden)]
+            const __FIELDS: &'static [&'static str] = &[
+                "seats",
+                "projects",
+                "devices",
+                "repositories",
+                "packages",
+                "perDevice",
+            ];
+            __serde::Deserializer::deserialize_struct(
+                __deserializer,
+                "OrganizationLimits",
+                __FIELDS,
+                __Visitor {
+                    __phantom_vars: ::core::marker::PhantomData,
+                },
+            )
+        }
+    }
+    #[doc = "Per-device limits for an organization.\n"]
+    #[derive(Clone, Debug, Default)]
+    pub struct OrganizationPerDeviceLimits {
+        #[doc = "Property limits.\n"]
+        pub properties: ResourceLimit,
+        #[doc = "Remote access volume limits (combined incoming and outgoing traffic).\n"]
+        pub remote_access_volume: ResourceLimit,
+        #[doc = "Read operations limits.\n"]
+        pub read_operations: ResourceLimit,
+        #[doc = "Write operations limits.\n"]
+        pub write_operations: ResourceLimit,
+    }
+    impl OrganizationPerDeviceLimits {
+        #[doc = "Creates a new [`OrganizationPerDeviceLimits`]."]
+        pub fn new(
+            properties: ResourceLimit,
+            remote_access_volume: ResourceLimit,
+            read_operations: ResourceLimit,
+            write_operations: ResourceLimit,
+        ) -> Self {
+            Self {
+                properties,
+                remote_access_volume,
+                read_operations,
+                write_operations,
+            }
+        }
+        #[doc = "Sets the value of `properties`."]
+        pub fn set_properties(&mut self, properties: ResourceLimit) -> &mut Self {
+            self.properties = properties;
+            self
+        }
+        #[doc = "Sets the value of `properties`."]
+        pub fn with_properties(mut self, properties: ResourceLimit) -> Self {
+            self.properties = properties;
+            self
+        }
+        #[doc = "Sets the value of `remote_access_volume`."]
+        pub fn set_remote_access_volume(
+            &mut self,
+            remote_access_volume: ResourceLimit,
+        ) -> &mut Self {
+            self.remote_access_volume = remote_access_volume;
+            self
+        }
+        #[doc = "Sets the value of `remote_access_volume`."]
+        pub fn with_remote_access_volume(mut self, remote_access_volume: ResourceLimit) -> Self {
+            self.remote_access_volume = remote_access_volume;
+            self
+        }
+        #[doc = "Sets the value of `read_operations`."]
+        pub fn set_read_operations(&mut self, read_operations: ResourceLimit) -> &mut Self {
+            self.read_operations = read_operations;
+            self
+        }
+        #[doc = "Sets the value of `read_operations`."]
+        pub fn with_read_operations(mut self, read_operations: ResourceLimit) -> Self {
+            self.read_operations = read_operations;
+            self
+        }
+        #[doc = "Sets the value of `write_operations`."]
+        pub fn set_write_operations(&mut self, write_operations: ResourceLimit) -> &mut Self {
+            self.write_operations = write_operations;
+            self
+        }
+        #[doc = "Sets the value of `write_operations`."]
+        pub fn with_write_operations(mut self, write_operations: ResourceLimit) -> Self {
+            self.write_operations = write_operations;
+            self
+        }
+    }
+    #[automatically_derived]
+    impl __serde::Serialize for OrganizationPerDeviceLimits {
+        fn serialize<__S: __serde::Serializer>(
+            &self,
+            __serializer: __S,
+        ) -> ::std::result::Result<__S::Ok, __S::Error> {
+            let mut __record = __sidex_serde::ser::RecordSerializer::new(
+                __serializer,
+                "OrganizationPerDeviceLimits",
+                4usize,
+            )?;
+            __record.serialize_field("properties", &self.properties)?;
+            __record.serialize_field("remoteAccessVolume", &self.remote_access_volume)?;
+            __record.serialize_field("readOperations", &self.read_operations)?;
+            __record.serialize_field("writeOperations", &self.write_operations)?;
+            __record.end()
+        }
+    }
+    #[automatically_derived]
+    impl<'de> __serde::Deserialize<'de> for OrganizationPerDeviceLimits {
+        fn deserialize<__D: __serde::Deserializer<'de>>(
+            __deserializer: __D,
+        ) -> ::std::result::Result<Self, __D::Error> {
+            #[doc(hidden)]
+            struct __Visitor {
+                __phantom_vars: ::core::marker::PhantomData<fn(&())>,
+            }
+            impl<'de> __serde::de::Visitor<'de> for __Visitor {
+                type Value = OrganizationPerDeviceLimits;
+                fn expecting(
+                    &self,
+                    __formatter: &mut ::core::fmt::Formatter,
+                ) -> ::core::fmt::Result {
+                    ::core::fmt::Formatter::write_str(
+                        __formatter,
+                        "record OrganizationPerDeviceLimits",
+                    )
+                }
+                #[inline]
+                fn visit_seq<__A>(
+                    self,
+                    mut __seq: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::SeqAccess<'de>,
+                {
+                    let __field0 =
+                        match __serde::de::SeqAccess::next_element::<ResourceLimit>(&mut __seq)? {
+                            ::core::option::Option::Some(__value) => __value,
+                            ::core::option::Option::None => {
+                                return ::core::result::Result::Err(
+                                    __serde::de::Error::invalid_length(
+                                        0usize,
+                                        &"record with 4 fields",
+                                    ),
+                                );
+                            }
+                        };
+                    let __field1 =
+                        match __serde::de::SeqAccess::next_element::<ResourceLimit>(&mut __seq)? {
+                            ::core::option::Option::Some(__value) => __value,
+                            ::core::option::Option::None => {
+                                return ::core::result::Result::Err(
+                                    __serde::de::Error::invalid_length(
+                                        1usize,
+                                        &"record with 4 fields",
+                                    ),
+                                );
+                            }
+                        };
+                    let __field2 =
+                        match __serde::de::SeqAccess::next_element::<ResourceLimit>(&mut __seq)? {
+                            ::core::option::Option::Some(__value) => __value,
+                            ::core::option::Option::None => {
+                                return ::core::result::Result::Err(
+                                    __serde::de::Error::invalid_length(
+                                        2usize,
+                                        &"record with 4 fields",
+                                    ),
+                                );
+                            }
+                        };
+                    let __field3 =
+                        match __serde::de::SeqAccess::next_element::<ResourceLimit>(&mut __seq)? {
+                            ::core::option::Option::Some(__value) => __value,
+                            ::core::option::Option::None => {
+                                return ::core::result::Result::Err(
+                                    __serde::de::Error::invalid_length(
+                                        3usize,
+                                        &"record with 4 fields",
+                                    ),
+                                );
+                            }
+                        };
+                    ::core::result::Result::Ok(OrganizationPerDeviceLimits {
+                        properties: __field0,
+                        remote_access_volume: __field1,
+                        read_operations: __field2,
+                        write_operations: __field3,
+                    })
+                }
+                #[inline]
+                fn visit_map<__A>(
+                    self,
+                    mut __map: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::MapAccess<'de>,
+                {
+                    #[doc(hidden)]
+                    const __IDENTIFIERS: &'static [&'static str] = &[
+                        "properties",
+                        "remoteAccessVolume",
+                        "readOperations",
+                        "writeOperations",
+                    ];
+                    #[doc(hidden)]
+                    const __EXPECTING_IDENTIFIERS: &'static str = "an identifier in [\"properties\", \"remoteAccessVolume\", \"readOperations\", \"writeOperations\"]";
+                    #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
+                    #[doc(hidden)]
+                    enum __Identifier {
+                        __Identifier0,
+                        __Identifier1,
+                        __Identifier2,
+                        __Identifier3,
+                        __Unknown,
+                    }
+                    #[doc(hidden)]
+                    struct __IdentifierVisitor;
+                    impl<'de> __serde::de::Visitor<'de> for __IdentifierVisitor {
+                        type Value = __Identifier;
+                        fn expecting(
+                            &self,
+                            __formatter: &mut ::core::fmt::Formatter,
+                        ) -> ::core::fmt::Result {
+                            ::core::fmt::Formatter::write_str(__formatter, __EXPECTING_IDENTIFIERS)
+                        }
+                        fn visit_u64<__E>(
+                            self,
+                            __value: u64,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                0u64 => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                                1u64 => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                                2u64 => ::core::result::Result::Ok(__Identifier::__Identifier2),
+                                3u64 => ::core::result::Result::Ok(__Identifier::__Identifier3),
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_str<__E>(
+                            self,
+                            __value: &str,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                "properties" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
+                                }
+                                "remoteAccessVolume" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier1)
+                                }
+                                "readOperations" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier2)
+                                }
+                                "writeOperations" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier3)
+                                }
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_bytes<__E>(
+                            self,
+                            __value: &[u8],
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                b"properties" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
+                                }
+                                b"remoteAccessVolume" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier1)
+                                }
+                                b"readOperations" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier2)
+                                }
+                                b"writeOperations" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier3)
+                                }
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                    }
+                    impl<'de> __serde::Deserialize<'de> for __Identifier {
+                        #[inline]
+                        fn deserialize<__D>(
+                            __deserializer: __D,
+                        ) -> ::core::result::Result<Self, __D::Error>
+                        where
+                            __D: __serde::Deserializer<'de>,
+                        {
+                            __serde::Deserializer::deserialize_identifier(
+                                __deserializer,
+                                __IdentifierVisitor,
+                            )
+                        }
+                    }
+                    let mut __field0: ::core::option::Option<ResourceLimit> =
+                        ::core::option::Option::None;
+                    let mut __field1: ::core::option::Option<ResourceLimit> =
+                        ::core::option::Option::None;
+                    let mut __field2: ::core::option::Option<ResourceLimit> =
+                        ::core::option::Option::None;
+                    let mut __field3: ::core::option::Option<ResourceLimit> =
+                        ::core::option::Option::None;
+                    while let ::core::option::Option::Some(__key) =
+                        __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
+                    {
+                        match __key {
+                            __Identifier::__Identifier0 => {
+                                if ::core::option::Option::is_some(&__field0) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "properties",
+                                        ),
+                                    );
+                                }
+                                __field0 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<ResourceLimit>(
+                                        &mut __map,
+                                    )?,
+                                );
+                            }
+                            __Identifier::__Identifier1 => {
+                                if ::core::option::Option::is_some(&__field1) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "remoteAccessVolume",
+                                        ),
+                                    );
+                                }
+                                __field1 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<ResourceLimit>(
+                                        &mut __map,
+                                    )?,
+                                );
+                            }
+                            __Identifier::__Identifier2 => {
+                                if ::core::option::Option::is_some(&__field2) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "readOperations",
+                                        ),
+                                    );
+                                }
+                                __field2 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<ResourceLimit>(
+                                        &mut __map,
+                                    )?,
+                                );
+                            }
+                            __Identifier::__Identifier3 => {
+                                if ::core::option::Option::is_some(&__field3) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "writeOperations",
+                                        ),
+                                    );
+                                }
+                                __field3 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<ResourceLimit>(
+                                        &mut __map,
+                                    )?,
+                                );
+                            }
+                            _ => {
+                                __serde::de::MapAccess::next_value::<__serde::de::IgnoredAny>(
+                                    &mut __map,
+                                )?;
+                            }
+                        }
+                    }
+                    let __field0 = match __field0 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                <__A::Error as __serde::de::Error>::missing_field("properties"),
+                            );
+                        }
+                    };
+                    let __field1 = match __field1 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                <__A::Error as __serde::de::Error>::missing_field(
+                                    "remoteAccessVolume",
+                                ),
+                            );
+                        }
+                    };
+                    let __field2 = match __field2 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                <__A::Error as __serde::de::Error>::missing_field("readOperations"),
+                            );
+                        }
+                    };
+                    let __field3 = match __field3 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                <__A::Error as __serde::de::Error>::missing_field(
+                                    "writeOperations",
+                                ),
+                            );
+                        }
+                    };
+                    ::core::result::Result::Ok(OrganizationPerDeviceLimits {
+                        properties: __field0,
+                        remote_access_volume: __field1,
+                        read_operations: __field2,
+                        write_operations: __field3,
+                    })
+                }
+            }
+            #[doc(hidden)]
+            const __FIELDS: &'static [&'static str] = &[
+                "properties",
+                "remoteAccessVolume",
+                "readOperations",
+                "writeOperations",
+            ];
+            __serde::Deserializer::deserialize_struct(
+                __deserializer,
+                "OrganizationPerDeviceLimits",
+                __FIELDS,
+                __Visitor {
+                    __phantom_vars: ::core::marker::PhantomData,
+                },
+            )
+        }
+    }
+    #[doc = "Daily resource limits for an organization.\n"]
+    #[derive(Clone, Debug, Default)]
+    pub struct OrganizationDailyLimits {
+        #[doc = "Per-device daily limits.\n"]
+        pub per_device: OrganizationPerDeviceDailyLimits,
+    }
+    impl OrganizationDailyLimits {
+        #[doc = "Creates a new [`OrganizationDailyLimits`]."]
+        pub fn new(per_device: OrganizationPerDeviceDailyLimits) -> Self {
+            Self { per_device }
+        }
+        #[doc = "Sets the value of `per_device`."]
+        pub fn set_per_device(
+            &mut self,
+            per_device: OrganizationPerDeviceDailyLimits,
+        ) -> &mut Self {
+            self.per_device = per_device;
+            self
+        }
+        #[doc = "Sets the value of `per_device`."]
+        pub fn with_per_device(mut self, per_device: OrganizationPerDeviceDailyLimits) -> Self {
+            self.per_device = per_device;
+            self
+        }
+    }
+    #[automatically_derived]
+    impl __serde::Serialize for OrganizationDailyLimits {
+        fn serialize<__S: __serde::Serializer>(
+            &self,
+            __serializer: __S,
+        ) -> ::std::result::Result<__S::Ok, __S::Error> {
+            let mut __record = __sidex_serde::ser::RecordSerializer::new(
+                __serializer,
+                "OrganizationDailyLimits",
+                1usize,
+            )?;
+            __record.serialize_field("perDevice", &self.per_device)?;
+            __record.end()
+        }
+    }
+    #[automatically_derived]
+    impl<'de> __serde::Deserialize<'de> for OrganizationDailyLimits {
+        fn deserialize<__D: __serde::Deserializer<'de>>(
+            __deserializer: __D,
+        ) -> ::std::result::Result<Self, __D::Error> {
+            #[doc(hidden)]
+            struct __Visitor {
+                __phantom_vars: ::core::marker::PhantomData<fn(&())>,
+            }
+            impl<'de> __serde::de::Visitor<'de> for __Visitor {
+                type Value = OrganizationDailyLimits;
+                fn expecting(
+                    &self,
+                    __formatter: &mut ::core::fmt::Formatter,
+                ) -> ::core::fmt::Result {
+                    ::core::fmt::Formatter::write_str(__formatter, "record OrganizationDailyLimits")
+                }
+                #[inline]
+                fn visit_seq<__A>(
+                    self,
+                    mut __seq: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::SeqAccess<'de>,
+                {
+                    let __field0 = match __serde::de::SeqAccess::next_element::<
+                        OrganizationPerDeviceDailyLimits,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(0usize, &"record with 1 fields"),
+                            );
+                        }
+                    };
+                    ::core::result::Result::Ok(OrganizationDailyLimits {
+                        per_device: __field0,
+                    })
+                }
+                #[inline]
+                fn visit_map<__A>(
+                    self,
+                    mut __map: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::MapAccess<'de>,
+                {
+                    #[doc(hidden)]
+                    const __IDENTIFIERS: &'static [&'static str] = &["perDevice"];
+                    #[doc(hidden)]
+                    const __EXPECTING_IDENTIFIERS: &'static str =
+                        "an identifier in [\"perDevice\"]";
+                    #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
+                    #[doc(hidden)]
+                    enum __Identifier {
+                        __Identifier0,
+                        __Unknown,
+                    }
+                    #[doc(hidden)]
+                    struct __IdentifierVisitor;
+                    impl<'de> __serde::de::Visitor<'de> for __IdentifierVisitor {
+                        type Value = __Identifier;
+                        fn expecting(
+                            &self,
+                            __formatter: &mut ::core::fmt::Formatter,
+                        ) -> ::core::fmt::Result {
+                            ::core::fmt::Formatter::write_str(__formatter, __EXPECTING_IDENTIFIERS)
+                        }
+                        fn visit_u64<__E>(
+                            self,
+                            __value: u64,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                0u64 => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_str<__E>(
+                            self,
+                            __value: &str,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                "perDevice" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
+                                }
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_bytes<__E>(
+                            self,
+                            __value: &[u8],
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                b"perDevice" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
+                                }
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                    }
+                    impl<'de> __serde::Deserialize<'de> for __Identifier {
+                        #[inline]
+                        fn deserialize<__D>(
+                            __deserializer: __D,
+                        ) -> ::core::result::Result<Self, __D::Error>
+                        where
+                            __D: __serde::Deserializer<'de>,
+                        {
+                            __serde::Deserializer::deserialize_identifier(
+                                __deserializer,
+                                __IdentifierVisitor,
+                            )
+                        }
+                    }
+                    let mut __field0: ::core::option::Option<OrganizationPerDeviceDailyLimits> =
+                        ::core::option::Option::None;
+                    while let ::core::option::Option::Some(__key) =
+                        __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
+                    {
+                        match __key {
+                            __Identifier::__Identifier0 => {
+                                if ::core::option::Option::is_some(&__field0) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "perDevice",
+                                        ),
+                                    );
+                                }
+                                __field0 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<
+                                        OrganizationPerDeviceDailyLimits,
+                                    >(&mut __map)?,
+                                );
+                            }
+                            _ => {
+                                __serde::de::MapAccess::next_value::<__serde::de::IgnoredAny>(
+                                    &mut __map,
+                                )?;
+                            }
+                        }
+                    }
+                    let __field0 = match __field0 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                <__A::Error as __serde::de::Error>::missing_field("perDevice"),
+                            );
+                        }
+                    };
+                    ::core::result::Result::Ok(OrganizationDailyLimits {
+                        per_device: __field0,
+                    })
+                }
+            }
+            #[doc(hidden)]
+            const __FIELDS: &'static [&'static str] = &["perDevice"];
+            __serde::Deserializer::deserialize_struct(
+                __deserializer,
+                "OrganizationDailyLimits",
+                __FIELDS,
+                __Visitor {
+                    __phantom_vars: ::core::marker::PhantomData,
+                },
+            )
+        }
+    }
+    #[doc = "Per-device daily limits for an organization.\n"]
+    #[derive(Clone, Debug, Default)]
+    pub struct OrganizationPerDeviceDailyLimits {
+        #[doc = "Remote access volume daily limit.\n"]
+        pub remote_access_volume: ResourceLimit,
+        #[doc = "Read operations daily limit.\n"]
+        pub read_operations: ResourceLimit,
+        #[doc = "Write operations daily limit.\n"]
+        pub write_operations: ResourceLimit,
+    }
+    impl OrganizationPerDeviceDailyLimits {
+        #[doc = "Creates a new [`OrganizationPerDeviceDailyLimits`]."]
+        pub fn new(
+            remote_access_volume: ResourceLimit,
+            read_operations: ResourceLimit,
+            write_operations: ResourceLimit,
+        ) -> Self {
+            Self {
+                remote_access_volume,
+                read_operations,
+                write_operations,
+            }
+        }
+        #[doc = "Sets the value of `remote_access_volume`."]
+        pub fn set_remote_access_volume(
+            &mut self,
+            remote_access_volume: ResourceLimit,
+        ) -> &mut Self {
+            self.remote_access_volume = remote_access_volume;
+            self
+        }
+        #[doc = "Sets the value of `remote_access_volume`."]
+        pub fn with_remote_access_volume(mut self, remote_access_volume: ResourceLimit) -> Self {
+            self.remote_access_volume = remote_access_volume;
+            self
+        }
+        #[doc = "Sets the value of `read_operations`."]
+        pub fn set_read_operations(&mut self, read_operations: ResourceLimit) -> &mut Self {
+            self.read_operations = read_operations;
+            self
+        }
+        #[doc = "Sets the value of `read_operations`."]
+        pub fn with_read_operations(mut self, read_operations: ResourceLimit) -> Self {
+            self.read_operations = read_operations;
+            self
+        }
+        #[doc = "Sets the value of `write_operations`."]
+        pub fn set_write_operations(&mut self, write_operations: ResourceLimit) -> &mut Self {
+            self.write_operations = write_operations;
+            self
+        }
+        #[doc = "Sets the value of `write_operations`."]
+        pub fn with_write_operations(mut self, write_operations: ResourceLimit) -> Self {
+            self.write_operations = write_operations;
+            self
+        }
+    }
+    #[automatically_derived]
+    impl __serde::Serialize for OrganizationPerDeviceDailyLimits {
+        fn serialize<__S: __serde::Serializer>(
+            &self,
+            __serializer: __S,
+        ) -> ::std::result::Result<__S::Ok, __S::Error> {
+            let mut __record = __sidex_serde::ser::RecordSerializer::new(
+                __serializer,
+                "OrganizationPerDeviceDailyLimits",
+                3usize,
+            )?;
+            __record.serialize_field("remoteAccessVolume", &self.remote_access_volume)?;
+            __record.serialize_field("readOperations", &self.read_operations)?;
+            __record.serialize_field("writeOperations", &self.write_operations)?;
+            __record.end()
+        }
+    }
+    #[automatically_derived]
+    impl<'de> __serde::Deserialize<'de> for OrganizationPerDeviceDailyLimits {
+        fn deserialize<__D: __serde::Deserializer<'de>>(
+            __deserializer: __D,
+        ) -> ::std::result::Result<Self, __D::Error> {
+            #[doc(hidden)]
+            struct __Visitor {
+                __phantom_vars: ::core::marker::PhantomData<fn(&())>,
+            }
+            impl<'de> __serde::de::Visitor<'de> for __Visitor {
+                type Value = OrganizationPerDeviceDailyLimits;
+                fn expecting(
+                    &self,
+                    __formatter: &mut ::core::fmt::Formatter,
+                ) -> ::core::fmt::Result {
+                    ::core::fmt::Formatter::write_str(
+                        __formatter,
+                        "record OrganizationPerDeviceDailyLimits",
+                    )
+                }
+                #[inline]
+                fn visit_seq<__A>(
+                    self,
+                    mut __seq: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::SeqAccess<'de>,
+                {
+                    let __field0 =
+                        match __serde::de::SeqAccess::next_element::<ResourceLimit>(&mut __seq)? {
+                            ::core::option::Option::Some(__value) => __value,
+                            ::core::option::Option::None => {
+                                return ::core::result::Result::Err(
+                                    __serde::de::Error::invalid_length(
+                                        0usize,
+                                        &"record with 3 fields",
+                                    ),
+                                );
+                            }
+                        };
+                    let __field1 =
+                        match __serde::de::SeqAccess::next_element::<ResourceLimit>(&mut __seq)? {
+                            ::core::option::Option::Some(__value) => __value,
+                            ::core::option::Option::None => {
+                                return ::core::result::Result::Err(
+                                    __serde::de::Error::invalid_length(
+                                        1usize,
+                                        &"record with 3 fields",
+                                    ),
+                                );
+                            }
+                        };
+                    let __field2 =
+                        match __serde::de::SeqAccess::next_element::<ResourceLimit>(&mut __seq)? {
+                            ::core::option::Option::Some(__value) => __value,
+                            ::core::option::Option::None => {
+                                return ::core::result::Result::Err(
+                                    __serde::de::Error::invalid_length(
+                                        2usize,
+                                        &"record with 3 fields",
+                                    ),
+                                );
+                            }
+                        };
+                    ::core::result::Result::Ok(OrganizationPerDeviceDailyLimits {
+                        remote_access_volume: __field0,
+                        read_operations: __field1,
+                        write_operations: __field2,
+                    })
+                }
+                #[inline]
+                fn visit_map<__A>(
+                    self,
+                    mut __map: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::MapAccess<'de>,
+                {
+                    #[doc(hidden)]
+                    const __IDENTIFIERS: &'static [&'static str] =
+                        &["remoteAccessVolume", "readOperations", "writeOperations"];
+                    #[doc(hidden)]
+                    const __EXPECTING_IDENTIFIERS: &'static str = "an identifier in [\"remoteAccessVolume\", \"readOperations\", \"writeOperations\"]";
+                    #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
+                    #[doc(hidden)]
+                    enum __Identifier {
+                        __Identifier0,
+                        __Identifier1,
+                        __Identifier2,
+                        __Unknown,
+                    }
+                    #[doc(hidden)]
+                    struct __IdentifierVisitor;
+                    impl<'de> __serde::de::Visitor<'de> for __IdentifierVisitor {
+                        type Value = __Identifier;
+                        fn expecting(
+                            &self,
+                            __formatter: &mut ::core::fmt::Formatter,
+                        ) -> ::core::fmt::Result {
+                            ::core::fmt::Formatter::write_str(__formatter, __EXPECTING_IDENTIFIERS)
+                        }
+                        fn visit_u64<__E>(
+                            self,
+                            __value: u64,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                0u64 => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                                1u64 => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                                2u64 => ::core::result::Result::Ok(__Identifier::__Identifier2),
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_str<__E>(
+                            self,
+                            __value: &str,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                "remoteAccessVolume" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
+                                }
+                                "readOperations" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier1)
+                                }
+                                "writeOperations" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier2)
+                                }
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_bytes<__E>(
+                            self,
+                            __value: &[u8],
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                b"remoteAccessVolume" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
+                                }
+                                b"readOperations" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier1)
+                                }
+                                b"writeOperations" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier2)
+                                }
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                    }
+                    impl<'de> __serde::Deserialize<'de> for __Identifier {
+                        #[inline]
+                        fn deserialize<__D>(
+                            __deserializer: __D,
+                        ) -> ::core::result::Result<Self, __D::Error>
+                        where
+                            __D: __serde::Deserializer<'de>,
+                        {
+                            __serde::Deserializer::deserialize_identifier(
+                                __deserializer,
+                                __IdentifierVisitor,
+                            )
+                        }
+                    }
+                    let mut __field0: ::core::option::Option<ResourceLimit> =
+                        ::core::option::Option::None;
+                    let mut __field1: ::core::option::Option<ResourceLimit> =
+                        ::core::option::Option::None;
+                    let mut __field2: ::core::option::Option<ResourceLimit> =
+                        ::core::option::Option::None;
+                    while let ::core::option::Option::Some(__key) =
+                        __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
+                    {
+                        match __key {
+                            __Identifier::__Identifier0 => {
+                                if ::core::option::Option::is_some(&__field0) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "remoteAccessVolume",
+                                        ),
+                                    );
+                                }
+                                __field0 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<ResourceLimit>(
+                                        &mut __map,
+                                    )?,
+                                );
+                            }
+                            __Identifier::__Identifier1 => {
+                                if ::core::option::Option::is_some(&__field1) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "readOperations",
+                                        ),
+                                    );
+                                }
+                                __field1 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<ResourceLimit>(
+                                        &mut __map,
+                                    )?,
+                                );
+                            }
+                            __Identifier::__Identifier2 => {
+                                if ::core::option::Option::is_some(&__field2) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "writeOperations",
+                                        ),
+                                    );
+                                }
+                                __field2 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<ResourceLimit>(
+                                        &mut __map,
+                                    )?,
+                                );
+                            }
+                            _ => {
+                                __serde::de::MapAccess::next_value::<__serde::de::IgnoredAny>(
+                                    &mut __map,
+                                )?;
+                            }
+                        }
+                    }
+                    let __field0 = match __field0 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                <__A::Error as __serde::de::Error>::missing_field(
+                                    "remoteAccessVolume",
+                                ),
+                            );
+                        }
+                    };
+                    let __field1 = match __field1 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                <__A::Error as __serde::de::Error>::missing_field("readOperations"),
+                            );
+                        }
+                    };
+                    let __field2 = match __field2 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                <__A::Error as __serde::de::Error>::missing_field(
+                                    "writeOperations",
+                                ),
+                            );
+                        }
+                    };
+                    ::core::result::Result::Ok(OrganizationPerDeviceDailyLimits {
+                        remote_access_volume: __field0,
+                        read_operations: __field1,
+                        write_operations: __field2,
+                    })
+                }
+            }
+            #[doc(hidden)]
+            const __FIELDS: &'static [&'static str] =
+                &["remoteAccessVolume", "readOperations", "writeOperations"];
+            __serde::Deserializer::deserialize_struct(
+                __deserializer,
+                "OrganizationPerDeviceDailyLimits",
+                __FIELDS,
+                __Visitor {
+                    __phantom_vars: ::core::marker::PhantomData,
+                },
+            )
+        }
+    }
+    #[doc = "Get the resource limits of an organization.\n\nReturns both the effective limits (set by organization administrators) and the\nmaximal limits defined by the subscription plan.\n"]
+    #[derive(Clone, Debug)]
+    pub struct GetOrganizationLimitsAction {
+        #[doc = "ID of the organization.\n"]
+        pub organization_id: OrganizationId,
+    }
+    impl GetOrganizationLimitsAction {
+        #[doc = "Creates a new [`GetOrganizationLimitsAction`]."]
+        pub fn new(organization_id: OrganizationId) -> Self {
+            Self { organization_id }
+        }
+        #[doc = "Sets the value of `organization_id`."]
+        pub fn set_organization_id(&mut self, organization_id: OrganizationId) -> &mut Self {
+            self.organization_id = organization_id;
+            self
+        }
+        #[doc = "Sets the value of `organization_id`."]
+        pub fn with_organization_id(mut self, organization_id: OrganizationId) -> Self {
+            self.organization_id = organization_id;
+            self
+        }
+    }
+    #[automatically_derived]
+    impl __serde::Serialize for GetOrganizationLimitsAction {
+        fn serialize<__S: __serde::Serializer>(
+            &self,
+            __serializer: __S,
+        ) -> ::std::result::Result<__S::Ok, __S::Error> {
+            let mut __record = __sidex_serde::ser::RecordSerializer::new(
+                __serializer,
+                "GetOrganizationLimitsAction",
+                1usize,
+            )?;
+            __record.serialize_field("organizationId", &self.organization_id)?;
+            __record.end()
+        }
+    }
+    #[automatically_derived]
+    impl<'de> __serde::Deserialize<'de> for GetOrganizationLimitsAction {
+        fn deserialize<__D: __serde::Deserializer<'de>>(
+            __deserializer: __D,
+        ) -> ::std::result::Result<Self, __D::Error> {
+            #[doc(hidden)]
+            struct __Visitor {
+                __phantom_vars: ::core::marker::PhantomData<fn(&())>,
+            }
+            impl<'de> __serde::de::Visitor<'de> for __Visitor {
+                type Value = GetOrganizationLimitsAction;
+                fn expecting(
+                    &self,
+                    __formatter: &mut ::core::fmt::Formatter,
+                ) -> ::core::fmt::Result {
+                    ::core::fmt::Formatter::write_str(
+                        __formatter,
+                        "record GetOrganizationLimitsAction",
+                    )
+                }
+                #[inline]
+                fn visit_seq<__A>(
+                    self,
+                    mut __seq: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::SeqAccess<'de>,
+                {
+                    let __field0 =
+                        match __serde::de::SeqAccess::next_element::<OrganizationId>(&mut __seq)? {
+                            ::core::option::Option::Some(__value) => __value,
+                            ::core::option::Option::None => {
+                                return ::core::result::Result::Err(
+                                    __serde::de::Error::invalid_length(
+                                        0usize,
+                                        &"record with 1 fields",
+                                    ),
+                                );
+                            }
+                        };
+                    ::core::result::Result::Ok(GetOrganizationLimitsAction {
+                        organization_id: __field0,
+                    })
+                }
+                #[inline]
+                fn visit_map<__A>(
+                    self,
+                    mut __map: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::MapAccess<'de>,
+                {
+                    #[doc(hidden)]
+                    const __IDENTIFIERS: &'static [&'static str] = &["organizationId"];
+                    #[doc(hidden)]
+                    const __EXPECTING_IDENTIFIERS: &'static str =
+                        "an identifier in [\"organizationId\"]";
+                    #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
+                    #[doc(hidden)]
+                    enum __Identifier {
+                        __Identifier0,
+                        __Unknown,
+                    }
+                    #[doc(hidden)]
+                    struct __IdentifierVisitor;
+                    impl<'de> __serde::de::Visitor<'de> for __IdentifierVisitor {
+                        type Value = __Identifier;
+                        fn expecting(
+                            &self,
+                            __formatter: &mut ::core::fmt::Formatter,
+                        ) -> ::core::fmt::Result {
+                            ::core::fmt::Formatter::write_str(__formatter, __EXPECTING_IDENTIFIERS)
+                        }
+                        fn visit_u64<__E>(
+                            self,
+                            __value: u64,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                0u64 => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_str<__E>(
+                            self,
+                            __value: &str,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                "organizationId" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
+                                }
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_bytes<__E>(
+                            self,
+                            __value: &[u8],
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                b"organizationId" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
+                                }
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                    }
+                    impl<'de> __serde::Deserialize<'de> for __Identifier {
+                        #[inline]
+                        fn deserialize<__D>(
+                            __deserializer: __D,
+                        ) -> ::core::result::Result<Self, __D::Error>
+                        where
+                            __D: __serde::Deserializer<'de>,
+                        {
+                            __serde::Deserializer::deserialize_identifier(
+                                __deserializer,
+                                __IdentifierVisitor,
+                            )
+                        }
+                    }
+                    let mut __field0: ::core::option::Option<OrganizationId> =
+                        ::core::option::Option::None;
+                    while let ::core::option::Option::Some(__key) =
+                        __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
+                    {
+                        match __key {
+                            __Identifier::__Identifier0 => {
+                                if ::core::option::Option::is_some(&__field0) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "organizationId",
+                                        ),
+                                    );
+                                }
+                                __field0 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<OrganizationId>(
+                                        &mut __map,
+                                    )?,
+                                );
+                            }
+                            _ => {
+                                __serde::de::MapAccess::next_value::<__serde::de::IgnoredAny>(
+                                    &mut __map,
+                                )?;
+                            }
+                        }
+                    }
+                    let __field0 = match __field0 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                <__A::Error as __serde::de::Error>::missing_field("organizationId"),
+                            );
+                        }
+                    };
+                    ::core::result::Result::Ok(GetOrganizationLimitsAction {
+                        organization_id: __field0,
+                    })
+                }
+            }
+            #[doc(hidden)]
+            const __FIELDS: &'static [&'static str] = &["organizationId"];
+            __serde::Deserializer::deserialize_struct(
+                __deserializer,
+                "GetOrganizationLimitsAction",
+                __FIELDS,
+                __Visitor {
+                    __phantom_vars: ::core::marker::PhantomData,
+                },
+            )
+        }
+    }
+    #[doc = "Output of getting the resource limits of an organization.\n"]
+    #[derive(Clone, Debug)]
+    pub struct GetOrganizationLimitsOutput {
+        #[doc = "Resource limits (billing period).\n"]
+        pub limits: OrganizationLimits,
+        #[doc = "Daily limits.\n"]
+        pub daily_limits: OrganizationDailyLimits,
+    }
+    impl GetOrganizationLimitsOutput {
+        #[doc = "Creates a new [`GetOrganizationLimitsOutput`]."]
+        pub fn new(limits: OrganizationLimits, daily_limits: OrganizationDailyLimits) -> Self {
+            Self {
+                limits,
+                daily_limits,
+            }
+        }
+        #[doc = "Sets the value of `limits`."]
+        pub fn set_limits(&mut self, limits: OrganizationLimits) -> &mut Self {
+            self.limits = limits;
+            self
+        }
+        #[doc = "Sets the value of `limits`."]
+        pub fn with_limits(mut self, limits: OrganizationLimits) -> Self {
+            self.limits = limits;
+            self
+        }
+        #[doc = "Sets the value of `daily_limits`."]
+        pub fn set_daily_limits(&mut self, daily_limits: OrganizationDailyLimits) -> &mut Self {
+            self.daily_limits = daily_limits;
+            self
+        }
+        #[doc = "Sets the value of `daily_limits`."]
+        pub fn with_daily_limits(mut self, daily_limits: OrganizationDailyLimits) -> Self {
+            self.daily_limits = daily_limits;
+            self
+        }
+    }
+    #[automatically_derived]
+    impl __serde::Serialize for GetOrganizationLimitsOutput {
+        fn serialize<__S: __serde::Serializer>(
+            &self,
+            __serializer: __S,
+        ) -> ::std::result::Result<__S::Ok, __S::Error> {
+            let mut __record = __sidex_serde::ser::RecordSerializer::new(
+                __serializer,
+                "GetOrganizationLimitsOutput",
+                2usize,
+            )?;
+            __record.serialize_field("limits", &self.limits)?;
+            __record.serialize_field("dailyLimits", &self.daily_limits)?;
+            __record.end()
+        }
+    }
+    #[automatically_derived]
+    impl<'de> __serde::Deserialize<'de> for GetOrganizationLimitsOutput {
+        fn deserialize<__D: __serde::Deserializer<'de>>(
+            __deserializer: __D,
+        ) -> ::std::result::Result<Self, __D::Error> {
+            #[doc(hidden)]
+            struct __Visitor {
+                __phantom_vars: ::core::marker::PhantomData<fn(&())>,
+            }
+            impl<'de> __serde::de::Visitor<'de> for __Visitor {
+                type Value = GetOrganizationLimitsOutput;
+                fn expecting(
+                    &self,
+                    __formatter: &mut ::core::fmt::Formatter,
+                ) -> ::core::fmt::Result {
+                    ::core::fmt::Formatter::write_str(
+                        __formatter,
+                        "record GetOrganizationLimitsOutput",
+                    )
+                }
+                #[inline]
+                fn visit_seq<__A>(
+                    self,
+                    mut __seq: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::SeqAccess<'de>,
+                {
+                    let __field0 = match __serde::de::SeqAccess::next_element::<OrganizationLimits>(
+                        &mut __seq,
+                    )? {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(0usize, &"record with 2 fields"),
+                            );
+                        }
+                    };
+                    let __field1 = match __serde::de::SeqAccess::next_element::<
+                        OrganizationDailyLimits,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(1usize, &"record with 2 fields"),
+                            );
+                        }
+                    };
+                    ::core::result::Result::Ok(GetOrganizationLimitsOutput {
+                        limits: __field0,
+                        daily_limits: __field1,
+                    })
+                }
+                #[inline]
+                fn visit_map<__A>(
+                    self,
+                    mut __map: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::MapAccess<'de>,
+                {
+                    #[doc(hidden)]
+                    const __IDENTIFIERS: &'static [&'static str] = &["limits", "dailyLimits"];
+                    #[doc(hidden)]
+                    const __EXPECTING_IDENTIFIERS: &'static str =
+                        "an identifier in [\"limits\", \"dailyLimits\"]";
+                    #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
+                    #[doc(hidden)]
+                    enum __Identifier {
+                        __Identifier0,
+                        __Identifier1,
+                        __Unknown,
+                    }
+                    #[doc(hidden)]
+                    struct __IdentifierVisitor;
+                    impl<'de> __serde::de::Visitor<'de> for __IdentifierVisitor {
+                        type Value = __Identifier;
+                        fn expecting(
+                            &self,
+                            __formatter: &mut ::core::fmt::Formatter,
+                        ) -> ::core::fmt::Result {
+                            ::core::fmt::Formatter::write_str(__formatter, __EXPECTING_IDENTIFIERS)
+                        }
+                        fn visit_u64<__E>(
+                            self,
+                            __value: u64,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                0u64 => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                                1u64 => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_str<__E>(
+                            self,
+                            __value: &str,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                "limits" => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                                "dailyLimits" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier1)
+                                }
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_bytes<__E>(
+                            self,
+                            __value: &[u8],
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                b"limits" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
+                                }
+                                b"dailyLimits" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier1)
+                                }
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                    }
+                    impl<'de> __serde::Deserialize<'de> for __Identifier {
+                        #[inline]
+                        fn deserialize<__D>(
+                            __deserializer: __D,
+                        ) -> ::core::result::Result<Self, __D::Error>
+                        where
+                            __D: __serde::Deserializer<'de>,
+                        {
+                            __serde::Deserializer::deserialize_identifier(
+                                __deserializer,
+                                __IdentifierVisitor,
+                            )
+                        }
+                    }
+                    let mut __field0: ::core::option::Option<OrganizationLimits> =
+                        ::core::option::Option::None;
+                    let mut __field1: ::core::option::Option<OrganizationDailyLimits> =
+                        ::core::option::Option::None;
+                    while let ::core::option::Option::Some(__key) =
+                        __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
+                    {
+                        match __key {
+                            __Identifier::__Identifier0 => {
+                                if ::core::option::Option::is_some(&__field0) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "limits",
+                                        ),
+                                    );
+                                }
+                                __field0 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<OrganizationLimits>(
+                                        &mut __map,
+                                    )?,
+                                );
+                            }
+                            __Identifier::__Identifier1 => {
+                                if ::core::option::Option::is_some(&__field1) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "dailyLimits",
+                                        ),
+                                    );
+                                }
+                                __field1 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<OrganizationDailyLimits>(
+                                        &mut __map,
+                                    )?,
+                                );
+                            }
+                            _ => {
+                                __serde::de::MapAccess::next_value::<__serde::de::IgnoredAny>(
+                                    &mut __map,
+                                )?;
+                            }
+                        }
+                    }
+                    let __field0 = match __field0 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                <__A::Error as __serde::de::Error>::missing_field("limits"),
+                            );
+                        }
+                    };
+                    let __field1 = match __field1 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                <__A::Error as __serde::de::Error>::missing_field("dailyLimits"),
+                            );
+                        }
+                    };
+                    ::core::result::Result::Ok(GetOrganizationLimitsOutput {
+                        limits: __field0,
+                        daily_limits: __field1,
+                    })
+                }
+            }
+            #[doc(hidden)]
+            const __FIELDS: &'static [&'static str] = &["limits", "dailyLimits"];
+            __serde::Deserializer::deserialize_struct(
+                __deserializer,
+                "GetOrganizationLimitsOutput",
+                __FIELDS,
+                __Visitor {
+                    __phantom_vars: ::core::marker::PhantomData,
+                },
+            )
+        }
+    }
+    #[doc = "Set the resource limits of an organization.\n\nOrganization administrators can set effective limits up to the maximal limits\ndefined by their subscription plan. Setting a higher limit may result in\noverage charges once actual usage exceeds the included amount.\n"]
+    #[derive(Clone, Debug)]
+    pub struct SetOrganizationLimitsAction {
+        #[doc = "ID of the organization.\n"]
+        pub organization_id: OrganizationId,
+        #[doc = "Resource limits to update (billing period).\n"]
+        pub limits: ::std::option::Option<SetOrganizationLimitsUpdate>,
+        #[doc = "Daily limits to update.\n"]
+        pub daily_limits: ::std::option::Option<SetOrganizationDailyLimitsUpdate>,
+    }
+    impl SetOrganizationLimitsAction {
+        #[doc = "Creates a new [`SetOrganizationLimitsAction`]."]
+        pub fn new(organization_id: OrganizationId) -> Self {
+            Self {
+                organization_id,
+                limits: ::std::default::Default::default(),
+                daily_limits: ::std::default::Default::default(),
+            }
+        }
+        #[doc = "Sets the value of `organization_id`."]
+        pub fn set_organization_id(&mut self, organization_id: OrganizationId) -> &mut Self {
+            self.organization_id = organization_id;
+            self
+        }
+        #[doc = "Sets the value of `organization_id`."]
+        pub fn with_organization_id(mut self, organization_id: OrganizationId) -> Self {
+            self.organization_id = organization_id;
+            self
+        }
+        #[doc = "Sets the value of `limits`."]
+        pub fn set_limits(
+            &mut self,
+            limits: ::std::option::Option<SetOrganizationLimitsUpdate>,
+        ) -> &mut Self {
+            self.limits = limits;
+            self
+        }
+        #[doc = "Sets the value of `limits`."]
+        pub fn with_limits(
+            mut self,
+            limits: ::std::option::Option<SetOrganizationLimitsUpdate>,
+        ) -> Self {
+            self.limits = limits;
+            self
+        }
+        #[doc = "Sets the value of `daily_limits`."]
+        pub fn set_daily_limits(
+            &mut self,
+            daily_limits: ::std::option::Option<SetOrganizationDailyLimitsUpdate>,
+        ) -> &mut Self {
+            self.daily_limits = daily_limits;
+            self
+        }
+        #[doc = "Sets the value of `daily_limits`."]
+        pub fn with_daily_limits(
+            mut self,
+            daily_limits: ::std::option::Option<SetOrganizationDailyLimitsUpdate>,
+        ) -> Self {
+            self.daily_limits = daily_limits;
+            self
+        }
+    }
+    #[automatically_derived]
+    impl __serde::Serialize for SetOrganizationLimitsAction {
+        fn serialize<__S: __serde::Serializer>(
+            &self,
+            __serializer: __S,
+        ) -> ::std::result::Result<__S::Ok, __S::Error> {
+            let mut __record = __sidex_serde::ser::RecordSerializer::new(
+                __serializer,
+                "SetOrganizationLimitsAction",
+                3usize,
+            )?;
+            __record.serialize_field("organizationId", &self.organization_id)?;
+            __record
+                .serialize_optional_field("limits", ::core::option::Option::as_ref(&self.limits))?;
+            __record.serialize_optional_field(
+                "dailyLimits",
+                ::core::option::Option::as_ref(&self.daily_limits),
+            )?;
+            __record.end()
+        }
+    }
+    #[automatically_derived]
+    impl<'de> __serde::Deserialize<'de> for SetOrganizationLimitsAction {
+        fn deserialize<__D: __serde::Deserializer<'de>>(
+            __deserializer: __D,
+        ) -> ::std::result::Result<Self, __D::Error> {
+            #[doc(hidden)]
+            struct __Visitor {
+                __phantom_vars: ::core::marker::PhantomData<fn(&())>,
+            }
+            impl<'de> __serde::de::Visitor<'de> for __Visitor {
+                type Value = SetOrganizationLimitsAction;
+                fn expecting(
+                    &self,
+                    __formatter: &mut ::core::fmt::Formatter,
+                ) -> ::core::fmt::Result {
+                    ::core::fmt::Formatter::write_str(
+                        __formatter,
+                        "record SetOrganizationLimitsAction",
+                    )
+                }
+                #[inline]
+                fn visit_seq<__A>(
+                    self,
+                    mut __seq: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::SeqAccess<'de>,
+                {
+                    let __field0 =
+                        match __serde::de::SeqAccess::next_element::<OrganizationId>(&mut __seq)? {
+                            ::core::option::Option::Some(__value) => __value,
+                            ::core::option::Option::None => {
+                                return ::core::result::Result::Err(
+                                    __serde::de::Error::invalid_length(
+                                        0usize,
+                                        &"record with 3 fields",
+                                    ),
+                                );
+                            }
+                        };
+                    let __field1 = match __serde::de::SeqAccess::next_element::<
+                        ::std::option::Option<SetOrganizationLimitsUpdate>,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(1usize, &"record with 3 fields"),
+                            );
+                        }
+                    };
+                    let __field2 = match __serde::de::SeqAccess::next_element::<
+                        ::std::option::Option<SetOrganizationDailyLimitsUpdate>,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(2usize, &"record with 3 fields"),
+                            );
+                        }
+                    };
+                    ::core::result::Result::Ok(SetOrganizationLimitsAction {
+                        organization_id: __field0,
+                        limits: __field1,
+                        daily_limits: __field2,
+                    })
+                }
+                #[inline]
+                fn visit_map<__A>(
+                    self,
+                    mut __map: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::MapAccess<'de>,
+                {
+                    #[doc(hidden)]
+                    const __IDENTIFIERS: &'static [&'static str] =
+                        &["organizationId", "limits", "dailyLimits"];
+                    #[doc(hidden)]
+                    const __EXPECTING_IDENTIFIERS: &'static str =
+                        "an identifier in [\"organizationId\", \"limits\", \"dailyLimits\"]";
+                    #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
+                    #[doc(hidden)]
+                    enum __Identifier {
+                        __Identifier0,
+                        __Identifier1,
+                        __Identifier2,
+                        __Unknown,
+                    }
+                    #[doc(hidden)]
+                    struct __IdentifierVisitor;
+                    impl<'de> __serde::de::Visitor<'de> for __IdentifierVisitor {
+                        type Value = __Identifier;
+                        fn expecting(
+                            &self,
+                            __formatter: &mut ::core::fmt::Formatter,
+                        ) -> ::core::fmt::Result {
+                            ::core::fmt::Formatter::write_str(__formatter, __EXPECTING_IDENTIFIERS)
+                        }
+                        fn visit_u64<__E>(
+                            self,
+                            __value: u64,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                0u64 => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                                1u64 => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                                2u64 => ::core::result::Result::Ok(__Identifier::__Identifier2),
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_str<__E>(
+                            self,
+                            __value: &str,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                "organizationId" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
+                                }
+                                "limits" => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                                "dailyLimits" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier2)
+                                }
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_bytes<__E>(
+                            self,
+                            __value: &[u8],
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                b"organizationId" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
+                                }
+                                b"limits" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier1)
+                                }
+                                b"dailyLimits" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier2)
+                                }
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                    }
+                    impl<'de> __serde::Deserialize<'de> for __Identifier {
+                        #[inline]
+                        fn deserialize<__D>(
+                            __deserializer: __D,
+                        ) -> ::core::result::Result<Self, __D::Error>
+                        where
+                            __D: __serde::Deserializer<'de>,
+                        {
+                            __serde::Deserializer::deserialize_identifier(
+                                __deserializer,
+                                __IdentifierVisitor,
+                            )
+                        }
+                    }
+                    let mut __field0: ::core::option::Option<OrganizationId> =
+                        ::core::option::Option::None;
+                    let mut __field1: ::core::option::Option<
+                        ::std::option::Option<SetOrganizationLimitsUpdate>,
+                    > = ::core::option::Option::None;
+                    let mut __field2: ::core::option::Option<
+                        ::std::option::Option<SetOrganizationDailyLimitsUpdate>,
+                    > = ::core::option::Option::None;
+                    while let ::core::option::Option::Some(__key) =
+                        __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
+                    {
+                        match __key {
+                            __Identifier::__Identifier0 => {
+                                if ::core::option::Option::is_some(&__field0) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "organizationId",
+                                        ),
+                                    );
+                                }
+                                __field0 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<OrganizationId>(
+                                        &mut __map,
+                                    )?,
+                                );
+                            }
+                            __Identifier::__Identifier1 => {
+                                if ::core::option::Option::is_some(&__field1) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "limits",
+                                        ),
+                                    );
+                                }
+                                __field1 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<
+                                        ::std::option::Option<SetOrganizationLimitsUpdate>,
+                                    >(&mut __map)?,
+                                );
+                            }
+                            __Identifier::__Identifier2 => {
+                                if ::core::option::Option::is_some(&__field2) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "dailyLimits",
+                                        ),
+                                    );
+                                }
+                                __field2 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<
+                                        ::std::option::Option<SetOrganizationDailyLimitsUpdate>,
+                                    >(&mut __map)?,
+                                );
+                            }
+                            _ => {
+                                __serde::de::MapAccess::next_value::<__serde::de::IgnoredAny>(
+                                    &mut __map,
+                                )?;
+                            }
+                        }
+                    }
+                    let __field0 = match __field0 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                <__A::Error as __serde::de::Error>::missing_field("organizationId"),
+                            );
+                        }
+                    };
+                    let __field1 = match __field1 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => ::core::option::Option::None,
+                    };
+                    let __field2 = match __field2 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => ::core::option::Option::None,
+                    };
+                    ::core::result::Result::Ok(SetOrganizationLimitsAction {
+                        organization_id: __field0,
+                        limits: __field1,
+                        daily_limits: __field2,
+                    })
+                }
+            }
+            #[doc(hidden)]
+            const __FIELDS: &'static [&'static str] = &["organizationId", "limits", "dailyLimits"];
+            __serde::Deserializer::deserialize_struct(
+                __deserializer,
+                "SetOrganizationLimitsAction",
+                __FIELDS,
+                __Visitor {
+                    __phantom_vars: ::core::marker::PhantomData,
+                },
+            )
+        }
+    }
+    #[doc = "Updates for organization resource limits.\n"]
+    #[derive(Clone, Debug)]
+    pub struct SetOrganizationLimitsUpdate {
+        #[doc = "New effective limit for seats.\n"]
+        pub seats: ::std::option::Option<u64>,
+        #[doc = "New effective limit for projects.\n"]
+        pub projects: ::std::option::Option<u64>,
+        #[doc = "New effective limit for devices.\n"]
+        pub devices: ::std::option::Option<u64>,
+        #[doc = "New effective limit for repositories.\n"]
+        pub repositories: ::std::option::Option<u64>,
+        #[doc = "New effective limit for packages.\n"]
+        pub packages: ::std::option::Option<u64>,
+        #[doc = "Per-device limit updates.\n"]
+        pub per_device: ::std::option::Option<SetOrganizationPerDeviceLimitsUpdate>,
+    }
+    impl SetOrganizationLimitsUpdate {
+        #[doc = "Creates a new [`SetOrganizationLimitsUpdate`]."]
+        pub fn new() -> Self {
+            Self {
+                seats: ::std::default::Default::default(),
+                projects: ::std::default::Default::default(),
+                devices: ::std::default::Default::default(),
+                repositories: ::std::default::Default::default(),
+                packages: ::std::default::Default::default(),
+                per_device: ::std::default::Default::default(),
+            }
+        }
+        #[doc = "Sets the value of `seats`."]
+        pub fn set_seats(&mut self, seats: ::std::option::Option<u64>) -> &mut Self {
+            self.seats = seats;
+            self
+        }
+        #[doc = "Sets the value of `seats`."]
+        pub fn with_seats(mut self, seats: ::std::option::Option<u64>) -> Self {
+            self.seats = seats;
+            self
+        }
+        #[doc = "Sets the value of `projects`."]
+        pub fn set_projects(&mut self, projects: ::std::option::Option<u64>) -> &mut Self {
+            self.projects = projects;
+            self
+        }
+        #[doc = "Sets the value of `projects`."]
+        pub fn with_projects(mut self, projects: ::std::option::Option<u64>) -> Self {
+            self.projects = projects;
+            self
+        }
+        #[doc = "Sets the value of `devices`."]
+        pub fn set_devices(&mut self, devices: ::std::option::Option<u64>) -> &mut Self {
+            self.devices = devices;
+            self
+        }
+        #[doc = "Sets the value of `devices`."]
+        pub fn with_devices(mut self, devices: ::std::option::Option<u64>) -> Self {
+            self.devices = devices;
+            self
+        }
+        #[doc = "Sets the value of `repositories`."]
+        pub fn set_repositories(&mut self, repositories: ::std::option::Option<u64>) -> &mut Self {
+            self.repositories = repositories;
+            self
+        }
+        #[doc = "Sets the value of `repositories`."]
+        pub fn with_repositories(mut self, repositories: ::std::option::Option<u64>) -> Self {
+            self.repositories = repositories;
+            self
+        }
+        #[doc = "Sets the value of `packages`."]
+        pub fn set_packages(&mut self, packages: ::std::option::Option<u64>) -> &mut Self {
+            self.packages = packages;
+            self
+        }
+        #[doc = "Sets the value of `packages`."]
+        pub fn with_packages(mut self, packages: ::std::option::Option<u64>) -> Self {
+            self.packages = packages;
+            self
+        }
+        #[doc = "Sets the value of `per_device`."]
+        pub fn set_per_device(
+            &mut self,
+            per_device: ::std::option::Option<SetOrganizationPerDeviceLimitsUpdate>,
+        ) -> &mut Self {
+            self.per_device = per_device;
+            self
+        }
+        #[doc = "Sets the value of `per_device`."]
+        pub fn with_per_device(
+            mut self,
+            per_device: ::std::option::Option<SetOrganizationPerDeviceLimitsUpdate>,
+        ) -> Self {
+            self.per_device = per_device;
+            self
+        }
+    }
+    impl ::std::default::Default for SetOrganizationLimitsUpdate {
+        fn default() -> Self {
+            Self::new()
+        }
+    }
+    #[automatically_derived]
+    impl __serde::Serialize for SetOrganizationLimitsUpdate {
+        fn serialize<__S: __serde::Serializer>(
+            &self,
+            __serializer: __S,
+        ) -> ::std::result::Result<__S::Ok, __S::Error> {
+            let mut __record = __sidex_serde::ser::RecordSerializer::new(
+                __serializer,
+                "SetOrganizationLimitsUpdate",
+                6usize,
+            )?;
+            __record
+                .serialize_optional_field("seats", ::core::option::Option::as_ref(&self.seats))?;
+            __record.serialize_optional_field(
+                "projects",
+                ::core::option::Option::as_ref(&self.projects),
+            )?;
+            __record.serialize_optional_field(
+                "devices",
+                ::core::option::Option::as_ref(&self.devices),
+            )?;
+            __record.serialize_optional_field(
+                "repositories",
+                ::core::option::Option::as_ref(&self.repositories),
+            )?;
+            __record.serialize_optional_field(
+                "packages",
+                ::core::option::Option::as_ref(&self.packages),
+            )?;
+            __record.serialize_optional_field(
+                "perDevice",
+                ::core::option::Option::as_ref(&self.per_device),
+            )?;
+            __record.end()
+        }
+    }
+    #[automatically_derived]
+    impl<'de> __serde::Deserialize<'de> for SetOrganizationLimitsUpdate {
+        fn deserialize<__D: __serde::Deserializer<'de>>(
+            __deserializer: __D,
+        ) -> ::std::result::Result<Self, __D::Error> {
+            #[doc(hidden)]
+            struct __Visitor {
+                __phantom_vars: ::core::marker::PhantomData<fn(&())>,
+            }
+            impl<'de> __serde::de::Visitor<'de> for __Visitor {
+                type Value = SetOrganizationLimitsUpdate;
+                fn expecting(
+                    &self,
+                    __formatter: &mut ::core::fmt::Formatter,
+                ) -> ::core::fmt::Result {
+                    ::core::fmt::Formatter::write_str(
+                        __formatter,
+                        "record SetOrganizationLimitsUpdate",
+                    )
+                }
+                #[inline]
+                fn visit_seq<__A>(
+                    self,
+                    mut __seq: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::SeqAccess<'de>,
+                {
+                    let __field0 = match __serde::de::SeqAccess::next_element::<
+                        ::std::option::Option<u64>,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(0usize, &"record with 6 fields"),
+                            );
+                        }
+                    };
+                    let __field1 = match __serde::de::SeqAccess::next_element::<
+                        ::std::option::Option<u64>,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(1usize, &"record with 6 fields"),
+                            );
+                        }
+                    };
+                    let __field2 = match __serde::de::SeqAccess::next_element::<
+                        ::std::option::Option<u64>,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(2usize, &"record with 6 fields"),
+                            );
+                        }
+                    };
+                    let __field3 = match __serde::de::SeqAccess::next_element::<
+                        ::std::option::Option<u64>,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(3usize, &"record with 6 fields"),
+                            );
+                        }
+                    };
+                    let __field4 = match __serde::de::SeqAccess::next_element::<
+                        ::std::option::Option<u64>,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(4usize, &"record with 6 fields"),
+                            );
+                        }
+                    };
+                    let __field5 = match __serde::de::SeqAccess::next_element::<
+                        ::std::option::Option<SetOrganizationPerDeviceLimitsUpdate>,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(5usize, &"record with 6 fields"),
+                            );
+                        }
+                    };
+                    ::core::result::Result::Ok(SetOrganizationLimitsUpdate {
+                        seats: __field0,
+                        projects: __field1,
+                        devices: __field2,
+                        repositories: __field3,
+                        packages: __field4,
+                        per_device: __field5,
+                    })
+                }
+                #[inline]
+                fn visit_map<__A>(
+                    self,
+                    mut __map: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::MapAccess<'de>,
+                {
+                    #[doc(hidden)]
+                    const __IDENTIFIERS: &'static [&'static str] = &[
+                        "seats",
+                        "projects",
+                        "devices",
+                        "repositories",
+                        "packages",
+                        "perDevice",
+                    ];
+                    #[doc(hidden)]
+                    const __EXPECTING_IDENTIFIERS: &'static str = "an identifier in [\"seats\", \"projects\", \"devices\", \"repositories\", \"packages\", \"perDevice\"]";
+                    #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
+                    #[doc(hidden)]
+                    enum __Identifier {
+                        __Identifier0,
+                        __Identifier1,
+                        __Identifier2,
+                        __Identifier3,
+                        __Identifier4,
+                        __Identifier5,
+                        __Unknown,
+                    }
+                    #[doc(hidden)]
+                    struct __IdentifierVisitor;
+                    impl<'de> __serde::de::Visitor<'de> for __IdentifierVisitor {
+                        type Value = __Identifier;
+                        fn expecting(
+                            &self,
+                            __formatter: &mut ::core::fmt::Formatter,
+                        ) -> ::core::fmt::Result {
+                            ::core::fmt::Formatter::write_str(__formatter, __EXPECTING_IDENTIFIERS)
+                        }
+                        fn visit_u64<__E>(
+                            self,
+                            __value: u64,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                0u64 => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                                1u64 => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                                2u64 => ::core::result::Result::Ok(__Identifier::__Identifier2),
+                                3u64 => ::core::result::Result::Ok(__Identifier::__Identifier3),
+                                4u64 => ::core::result::Result::Ok(__Identifier::__Identifier4),
+                                5u64 => ::core::result::Result::Ok(__Identifier::__Identifier5),
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_str<__E>(
+                            self,
+                            __value: &str,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                "seats" => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                                "projects" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier1)
+                                }
+                                "devices" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier2)
+                                }
+                                "repositories" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier3)
+                                }
+                                "packages" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier4)
+                                }
+                                "perDevice" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier5)
+                                }
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_bytes<__E>(
+                            self,
+                            __value: &[u8],
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                b"seats" => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                                b"projects" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier1)
+                                }
+                                b"devices" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier2)
+                                }
+                                b"repositories" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier3)
+                                }
+                                b"packages" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier4)
+                                }
+                                b"perDevice" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier5)
+                                }
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                    }
+                    impl<'de> __serde::Deserialize<'de> for __Identifier {
+                        #[inline]
+                        fn deserialize<__D>(
+                            __deserializer: __D,
+                        ) -> ::core::result::Result<Self, __D::Error>
+                        where
+                            __D: __serde::Deserializer<'de>,
+                        {
+                            __serde::Deserializer::deserialize_identifier(
+                                __deserializer,
+                                __IdentifierVisitor,
+                            )
+                        }
+                    }
+                    let mut __field0: ::core::option::Option<::std::option::Option<u64>> =
+                        ::core::option::Option::None;
+                    let mut __field1: ::core::option::Option<::std::option::Option<u64>> =
+                        ::core::option::Option::None;
+                    let mut __field2: ::core::option::Option<::std::option::Option<u64>> =
+                        ::core::option::Option::None;
+                    let mut __field3: ::core::option::Option<::std::option::Option<u64>> =
+                        ::core::option::Option::None;
+                    let mut __field4: ::core::option::Option<::std::option::Option<u64>> =
+                        ::core::option::Option::None;
+                    let mut __field5: ::core::option::Option<
+                        ::std::option::Option<SetOrganizationPerDeviceLimitsUpdate>,
+                    > = ::core::option::Option::None;
+                    while let ::core::option::Option::Some(__key) =
+                        __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
+                    {
+                        match __key {
+                            __Identifier::__Identifier0 => {
+                                if ::core::option::Option::is_some(&__field0) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "seats",
+                                        ),
+                                    );
+                                }
+                                __field0 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<::std::option::Option<u64>>(
+                                        &mut __map,
+                                    )?,
+                                );
+                            }
+                            __Identifier::__Identifier1 => {
+                                if ::core::option::Option::is_some(&__field1) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "projects",
+                                        ),
+                                    );
+                                }
+                                __field1 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<::std::option::Option<u64>>(
+                                        &mut __map,
+                                    )?,
+                                );
+                            }
+                            __Identifier::__Identifier2 => {
+                                if ::core::option::Option::is_some(&__field2) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "devices",
+                                        ),
+                                    );
+                                }
+                                __field2 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<::std::option::Option<u64>>(
+                                        &mut __map,
+                                    )?,
+                                );
+                            }
+                            __Identifier::__Identifier3 => {
+                                if ::core::option::Option::is_some(&__field3) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "repositories",
+                                        ),
+                                    );
+                                }
+                                __field3 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<::std::option::Option<u64>>(
+                                        &mut __map,
+                                    )?,
+                                );
+                            }
+                            __Identifier::__Identifier4 => {
+                                if ::core::option::Option::is_some(&__field4) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "packages",
+                                        ),
+                                    );
+                                }
+                                __field4 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<::std::option::Option<u64>>(
+                                        &mut __map,
+                                    )?,
+                                );
+                            }
+                            __Identifier::__Identifier5 => {
+                                if ::core::option::Option::is_some(&__field5) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "perDevice",
+                                        ),
+                                    );
+                                }
+                                __field5 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<
+                                        ::std::option::Option<SetOrganizationPerDeviceLimitsUpdate>,
+                                    >(&mut __map)?,
+                                );
+                            }
+                            _ => {
+                                __serde::de::MapAccess::next_value::<__serde::de::IgnoredAny>(
+                                    &mut __map,
+                                )?;
+                            }
+                        }
+                    }
+                    let __field0 = match __field0 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => ::core::option::Option::None,
+                    };
+                    let __field1 = match __field1 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => ::core::option::Option::None,
+                    };
+                    let __field2 = match __field2 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => ::core::option::Option::None,
+                    };
+                    let __field3 = match __field3 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => ::core::option::Option::None,
+                    };
+                    let __field4 = match __field4 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => ::core::option::Option::None,
+                    };
+                    let __field5 = match __field5 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => ::core::option::Option::None,
+                    };
+                    ::core::result::Result::Ok(SetOrganizationLimitsUpdate {
+                        seats: __field0,
+                        projects: __field1,
+                        devices: __field2,
+                        repositories: __field3,
+                        packages: __field4,
+                        per_device: __field5,
+                    })
+                }
+            }
+            #[doc(hidden)]
+            const __FIELDS: &'static [&'static str] = &[
+                "seats",
+                "projects",
+                "devices",
+                "repositories",
+                "packages",
+                "perDevice",
+            ];
+            __serde::Deserializer::deserialize_struct(
+                __deserializer,
+                "SetOrganizationLimitsUpdate",
+                __FIELDS,
+                __Visitor {
+                    __phantom_vars: ::core::marker::PhantomData,
+                },
+            )
+        }
+    }
+    #[doc = "Updates for organization per-device limits.\n"]
+    #[derive(Clone, Debug)]
+    pub struct SetOrganizationPerDeviceLimitsUpdate {
+        #[doc = "New effective limit for properties per device.\n"]
+        pub properties: ::std::option::Option<u64>,
+        #[doc = "New effective limit for remote access volume per device.\n"]
+        pub remote_access_volume: ::std::option::Option<u64>,
+        #[doc = "New effective limit for read operations per device.\n"]
+        pub read_operations: ::std::option::Option<u64>,
+        #[doc = "New effective limit for write operations per device.\n"]
+        pub write_operations: ::std::option::Option<u64>,
+    }
+    impl SetOrganizationPerDeviceLimitsUpdate {
+        #[doc = "Creates a new [`SetOrganizationPerDeviceLimitsUpdate`]."]
+        pub fn new() -> Self {
+            Self {
+                properties: ::std::default::Default::default(),
+                remote_access_volume: ::std::default::Default::default(),
+                read_operations: ::std::default::Default::default(),
+                write_operations: ::std::default::Default::default(),
+            }
+        }
+        #[doc = "Sets the value of `properties`."]
+        pub fn set_properties(&mut self, properties: ::std::option::Option<u64>) -> &mut Self {
+            self.properties = properties;
+            self
+        }
+        #[doc = "Sets the value of `properties`."]
+        pub fn with_properties(mut self, properties: ::std::option::Option<u64>) -> Self {
+            self.properties = properties;
+            self
+        }
+        #[doc = "Sets the value of `remote_access_volume`."]
+        pub fn set_remote_access_volume(
+            &mut self,
+            remote_access_volume: ::std::option::Option<u64>,
+        ) -> &mut Self {
+            self.remote_access_volume = remote_access_volume;
+            self
+        }
+        #[doc = "Sets the value of `remote_access_volume`."]
+        pub fn with_remote_access_volume(
+            mut self,
+            remote_access_volume: ::std::option::Option<u64>,
+        ) -> Self {
+            self.remote_access_volume = remote_access_volume;
+            self
+        }
+        #[doc = "Sets the value of `read_operations`."]
+        pub fn set_read_operations(
+            &mut self,
+            read_operations: ::std::option::Option<u64>,
+        ) -> &mut Self {
+            self.read_operations = read_operations;
+            self
+        }
+        #[doc = "Sets the value of `read_operations`."]
+        pub fn with_read_operations(mut self, read_operations: ::std::option::Option<u64>) -> Self {
+            self.read_operations = read_operations;
+            self
+        }
+        #[doc = "Sets the value of `write_operations`."]
+        pub fn set_write_operations(
+            &mut self,
+            write_operations: ::std::option::Option<u64>,
+        ) -> &mut Self {
+            self.write_operations = write_operations;
+            self
+        }
+        #[doc = "Sets the value of `write_operations`."]
+        pub fn with_write_operations(
+            mut self,
+            write_operations: ::std::option::Option<u64>,
+        ) -> Self {
+            self.write_operations = write_operations;
+            self
+        }
+    }
+    impl ::std::default::Default for SetOrganizationPerDeviceLimitsUpdate {
+        fn default() -> Self {
+            Self::new()
+        }
+    }
+    #[automatically_derived]
+    impl __serde::Serialize for SetOrganizationPerDeviceLimitsUpdate {
+        fn serialize<__S: __serde::Serializer>(
+            &self,
+            __serializer: __S,
+        ) -> ::std::result::Result<__S::Ok, __S::Error> {
+            let mut __record = __sidex_serde::ser::RecordSerializer::new(
+                __serializer,
+                "SetOrganizationPerDeviceLimitsUpdate",
+                4usize,
+            )?;
+            __record.serialize_optional_field(
+                "properties",
+                ::core::option::Option::as_ref(&self.properties),
+            )?;
+            __record.serialize_optional_field(
+                "remoteAccessVolume",
+                ::core::option::Option::as_ref(&self.remote_access_volume),
+            )?;
+            __record.serialize_optional_field(
+                "readOperations",
+                ::core::option::Option::as_ref(&self.read_operations),
+            )?;
+            __record.serialize_optional_field(
+                "writeOperations",
+                ::core::option::Option::as_ref(&self.write_operations),
+            )?;
+            __record.end()
+        }
+    }
+    #[automatically_derived]
+    impl<'de> __serde::Deserialize<'de> for SetOrganizationPerDeviceLimitsUpdate {
+        fn deserialize<__D: __serde::Deserializer<'de>>(
+            __deserializer: __D,
+        ) -> ::std::result::Result<Self, __D::Error> {
+            #[doc(hidden)]
+            struct __Visitor {
+                __phantom_vars: ::core::marker::PhantomData<fn(&())>,
+            }
+            impl<'de> __serde::de::Visitor<'de> for __Visitor {
+                type Value = SetOrganizationPerDeviceLimitsUpdate;
+                fn expecting(
+                    &self,
+                    __formatter: &mut ::core::fmt::Formatter,
+                ) -> ::core::fmt::Result {
+                    ::core::fmt::Formatter::write_str(
+                        __formatter,
+                        "record SetOrganizationPerDeviceLimitsUpdate",
+                    )
+                }
+                #[inline]
+                fn visit_seq<__A>(
+                    self,
+                    mut __seq: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::SeqAccess<'de>,
+                {
+                    let __field0 = match __serde::de::SeqAccess::next_element::<
+                        ::std::option::Option<u64>,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(0usize, &"record with 4 fields"),
+                            );
+                        }
+                    };
+                    let __field1 = match __serde::de::SeqAccess::next_element::<
+                        ::std::option::Option<u64>,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(1usize, &"record with 4 fields"),
+                            );
+                        }
+                    };
+                    let __field2 = match __serde::de::SeqAccess::next_element::<
+                        ::std::option::Option<u64>,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(2usize, &"record with 4 fields"),
+                            );
+                        }
+                    };
+                    let __field3 = match __serde::de::SeqAccess::next_element::<
+                        ::std::option::Option<u64>,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(3usize, &"record with 4 fields"),
+                            );
+                        }
+                    };
+                    ::core::result::Result::Ok(SetOrganizationPerDeviceLimitsUpdate {
+                        properties: __field0,
+                        remote_access_volume: __field1,
+                        read_operations: __field2,
+                        write_operations: __field3,
+                    })
+                }
+                #[inline]
+                fn visit_map<__A>(
+                    self,
+                    mut __map: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::MapAccess<'de>,
+                {
+                    #[doc(hidden)]
+                    const __IDENTIFIERS: &'static [&'static str] = &[
+                        "properties",
+                        "remoteAccessVolume",
+                        "readOperations",
+                        "writeOperations",
+                    ];
+                    #[doc(hidden)]
+                    const __EXPECTING_IDENTIFIERS: &'static str = "an identifier in [\"properties\", \"remoteAccessVolume\", \"readOperations\", \"writeOperations\"]";
+                    #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
+                    #[doc(hidden)]
+                    enum __Identifier {
+                        __Identifier0,
+                        __Identifier1,
+                        __Identifier2,
+                        __Identifier3,
+                        __Unknown,
+                    }
+                    #[doc(hidden)]
+                    struct __IdentifierVisitor;
+                    impl<'de> __serde::de::Visitor<'de> for __IdentifierVisitor {
+                        type Value = __Identifier;
+                        fn expecting(
+                            &self,
+                            __formatter: &mut ::core::fmt::Formatter,
+                        ) -> ::core::fmt::Result {
+                            ::core::fmt::Formatter::write_str(__formatter, __EXPECTING_IDENTIFIERS)
+                        }
+                        fn visit_u64<__E>(
+                            self,
+                            __value: u64,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                0u64 => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                                1u64 => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                                2u64 => ::core::result::Result::Ok(__Identifier::__Identifier2),
+                                3u64 => ::core::result::Result::Ok(__Identifier::__Identifier3),
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_str<__E>(
+                            self,
+                            __value: &str,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                "properties" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
+                                }
+                                "remoteAccessVolume" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier1)
+                                }
+                                "readOperations" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier2)
+                                }
+                                "writeOperations" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier3)
+                                }
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_bytes<__E>(
+                            self,
+                            __value: &[u8],
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                b"properties" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
+                                }
+                                b"remoteAccessVolume" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier1)
+                                }
+                                b"readOperations" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier2)
+                                }
+                                b"writeOperations" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier3)
+                                }
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                    }
+                    impl<'de> __serde::Deserialize<'de> for __Identifier {
+                        #[inline]
+                        fn deserialize<__D>(
+                            __deserializer: __D,
+                        ) -> ::core::result::Result<Self, __D::Error>
+                        where
+                            __D: __serde::Deserializer<'de>,
+                        {
+                            __serde::Deserializer::deserialize_identifier(
+                                __deserializer,
+                                __IdentifierVisitor,
+                            )
+                        }
+                    }
+                    let mut __field0: ::core::option::Option<::std::option::Option<u64>> =
+                        ::core::option::Option::None;
+                    let mut __field1: ::core::option::Option<::std::option::Option<u64>> =
+                        ::core::option::Option::None;
+                    let mut __field2: ::core::option::Option<::std::option::Option<u64>> =
+                        ::core::option::Option::None;
+                    let mut __field3: ::core::option::Option<::std::option::Option<u64>> =
+                        ::core::option::Option::None;
+                    while let ::core::option::Option::Some(__key) =
+                        __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
+                    {
+                        match __key {
+                            __Identifier::__Identifier0 => {
+                                if ::core::option::Option::is_some(&__field0) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "properties",
+                                        ),
+                                    );
+                                }
+                                __field0 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<::std::option::Option<u64>>(
+                                        &mut __map,
+                                    )?,
+                                );
+                            }
+                            __Identifier::__Identifier1 => {
+                                if ::core::option::Option::is_some(&__field1) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "remoteAccessVolume",
+                                        ),
+                                    );
+                                }
+                                __field1 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<::std::option::Option<u64>>(
+                                        &mut __map,
+                                    )?,
+                                );
+                            }
+                            __Identifier::__Identifier2 => {
+                                if ::core::option::Option::is_some(&__field2) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "readOperations",
+                                        ),
+                                    );
+                                }
+                                __field2 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<::std::option::Option<u64>>(
+                                        &mut __map,
+                                    )?,
+                                );
+                            }
+                            __Identifier::__Identifier3 => {
+                                if ::core::option::Option::is_some(&__field3) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "writeOperations",
+                                        ),
+                                    );
+                                }
+                                __field3 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<::std::option::Option<u64>>(
+                                        &mut __map,
+                                    )?,
+                                );
+                            }
+                            _ => {
+                                __serde::de::MapAccess::next_value::<__serde::de::IgnoredAny>(
+                                    &mut __map,
+                                )?;
+                            }
+                        }
+                    }
+                    let __field0 = match __field0 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => ::core::option::Option::None,
+                    };
+                    let __field1 = match __field1 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => ::core::option::Option::None,
+                    };
+                    let __field2 = match __field2 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => ::core::option::Option::None,
+                    };
+                    let __field3 = match __field3 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => ::core::option::Option::None,
+                    };
+                    ::core::result::Result::Ok(SetOrganizationPerDeviceLimitsUpdate {
+                        properties: __field0,
+                        remote_access_volume: __field1,
+                        read_operations: __field2,
+                        write_operations: __field3,
+                    })
+                }
+            }
+            #[doc(hidden)]
+            const __FIELDS: &'static [&'static str] = &[
+                "properties",
+                "remoteAccessVolume",
+                "readOperations",
+                "writeOperations",
+            ];
+            __serde::Deserializer::deserialize_struct(
+                __deserializer,
+                "SetOrganizationPerDeviceLimitsUpdate",
+                __FIELDS,
+                __Visitor {
+                    __phantom_vars: ::core::marker::PhantomData,
+                },
+            )
+        }
+    }
+    #[doc = "Updates for organization daily limits.\n"]
+    #[derive(Clone, Debug)]
+    pub struct SetOrganizationDailyLimitsUpdate {
+        #[doc = "Per-device daily limit updates.\n"]
+        pub per_device: ::std::option::Option<SetOrganizationPerDeviceDailyLimitsUpdate>,
+    }
+    impl SetOrganizationDailyLimitsUpdate {
+        #[doc = "Creates a new [`SetOrganizationDailyLimitsUpdate`]."]
+        pub fn new() -> Self {
+            Self {
+                per_device: ::std::default::Default::default(),
+            }
+        }
+        #[doc = "Sets the value of `per_device`."]
+        pub fn set_per_device(
+            &mut self,
+            per_device: ::std::option::Option<SetOrganizationPerDeviceDailyLimitsUpdate>,
+        ) -> &mut Self {
+            self.per_device = per_device;
+            self
+        }
+        #[doc = "Sets the value of `per_device`."]
+        pub fn with_per_device(
+            mut self,
+            per_device: ::std::option::Option<SetOrganizationPerDeviceDailyLimitsUpdate>,
+        ) -> Self {
+            self.per_device = per_device;
+            self
+        }
+    }
+    impl ::std::default::Default for SetOrganizationDailyLimitsUpdate {
+        fn default() -> Self {
+            Self::new()
+        }
+    }
+    #[automatically_derived]
+    impl __serde::Serialize for SetOrganizationDailyLimitsUpdate {
+        fn serialize<__S: __serde::Serializer>(
+            &self,
+            __serializer: __S,
+        ) -> ::std::result::Result<__S::Ok, __S::Error> {
+            let mut __record = __sidex_serde::ser::RecordSerializer::new(
+                __serializer,
+                "SetOrganizationDailyLimitsUpdate",
+                1usize,
+            )?;
+            __record.serialize_optional_field(
+                "perDevice",
+                ::core::option::Option::as_ref(&self.per_device),
+            )?;
+            __record.end()
+        }
+    }
+    #[automatically_derived]
+    impl<'de> __serde::Deserialize<'de> for SetOrganizationDailyLimitsUpdate {
+        fn deserialize<__D: __serde::Deserializer<'de>>(
+            __deserializer: __D,
+        ) -> ::std::result::Result<Self, __D::Error> {
+            #[doc(hidden)]
+            struct __Visitor {
+                __phantom_vars: ::core::marker::PhantomData<fn(&())>,
+            }
+            impl<'de> __serde::de::Visitor<'de> for __Visitor {
+                type Value = SetOrganizationDailyLimitsUpdate;
+                fn expecting(
+                    &self,
+                    __formatter: &mut ::core::fmt::Formatter,
+                ) -> ::core::fmt::Result {
+                    ::core::fmt::Formatter::write_str(
+                        __formatter,
+                        "record SetOrganizationDailyLimitsUpdate",
+                    )
+                }
+                #[inline]
+                fn visit_seq<__A>(
+                    self,
+                    mut __seq: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::SeqAccess<'de>,
+                {
+                    let __field0 = match __serde::de::SeqAccess::next_element::<
+                        ::std::option::Option<SetOrganizationPerDeviceDailyLimitsUpdate>,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(0usize, &"record with 1 fields"),
+                            );
+                        }
+                    };
+                    ::core::result::Result::Ok(SetOrganizationDailyLimitsUpdate {
+                        per_device: __field0,
+                    })
+                }
+                #[inline]
+                fn visit_map<__A>(
+                    self,
+                    mut __map: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::MapAccess<'de>,
+                {
+                    #[doc(hidden)]
+                    const __IDENTIFIERS: &'static [&'static str] = &["perDevice"];
+                    #[doc(hidden)]
+                    const __EXPECTING_IDENTIFIERS: &'static str =
+                        "an identifier in [\"perDevice\"]";
+                    #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
+                    #[doc(hidden)]
+                    enum __Identifier {
+                        __Identifier0,
+                        __Unknown,
+                    }
+                    #[doc(hidden)]
+                    struct __IdentifierVisitor;
+                    impl<'de> __serde::de::Visitor<'de> for __IdentifierVisitor {
+                        type Value = __Identifier;
+                        fn expecting(
+                            &self,
+                            __formatter: &mut ::core::fmt::Formatter,
+                        ) -> ::core::fmt::Result {
+                            ::core::fmt::Formatter::write_str(__formatter, __EXPECTING_IDENTIFIERS)
+                        }
+                        fn visit_u64<__E>(
+                            self,
+                            __value: u64,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                0u64 => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_str<__E>(
+                            self,
+                            __value: &str,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                "perDevice" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
+                                }
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_bytes<__E>(
+                            self,
+                            __value: &[u8],
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                b"perDevice" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
+                                }
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                    }
+                    impl<'de> __serde::Deserialize<'de> for __Identifier {
+                        #[inline]
+                        fn deserialize<__D>(
+                            __deserializer: __D,
+                        ) -> ::core::result::Result<Self, __D::Error>
+                        where
+                            __D: __serde::Deserializer<'de>,
+                        {
+                            __serde::Deserializer::deserialize_identifier(
+                                __deserializer,
+                                __IdentifierVisitor,
+                            )
+                        }
+                    }
+                    let mut __field0: ::core::option::Option<
+                        ::std::option::Option<SetOrganizationPerDeviceDailyLimitsUpdate>,
+                    > = ::core::option::Option::None;
+                    while let ::core::option::Option::Some(__key) =
+                        __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
+                    {
+                        match __key {
+                            __Identifier::__Identifier0 => {
+                                if ::core::option::Option::is_some(&__field0) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "perDevice",
+                                        ),
+                                    );
+                                }
+                                __field0 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<
+                                        ::std::option::Option<
+                                            SetOrganizationPerDeviceDailyLimitsUpdate,
+                                        >,
+                                    >(&mut __map)?,
+                                );
+                            }
+                            _ => {
+                                __serde::de::MapAccess::next_value::<__serde::de::IgnoredAny>(
+                                    &mut __map,
+                                )?;
+                            }
+                        }
+                    }
+                    let __field0 = match __field0 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => ::core::option::Option::None,
+                    };
+                    ::core::result::Result::Ok(SetOrganizationDailyLimitsUpdate {
+                        per_device: __field0,
+                    })
+                }
+            }
+            #[doc(hidden)]
+            const __FIELDS: &'static [&'static str] = &["perDevice"];
+            __serde::Deserializer::deserialize_struct(
+                __deserializer,
+                "SetOrganizationDailyLimitsUpdate",
+                __FIELDS,
+                __Visitor {
+                    __phantom_vars: ::core::marker::PhantomData,
+                },
+            )
+        }
+    }
+    #[doc = "Updates for organization per-device daily limits.\n"]
+    #[derive(Clone, Debug)]
+    pub struct SetOrganizationPerDeviceDailyLimitsUpdate {
+        #[doc = "New effective daily limit for remote access volume per device.\n"]
+        pub remote_access_volume: ::std::option::Option<u64>,
+        #[doc = "New effective daily limit for read operations per device.\n"]
+        pub read_operations: ::std::option::Option<u64>,
+        #[doc = "New effective daily limit for write operations per device.\n"]
+        pub write_operations: ::std::option::Option<u64>,
+    }
+    impl SetOrganizationPerDeviceDailyLimitsUpdate {
+        #[doc = "Creates a new [`SetOrganizationPerDeviceDailyLimitsUpdate`]."]
+        pub fn new() -> Self {
+            Self {
+                remote_access_volume: ::std::default::Default::default(),
+                read_operations: ::std::default::Default::default(),
+                write_operations: ::std::default::Default::default(),
+            }
+        }
+        #[doc = "Sets the value of `remote_access_volume`."]
+        pub fn set_remote_access_volume(
+            &mut self,
+            remote_access_volume: ::std::option::Option<u64>,
+        ) -> &mut Self {
+            self.remote_access_volume = remote_access_volume;
+            self
+        }
+        #[doc = "Sets the value of `remote_access_volume`."]
+        pub fn with_remote_access_volume(
+            mut self,
+            remote_access_volume: ::std::option::Option<u64>,
+        ) -> Self {
+            self.remote_access_volume = remote_access_volume;
+            self
+        }
+        #[doc = "Sets the value of `read_operations`."]
+        pub fn set_read_operations(
+            &mut self,
+            read_operations: ::std::option::Option<u64>,
+        ) -> &mut Self {
+            self.read_operations = read_operations;
+            self
+        }
+        #[doc = "Sets the value of `read_operations`."]
+        pub fn with_read_operations(mut self, read_operations: ::std::option::Option<u64>) -> Self {
+            self.read_operations = read_operations;
+            self
+        }
+        #[doc = "Sets the value of `write_operations`."]
+        pub fn set_write_operations(
+            &mut self,
+            write_operations: ::std::option::Option<u64>,
+        ) -> &mut Self {
+            self.write_operations = write_operations;
+            self
+        }
+        #[doc = "Sets the value of `write_operations`."]
+        pub fn with_write_operations(
+            mut self,
+            write_operations: ::std::option::Option<u64>,
+        ) -> Self {
+            self.write_operations = write_operations;
+            self
+        }
+    }
+    impl ::std::default::Default for SetOrganizationPerDeviceDailyLimitsUpdate {
+        fn default() -> Self {
+            Self::new()
+        }
+    }
+    #[automatically_derived]
+    impl __serde::Serialize for SetOrganizationPerDeviceDailyLimitsUpdate {
+        fn serialize<__S: __serde::Serializer>(
+            &self,
+            __serializer: __S,
+        ) -> ::std::result::Result<__S::Ok, __S::Error> {
+            let mut __record = __sidex_serde::ser::RecordSerializer::new(
+                __serializer,
+                "SetOrganizationPerDeviceDailyLimitsUpdate",
+                3usize,
+            )?;
+            __record.serialize_optional_field(
+                "remoteAccessVolume",
+                ::core::option::Option::as_ref(&self.remote_access_volume),
+            )?;
+            __record.serialize_optional_field(
+                "readOperations",
+                ::core::option::Option::as_ref(&self.read_operations),
+            )?;
+            __record.serialize_optional_field(
+                "writeOperations",
+                ::core::option::Option::as_ref(&self.write_operations),
+            )?;
+            __record.end()
+        }
+    }
+    #[automatically_derived]
+    impl<'de> __serde::Deserialize<'de> for SetOrganizationPerDeviceDailyLimitsUpdate {
+        fn deserialize<__D: __serde::Deserializer<'de>>(
+            __deserializer: __D,
+        ) -> ::std::result::Result<Self, __D::Error> {
+            #[doc(hidden)]
+            struct __Visitor {
+                __phantom_vars: ::core::marker::PhantomData<fn(&())>,
+            }
+            impl<'de> __serde::de::Visitor<'de> for __Visitor {
+                type Value = SetOrganizationPerDeviceDailyLimitsUpdate;
+                fn expecting(
+                    &self,
+                    __formatter: &mut ::core::fmt::Formatter,
+                ) -> ::core::fmt::Result {
+                    ::core::fmt::Formatter::write_str(
+                        __formatter,
+                        "record SetOrganizationPerDeviceDailyLimitsUpdate",
+                    )
+                }
+                #[inline]
+                fn visit_seq<__A>(
+                    self,
+                    mut __seq: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::SeqAccess<'de>,
+                {
+                    let __field0 = match __serde::de::SeqAccess::next_element::<
+                        ::std::option::Option<u64>,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(0usize, &"record with 3 fields"),
+                            );
+                        }
+                    };
+                    let __field1 = match __serde::de::SeqAccess::next_element::<
+                        ::std::option::Option<u64>,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(1usize, &"record with 3 fields"),
+                            );
+                        }
+                    };
+                    let __field2 = match __serde::de::SeqAccess::next_element::<
+                        ::std::option::Option<u64>,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(2usize, &"record with 3 fields"),
+                            );
+                        }
+                    };
+                    ::core::result::Result::Ok(SetOrganizationPerDeviceDailyLimitsUpdate {
+                        remote_access_volume: __field0,
+                        read_operations: __field1,
+                        write_operations: __field2,
+                    })
+                }
+                #[inline]
+                fn visit_map<__A>(
+                    self,
+                    mut __map: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::MapAccess<'de>,
+                {
+                    #[doc(hidden)]
+                    const __IDENTIFIERS: &'static [&'static str] =
+                        &["remoteAccessVolume", "readOperations", "writeOperations"];
+                    #[doc(hidden)]
+                    const __EXPECTING_IDENTIFIERS: &'static str = "an identifier in [\"remoteAccessVolume\", \"readOperations\", \"writeOperations\"]";
+                    #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
+                    #[doc(hidden)]
+                    enum __Identifier {
+                        __Identifier0,
+                        __Identifier1,
+                        __Identifier2,
+                        __Unknown,
+                    }
+                    #[doc(hidden)]
+                    struct __IdentifierVisitor;
+                    impl<'de> __serde::de::Visitor<'de> for __IdentifierVisitor {
+                        type Value = __Identifier;
+                        fn expecting(
+                            &self,
+                            __formatter: &mut ::core::fmt::Formatter,
+                        ) -> ::core::fmt::Result {
+                            ::core::fmt::Formatter::write_str(__formatter, __EXPECTING_IDENTIFIERS)
+                        }
+                        fn visit_u64<__E>(
+                            self,
+                            __value: u64,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                0u64 => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                                1u64 => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                                2u64 => ::core::result::Result::Ok(__Identifier::__Identifier2),
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_str<__E>(
+                            self,
+                            __value: &str,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                "remoteAccessVolume" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
+                                }
+                                "readOperations" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier1)
+                                }
+                                "writeOperations" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier2)
+                                }
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_bytes<__E>(
+                            self,
+                            __value: &[u8],
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                b"remoteAccessVolume" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
+                                }
+                                b"readOperations" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier1)
+                                }
+                                b"writeOperations" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier2)
+                                }
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                    }
+                    impl<'de> __serde::Deserialize<'de> for __Identifier {
+                        #[inline]
+                        fn deserialize<__D>(
+                            __deserializer: __D,
+                        ) -> ::core::result::Result<Self, __D::Error>
+                        where
+                            __D: __serde::Deserializer<'de>,
+                        {
+                            __serde::Deserializer::deserialize_identifier(
+                                __deserializer,
+                                __IdentifierVisitor,
+                            )
+                        }
+                    }
+                    let mut __field0: ::core::option::Option<::std::option::Option<u64>> =
+                        ::core::option::Option::None;
+                    let mut __field1: ::core::option::Option<::std::option::Option<u64>> =
+                        ::core::option::Option::None;
+                    let mut __field2: ::core::option::Option<::std::option::Option<u64>> =
+                        ::core::option::Option::None;
+                    while let ::core::option::Option::Some(__key) =
+                        __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
+                    {
+                        match __key {
+                            __Identifier::__Identifier0 => {
+                                if ::core::option::Option::is_some(&__field0) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "remoteAccessVolume",
+                                        ),
+                                    );
+                                }
+                                __field0 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<::std::option::Option<u64>>(
+                                        &mut __map,
+                                    )?,
+                                );
+                            }
+                            __Identifier::__Identifier1 => {
+                                if ::core::option::Option::is_some(&__field1) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "readOperations",
+                                        ),
+                                    );
+                                }
+                                __field1 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<::std::option::Option<u64>>(
+                                        &mut __map,
+                                    )?,
+                                );
+                            }
+                            __Identifier::__Identifier2 => {
+                                if ::core::option::Option::is_some(&__field2) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "writeOperations",
+                                        ),
+                                    );
+                                }
+                                __field2 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<::std::option::Option<u64>>(
+                                        &mut __map,
+                                    )?,
+                                );
+                            }
+                            _ => {
+                                __serde::de::MapAccess::next_value::<__serde::de::IgnoredAny>(
+                                    &mut __map,
+                                )?;
+                            }
+                        }
+                    }
+                    let __field0 = match __field0 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => ::core::option::Option::None,
+                    };
+                    let __field1 = match __field1 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => ::core::option::Option::None,
+                    };
+                    let __field2 = match __field2 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => ::core::option::Option::None,
+                    };
+                    ::core::result::Result::Ok(SetOrganizationPerDeviceDailyLimitsUpdate {
+                        remote_access_volume: __field0,
+                        read_operations: __field1,
+                        write_operations: __field2,
+                    })
+                }
+            }
+            #[doc(hidden)]
+            const __FIELDS: &'static [&'static str] =
+                &["remoteAccessVolume", "readOperations", "writeOperations"];
+            __serde::Deserializer::deserialize_struct(
+                __deserializer,
+                "SetOrganizationPerDeviceDailyLimitsUpdate",
+                __FIELDS,
+                __Visitor {
+                    __phantom_vars: ::core::marker::PhantomData,
+                },
+            )
+        }
+    }
 }
 pub mod outputs {
     #![doc = "Additional output types for actions.\n"]

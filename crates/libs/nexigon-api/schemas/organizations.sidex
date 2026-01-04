@@ -256,3 +256,135 @@ record OrganizationInvitationCreatedEvent {
     /// Email address of the invited user.
     email: string,
 }
+
+/// Effective and maximal limit for a resource.
+#[rust(derive(Default))]
+record ResourceLimit {
+    /// The effective limit set by the organization administrator.
+    effective: u64,
+    /// The maximal limit defined by the subscription plan.
+    max: u64,
+}
+
+/// Resource limits for an organization.
+#[rust(derive(Default))]
+record OrganizationLimits {
+    /// Seat limits.
+    seats: ResourceLimit,
+    /// Project limits.
+    projects: ResourceLimit,
+    /// Device limits.
+    devices: ResourceLimit,
+    /// Repository limits.
+    repositories: ResourceLimit,
+    /// Package limits.
+    packages: ResourceLimit,
+    /// Per-device limits.
+    per_device: OrganizationPerDeviceLimits,
+}
+
+/// Per-device limits for an organization.
+#[rust(derive(Default))]
+record OrganizationPerDeviceLimits {
+    /// Property limits.
+    properties: ResourceLimit,
+    /// Remote access volume limits (combined incoming and outgoing traffic).
+    remote_access_volume: ResourceLimit,
+    /// Read operations limits.
+    read_operations: ResourceLimit,
+    /// Write operations limits.
+    write_operations: ResourceLimit,
+}
+
+/// Daily resource limits for an organization.
+#[rust(derive(Default))]
+record OrganizationDailyLimits {
+    /// Per-device daily limits.
+    per_device: OrganizationPerDeviceDailyLimits,
+}
+
+/// Per-device daily limits for an organization.
+#[rust(derive(Default))]
+record OrganizationPerDeviceDailyLimits {
+    /// Remote access volume daily limit.
+    remote_access_volume: ResourceLimit,
+    /// Read operations daily limit.
+    read_operations: ResourceLimit,
+    /// Write operations daily limit.
+    write_operations: ResourceLimit,
+}
+
+/// Get the resource limits of an organization.
+///
+/// Returns both the effective limits (set by organization administrators) and the
+/// maximal limits defined by the subscription plan.
+record GetOrganizationLimitsAction {
+    /// ID of the organization.
+    organization_id: OrganizationId,
+}
+
+/// Output of getting the resource limits of an organization.
+record GetOrganizationLimitsOutput {
+    /// Resource limits (billing period).
+    limits: OrganizationLimits,
+    /// Daily limits.
+    daily_limits: OrganizationDailyLimits,
+}
+
+/// Set the resource limits of an organization.
+///
+/// Organization administrators can set effective limits up to the maximal limits
+/// defined by their subscription plan. Setting a higher limit may result in
+/// overage charges once actual usage exceeds the included amount.
+record SetOrganizationLimitsAction {
+    /// ID of the organization.
+    organization_id: OrganizationId,
+    /// Resource limits to update (billing period).
+    limits?: SetOrganizationLimitsUpdate,
+    /// Daily limits to update.
+    daily_limits?: SetOrganizationDailyLimitsUpdate,
+}
+
+/// Updates for organization resource limits.
+record SetOrganizationLimitsUpdate {
+    /// New effective limit for seats.
+    seats?: u64,
+    /// New effective limit for projects.
+    projects?: u64,
+    /// New effective limit for devices.
+    devices?: u64,
+    /// New effective limit for repositories.
+    repositories?: u64,
+    /// New effective limit for packages.
+    packages?: u64,
+    /// Per-device limit updates.
+    per_device?: SetOrganizationPerDeviceLimitsUpdate,
+}
+
+/// Updates for organization per-device limits.
+record SetOrganizationPerDeviceLimitsUpdate {
+    /// New effective limit for properties per device.
+    properties?: u64,
+    /// New effective limit for remote access volume per device.
+    remote_access_volume?: u64,
+    /// New effective limit for read operations per device.
+    read_operations?: u64,
+    /// New effective limit for write operations per device.
+    write_operations?: u64,
+}
+
+/// Updates for organization daily limits.
+record SetOrganizationDailyLimitsUpdate {
+    /// Per-device daily limit updates.
+    per_device?: SetOrganizationPerDeviceDailyLimitsUpdate,
+}
+
+/// Updates for organization per-device daily limits.
+record SetOrganizationPerDeviceDailyLimitsUpdate {
+    /// New effective daily limit for remote access volume per device.
+    remote_access_volume?: u64,
+    /// New effective daily limit for read operations per device.
+    read_operations?: u64,
+    /// New effective daily limit for write operations per device.
+    write_operations?: u64,
+}
