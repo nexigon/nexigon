@@ -113,6 +113,7 @@ macro_rules! with_actions {
             // ## Organization Members
             ("organizations_AddMember", AddOrganizationMember, organizations::AddOrganizationMemberAction, outputs::Empty),
             ("organizations_RemoveMember", RemoveOrganizationMember, organizations::RemoveOrganizationMemberAction, outputs::Empty),
+            ("organizations_SetMemberIsAdmin", SetOrganizationMemberIsAdmin, organizations::SetOrganizationMemberIsAdminAction, outputs::Empty),
             ("organizations_InviteMember", InviteOrganizationMember, organizations::InviteOrganizationMemberAction, organizations::InviteOrganizationMemberOutput),
             ("organizations_DeleteInvitation", DeleteOrganizationInvitation, organizations::DeleteOrganizationInvitationAction, outputs::Empty),
             // ## Organization Audit Log
@@ -129,6 +130,7 @@ macro_rules! with_actions {
             ("projects_QueryDeploymentTokens", QueryProjectDeploymentTokens, projects::QueryProjectDeploymentTokensAction, projects::QueryProjectDeploymentTokensOutput),
             ("projects_QueryLinkedRepositories", QueryProjectRepositories, projects::QueryProjectRepositoriesAction, projects::QueryProjectRepositoriesOutput),
             ("projects_SetOrganization", SetProjectOrganization, projects::SetProjectOrganizationAction, outputs::Empty),
+            ("projects_SetName", SetProjectName, projects::SetProjectNameAction, outputs::Empty),
             // ## Deployment Tokens
             ("projects_CreateDeploymentToken", CreateDeploymentToken, projects::CreateDeploymentTokenAction, projects::CreateDeploymentTokenOutput),
             ("projects_DeleteDeploymentToken", DeleteDeploymentToken, projects::DeleteDeploymentTokenAction, outputs::Empty),
@@ -177,6 +179,8 @@ macro_rules! with_actions {
             ("repositories_Delete", DeleteRepository, repositories::DeleteRepositoryAction, outputs::Empty),
             ("repositories_SetOrganization", SetRepositoryOrganization, repositories::SetRepositoryOrganizationAction, outputs::Empty),
             ("repositories_SetVisibility", SetRepositoryVisibility, repositories::SetRepositoryVisibilityAction, outputs::Empty),
+            ("repositories_SetDisplayName", SetRepositoryDisplayName, repositories::SetRepositoryDisplayNameAction, outputs::Empty),
+            ("repositories_SetPublicName", SetRepositoryPublicName, repositories::SetRepositoryPublicNameAction, repositories::SetRepositoryPublicNameOutput),
             ("repositories_QueryPackages", QueryRepositoryPackages, repositories::QueryRepositoryPackagesAction, repositories::QueryRepositoryPackagesOutput),
             ("repositories_QueryAssets", QueryRepositoryAssets, repositories::QueryRepositoryAssetsAction, repositories::QueryRepositoryAssetsOutput),
             ("repositories_QueryLinkedProjects", QueryRepositoryProjects, repositories::QueryRepositoryProjectsAction, repositories::QueryRepositoryProjectsOutput),
@@ -185,12 +189,14 @@ macro_rules! with_actions {
             ("repositories_GetPackageDetails", GetPackageDetails, repositories::GetPackageDetailsAction, repositories::GetPackageDetailsOutput),
             ("repositories_CreatePackage", CreatePackage, repositories::CreatePackageAction, repositories::CreatePackageOutput),
             ("repositories_DeletePackage", DeletePackage, repositories::DeletePackageAction, outputs::Empty),
+            ("repositories_SetPackageName", SetPackageName, repositories::SetPackageNameAction, repositories::SetPackageNameOutput),
             ("repositories_QueryPackageVersions", QueryPackageVersions, repositories::QueryPackageVersionsAction, repositories::QueryPackageVersionsOutput),
             // ## Package Versions
             ("repositories_ResolveVersionByPath", ResolvePackageVersionByPath, repositories::ResolvePackageVersionByPathAction, repositories::ResolvePackageVersionByPathOutput),
             ("repositories_GetVersionDetails", GetPackageVersionDetails, repositories::GetPackageVersionDetailsAction, repositories::GetPackageVersionDetailsOutput),
             ("repositories_CreateVersion", CreatePackageVersion, repositories::CreatePackageVersionAction, repositories::CreatePackageVersionOutput),
             ("repositories_DeleteVersion", DeletePackageVersion, repositories::DeletePackageVersionAction, outputs::Empty),
+            ("repositories_SetVersionName", SetPackageVersionName, repositories::SetPackageVersionNameAction, outputs::Empty),
             ("repositories_AddVersionAsset", AddPackageVersionAsset, repositories::AddPackageVersionAssetAction, repositories::AddPackageVersionAssetOutput),
             ("repositories_RemoveVersionAsset", RemovePackageVersionAsset, repositories::RemovePackageVersionAssetAction, outputs::Empty),
             ("repositories_TagVersion", TagPackageVersion, repositories::TagPackageVersionAction, outputs::Empty),

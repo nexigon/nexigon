@@ -151,6 +151,33 @@ record SetRepositoryVisibilityAction {
     visibility: RepositoryVisibility,
 }
 
+/// Set the display name of a repository.
+record SetRepositoryDisplayNameAction {
+    /// ID of the repository.
+    repository_id: RepositoryId,
+    /// New display name of the repository.
+    display_name?: string,
+}
+
+/// Set the public name of a repository.
+/// 
+/// Note: Setting the public name requires the `public_repositories` subscription feature.
+record SetRepositoryPublicNameAction {
+    /// ID of the repository.
+    repository_id: RepositoryId,
+    /// New public name of the repository.
+    public_name: string,
+}
+
+/// Output of setting the public name of a repository.
+#[json(tag = "result")]
+variant SetRepositoryPublicNameOutput {
+    /// A repository with the same public name already exists.
+    NameAlreadyExists,
+    /// The public name has been set.
+    Success,
+}
+
 /// Query the packages of a repository.
 record QueryRepositoryPackagesAction {
     /// ID of the repository.
@@ -283,6 +310,23 @@ record CreatePackageSuccess {
 record DeletePackageAction {
     /// ID of the package.
     package_id: PackageId,
+}
+
+/// Set the name of a package.
+record SetPackageNameAction {
+    /// ID of the package.
+    package_id: PackageId,
+    /// New name of the package.
+    name: string,
+}
+
+/// Output of setting the name of a package.
+#[json(tag = "result")]
+variant SetPackageNameOutput {
+    /// A package with the same name already exists.
+    NameAlreadyExists,
+    /// The name has been set.
+    Success,
 }
 
 /// Query the versions of a package.
@@ -423,6 +467,14 @@ record CreatePackageVersionSuccess {
 record DeletePackageVersionAction {
     /// ID of the package version.
     version_id: PackageVersionId,
+}
+
+/// Set the name of a package version.
+record SetPackageVersionNameAction {
+    /// ID of the package version.
+    version_id: PackageVersionId,
+    /// New name of the package version.
+    name?: string,
 }
 
 /// Add an assert to a package version.

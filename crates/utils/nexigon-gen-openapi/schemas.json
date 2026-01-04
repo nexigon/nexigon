@@ -2288,6 +2288,27 @@
     ],
     "unevaluatedProperties": false
   },
+  "nexigon_api.organizations.SetOrganizationMemberIsAdminAction": {
+    "type": "object",
+    "description": "Set whether the user is an administrator of the organization.",
+    "properties": {
+      "organizationId": {
+        "$ref": "#/components/schemas/nexigon_api.organizations.OrganizationId"
+      },
+      "userId": {
+        "$ref": "#/components/schemas/nexigon_api.users.UserId"
+      },
+      "isAdmin": {
+        "type": "boolean"
+      }
+    },
+    "required": [
+      "organizationId",
+      "userId",
+      "isAdmin"
+    ],
+    "unevaluatedProperties": false
+  },
   "nexigon_api.outputs.Empty": {
     "type": "object",
     "description": "Empty output.",
@@ -2868,6 +2889,23 @@
     "required": [
       "tokenId",
       "flags"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.projects.SetProjectNameAction": {
+    "type": "object",
+    "description": "Set the name of a project.",
+    "properties": {
+      "projectId": {
+        "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+      },
+      "name": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "projectId",
+      "name"
     ],
     "unevaluatedProperties": false
   },
@@ -4267,6 +4305,66 @@
       }
     ]
   },
+  "nexigon_api.repositories.SetPackageNameAction": {
+    "type": "object",
+    "description": "Set the name of a package.",
+    "properties": {
+      "packageId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.PackageId"
+      },
+      "name": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "packageId",
+      "name"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.repositories.SetPackageNameOutput": {
+    "enum": [
+      {
+        "result": "NameAlreadyExists"
+      },
+      {
+        "result": "Success"
+      }
+    ],
+    "description": "Output of setting the name of a package."
+  },
+  "nexigon_api.repositories.SetPackageVersionNameAction": {
+    "type": "object",
+    "description": "Set the name of a package version.",
+    "properties": {
+      "versionId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.PackageVersionId"
+      },
+      "name": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "versionId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.repositories.SetRepositoryDisplayNameAction": {
+    "type": "object",
+    "description": "Set the display name of a repository.",
+    "properties": {
+      "repositoryId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryId"
+      },
+      "displayName": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "repositoryId"
+    ],
+    "unevaluatedProperties": false
+  },
   "nexigon_api.repositories.SetRepositoryOrganizationAction": {
     "type": "object",
     "description": "Set the organization of a repository.",
@@ -4283,6 +4381,34 @@
       "organizationId"
     ],
     "unevaluatedProperties": false
+  },
+  "nexigon_api.repositories.SetRepositoryPublicNameAction": {
+    "type": "object",
+    "description": "Set the public name of a repository.\n\nNote: Setting the public name requires the `public_repositories` subscription feature.",
+    "properties": {
+      "repositoryId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryId"
+      },
+      "publicName": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "repositoryId",
+      "publicName"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.repositories.SetRepositoryPublicNameOutput": {
+    "enum": [
+      {
+        "result": "NameAlreadyExists"
+      },
+      {
+        "result": "Success"
+      }
+    ],
+    "description": "Output of setting the public name of a repository."
   },
   "nexigon_api.repositories.SetRepositoryS3ConfigAction": {
     "type": "object",

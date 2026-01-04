@@ -3,6 +3,9 @@
 #[allow(warnings)]
 mod generated;
 pub use generated::*;
+use nexigon_ids::ids::UserId;
+
+use crate::types::actor::Actor;
 
 impl std::str::FromStr for devices::DeviceEventSeverity {
     type Err = &'static str;
@@ -52,3 +55,13 @@ impl std::fmt::Display for errors::ActionError {
 }
 
 impl std::error::Error for errors::ActionError {}
+
+impl Actor {
+    pub fn user_id(&self) -> Option<&UserId> {
+        match self {
+            Actor::User(user) => Some(&user.user_id),
+            Actor::UserToken(user) => Some(&user.user_id),
+            _ => None,
+        }
+    }
+}

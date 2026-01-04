@@ -159,6 +159,16 @@ record RemoveOrganizationMemberAction {
     user_id: UserId,
 }
 
+/// Set whether the user is an administrator of the organization.
+record SetOrganizationMemberIsAdminAction {
+    /// ID of the organization.
+    organization_id: OrganizationId,
+    /// ID of the user.
+    user_id: UserId,
+    /// Whether the user should be an administrator of the organization.
+    is_admin: bool,
+}
+
 /// Invite a user to an organization.
 record InviteOrganizationMemberAction {
     /// ID of the organization.

@@ -55,6 +55,14 @@ record GetProjectDetailsOutput {
     device_count: u32,
 }
 
+/// Set the name of a project.
+record SetProjectNameAction {
+    /// ID of the project.
+    project_id: ProjectId,
+    /// New name of the project.
+    name: string,
+}
+
 /// Create a new project.
 record CreateProjectAction {
     /// Organization to create the project in.
