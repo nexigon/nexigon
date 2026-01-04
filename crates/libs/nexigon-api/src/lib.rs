@@ -115,6 +115,8 @@ macro_rules! with_actions {
             ("organizations_RemoveMember", RemoveOrganizationMember, organizations::RemoveOrganizationMemberAction, outputs::Empty),
             ("organizations_InviteMember", InviteOrganizationMember, organizations::InviteOrganizationMemberAction, organizations::InviteOrganizationMemberOutput),
             ("organizations_DeleteInvitation", DeleteOrganizationInvitation, organizations::DeleteOrganizationInvitationAction, outputs::Empty),
+            // ## Organization Audit Log
+            ("organizations_QueryAuditLog", QueryOrganizationAuditLog, organizations::QueryOrganizationAuditLogAction, organizations::QueryOrganizationAuditLogOutput),
             // ## Organization Resources
             ("organizations_GetResourceUsage", GetOrganizationResourceUsage, organizations::GetOrganizationResourceUsageAction, organizations::GetOrganizationResourceUsageOutput),
 

@@ -1,5 +1,6 @@
 //! Actions and types related to organizations.
 
+import audit::AuditLogEvent
 import projects::ProjectId
 import repositories::RepositoryId
 import resources::ResourceUsage
@@ -192,6 +193,18 @@ record GetOrganizationResourceUsageOutput {
     devices: ResourceUsage,
     repositories: ResourceUsage,
     packages: ResourceUsage,
+}
+
+/// Query the audit log of an organization.
+record QueryOrganizationAuditLogAction {
+    /// ID of the organization.
+    organization_id: OrganizationId,
+}
+
+/// Output of querying the audit log of an organization.
+record QueryOrganizationAuditLogOutput {
+    /// List of audit log events.
+    events: [AuditLogEvent],
 }
 
 /// Event indicating the creation of an organization.

@@ -2005,6 +2005,35 @@
     ],
     "unevaluatedProperties": false
   },
+  "nexigon_api.organizations.QueryOrganizationAuditLogAction": {
+    "type": "object",
+    "description": "Query the audit log of an organization.",
+    "properties": {
+      "organizationId": {
+        "$ref": "#/components/schemas/nexigon_api.organizations.OrganizationId"
+      }
+    },
+    "required": [
+      "organizationId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.organizations.QueryOrganizationAuditLogOutput": {
+    "type": "object",
+    "description": "Output of querying the audit log of an organization.",
+    "properties": {
+      "events": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.audit.AuditLogEvent"
+        }
+      }
+    },
+    "required": [
+      "events"
+    ],
+    "unevaluatedProperties": false
+  },
   "nexigon_api.organizations.QueryOrganizationInvitationsAction": {
     "type": "object",
     "description": "Query the invitations of an organization.",

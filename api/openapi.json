@@ -1122,6 +1122,37 @@
         }
       }
     },
+    "/api/v1/actions/invoke/organizations_QueryAuditLog": {
+      "post": {
+        "tags": [
+          "organizations"
+        ],
+        "summary": "QueryAuditLog",
+        "description": "Query the audit log of an organization.",
+        "operationId": "organizations_QueryAuditLog",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/nexigon_api.organizations.QueryOrganizationAuditLogAction"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/nexigon_api.organizations.QueryOrganizationAuditLogOutput"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/actions/invoke/organizations_GetResourceUsage": {
       "post": {
         "tags": [
@@ -5538,6 +5569,34 @@
         "required": [
           "organizationId",
           "userId"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.organizations.QueryOrganizationAuditLogAction": {
+        "type": "object",
+        "properties": {
+          "organizationId": {
+            "$ref": "#/components/schemas/nexigon_api.organizations.OrganizationId"
+          }
+        },
+        "required": [
+          "organizationId"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.organizations.QueryOrganizationAuditLogOutput": {
+        "type": "object",
+        "description": "Output of querying the audit log of an organization.",
+        "properties": {
+          "events": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/nexigon_api.audit.AuditLogEvent"
+            }
+          }
+        },
+        "required": [
+          "events"
         ],
         "unevaluatedProperties": false
       },
