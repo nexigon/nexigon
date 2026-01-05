@@ -258,12 +258,11 @@ record OrganizationInvitationCreatedEvent {
 }
 
 /// Effective and maximal limit for a resource.
-#[rust(derive(Default))]
 record ResourceLimit {
     /// The effective limit set by the organization administrator.
-    effective: u64,
+    effective?: u64,
     /// The maximal limit defined by the subscription plan.
-    max: u64,
+    max?: u64,
 }
 
 /// Resource limits for an organization.

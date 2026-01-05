@@ -2423,10 +2423,7 @@
         "format": "uint64"
       }
     },
-    "required": [
-      "effective",
-      "max"
-    ],
+    "required": [],
     "unevaluatedProperties": false
   },
   "nexigon_api.organizations.SetOrganizationDailyLimitsUpdate": {

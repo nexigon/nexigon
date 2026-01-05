@@ -32891,37 +32891,45 @@ pub mod organizations {
         }
     }
     #[doc = "Effective and maximal limit for a resource.\n"]
-    #[derive(Clone, Debug, Default)]
+    #[derive(Clone, Debug)]
     pub struct ResourceLimit {
         #[doc = "The effective limit set by the organization administrator.\n"]
-        pub effective: u64,
+        pub effective: ::std::option::Option<u64>,
         #[doc = "The maximal limit defined by the subscription plan.\n"]
-        pub max: u64,
+        pub max: ::std::option::Option<u64>,
     }
     impl ResourceLimit {
         #[doc = "Creates a new [`ResourceLimit`]."]
-        pub fn new(effective: u64, max: u64) -> Self {
-            Self { effective, max }
+        pub fn new() -> Self {
+            Self {
+                effective: ::std::default::Default::default(),
+                max: ::std::default::Default::default(),
+            }
         }
         #[doc = "Sets the value of `effective`."]
-        pub fn set_effective(&mut self, effective: u64) -> &mut Self {
+        pub fn set_effective(&mut self, effective: ::std::option::Option<u64>) -> &mut Self {
             self.effective = effective;
             self
         }
         #[doc = "Sets the value of `effective`."]
-        pub fn with_effective(mut self, effective: u64) -> Self {
+        pub fn with_effective(mut self, effective: ::std::option::Option<u64>) -> Self {
             self.effective = effective;
             self
         }
         #[doc = "Sets the value of `max`."]
-        pub fn set_max(&mut self, max: u64) -> &mut Self {
+        pub fn set_max(&mut self, max: ::std::option::Option<u64>) -> &mut Self {
             self.max = max;
             self
         }
         #[doc = "Sets the value of `max`."]
-        pub fn with_max(mut self, max: u64) -> Self {
+        pub fn with_max(mut self, max: ::std::option::Option<u64>) -> Self {
             self.max = max;
             self
+        }
+    }
+    impl ::std::default::Default for ResourceLimit {
+        fn default() -> Self {
+            Self::new()
         }
     }
     #[automatically_derived]
@@ -32932,8 +32940,11 @@ pub mod organizations {
         ) -> ::std::result::Result<__S::Ok, __S::Error> {
             let mut __record =
                 __sidex_serde::ser::RecordSerializer::new(__serializer, "ResourceLimit", 2usize)?;
-            __record.serialize_field("effective", &self.effective)?;
-            __record.serialize_field("max", &self.max)?;
+            __record.serialize_optional_field(
+                "effective",
+                ::core::option::Option::as_ref(&self.effective),
+            )?;
+            __record.serialize_optional_field("max", ::core::option::Option::as_ref(&self.max))?;
             __record.end()
         }
     }
@@ -32962,7 +32973,10 @@ pub mod organizations {
                 where
                     __A: __serde::de::SeqAccess<'de>,
                 {
-                    let __field0 = match __serde::de::SeqAccess::next_element::<u64>(&mut __seq)? {
+                    let __field0 = match __serde::de::SeqAccess::next_element::<
+                        ::std::option::Option<u64>,
+                    >(&mut __seq)?
+                    {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
@@ -32970,7 +32984,10 @@ pub mod organizations {
                             );
                         }
                     };
-                    let __field1 = match __serde::de::SeqAccess::next_element::<u64>(&mut __seq)? {
+                    let __field1 = match __serde::de::SeqAccess::next_element::<
+                        ::std::option::Option<u64>,
+                    >(&mut __seq)?
+                    {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
@@ -33071,8 +33088,10 @@ pub mod organizations {
                             )
                         }
                     }
-                    let mut __field0: ::core::option::Option<u64> = ::core::option::Option::None;
-                    let mut __field1: ::core::option::Option<u64> = ::core::option::Option::None;
+                    let mut __field0: ::core::option::Option<::std::option::Option<u64>> =
+                        ::core::option::Option::None;
+                    let mut __field1: ::core::option::Option<::std::option::Option<u64>> =
+                        ::core::option::Option::None;
                     while let ::core::option::Option::Some(__key) =
                         __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
                     {
@@ -33086,7 +33105,9 @@ pub mod organizations {
                                     );
                                 }
                                 __field0 = ::core::option::Option::Some(
-                                    __serde::de::MapAccess::next_value::<u64>(&mut __map)?,
+                                    __serde::de::MapAccess::next_value::<::std::option::Option<u64>>(
+                                        &mut __map,
+                                    )?,
                                 );
                             }
                             __Identifier::__Identifier1 => {
@@ -33096,7 +33117,9 @@ pub mod organizations {
                                     );
                                 }
                                 __field1 = ::core::option::Option::Some(
-                                    __serde::de::MapAccess::next_value::<u64>(&mut __map)?,
+                                    __serde::de::MapAccess::next_value::<::std::option::Option<u64>>(
+                                        &mut __map,
+                                    )?,
                                 );
                             }
                             _ => {
@@ -33108,19 +33131,11 @@ pub mod organizations {
                     }
                     let __field0 = match __field0 {
                         ::core::option::Option::Some(__value) => __value,
-                        ::core::option::Option::None => {
-                            return ::core::result::Result::Err(
-                                <__A::Error as __serde::de::Error>::missing_field("effective"),
-                            );
-                        }
+                        ::core::option::Option::None => ::core::option::Option::None,
                     };
                     let __field1 = match __field1 {
                         ::core::option::Option::Some(__value) => __value,
-                        ::core::option::Option::None => {
-                            return ::core::result::Result::Err(
-                                <__A::Error as __serde::de::Error>::missing_field("max"),
-                            );
-                        }
+                        ::core::option::Option::None => ::core::option::Option::None,
                     };
                     ::core::result::Result::Ok(ResourceLimit {
                         effective: __field0,
