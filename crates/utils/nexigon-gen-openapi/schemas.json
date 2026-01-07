@@ -3477,6 +3477,9 @@
       "packageId": {
         "$ref": "#/components/schemas/nexigon_api.repositories.PackageId"
       },
+      "name": {
+        "type": "string"
+      },
       "tags": {
         "type": "array",
         "items": {
@@ -3743,6 +3746,9 @@
       "packageId": {
         "$ref": "#/components/schemas/nexigon_api.repositories.PackageId"
       },
+      "name": {
+        "type": "string"
+      },
       "assets": {
         "type": "array",
         "items": {
@@ -4000,6 +4006,9 @@
     "properties": {
       "versionId": {
         "$ref": "#/components/schemas/nexigon_api.repositories.PackageVersionId"
+      },
+      "name": {
+        "type": "string"
       },
       "createdAt": {
         "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"

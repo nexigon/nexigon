@@ -347,6 +347,8 @@ record QueryPackageVersionsOutput {
 record QueryPackageVersionsItem {
     /// ID of the package version.
     version_id: PackageVersionId,
+    /// Optional name of the version.
+    name?: string,
     /// Timestamp when the package version was created.
     created_at: Timestamp,
     /// Tags of the package version.
@@ -438,6 +440,8 @@ record GetPackageVersionDetailsOutput {
     repository_id: RepositoryId,
     /// ID of the package.
     package_id: PackageId,
+    /// Optional name of the version.
+    name?: string,
     /// Assets of the version.
     assets: [PackageVersionAsset],
     /// Tags of the version.
@@ -448,6 +452,8 @@ record GetPackageVersionDetailsOutput {
 record CreatePackageVersionAction {
     /// ID of the package.
     package_id: PackageId,
+    /// Optional name of the version.
+    name?: string,
     /// Tags to add to the package version.
     tags?: [AddTagItem],
 }

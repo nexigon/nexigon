@@ -58356,6 +58356,8 @@ pub mod repositories {
     pub struct QueryPackageVersionsItem {
         #[doc = "ID of the package version.\n"]
         pub version_id: PackageVersionId,
+        #[doc = "Optional name of the version.\n"]
+        pub name: ::std::option::Option<::std::string::String>,
         #[doc = "Timestamp when the package version was created.\n"]
         pub created_at: super::datetime::Timestamp,
         #[doc = "Tags of the package version.\n"]
@@ -58372,6 +58374,7 @@ pub mod repositories {
                 version_id,
                 created_at,
                 tags,
+                name: ::std::default::Default::default(),
             }
         }
         #[doc = "Sets the value of `version_id`."]
@@ -58382,6 +58385,19 @@ pub mod repositories {
         #[doc = "Sets the value of `version_id`."]
         pub fn with_version_id(mut self, version_id: PackageVersionId) -> Self {
             self.version_id = version_id;
+            self
+        }
+        #[doc = "Sets the value of `name`."]
+        pub fn set_name(
+            &mut self,
+            name: ::std::option::Option<::std::string::String>,
+        ) -> &mut Self {
+            self.name = name;
+            self
+        }
+        #[doc = "Sets the value of `name`."]
+        pub fn with_name(mut self, name: ::std::option::Option<::std::string::String>) -> Self {
+            self.name = name;
             self
         }
         #[doc = "Sets the value of `created_at`."]
@@ -58414,9 +58430,11 @@ pub mod repositories {
             let mut __record = __sidex_serde::ser::RecordSerializer::new(
                 __serializer,
                 "QueryPackageVersionsItem",
-                3usize,
+                4usize,
             )?;
             __record.serialize_field("versionId", &self.version_id)?;
+            __record
+                .serialize_optional_field("name", ::core::option::Option::as_ref(&self.name))?;
             __record.serialize_field("createdAt", &self.created_at)?;
             __record.serialize_field("tags", &self.tags)?;
             __record.end()
@@ -58458,37 +58476,49 @@ pub mod repositories {
                                 return ::core::result::Result::Err(
                                     __serde::de::Error::invalid_length(
                                         0usize,
-                                        &"record with 3 fields",
+                                        &"record with 4 fields",
                                     ),
                                 );
                             }
                         };
                     let __field1 = match __serde::de::SeqAccess::next_element::<
+                        ::std::option::Option<::std::string::String>,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(1usize, &"record with 4 fields"),
+                            );
+                        }
+                    };
+                    let __field2 = match __serde::de::SeqAccess::next_element::<
                         super::datetime::Timestamp,
                     >(&mut __seq)?
                     {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(1usize, &"record with 3 fields"),
+                                __serde::de::Error::invalid_length(2usize, &"record with 4 fields"),
                             );
                         }
                     };
-                    let __field2 = match __serde::de::SeqAccess::next_element::<
+                    let __field3 = match __serde::de::SeqAccess::next_element::<
                         ::std::vec::Vec<PackageVersionTag>,
                     >(&mut __seq)?
                     {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(2usize, &"record with 3 fields"),
+                                __serde::de::Error::invalid_length(3usize, &"record with 4 fields"),
                             );
                         }
                     };
                     ::core::result::Result::Ok(QueryPackageVersionsItem {
                         version_id: __field0,
-                        created_at: __field1,
-                        tags: __field2,
+                        name: __field1,
+                        created_at: __field2,
+                        tags: __field3,
                     })
                 }
                 #[inline]
@@ -58501,16 +58531,17 @@ pub mod repositories {
                 {
                     #[doc(hidden)]
                     const __IDENTIFIERS: &'static [&'static str] =
-                        &["versionId", "createdAt", "tags"];
+                        &["versionId", "name", "createdAt", "tags"];
                     #[doc(hidden)]
                     const __EXPECTING_IDENTIFIERS: &'static str =
-                        "an identifier in [\"versionId\", \"createdAt\", \"tags\"]";
+                        "an identifier in [\"versionId\", \"name\", \"createdAt\", \"tags\"]";
                     #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
                     #[doc(hidden)]
                     enum __Identifier {
                         __Identifier0,
                         __Identifier1,
                         __Identifier2,
+                        __Identifier3,
                         __Unknown,
                     }
                     #[doc(hidden)]
@@ -58534,6 +58565,7 @@ pub mod repositories {
                                 0u64 => ::core::result::Result::Ok(__Identifier::__Identifier0),
                                 1u64 => ::core::result::Result::Ok(__Identifier::__Identifier1),
                                 2u64 => ::core::result::Result::Ok(__Identifier::__Identifier2),
+                                3u64 => ::core::result::Result::Ok(__Identifier::__Identifier3),
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
                         }
@@ -58548,10 +58580,11 @@ pub mod repositories {
                                 "versionId" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier0)
                                 }
+                                "name" => ::core::result::Result::Ok(__Identifier::__Identifier1),
                                 "createdAt" => {
-                                    ::core::result::Result::Ok(__Identifier::__Identifier1)
+                                    ::core::result::Result::Ok(__Identifier::__Identifier2)
                                 }
-                                "tags" => ::core::result::Result::Ok(__Identifier::__Identifier2),
+                                "tags" => ::core::result::Result::Ok(__Identifier::__Identifier3),
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
                         }
@@ -58566,10 +58599,11 @@ pub mod repositories {
                                 b"versionId" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier0)
                                 }
+                                b"name" => ::core::result::Result::Ok(__Identifier::__Identifier1),
                                 b"createdAt" => {
-                                    ::core::result::Result::Ok(__Identifier::__Identifier1)
+                                    ::core::result::Result::Ok(__Identifier::__Identifier2)
                                 }
-                                b"tags" => ::core::result::Result::Ok(__Identifier::__Identifier2),
+                                b"tags" => ::core::result::Result::Ok(__Identifier::__Identifier3),
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
                         }
@@ -58590,9 +58624,12 @@ pub mod repositories {
                     }
                     let mut __field0: ::core::option::Option<PackageVersionId> =
                         ::core::option::Option::None;
-                    let mut __field1: ::core::option::Option<super::datetime::Timestamp> =
+                    let mut __field1: ::core::option::Option<
+                        ::std::option::Option<::std::string::String>,
+                    > = ::core::option::Option::None;
+                    let mut __field2: ::core::option::Option<super::datetime::Timestamp> =
                         ::core::option::Option::None;
-                    let mut __field2: ::core::option::Option<::std::vec::Vec<PackageVersionTag>> =
+                    let mut __field3: ::core::option::Option<::std::vec::Vec<PackageVersionTag>> =
                         ::core::option::Option::None;
                     while let ::core::option::Option::Some(__key) =
                         __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
@@ -58615,24 +58652,36 @@ pub mod repositories {
                             __Identifier::__Identifier1 => {
                                 if ::core::option::Option::is_some(&__field1) {
                                     return ::core::result::Result::Err(
-                                        <__A::Error as __serde::de::Error>::duplicate_field(
-                                            "createdAt",
-                                        ),
+                                        <__A::Error as __serde::de::Error>::duplicate_field("name"),
                                     );
                                 }
                                 __field1 = ::core::option::Option::Some(
-                                    __serde::de::MapAccess::next_value::<super::datetime::Timestamp>(
-                                        &mut __map,
-                                    )?,
+                                    __serde::de::MapAccess::next_value::<
+                                        ::std::option::Option<::std::string::String>,
+                                    >(&mut __map)?,
                                 );
                             }
                             __Identifier::__Identifier2 => {
                                 if ::core::option::Option::is_some(&__field2) {
                                     return ::core::result::Result::Err(
-                                        <__A::Error as __serde::de::Error>::duplicate_field("tags"),
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "createdAt",
+                                        ),
                                     );
                                 }
                                 __field2 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<super::datetime::Timestamp>(
+                                        &mut __map,
+                                    )?,
+                                );
+                            }
+                            __Identifier::__Identifier3 => {
+                                if ::core::option::Option::is_some(&__field3) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field("tags"),
+                                    );
+                                }
+                                __field3 = ::core::option::Option::Some(
                                     __serde::de::MapAccess::next_value::<
                                         ::std::vec::Vec<PackageVersionTag>,
                                     >(&mut __map)?,
@@ -58655,13 +58704,17 @@ pub mod repositories {
                     };
                     let __field1 = match __field1 {
                         ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => ::core::option::Option::None,
+                    };
+                    let __field2 = match __field2 {
+                        ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
                                 <__A::Error as __serde::de::Error>::missing_field("createdAt"),
                             );
                         }
                     };
-                    let __field2 = match __field2 {
+                    let __field3 = match __field3 {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
@@ -58671,13 +58724,14 @@ pub mod repositories {
                     };
                     ::core::result::Result::Ok(QueryPackageVersionsItem {
                         version_id: __field0,
-                        created_at: __field1,
-                        tags: __field2,
+                        name: __field1,
+                        created_at: __field2,
+                        tags: __field3,
                     })
                 }
             }
             #[doc(hidden)]
-            const __FIELDS: &'static [&'static str] = &["versionId", "createdAt", "tags"];
+            const __FIELDS: &'static [&'static str] = &["versionId", "name", "createdAt", "tags"];
             __serde::Deserializer::deserialize_struct(
                 __deserializer,
                 "QueryPackageVersionsItem",
@@ -60997,6 +61051,8 @@ pub mod repositories {
         pub repository_id: RepositoryId,
         #[doc = "ID of the package.\n"]
         pub package_id: PackageId,
+        #[doc = "Optional name of the version.\n"]
+        pub name: ::std::option::Option<::std::string::String>,
         #[doc = "Assets of the version.\n"]
         pub assets: ::std::vec::Vec<PackageVersionAsset>,
         #[doc = "Tags of the version.\n"]
@@ -61017,6 +61073,7 @@ pub mod repositories {
                 package_id,
                 assets,
                 tags,
+                name: ::std::default::Default::default(),
             }
         }
         #[doc = "Sets the value of `version_id`."]
@@ -61049,6 +61106,19 @@ pub mod repositories {
             self.package_id = package_id;
             self
         }
+        #[doc = "Sets the value of `name`."]
+        pub fn set_name(
+            &mut self,
+            name: ::std::option::Option<::std::string::String>,
+        ) -> &mut Self {
+            self.name = name;
+            self
+        }
+        #[doc = "Sets the value of `name`."]
+        pub fn with_name(mut self, name: ::std::option::Option<::std::string::String>) -> Self {
+            self.name = name;
+            self
+        }
         #[doc = "Sets the value of `assets`."]
         pub fn set_assets(&mut self, assets: ::std::vec::Vec<PackageVersionAsset>) -> &mut Self {
             self.assets = assets;
@@ -61079,11 +61149,13 @@ pub mod repositories {
             let mut __record = __sidex_serde::ser::RecordSerializer::new(
                 __serializer,
                 "GetPackageVersionDetailsOutput",
-                5usize,
+                6usize,
             )?;
             __record.serialize_field("versionId", &self.version_id)?;
             __record.serialize_field("repositoryId", &self.repository_id)?;
             __record.serialize_field("packageId", &self.package_id)?;
+            __record
+                .serialize_optional_field("name", ::core::option::Option::as_ref(&self.name))?;
             __record.serialize_field("assets", &self.assets)?;
             __record.serialize_field("tags", &self.tags)?;
             __record.end()
@@ -61125,7 +61197,7 @@ pub mod repositories {
                                 return ::core::result::Result::Err(
                                     __serde::de::Error::invalid_length(
                                         0usize,
-                                        &"record with 5 fields",
+                                        &"record with 6 fields",
                                     ),
                                 );
                             }
@@ -61137,7 +61209,7 @@ pub mod repositories {
                                 return ::core::result::Result::Err(
                                     __serde::de::Error::invalid_length(
                                         1usize,
-                                        &"record with 5 fields",
+                                        &"record with 6 fields",
                                     ),
                                 );
                             }
@@ -61149,30 +61221,41 @@ pub mod repositories {
                                 return ::core::result::Result::Err(
                                     __serde::de::Error::invalid_length(
                                         2usize,
-                                        &"record with 5 fields",
+                                        &"record with 6 fields",
                                     ),
                                 );
                             }
                         };
                     let __field3 = match __serde::de::SeqAccess::next_element::<
+                        ::std::option::Option<::std::string::String>,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(3usize, &"record with 6 fields"),
+                            );
+                        }
+                    };
+                    let __field4 = match __serde::de::SeqAccess::next_element::<
                         ::std::vec::Vec<PackageVersionAsset>,
                     >(&mut __seq)?
                     {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(3usize, &"record with 5 fields"),
+                                __serde::de::Error::invalid_length(4usize, &"record with 6 fields"),
                             );
                         }
                     };
-                    let __field4 = match __serde::de::SeqAccess::next_element::<
+                    let __field5 = match __serde::de::SeqAccess::next_element::<
                         ::std::vec::Vec<PackageVersionTag>,
                     >(&mut __seq)?
                     {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(4usize, &"record with 5 fields"),
+                                __serde::de::Error::invalid_length(5usize, &"record with 6 fields"),
                             );
                         }
                     };
@@ -61180,8 +61263,9 @@ pub mod repositories {
                         version_id: __field0,
                         repository_id: __field1,
                         package_id: __field2,
-                        assets: __field3,
-                        tags: __field4,
+                        name: __field3,
+                        assets: __field4,
+                        tags: __field5,
                     })
                 }
                 #[inline]
@@ -61193,10 +61277,16 @@ pub mod repositories {
                     __A: __serde::de::MapAccess<'de>,
                 {
                     #[doc(hidden)]
-                    const __IDENTIFIERS: &'static [&'static str] =
-                        &["versionId", "repositoryId", "packageId", "assets", "tags"];
+                    const __IDENTIFIERS: &'static [&'static str] = &[
+                        "versionId",
+                        "repositoryId",
+                        "packageId",
+                        "name",
+                        "assets",
+                        "tags",
+                    ];
                     #[doc(hidden)]
-                    const __EXPECTING_IDENTIFIERS: &'static str = "an identifier in [\"versionId\", \"repositoryId\", \"packageId\", \"assets\", \"tags\"]";
+                    const __EXPECTING_IDENTIFIERS: &'static str = "an identifier in [\"versionId\", \"repositoryId\", \"packageId\", \"name\", \"assets\", \"tags\"]";
                     #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
                     #[doc(hidden)]
                     enum __Identifier {
@@ -61205,6 +61295,7 @@ pub mod repositories {
                         __Identifier2,
                         __Identifier3,
                         __Identifier4,
+                        __Identifier5,
                         __Unknown,
                     }
                     #[doc(hidden)]
@@ -61230,6 +61321,7 @@ pub mod repositories {
                                 2u64 => ::core::result::Result::Ok(__Identifier::__Identifier2),
                                 3u64 => ::core::result::Result::Ok(__Identifier::__Identifier3),
                                 4u64 => ::core::result::Result::Ok(__Identifier::__Identifier4),
+                                5u64 => ::core::result::Result::Ok(__Identifier::__Identifier5),
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
                         }
@@ -61250,8 +61342,9 @@ pub mod repositories {
                                 "packageId" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier2)
                                 }
-                                "assets" => ::core::result::Result::Ok(__Identifier::__Identifier3),
-                                "tags" => ::core::result::Result::Ok(__Identifier::__Identifier4),
+                                "name" => ::core::result::Result::Ok(__Identifier::__Identifier3),
+                                "assets" => ::core::result::Result::Ok(__Identifier::__Identifier4),
+                                "tags" => ::core::result::Result::Ok(__Identifier::__Identifier5),
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
                         }
@@ -61272,10 +61365,11 @@ pub mod repositories {
                                 b"packageId" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier2)
                                 }
+                                b"name" => ::core::result::Result::Ok(__Identifier::__Identifier3),
                                 b"assets" => {
-                                    ::core::result::Result::Ok(__Identifier::__Identifier3)
+                                    ::core::result::Result::Ok(__Identifier::__Identifier4)
                                 }
-                                b"tags" => ::core::result::Result::Ok(__Identifier::__Identifier4),
+                                b"tags" => ::core::result::Result::Ok(__Identifier::__Identifier5),
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
                         }
@@ -61300,9 +61394,12 @@ pub mod repositories {
                         ::core::option::Option::None;
                     let mut __field2: ::core::option::Option<PackageId> =
                         ::core::option::Option::None;
-                    let mut __field3: ::core::option::Option<::std::vec::Vec<PackageVersionAsset>> =
+                    let mut __field3: ::core::option::Option<
+                        ::std::option::Option<::std::string::String>,
+                    > = ::core::option::Option::None;
+                    let mut __field4: ::core::option::Option<::std::vec::Vec<PackageVersionAsset>> =
                         ::core::option::Option::None;
-                    let mut __field4: ::core::option::Option<::std::vec::Vec<PackageVersionTag>> =
+                    let mut __field5: ::core::option::Option<::std::vec::Vec<PackageVersionTag>> =
                         ::core::option::Option::None;
                     while let ::core::option::Option::Some(__key) =
                         __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
@@ -61349,24 +61446,36 @@ pub mod repositories {
                             __Identifier::__Identifier3 => {
                                 if ::core::option::Option::is_some(&__field3) {
                                     return ::core::result::Result::Err(
-                                        <__A::Error as __serde::de::Error>::duplicate_field(
-                                            "assets",
-                                        ),
+                                        <__A::Error as __serde::de::Error>::duplicate_field("name"),
                                     );
                                 }
                                 __field3 = ::core::option::Option::Some(
                                     __serde::de::MapAccess::next_value::<
-                                        ::std::vec::Vec<PackageVersionAsset>,
+                                        ::std::option::Option<::std::string::String>,
                                     >(&mut __map)?,
                                 );
                             }
                             __Identifier::__Identifier4 => {
                                 if ::core::option::Option::is_some(&__field4) {
                                     return ::core::result::Result::Err(
-                                        <__A::Error as __serde::de::Error>::duplicate_field("tags"),
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "assets",
+                                        ),
                                     );
                                 }
                                 __field4 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<
+                                        ::std::vec::Vec<PackageVersionAsset>,
+                                    >(&mut __map)?,
+                                );
+                            }
+                            __Identifier::__Identifier5 => {
+                                if ::core::option::Option::is_some(&__field5) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field("tags"),
+                                    );
+                                }
+                                __field5 = ::core::option::Option::Some(
                                     __serde::de::MapAccess::next_value::<
                                         ::std::vec::Vec<PackageVersionTag>,
                                     >(&mut __map)?,
@@ -61405,13 +61514,17 @@ pub mod repositories {
                     };
                     let __field3 = match __field3 {
                         ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => ::core::option::Option::None,
+                    };
+                    let __field4 = match __field4 {
+                        ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
                                 <__A::Error as __serde::de::Error>::missing_field("assets"),
                             );
                         }
                     };
-                    let __field4 = match __field4 {
+                    let __field5 = match __field5 {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
@@ -61423,14 +61536,21 @@ pub mod repositories {
                         version_id: __field0,
                         repository_id: __field1,
                         package_id: __field2,
-                        assets: __field3,
-                        tags: __field4,
+                        name: __field3,
+                        assets: __field4,
+                        tags: __field5,
                     })
                 }
             }
             #[doc(hidden)]
-            const __FIELDS: &'static [&'static str] =
-                &["versionId", "repositoryId", "packageId", "assets", "tags"];
+            const __FIELDS: &'static [&'static str] = &[
+                "versionId",
+                "repositoryId",
+                "packageId",
+                "name",
+                "assets",
+                "tags",
+            ];
             __serde::Deserializer::deserialize_struct(
                 __deserializer,
                 "GetPackageVersionDetailsOutput",
@@ -61446,6 +61566,8 @@ pub mod repositories {
     pub struct CreatePackageVersionAction {
         #[doc = "ID of the package.\n"]
         pub package_id: PackageId,
+        #[doc = "Optional name of the version.\n"]
+        pub name: ::std::option::Option<::std::string::String>,
         #[doc = "Tags to add to the package version.\n"]
         pub tags: ::std::option::Option<::std::vec::Vec<AddTagItem>>,
     }
@@ -61454,6 +61576,7 @@ pub mod repositories {
         pub fn new(package_id: PackageId) -> Self {
             Self {
                 package_id,
+                name: ::std::default::Default::default(),
                 tags: ::std::default::Default::default(),
             }
         }
@@ -61465,6 +61588,19 @@ pub mod repositories {
         #[doc = "Sets the value of `package_id`."]
         pub fn with_package_id(mut self, package_id: PackageId) -> Self {
             self.package_id = package_id;
+            self
+        }
+        #[doc = "Sets the value of `name`."]
+        pub fn set_name(
+            &mut self,
+            name: ::std::option::Option<::std::string::String>,
+        ) -> &mut Self {
+            self.name = name;
+            self
+        }
+        #[doc = "Sets the value of `name`."]
+        pub fn with_name(mut self, name: ::std::option::Option<::std::string::String>) -> Self {
+            self.name = name;
             self
         }
         #[doc = "Sets the value of `tags`."]
@@ -61493,9 +61629,11 @@ pub mod repositories {
             let mut __record = __sidex_serde::ser::RecordSerializer::new(
                 __serializer,
                 "CreatePackageVersionAction",
-                2usize,
+                3usize,
             )?;
             __record.serialize_field("packageId", &self.package_id)?;
+            __record
+                .serialize_optional_field("name", ::core::option::Option::as_ref(&self.name))?;
             __record
                 .serialize_optional_field("tags", ::core::option::Option::as_ref(&self.tags))?;
             __record.end()
@@ -61536,25 +61674,37 @@ pub mod repositories {
                                 return ::core::result::Result::Err(
                                     __serde::de::Error::invalid_length(
                                         0usize,
-                                        &"record with 2 fields",
+                                        &"record with 3 fields",
                                     ),
                                 );
                             }
                         };
                     let __field1 = match __serde::de::SeqAccess::next_element::<
+                        ::std::option::Option<::std::string::String>,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(1usize, &"record with 3 fields"),
+                            );
+                        }
+                    };
+                    let __field2 = match __serde::de::SeqAccess::next_element::<
                         ::std::option::Option<::std::vec::Vec<AddTagItem>>,
                     >(&mut __seq)?
                     {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(1usize, &"record with 2 fields"),
+                                __serde::de::Error::invalid_length(2usize, &"record with 3 fields"),
                             );
                         }
                     };
                     ::core::result::Result::Ok(CreatePackageVersionAction {
                         package_id: __field0,
-                        tags: __field1,
+                        name: __field1,
+                        tags: __field2,
                     })
                 }
                 #[inline]
@@ -61566,15 +61716,16 @@ pub mod repositories {
                     __A: __serde::de::MapAccess<'de>,
                 {
                     #[doc(hidden)]
-                    const __IDENTIFIERS: &'static [&'static str] = &["packageId", "tags"];
+                    const __IDENTIFIERS: &'static [&'static str] = &["packageId", "name", "tags"];
                     #[doc(hidden)]
                     const __EXPECTING_IDENTIFIERS: &'static str =
-                        "an identifier in [\"packageId\", \"tags\"]";
+                        "an identifier in [\"packageId\", \"name\", \"tags\"]";
                     #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
                     #[doc(hidden)]
                     enum __Identifier {
                         __Identifier0,
                         __Identifier1,
+                        __Identifier2,
                         __Unknown,
                     }
                     #[doc(hidden)]
@@ -61597,6 +61748,7 @@ pub mod repositories {
                             match __value {
                                 0u64 => ::core::result::Result::Ok(__Identifier::__Identifier0),
                                 1u64 => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                                2u64 => ::core::result::Result::Ok(__Identifier::__Identifier2),
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
                         }
@@ -61611,7 +61763,8 @@ pub mod repositories {
                                 "packageId" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier0)
                                 }
-                                "tags" => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                                "name" => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                                "tags" => ::core::result::Result::Ok(__Identifier::__Identifier2),
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
                         }
@@ -61626,7 +61779,8 @@ pub mod repositories {
                                 b"packageId" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier0)
                                 }
-                                b"tags" => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                                b"name" => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                                b"tags" => ::core::result::Result::Ok(__Identifier::__Identifier2),
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
                         }
@@ -61648,6 +61802,9 @@ pub mod repositories {
                     let mut __field0: ::core::option::Option<PackageId> =
                         ::core::option::Option::None;
                     let mut __field1: ::core::option::Option<
+                        ::std::option::Option<::std::string::String>,
+                    > = ::core::option::Option::None;
+                    let mut __field2: ::core::option::Option<
                         ::std::option::Option<::std::vec::Vec<AddTagItem>>,
                     > = ::core::option::Option::None;
                     while let ::core::option::Option::Some(__key) =
@@ -61669,10 +61826,22 @@ pub mod repositories {
                             __Identifier::__Identifier1 => {
                                 if ::core::option::Option::is_some(&__field1) {
                                     return ::core::result::Result::Err(
-                                        <__A::Error as __serde::de::Error>::duplicate_field("tags"),
+                                        <__A::Error as __serde::de::Error>::duplicate_field("name"),
                                     );
                                 }
                                 __field1 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<
+                                        ::std::option::Option<::std::string::String>,
+                                    >(&mut __map)?,
+                                );
+                            }
+                            __Identifier::__Identifier2 => {
+                                if ::core::option::Option::is_some(&__field2) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field("tags"),
+                                    );
+                                }
+                                __field2 = ::core::option::Option::Some(
                                     __serde::de::MapAccess::next_value::<
                                         ::std::option::Option<::std::vec::Vec<AddTagItem>>,
                                     >(&mut __map)?,
@@ -61697,14 +61866,19 @@ pub mod repositories {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => ::core::option::Option::None,
                     };
+                    let __field2 = match __field2 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => ::core::option::Option::None,
+                    };
                     ::core::result::Result::Ok(CreatePackageVersionAction {
                         package_id: __field0,
-                        tags: __field1,
+                        name: __field1,
+                        tags: __field2,
                     })
                 }
             }
             #[doc(hidden)]
-            const __FIELDS: &'static [&'static str] = &["packageId", "tags"];
+            const __FIELDS: &'static [&'static str] = &["packageId", "name", "tags"];
             __serde::Deserializer::deserialize_struct(
                 __deserializer,
                 "CreatePackageVersionAction",
