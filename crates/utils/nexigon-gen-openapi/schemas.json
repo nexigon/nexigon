@@ -3785,7 +3785,10 @@
       "repositoryId": {
         "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryId"
       },
-      "name": {
+      "displayName": {
+        "type": "string"
+      },
+      "publicName": {
         "type": "string"
       },
       "visibility": {
@@ -3802,7 +3805,7 @@
     },
     "required": [
       "repositoryId",
-      "name",
+      "displayName",
       "visibility",
       "packageCount",
       "assetCount"

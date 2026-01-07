@@ -50280,8 +50280,10 @@ pub mod repositories {
     pub struct GetRepositoryDetailsOutput {
         #[doc = "ID of the repository.\n"]
         pub repository_id: RepositoryId,
+        #[doc = "Display name of the repository.\n"]
+        pub display_name: ::std::string::String,
         #[doc = "Name of the repository.\n"]
-        pub name: ::std::string::String,
+        pub public_name: ::std::option::Option<::std::string::String>,
         #[doc = "Visibility of the repository.\n"]
         pub visibility: RepositoryVisibility,
         #[doc = "Number of packages in the repository.\n"]
@@ -50293,17 +50295,18 @@ pub mod repositories {
         #[doc = "Creates a new [`GetRepositoryDetailsOutput`]."]
         pub fn new(
             repository_id: RepositoryId,
-            name: ::std::string::String,
+            display_name: ::std::string::String,
             visibility: RepositoryVisibility,
             package_count: u64,
             asset_count: u64,
         ) -> Self {
             Self {
                 repository_id,
-                name,
+                display_name,
                 visibility,
                 package_count,
                 asset_count,
+                public_name: ::std::default::Default::default(),
             }
         }
         #[doc = "Sets the value of `repository_id`."]
@@ -50316,14 +50319,30 @@ pub mod repositories {
             self.repository_id = repository_id;
             self
         }
-        #[doc = "Sets the value of `name`."]
-        pub fn set_name(&mut self, name: ::std::string::String) -> &mut Self {
-            self.name = name;
+        #[doc = "Sets the value of `display_name`."]
+        pub fn set_display_name(&mut self, display_name: ::std::string::String) -> &mut Self {
+            self.display_name = display_name;
             self
         }
-        #[doc = "Sets the value of `name`."]
-        pub fn with_name(mut self, name: ::std::string::String) -> Self {
-            self.name = name;
+        #[doc = "Sets the value of `display_name`."]
+        pub fn with_display_name(mut self, display_name: ::std::string::String) -> Self {
+            self.display_name = display_name;
+            self
+        }
+        #[doc = "Sets the value of `public_name`."]
+        pub fn set_public_name(
+            &mut self,
+            public_name: ::std::option::Option<::std::string::String>,
+        ) -> &mut Self {
+            self.public_name = public_name;
+            self
+        }
+        #[doc = "Sets the value of `public_name`."]
+        pub fn with_public_name(
+            mut self,
+            public_name: ::std::option::Option<::std::string::String>,
+        ) -> Self {
+            self.public_name = public_name;
             self
         }
         #[doc = "Sets the value of `visibility`."]
@@ -50366,10 +50385,14 @@ pub mod repositories {
             let mut __record = __sidex_serde::ser::RecordSerializer::new(
                 __serializer,
                 "GetRepositoryDetailsOutput",
-                5usize,
+                6usize,
             )?;
             __record.serialize_field("repositoryId", &self.repository_id)?;
-            __record.serialize_field("name", &self.name)?;
+            __record.serialize_field("displayName", &self.display_name)?;
+            __record.serialize_optional_field(
+                "publicName",
+                ::core::option::Option::as_ref(&self.public_name),
+            )?;
             __record.serialize_field("visibility", &self.visibility)?;
             __record.serialize_field("packageCount", &self.package_count)?;
             __record.serialize_field("assetCount", &self.asset_count)?;
@@ -50411,7 +50434,7 @@ pub mod repositories {
                                 return ::core::result::Result::Err(
                                     __serde::de::Error::invalid_length(
                                         0usize,
-                                        &"record with 5 fields",
+                                        &"record with 6 fields",
                                     ),
                                 );
                             }
@@ -50423,25 +50446,28 @@ pub mod repositories {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(1usize, &"record with 5 fields"),
+                                __serde::de::Error::invalid_length(1usize, &"record with 6 fields"),
                             );
                         }
                     };
-                    let __field2 = match __serde::de::SeqAccess::next_element::<RepositoryVisibility>(
+                    let __field2 = match __serde::de::SeqAccess::next_element::<
+                        ::std::option::Option<::std::string::String>,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(2usize, &"record with 6 fields"),
+                            );
+                        }
+                    };
+                    let __field3 = match __serde::de::SeqAccess::next_element::<RepositoryVisibility>(
                         &mut __seq,
                     )? {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(2usize, &"record with 5 fields"),
-                            );
-                        }
-                    };
-                    let __field3 = match __serde::de::SeqAccess::next_element::<u64>(&mut __seq)? {
-                        ::core::option::Option::Some(__value) => __value,
-                        ::core::option::Option::None => {
-                            return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(3usize, &"record with 5 fields"),
+                                __serde::de::Error::invalid_length(3usize, &"record with 6 fields"),
                             );
                         }
                     };
@@ -50449,16 +50475,25 @@ pub mod repositories {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(4usize, &"record with 5 fields"),
+                                __serde::de::Error::invalid_length(4usize, &"record with 6 fields"),
+                            );
+                        }
+                    };
+                    let __field5 = match __serde::de::SeqAccess::next_element::<u64>(&mut __seq)? {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(5usize, &"record with 6 fields"),
                             );
                         }
                     };
                     ::core::result::Result::Ok(GetRepositoryDetailsOutput {
                         repository_id: __field0,
-                        name: __field1,
-                        visibility: __field2,
-                        package_count: __field3,
-                        asset_count: __field4,
+                        display_name: __field1,
+                        public_name: __field2,
+                        visibility: __field3,
+                        package_count: __field4,
+                        asset_count: __field5,
                     })
                 }
                 #[inline]
@@ -50472,13 +50507,14 @@ pub mod repositories {
                     #[doc(hidden)]
                     const __IDENTIFIERS: &'static [&'static str] = &[
                         "repositoryId",
-                        "name",
+                        "displayName",
+                        "publicName",
                         "visibility",
                         "packageCount",
                         "assetCount",
                     ];
                     #[doc(hidden)]
-                    const __EXPECTING_IDENTIFIERS: &'static str = "an identifier in [\"repositoryId\", \"name\", \"visibility\", \"packageCount\", \"assetCount\"]";
+                    const __EXPECTING_IDENTIFIERS: &'static str = "an identifier in [\"repositoryId\", \"displayName\", \"publicName\", \"visibility\", \"packageCount\", \"assetCount\"]";
                     #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
                     #[doc(hidden)]
                     enum __Identifier {
@@ -50487,6 +50523,7 @@ pub mod repositories {
                         __Identifier2,
                         __Identifier3,
                         __Identifier4,
+                        __Identifier5,
                         __Unknown,
                     }
                     #[doc(hidden)]
@@ -50512,6 +50549,7 @@ pub mod repositories {
                                 2u64 => ::core::result::Result::Ok(__Identifier::__Identifier2),
                                 3u64 => ::core::result::Result::Ok(__Identifier::__Identifier3),
                                 4u64 => ::core::result::Result::Ok(__Identifier::__Identifier4),
+                                5u64 => ::core::result::Result::Ok(__Identifier::__Identifier5),
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
                         }
@@ -50526,15 +50564,20 @@ pub mod repositories {
                                 "repositoryId" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier0)
                                 }
-                                "name" => ::core::result::Result::Ok(__Identifier::__Identifier1),
-                                "visibility" => {
+                                "displayName" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier1)
+                                }
+                                "publicName" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier2)
                                 }
-                                "packageCount" => {
+                                "visibility" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier3)
                                 }
-                                "assetCount" => {
+                                "packageCount" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier4)
+                                }
+                                "assetCount" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier5)
                                 }
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
@@ -50550,15 +50593,20 @@ pub mod repositories {
                                 b"repositoryId" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier0)
                                 }
-                                b"name" => ::core::result::Result::Ok(__Identifier::__Identifier1),
-                                b"visibility" => {
+                                b"displayName" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier1)
+                                }
+                                b"publicName" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier2)
                                 }
-                                b"packageCount" => {
+                                b"visibility" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier3)
                                 }
-                                b"assetCount" => {
+                                b"packageCount" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier4)
+                                }
+                                b"assetCount" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier5)
                                 }
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
@@ -50582,10 +50630,13 @@ pub mod repositories {
                         ::core::option::Option::None;
                     let mut __field1: ::core::option::Option<::std::string::String> =
                         ::core::option::Option::None;
-                    let mut __field2: ::core::option::Option<RepositoryVisibility> =
+                    let mut __field2: ::core::option::Option<
+                        ::std::option::Option<::std::string::String>,
+                    > = ::core::option::Option::None;
+                    let mut __field3: ::core::option::Option<RepositoryVisibility> =
                         ::core::option::Option::None;
-                    let mut __field3: ::core::option::Option<u64> = ::core::option::Option::None;
                     let mut __field4: ::core::option::Option<u64> = ::core::option::Option::None;
+                    let mut __field5: ::core::option::Option<u64> = ::core::option::Option::None;
                     while let ::core::option::Option::Some(__key) =
                         __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
                     {
@@ -50605,7 +50656,9 @@ pub mod repositories {
                             __Identifier::__Identifier1 => {
                                 if ::core::option::Option::is_some(&__field1) {
                                     return ::core::result::Result::Err(
-                                        <__A::Error as __serde::de::Error>::duplicate_field("name"),
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "displayName",
+                                        ),
                                     );
                                 }
                                 __field1 = ::core::option::Option::Some(
@@ -50618,37 +50671,51 @@ pub mod repositories {
                                 if ::core::option::Option::is_some(&__field2) {
                                     return ::core::result::Result::Err(
                                         <__A::Error as __serde::de::Error>::duplicate_field(
-                                            "visibility",
+                                            "publicName",
                                         ),
                                     );
                                 }
                                 __field2 = ::core::option::Option::Some(
-                                    __serde::de::MapAccess::next_value::<RepositoryVisibility>(
-                                        &mut __map,
-                                    )?,
+                                    __serde::de::MapAccess::next_value::<
+                                        ::std::option::Option<::std::string::String>,
+                                    >(&mut __map)?,
                                 );
                             }
                             __Identifier::__Identifier3 => {
                                 if ::core::option::Option::is_some(&__field3) {
                                     return ::core::result::Result::Err(
                                         <__A::Error as __serde::de::Error>::duplicate_field(
-                                            "packageCount",
+                                            "visibility",
                                         ),
                                     );
                                 }
                                 __field3 = ::core::option::Option::Some(
-                                    __serde::de::MapAccess::next_value::<u64>(&mut __map)?,
+                                    __serde::de::MapAccess::next_value::<RepositoryVisibility>(
+                                        &mut __map,
+                                    )?,
                                 );
                             }
                             __Identifier::__Identifier4 => {
                                 if ::core::option::Option::is_some(&__field4) {
                                     return ::core::result::Result::Err(
                                         <__A::Error as __serde::de::Error>::duplicate_field(
-                                            "assetCount",
+                                            "packageCount",
                                         ),
                                     );
                                 }
                                 __field4 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<u64>(&mut __map)?,
+                                );
+                            }
+                            __Identifier::__Identifier5 => {
+                                if ::core::option::Option::is_some(&__field5) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "assetCount",
+                                        ),
+                                    );
+                                }
+                                __field5 = ::core::option::Option::Some(
                                     __serde::de::MapAccess::next_value::<u64>(&mut __map)?,
                                 );
                             }
@@ -50671,11 +50738,15 @@ pub mod repositories {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                <__A::Error as __serde::de::Error>::missing_field("name"),
+                                <__A::Error as __serde::de::Error>::missing_field("displayName"),
                             );
                         }
                     };
                     let __field2 = match __field2 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => ::core::option::Option::None,
+                    };
+                    let __field3 = match __field3 {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
@@ -50683,7 +50754,7 @@ pub mod repositories {
                             );
                         }
                     };
-                    let __field3 = match __field3 {
+                    let __field4 = match __field4 {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
@@ -50691,7 +50762,7 @@ pub mod repositories {
                             );
                         }
                     };
-                    let __field4 = match __field4 {
+                    let __field5 = match __field5 {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
@@ -50701,17 +50772,19 @@ pub mod repositories {
                     };
                     ::core::result::Result::Ok(GetRepositoryDetailsOutput {
                         repository_id: __field0,
-                        name: __field1,
-                        visibility: __field2,
-                        package_count: __field3,
-                        asset_count: __field4,
+                        display_name: __field1,
+                        public_name: __field2,
+                        visibility: __field3,
+                        package_count: __field4,
+                        asset_count: __field5,
                     })
                 }
             }
             #[doc(hidden)]
             const __FIELDS: &'static [&'static str] = &[
                 "repositoryId",
-                "name",
+                "displayName",
+                "publicName",
                 "visibility",
                 "packageCount",
                 "assetCount",

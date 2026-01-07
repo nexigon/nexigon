@@ -92,8 +92,10 @@ record GetRepositoryDetailsAction {
 record GetRepositoryDetailsOutput {
     /// ID of the repository.
     repository_id: RepositoryId,
+    /// Display name of the repository.
+    display_name: string,
     /// Name of the repository.
-    name: string,
+    public_name?: string,
     /// Visibility of the repository.
     visibility: RepositoryVisibility,
     /// Number of packages in the repository.
