@@ -455,6 +455,23 @@
     ],
     "description": "Date string without time zone."
   },
+  "nexigon_api.datetime.DateSpan": {
+    "type": "object",
+    "description": "Date span with start and end dates.\n\n**The end date itself is not included in the span.**",
+    "properties": {
+      "start": {
+        "$ref": "#/components/schemas/nexigon_api.datetime.Date"
+      },
+      "end": {
+        "$ref": "#/components/schemas/nexigon_api.datetime.Date"
+      }
+    },
+    "required": [
+      "start",
+      "end"
+    ],
+    "unevaluatedProperties": false
+  },
   "nexigon_api.datetime.Timestamp": {
     "type": [
       "string"

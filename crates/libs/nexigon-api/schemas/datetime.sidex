@@ -9,3 +9,16 @@ opaque Timestamp
 #[rust(type = "jiff::civil::Date")]
 #[json(type = "string")]
 opaque Date
+
+/// Date span with start and end dates.
+/// 
+/// **The end date itself is not included in the span.**
+#[rust(derive(PartialEq, Eq, Hash))]
+record DateSpan {
+    /// Start date of the span.
+    start: Date,
+    /// End date of the span.
+    /// 
+    /// **The end date itself is not included in the span.**
+    end: Date,
+}
