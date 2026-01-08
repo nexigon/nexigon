@@ -489,6 +489,11 @@ define_types! {
     OrganizationId => (FlatRawId, "org", 22, secret = false),
     /// Organization invitation id (globally unique).
     OrganizationInvitationId => (FlatRawId, "org_invite", 22, secret = false),
+
+    /// Subscription ID (globally unique).
+    SubscriptionId => (FlatRawId, "subscription", 22, secret = false),
+    /// Billing period ID (globally unique).
+    BillingPeriodId => (FlatRawId, "billing_period", 22, secret = false),
 }
 
 /// Check whether a character is a base 58 digit.

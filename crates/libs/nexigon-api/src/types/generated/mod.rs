@@ -5897,6 +5897,8 @@ pub mod datetime {
     use :: sidex_serde as __sidex_serde;
     #[doc = "ISO 8601 formatted date and time string.\n"]
     pub type Timestamp = jiff::Timestamp;
+    #[doc = "Date string without time zone.\n"]
+    pub type Date = jiff::civil::Date;
 }
 pub mod devices {
     #![doc = "Actions and types related to devices.\n"]

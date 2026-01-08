@@ -449,6 +449,12 @@
     "required": [],
     "unevaluatedProperties": false
   },
+  "nexigon_api.datetime.Date": {
+    "type": [
+      "string"
+    ],
+    "description": "Date string without time zone."
+  },
   "nexigon_api.datetime.Timestamp": {
     "type": [
       "string"

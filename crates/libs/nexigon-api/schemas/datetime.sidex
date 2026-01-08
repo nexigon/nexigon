@@ -4,3 +4,8 @@
 #[rust(type = "jiff::Timestamp")]
 #[json(type = "string")]
 opaque Timestamp
+
+/// Date string without time zone.
+#[rust(type = "jiff::civil::Date")]
+#[json(type = "string")]
+opaque Date
