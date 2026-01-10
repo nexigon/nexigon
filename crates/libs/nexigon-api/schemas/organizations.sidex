@@ -256,3 +256,21 @@ record OrganizationInvitationCreatedEvent {
     /// Email address of the invited user.
     email: string,
 }
+
+/// Event indicating that a member's admin status has changed.
+record OrganizationMemberAdminStatusChangedEvent {
+    /// ID of the organization.
+    organization_id: OrganizationId,
+    /// ID of the user.
+    user_id: UserId,
+    /// Whether the user is now an administrator.
+    is_admin: bool,
+}
+
+/// Event indicating that an organization invitation has been deleted.
+record OrganizationInvitationDeletedEvent {
+    /// ID of the organization.
+    organization_id: OrganizationId,
+    /// ID of the invitation.
+    invitation_id: OrganizationInvitationId,
+}

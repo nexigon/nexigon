@@ -667,3 +667,175 @@ record QueryAuditLogEventsOutput {
    /// List of audit log events.
    events: [AuditLogEvent],
 }
+
+/// Event indicating that a repository has been created.
+record RepositoryCreatedEvent {
+    /// ID of the repository.
+    repository_id: RepositoryId,
+    /// ID of the organization.
+    organization_id: OrganizationId,
+}
+
+/// Event indicating that a repository has been deleted.
+record RepositoryDeletedEvent {
+    /// ID of the repository.
+    repository_id: RepositoryId,
+    /// ID of the organization.
+    organization_id: OrganizationId,
+}
+
+/// Event indicating that a repository has been moved to a different organization.
+record RepositoryOrganizationChangedEvent {
+    /// ID of the repository.
+    repository_id: RepositoryId,
+    /// ID of the previous organization.
+    previous_organization_id: OrganizationId,
+    /// ID of the new organization.
+    new_organization_id: OrganizationId,
+}
+
+/// Event indicating that a repository's visibility has been changed.
+record RepositoryVisibilityChangedEvent {
+    /// ID of the repository.
+    repository_id: RepositoryId,
+    /// New visibility of the repository.
+    visibility: RepositoryVisibility,
+}
+
+/// Event indicating that a repository's display name has been changed.
+record RepositoryDisplayNameChangedEvent {
+    /// ID of the repository.
+    repository_id: RepositoryId,
+    /// New display name of the repository.
+    display_name?: string,
+}
+
+/// Event indicating that a repository's public name has been changed.
+record RepositoryPublicNameChangedEvent {
+    /// ID of the repository.
+    repository_id: RepositoryId,
+    /// New public name of the repository.
+    public_name: string,
+}
+
+/// Event indicating that a package has been created.
+record PackageCreatedEvent {
+    /// ID of the repository.
+    repository_id: RepositoryId,
+    /// ID of the package.
+    package_id: PackageId,
+    /// Name of the package.
+    name: string,
+}
+
+/// Event indicating that a package has been deleted.
+record PackageDeletedEvent {
+    /// ID of the repository.
+    repository_id: RepositoryId,
+    /// ID of the package.
+    package_id: PackageId,
+}
+
+/// Event indicating that a package's name has been changed.
+record PackageNameChangedEvent {
+    /// ID of the repository.
+    repository_id: RepositoryId,
+    /// ID of the package.
+    package_id: PackageId,
+    /// New name of the package.
+    name: string,
+}
+
+/// Event indicating that a package version has been created.
+record PackageVersionCreatedEvent {
+    /// ID of the repository.
+    repository_id: RepositoryId,
+    /// ID of the package.
+    package_id: PackageId,
+    /// ID of the package version.
+    version_id: PackageVersionId,
+}
+
+/// Event indicating that a package version has been deleted.
+record PackageVersionDeletedEvent {
+    /// ID of the repository.
+    repository_id: RepositoryId,
+    /// ID of the package.
+    package_id: PackageId,
+    /// ID of the package version.
+    version_id: PackageVersionId,
+}
+
+/// Event indicating that a package version's name has been changed.
+record PackageVersionNameChangedEvent {
+    /// ID of the repository.
+    repository_id: RepositoryId,
+    /// ID of the package version.
+    version_id: PackageVersionId,
+    /// New name of the package version.
+    name?: string,
+}
+
+/// Event indicating that an asset has been added to a package version.
+record PackageVersionAssetAddedEvent {
+    /// ID of the repository.
+    repository_id: RepositoryId,
+    /// ID of the package version.
+    version_id: PackageVersionId,
+    /// ID of the asset.
+    asset_id: RepositoryAssetId,
+    /// Filename of the asset.
+    filename: string,
+}
+
+/// Event indicating that an asset has been removed from a package version.
+record PackageVersionAssetRemovedEvent {
+    /// ID of the repository.
+    repository_id: RepositoryId,
+    /// ID of the package version.
+    version_id: PackageVersionId,
+    /// Filename of the asset.
+    filename: string,
+}
+
+/// Event indicating that a package version has been tagged.
+record PackageVersionTaggedEvent {
+    /// ID of the repository.
+    repository_id: RepositoryId,
+    /// ID of the package version.
+    version_id: PackageVersionId,
+    /// Tags that were added.
+    tags: [string],
+}
+
+/// Event indicating that tags have been removed from a package version.
+record PackageVersionUntaggedEvent {
+    /// ID of the repository.
+    repository_id: RepositoryId,
+    /// ID of the package version.
+    version_id: PackageVersionId,
+    /// Tags that were removed.
+    tags: [string],
+}
+
+/// Event indicating that a repository's S3 configuration has been changed.
+record RepositoryS3ConfigChangedEvent {
+    /// ID of the repository.
+    repository_id: RepositoryId,
+}
+
+/// Event indicating that an asset has been created.
+record AssetCreatedEvent {
+    /// ID of the repository.
+    repository_id: RepositoryId,
+    /// ID of the asset.
+    asset_id: RepositoryAssetId,
+}
+
+/// Event indicating that an asset has been deleted.
+record AssetDeletedEvent {
+    /// ID of the repository.
+    repository_id: RepositoryId,
+    /// ID of the asset.
+    asset_id: RepositoryAssetId,
+}

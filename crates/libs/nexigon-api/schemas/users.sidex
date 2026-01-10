@@ -522,3 +522,25 @@ record UserRegistrationCompletedEvent {
     /// ID of the user.
     user_id: UserId,
 }
+
+/// Event indicating that a user's display name has been changed.
+record UserDisplayNameChangedEvent {
+    /// ID of the user.
+    user_id: UserId,
+    /// New display name of the user.
+    display_name: string,
+}
+
+/// Event indicating that a user's password has been reset.
+record UserPasswordResetCompletedEvent {
+    /// ID of the user.
+    user_id: UserId,
+}
+
+/// Event indicating that a user session has been terminated.
+record UserSessionTerminatedEvent {
+    /// ID of the user.
+    user_id: UserId,
+    /// ID of the session that was terminated.
+    session_id: UserSessionId,
+}

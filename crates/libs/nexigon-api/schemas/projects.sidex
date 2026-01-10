@@ -290,3 +290,21 @@ record ProjectRepositoryRemovedEvent {
     /// ID of the repository.
     repository_id: RepositoryId,
 }
+
+/// Event indicating that a project's name has been changed.
+record ProjectNameChangedEvent {
+    /// ID of the project.
+    project_id: ProjectId,
+    /// New name of the project.
+    name: string,
+}
+
+/// Event indicating that a project has been moved to a different organization.
+record ProjectOrganizationChangedEvent {
+    /// ID of the project.
+    project_id: ProjectId,
+    /// ID of the previous organization.
+    previous_organization_id: OrganizationId,
+    /// ID of the new organization.
+    new_organization_id: OrganizationId,
+}

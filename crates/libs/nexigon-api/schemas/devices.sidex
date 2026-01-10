@@ -538,3 +538,33 @@ record DeviceCertificateStatusChangedEvent {
     /// Status of the certificate.
     status: DeviceCertificateStatus,
 }
+
+/// Device name has been changed.
+record DeviceNameChangedEvent {
+    /// ID of the project.
+    project_id: ProjectId,
+    /// ID of the device.
+    device_id: DeviceId,
+    /// New name of the device (None if cleared).
+    name?: string,
+}
+
+/// Device property has been set.
+record DevicePropertySetEvent {
+    /// ID of the project.
+    project_id: ProjectId,
+    /// ID of the device.
+    device_id: DeviceId,
+    /// Name of the property.
+    property_name: string,
+}
+
+/// Device property has been removed.
+record DevicePropertyRemovedEvent {
+    /// ID of the project.
+    project_id: ProjectId,
+    /// ID of the device.
+    device_id: DeviceId,
+    /// Name of the property.
+    property_name: string,
+}
