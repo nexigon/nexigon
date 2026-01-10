@@ -1859,36 +1859,6 @@
     ],
     "unevaluatedProperties": false
   },
-  "nexigon_api.organizations.GetOrganizationLimitsAction": {
-    "type": "object",
-    "description": "Get the resource limits of an organization.\n\nReturns both the effective limits (set by organization administrators) and the\nmaximal limits defined by the subscription plan.",
-    "properties": {
-      "organizationId": {
-        "$ref": "#/components/schemas/nexigon_api.organizations.OrganizationId"
-      }
-    },
-    "required": [
-      "organizationId"
-    ],
-    "unevaluatedProperties": false
-  },
-  "nexigon_api.organizations.GetOrganizationLimitsOutput": {
-    "type": "object",
-    "description": "Output of getting the resource limits of an organization.",
-    "properties": {
-      "limits": {
-        "$ref": "#/components/schemas/nexigon_api.organizations.OrganizationLimits"
-      },
-      "dailyLimits": {
-        "$ref": "#/components/schemas/nexigon_api.organizations.OrganizationDailyLimits"
-      }
-    },
-    "required": [
-      "limits",
-      "dailyLimits"
-    ],
-    "unevaluatedProperties": false
-  },
   "nexigon_api.organizations.GetOrganizationResourceUsageAction": {
     "type": "object",
     "description": "Get the resources used by the organization and their limits.",
@@ -1974,19 +1944,6 @@
     ],
     "unevaluatedProperties": false
   },
-  "nexigon_api.organizations.OrganizationDailyLimits": {
-    "type": "object",
-    "description": "Daily resource limits for an organization.",
-    "properties": {
-      "perDevice": {
-        "$ref": "#/components/schemas/nexigon_api.organizations.OrganizationPerDeviceDailyLimits"
-      }
-    },
-    "required": [
-      "perDevice"
-    ],
-    "unevaluatedProperties": false
-  },
   "nexigon_api.organizations.OrganizationDeletedEvent": {
     "type": "object",
     "description": "Event indicating the deletion of an organization.",
@@ -2033,39 +1990,6 @@
     ],
     "description": "Unique ID of an invitation to an organization."
   },
-  "nexigon_api.organizations.OrganizationLimits": {
-    "type": "object",
-    "description": "Resource limits for an organization.",
-    "properties": {
-      "seats": {
-        "$ref": "#/components/schemas/nexigon_api.organizations.ResourceLimit"
-      },
-      "projects": {
-        "$ref": "#/components/schemas/nexigon_api.organizations.ResourceLimit"
-      },
-      "devices": {
-        "$ref": "#/components/schemas/nexigon_api.organizations.ResourceLimit"
-      },
-      "repositories": {
-        "$ref": "#/components/schemas/nexigon_api.organizations.ResourceLimit"
-      },
-      "packages": {
-        "$ref": "#/components/schemas/nexigon_api.organizations.ResourceLimit"
-      },
-      "perDevice": {
-        "$ref": "#/components/schemas/nexigon_api.organizations.OrganizationPerDeviceLimits"
-      }
-    },
-    "required": [
-      "seats",
-      "projects",
-      "devices",
-      "repositories",
-      "packages",
-      "perDevice"
-    ],
-    "unevaluatedProperties": false
-  },
   "nexigon_api.organizations.OrganizationMemberAddedEvent": {
     "type": "object",
     "description": "Event indicating that a member has been added to an organization.",
@@ -2101,52 +2025,6 @@
     "required": [
       "organizationId",
       "userId"
-    ],
-    "unevaluatedProperties": false
-  },
-  "nexigon_api.organizations.OrganizationPerDeviceDailyLimits": {
-    "type": "object",
-    "description": "Per-device daily limits for an organization.",
-    "properties": {
-      "remoteAccessVolume": {
-        "$ref": "#/components/schemas/nexigon_api.organizations.ResourceLimit"
-      },
-      "readOperations": {
-        "$ref": "#/components/schemas/nexigon_api.organizations.ResourceLimit"
-      },
-      "writeOperations": {
-        "$ref": "#/components/schemas/nexigon_api.organizations.ResourceLimit"
-      }
-    },
-    "required": [
-      "remoteAccessVolume",
-      "readOperations",
-      "writeOperations"
-    ],
-    "unevaluatedProperties": false
-  },
-  "nexigon_api.organizations.OrganizationPerDeviceLimits": {
-    "type": "object",
-    "description": "Per-device limits for an organization.",
-    "properties": {
-      "properties": {
-        "$ref": "#/components/schemas/nexigon_api.organizations.ResourceLimit"
-      },
-      "remoteAccessVolume": {
-        "$ref": "#/components/schemas/nexigon_api.organizations.ResourceLimit"
-      },
-      "readOperations": {
-        "$ref": "#/components/schemas/nexigon_api.organizations.ResourceLimit"
-      },
-      "writeOperations": {
-        "$ref": "#/components/schemas/nexigon_api.organizations.ResourceLimit"
-      }
-    },
-    "required": [
-      "properties",
-      "remoteAccessVolume",
-      "readOperations",
-      "writeOperations"
     ],
     "unevaluatedProperties": false
   },
@@ -2433,83 +2311,6 @@
     ],
     "unevaluatedProperties": false
   },
-  "nexigon_api.organizations.ResourceLimit": {
-    "type": "object",
-    "description": "Effective and maximal limit for a resource.",
-    "properties": {
-      "effective": {
-        "type": "integer",
-        "format": "uint64"
-      },
-      "max": {
-        "type": "integer",
-        "format": "uint64"
-      }
-    },
-    "required": [],
-    "unevaluatedProperties": false
-  },
-  "nexigon_api.organizations.SetOrganizationDailyLimitsUpdate": {
-    "type": "object",
-    "description": "Updates for organization daily limits.",
-    "properties": {
-      "perDevice": {
-        "$ref": "#/components/schemas/nexigon_api.organizations.SetOrganizationPerDeviceDailyLimitsUpdate"
-      }
-    },
-    "required": [],
-    "unevaluatedProperties": false
-  },
-  "nexigon_api.organizations.SetOrganizationLimitsAction": {
-    "type": "object",
-    "description": "Set the resource limits of an organization.\n\nOrganization administrators can set effective limits up to the maximal limits\ndefined by their subscription plan. Setting a higher limit may result in\noverage charges once actual usage exceeds the included amount.",
-    "properties": {
-      "organizationId": {
-        "$ref": "#/components/schemas/nexigon_api.organizations.OrganizationId"
-      },
-      "limits": {
-        "$ref": "#/components/schemas/nexigon_api.organizations.SetOrganizationLimitsUpdate"
-      },
-      "dailyLimits": {
-        "$ref": "#/components/schemas/nexigon_api.organizations.SetOrganizationDailyLimitsUpdate"
-      }
-    },
-    "required": [
-      "organizationId"
-    ],
-    "unevaluatedProperties": false
-  },
-  "nexigon_api.organizations.SetOrganizationLimitsUpdate": {
-    "type": "object",
-    "description": "Updates for organization resource limits.",
-    "properties": {
-      "seats": {
-        "type": "integer",
-        "format": "uint64"
-      },
-      "projects": {
-        "type": "integer",
-        "format": "uint64"
-      },
-      "devices": {
-        "type": "integer",
-        "format": "uint64"
-      },
-      "repositories": {
-        "type": "integer",
-        "format": "uint64"
-      },
-      "packages": {
-        "type": "integer",
-        "format": "uint64"
-      },
-      "perDevice": {
-        "$ref": "#/components/schemas/nexigon_api.organizations.SetOrganizationPerDeviceLimitsUpdate"
-      }
-    },
-    "required": [],
-    "unevaluatedProperties": false
-  },
   "nexigon_api.organizations.SetOrganizationMemberIsAdminAction": {
     "type": "object",
     "description": "Set whether the user is an administrator of the organization.",
@@ -2529,50 +2330,6 @@
       "userId",
       "isAdmin"
     ],
-    "unevaluatedProperties": false
-  },
-  "nexigon_api.organizations.SetOrganizationPerDeviceDailyLimitsUpdate": {
-    "type": "object",
-    "description": "Updates for organization per-device daily limits.",
-    "properties": {
-      "remoteAccessVolume": {
-        "type": "integer",
-        "format": "uint64"
-      },
-      "readOperations": {
-        "type": "integer",
-        "format": "uint64"
-      },
-      "writeOperations": {
-        "type": "integer",
-        "format": "uint64"
-      }
-    },
-    "required": [],
-    "unevaluatedProperties": false
-  },
-  "nexigon_api.organizations.SetOrganizationPerDeviceLimitsUpdate": {
-    "type": "object",
-    "description": "Updates for organization per-device limits.",
-    "properties": {
-      "properties": {
-        "type": "integer",
-        "format": "uint64"
-      },
-      "remoteAccessVolume": {
-        "type": "integer",
-        "format": "uint64"
-      },
-      "readOperations": {
-        "type": "integer",
-        "format": "uint64"
-      },
-      "writeOperations": {
-        "type": "integer",
-        "format": "uint64"
-      }
-    },
-    "required": [],
     "unevaluatedProperties": false
   },
   "nexigon_api.outputs.Empty": {

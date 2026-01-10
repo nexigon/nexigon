@@ -120,9 +120,6 @@ macro_rules! with_actions {
             ("organizations_QueryAuditLog", QueryOrganizationAuditLog, organizations::QueryOrganizationAuditLogAction, organizations::QueryOrganizationAuditLogOutput),
             // ## Organization Resources
             ("organizations_GetResourceUsage", GetOrganizationResourceUsage, organizations::GetOrganizationResourceUsageAction, organizations::GetOrganizationResourceUsageOutput),
-            // ## Organization Limits
-            ("organizations_GetLimits", GetOrganizationLimits, organizations::GetOrganizationLimitsAction, organizations::GetOrganizationLimitsOutput),
-            ("organizations_SetLimits", SetOrganizationLimits, organizations::SetOrganizationLimitsAction, outputs::Empty),
 
             // # Projects
             ("projects_Query", QueryProjects, projects::QueryProjectsAction, projects::QueryProjectsOutput),
