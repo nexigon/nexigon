@@ -113,6 +113,10 @@ record QueryProjectDevicesItem {
     is_connected: bool,
     /// Pending device certificates.
     pending_certificates_count: u32,
+    /// Timestamp when the device was last connected (current or most recent connection).
+    last_connected_at?: Timestamp,
+    /// Duration of the current connection in seconds (null if not connected).
+    current_connection_duration_secs?: u32,
 }
 
 /// Query the deployment tokens of a project.

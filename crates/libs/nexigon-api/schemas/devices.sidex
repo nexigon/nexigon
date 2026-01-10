@@ -60,6 +60,12 @@ record QueryDevicesItem {
     device_id: DeviceId,
     /// Project ID of the device.
     project_id: ProjectId,
+    /// Indicates whether the device is currently connected.
+    is_connected: bool,
+    /// Timestamp when the device was last connected (current or most recent connection).
+    last_connected_at?: Timestamp,
+    /// Duration of the current connection in seconds (null if not connected).
+    current_connection_duration_secs?: u32,
 }
 
 /// Get information about a device.
@@ -121,6 +127,35 @@ variant DeviceCertificateStatus {
     Rejected,
     /// The certificate has been revoked.
     Revoked,
+}
+
+/// Reason why a device connection ended.
+#[json(tagged = externally)]
+variant ConnectionEndReason {
+    /// Unknown reason (fallback).
+    Unknown,
+    /// Device disconnected normally.
+    Disconnected,
+    /// Connection ended due to cluster node crash or heartbeat timeout.
+    NodeCrashed,
+    /// Connection ended due to graceful server shutdown.
+    ServerShutdown,
+}
+
+/// Device connection log entry (for connection history).
+record DeviceConnectionLog {
+    /// ID of the connection.
+    connection_id: DeviceConnectionId,
+    /// ID of the cluster node.
+    node_id: ClusterNodeId,
+    /// Timestamp when the connection was established.
+    connected_at: Timestamp,
+    /// Timestamp when the connection ended (null if still connected).
+    ended_at?: Timestamp,
+    /// Reason why the connection ended (null if still connected).
+    end_reason?: ConnectionEndReason,
+    /// Duration of the connection in seconds.
+    duration_secs: u32,
 }
 
 /// Create a new device.
@@ -270,6 +305,24 @@ record RegisterDeviceConnectionOutput {
 record UnregisterDeviceConnectionAction {
     /// ID of the connection.
     connection_id: DeviceConnectionId,
+    /// Reason for ending the connection.
+    end_reason: ConnectionEndReason,
+}
+
+/// Query the connection history of a device.
+record QueryDeviceConnectionsAction {
+    /// ID of the device.
+    device_id: DeviceId,
+    /// Limit results (default 100).
+    limit?: u32,
+    /// Include only active connections.
+    active_only?: bool,
+}
+
+/// Output of querying device connections.
+record QueryDeviceConnectionsOutput {
+    /// List of connections.
+    connections: [DeviceConnectionLog],
 }
 
 /// Issue a HTTP proxy JWT.

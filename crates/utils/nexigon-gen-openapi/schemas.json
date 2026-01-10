@@ -370,6 +370,9 @@
       "name": {
         "type": "string"
       },
+      "status": {
+        "$ref": "#/components/schemas/nexigon_api.cluster.ClusterNodeStatus"
+      },
       "joinedAt": {
         "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
       },
@@ -379,10 +382,17 @@
       },
       "lastHeartbeat": {
         "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
+      },
+      "terminatedAt": {
+        "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
+      },
+      "terminationReason": {
+        "$ref": "#/components/schemas/nexigon_api.cluster.ClusterNodeTerminationReason"
       }
     },
     "required": [
       "nodeId",
+      "status",
       "joinedAt",
       "uptimeSecs",
       "lastHeartbeat"
@@ -395,10 +405,29 @@
     ],
     "description": "Unique ID of a cluster node."
   },
+  "nexigon_api.cluster.ClusterNodeStatus": {
+    "enum": [
+      "Active",
+      "Terminated"
+    ],
+    "description": "Status of a cluster node."
+  },
+  "nexigon_api.cluster.ClusterNodeTerminationReason": {
+    "enum": [
+      "Unknown",
+      "HeartbeatTimeout",
+      "Shutdown"
+    ],
+    "description": "Reason why a cluster node was terminated."
+  },
   "nexigon_api.cluster.GetClusterDetailsAction": {
     "type": "object",
     "description": "Get information about the cluster.",
-    "properties": {},
+    "properties": {
+      "includeTerminated": {
+        "type": "boolean"
+      }
+    },
     "required": [],
     "unevaluatedProperties": false
   },
@@ -567,6 +596,15 @@
     ],
     "description": "Fingerprint of a device certificate."
   },
+  "nexigon_api.devices.ConnectionEndReason": {
+    "enum": [
+      "Unknown",
+      "Disconnected",
+      "NodeCrashed",
+      "ServerShutdown"
+    ],
+    "description": "Reason why a device connection ended."
+  },
   "nexigon_api.devices.CreateDeviceAction": {
     "type": "object",
     "description": "Create a new device.",
@@ -694,6 +732,38 @@
       "string"
     ],
     "description": "Unique ID of a device connection."
+  },
+  "nexigon_api.devices.DeviceConnectionLog": {
+    "type": "object",
+    "description": "Device connection log entry (for connection history).",
+    "properties": {
+      "connectionId": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceConnectionId"
+      },
+      "nodeId": {
+        "$ref": "#/components/schemas/nexigon_api.cluster.ClusterNodeId"
+      },
+      "connectedAt": {
+        "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
+      },
+      "endedAt": {
+        "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
+      },
+      "endReason": {
+        "$ref": "#/components/schemas/nexigon_api.devices.ConnectionEndReason"
+      },
+      "durationSecs": {
+        "type": "integer",
+        "format": "uint32"
+      }
+    },
+    "required": [
+      "connectionId",
+      "nodeId",
+      "connectedAt",
+      "durationSecs"
+    ],
+    "unevaluatedProperties": false
   },
   "nexigon_api.devices.DeviceEvent": {
     "type": "object",
@@ -1070,6 +1140,42 @@
     ],
     "unevaluatedProperties": false
   },
+  "nexigon_api.devices.QueryDeviceConnectionsAction": {
+    "type": "object",
+    "description": "Query the connection history of a device.",
+    "properties": {
+      "deviceId": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceId"
+      },
+      "limit": {
+        "type": "integer",
+        "format": "uint32"
+      },
+      "activeOnly": {
+        "type": "boolean"
+      }
+    },
+    "required": [
+      "deviceId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.devices.QueryDeviceConnectionsOutput": {
+    "type": "object",
+    "description": "Output of querying device connections.",
+    "properties": {
+      "connections": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.devices.DeviceConnectionLog"
+        }
+      }
+    },
+    "required": [
+      "connections"
+    ],
+    "unevaluatedProperties": false
+  },
   "nexigon_api.devices.QueryDeviceEventsAction": {
     "type": "object",
     "description": "Query device events.",
@@ -1148,11 +1254,22 @@
       },
       "projectId": {
         "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+      },
+      "isConnected": {
+        "type": "boolean"
+      },
+      "lastConnectedAt": {
+        "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
+      },
+      "currentConnectionDurationSecs": {
+        "type": "integer",
+        "format": "uint32"
       }
     },
     "required": [
       "deviceId",
-      "projectId"
+      "projectId",
+      "isConnected"
     ],
     "unevaluatedProperties": false
   },
@@ -1293,10 +1410,14 @@
     "properties": {
       "connectionId": {
         "$ref": "#/components/schemas/nexigon_api.devices.DeviceConnectionId"
+      },
+      "endReason": {
+        "$ref": "#/components/schemas/nexigon_api.devices.ConnectionEndReason"
       }
     },
     "required": [
-      "connectionId"
+      "connectionId",
+      "endReason"
     ],
     "unevaluatedProperties": false
   },
@@ -2455,6 +2576,13 @@
         "type": "boolean"
       },
       "pendingCertificatesCount": {
+        "type": "integer",
+        "format": "uint32"
+      },
+      "lastConnectedAt": {
+        "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
+      },
+      "currentConnectionDurationSecs": {
         "type": "integer",
         "format": "uint32"
       }

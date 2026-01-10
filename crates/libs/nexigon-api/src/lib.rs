@@ -110,6 +110,7 @@ macro_rules! with_actions {
             // ## Device Connections
             ("devices_RegisterConnection", RegisterDeviceConnection, devices::RegisterDeviceConnectionAction, devices::RegisterDeviceConnectionOutput),
             ("devices_UnregisterConnection", UnregisterDeviceConnection, devices::UnregisterDeviceConnectionAction, outputs::Empty),
+            ("devices_QueryConnections", QueryDeviceConnections, devices::QueryDeviceConnectionsAction, devices::QueryDeviceConnectionsOutput),
             // ## HTTP Proxy
             ("devices_IssueHttpProxyToken", IssueDeviceHttpProxyToken, devices::IssueDeviceHttpProxyTokenAction, devices::IssueDeviceHttpProxyTokenOutput),
             ("devices_ValidateHttpProxyToken", ValidateDeviceHttpProxyToken, devices::ValidateDeviceHttpProxyTokenAction, devices::ValidateDeviceHttpProxyTokenOutput),

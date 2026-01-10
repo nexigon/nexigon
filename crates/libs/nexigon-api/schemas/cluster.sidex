@@ -7,12 +7,35 @@ import datetime::Timestamp
 #[json(type = "string")]
 opaque ClusterNodeId
 
+/// Status of a cluster node.
+#[json(tagged = externally)]
+variant ClusterNodeStatus {
+    /// Node is active and running.
+    Active,
+    /// Node has been terminated.
+    Terminated,
+}
+
+/// Reason why a cluster node was terminated.
+#[json(tagged = externally)]
+variant ClusterNodeTerminationReason {
+    /// Unknown reason (fallback).
+    Unknown,
+    /// Node was terminated due to heartbeat timeout.
+    HeartbeatTimeout,
+    /// Node was terminated due to graceful shutdown.
+    Shutdown,
+}
+
 /// Get information about the cluster.
-record GetClusterDetailsAction { }
+record GetClusterDetailsAction {
+    /// Include terminated nodes in the response.
+    include_terminated?: bool,
+}
 
 /// Information about the cluster.
 record GetClusterDetailsOutput {
-    /// Active nodes of the cluster.
+    /// Nodes of the cluster.
     nodes: [ClusterNode],
 }
 
@@ -22,12 +45,18 @@ record ClusterNode {
     node_id: ClusterNodeId,
     /// Name of the cluster node.
     name?: string,
+    /// Status of the cluster node.
+    status: ClusterNodeStatus,
     /// Timestamp when the node joined the cluster.
     joined_at: Timestamp,
     /// Uptime of the node in seconds.
     uptime_secs: u32,
     /// Timestamp when the node last reported a heartbeat.
     last_heartbeat: Timestamp,
+    /// Timestamp when the node was terminated.
+    terminated_at?: Timestamp,
+    /// Reason why the node was terminated.
+    termination_reason?: ClusterNodeTerminationReason,
 }
 
 /// Register a new cluster node.

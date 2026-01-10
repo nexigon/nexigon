@@ -4342,13 +4342,401 @@ pub mod cluster {
     use :: sidex_serde as __sidex_serde;
     #[doc = "Unique ID of a cluster node.\n"]
     pub type ClusterNodeId = nexigon_ids::ids::ClusterNodeId;
+    #[doc = "Status of a cluster node.\n"]
+    #[derive(Clone, Debug)]
+    pub enum ClusterNodeStatus {
+        #[doc = "Node is active and running.\n"]
+        Active,
+        #[doc = "Node has been terminated.\n"]
+        Terminated,
+    }
+    #[automatically_derived]
+    impl __serde::Serialize for ClusterNodeStatus {
+        fn serialize<__S: __serde::Serializer>(
+            &self,
+            __serializer: __S,
+        ) -> ::std::result::Result<__S::Ok, __S::Error> {
+            let __serializer =
+                __sidex_serde::ser::VariantSerializer::new(__serializer, "ClusterNodeStatus");
+            match self {
+                Self::Active => __serializer.serialize_tag("Active", 0u32),
+                Self::Terminated => __serializer.serialize_tag("Terminated", 1u32),
+            }
+        }
+    }
+    #[automatically_derived]
+    impl<'de> __serde::Deserialize<'de> for ClusterNodeStatus {
+        fn deserialize<__D: __serde::Deserializer<'de>>(
+            __deserializer: __D,
+        ) -> ::std::result::Result<Self, __D::Error> {
+            #[doc(hidden)]
+            const __IDENTIFIERS: &'static [&'static str] = &["Active", "Terminated"];
+            #[doc(hidden)]
+            const __EXPECTING_IDENTIFIERS: &'static str =
+                "an identifier in [\"Active\", \"Terminated\"]";
+            #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
+            #[doc(hidden)]
+            enum __Identifier {
+                __Identifier0,
+                __Identifier1,
+            }
+            #[doc(hidden)]
+            struct __IdentifierVisitor;
+            impl<'de> __serde::de::Visitor<'de> for __IdentifierVisitor {
+                type Value = __Identifier;
+                fn expecting(
+                    &self,
+                    __formatter: &mut ::core::fmt::Formatter,
+                ) -> ::core::fmt::Result {
+                    ::core::fmt::Formatter::write_str(__formatter, __EXPECTING_IDENTIFIERS)
+                }
+                fn visit_u64<__E>(self, __value: u64) -> ::core::result::Result<Self::Value, __E>
+                where
+                    __E: __serde::de::Error,
+                {
+                    match __value {
+                        0u64 => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                        1u64 => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                        __variant => {
+                            ::core::result::Result::Err(__serde::de::Error::invalid_value(
+                                __serde::de::Unexpected::Unsigned(__variant),
+                                &__EXPECTING_IDENTIFIERS,
+                            ))
+                        }
+                    }
+                }
+                fn visit_str<__E>(self, __value: &str) -> ::core::result::Result<Self::Value, __E>
+                where
+                    __E: __serde::de::Error,
+                {
+                    match __value {
+                        "Active" => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                        "Terminated" => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                        __variant => ::core::result::Result::Err(
+                            __serde::de::Error::unknown_variant(__variant, __IDENTIFIERS),
+                        ),
+                    }
+                }
+                fn visit_bytes<__E>(
+                    self,
+                    __value: &[u8],
+                ) -> ::core::result::Result<Self::Value, __E>
+                where
+                    __E: __serde::de::Error,
+                {
+                    match __value {
+                        b"Active" => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                        b"Terminated" => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                        __variant => {
+                            ::core::result::Result::Err(__serde::de::Error::invalid_value(
+                                __serde::de::Unexpected::Bytes(__variant),
+                                &__EXPECTING_IDENTIFIERS,
+                            ))
+                        }
+                    }
+                }
+            }
+            impl<'de> __serde::Deserialize<'de> for __Identifier {
+                #[inline]
+                fn deserialize<__D>(__deserializer: __D) -> ::core::result::Result<Self, __D::Error>
+                where
+                    __D: __serde::Deserializer<'de>,
+                {
+                    __serde::Deserializer::deserialize_identifier(
+                        __deserializer,
+                        __IdentifierVisitor,
+                    )
+                }
+            }
+            #[doc(hidden)]
+            const __VARIANTS: &'static [&'static str] = &["Active", "Terminated"];
+            #[doc(hidden)]
+            struct __Visitor {
+                __phantom_vars: ::core::marker::PhantomData<fn(&())>,
+            }
+            impl<'de> __serde::de::Visitor<'de> for __Visitor {
+                type Value = ClusterNodeStatus;
+                fn expecting(
+                    &self,
+                    __formatter: &mut ::core::fmt::Formatter,
+                ) -> ::core::fmt::Result {
+                    ::core::fmt::Formatter::write_str(__formatter, "enum ClusterNodeStatus")
+                }
+                #[inline]
+                fn visit_str<__E>(self, __value: &str) -> ::core::result::Result<Self::Value, __E>
+                where
+                    __E: __serde::de::Error,
+                {
+                    let __identifier = __IdentifierVisitor.visit_str(__value)?;
+                    #[allow(unreachable_patterns)]
+                    match __identifier {
+                        __Identifier::__Identifier0 => {
+                            ::core::result::Result::Ok(ClusterNodeStatus::Active)
+                        }
+                        __Identifier::__Identifier1 => {
+                            ::core::result::Result::Ok(ClusterNodeStatus::Terminated)
+                        }
+                        _ => Err(__E::invalid_value(
+                            __serde::de::Unexpected::Str(__value),
+                            &self,
+                        )),
+                    }
+                }
+                #[inline]
+                fn visit_enum<__A>(
+                    self,
+                    __data: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::EnumAccess<'de>,
+                {
+                    match __serde::de::EnumAccess::variant::<__Identifier>(__data)? {
+                        (__Identifier::__Identifier0, __variant) => {
+                            __serde::de::VariantAccess::unit_variant(__variant)?;
+                            ::core::result::Result::Ok(ClusterNodeStatus::Active)
+                        }
+                        (__Identifier::__Identifier1, __variant) => {
+                            __serde::de::VariantAccess::unit_variant(__variant)?;
+                            ::core::result::Result::Ok(ClusterNodeStatus::Terminated)
+                        }
+                    }
+                }
+            }
+            __serde::Deserializer::deserialize_enum(
+                __deserializer,
+                "ClusterNodeStatus",
+                __VARIANTS,
+                __Visitor {
+                    __phantom_vars: ::core::marker::PhantomData,
+                },
+            )
+        }
+    }
+    #[doc = "Reason why a cluster node was terminated.\n"]
+    #[derive(Clone, Debug)]
+    pub enum ClusterNodeTerminationReason {
+        #[doc = "Unknown reason (fallback).\n"]
+        Unknown,
+        #[doc = "Node was terminated due to heartbeat timeout.\n"]
+        HeartbeatTimeout,
+        #[doc = "Node was terminated due to graceful shutdown.\n"]
+        Shutdown,
+    }
+    #[automatically_derived]
+    impl __serde::Serialize for ClusterNodeTerminationReason {
+        fn serialize<__S: __serde::Serializer>(
+            &self,
+            __serializer: __S,
+        ) -> ::std::result::Result<__S::Ok, __S::Error> {
+            let __serializer = __sidex_serde::ser::VariantSerializer::new(
+                __serializer,
+                "ClusterNodeTerminationReason",
+            );
+            match self {
+                Self::Unknown => __serializer.serialize_tag("Unknown", 0u32),
+                Self::HeartbeatTimeout => __serializer.serialize_tag("HeartbeatTimeout", 1u32),
+                Self::Shutdown => __serializer.serialize_tag("Shutdown", 2u32),
+            }
+        }
+    }
+    #[automatically_derived]
+    impl<'de> __serde::Deserialize<'de> for ClusterNodeTerminationReason {
+        fn deserialize<__D: __serde::Deserializer<'de>>(
+            __deserializer: __D,
+        ) -> ::std::result::Result<Self, __D::Error> {
+            #[doc(hidden)]
+            const __IDENTIFIERS: &'static [&'static str] =
+                &["Unknown", "HeartbeatTimeout", "Shutdown"];
+            #[doc(hidden)]
+            const __EXPECTING_IDENTIFIERS: &'static str =
+                "an identifier in [\"Unknown\", \"HeartbeatTimeout\", \"Shutdown\"]";
+            #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
+            #[doc(hidden)]
+            enum __Identifier {
+                __Identifier0,
+                __Identifier1,
+                __Identifier2,
+            }
+            #[doc(hidden)]
+            struct __IdentifierVisitor;
+            impl<'de> __serde::de::Visitor<'de> for __IdentifierVisitor {
+                type Value = __Identifier;
+                fn expecting(
+                    &self,
+                    __formatter: &mut ::core::fmt::Formatter,
+                ) -> ::core::fmt::Result {
+                    ::core::fmt::Formatter::write_str(__formatter, __EXPECTING_IDENTIFIERS)
+                }
+                fn visit_u64<__E>(self, __value: u64) -> ::core::result::Result<Self::Value, __E>
+                where
+                    __E: __serde::de::Error,
+                {
+                    match __value {
+                        0u64 => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                        1u64 => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                        2u64 => ::core::result::Result::Ok(__Identifier::__Identifier2),
+                        __variant => {
+                            ::core::result::Result::Err(__serde::de::Error::invalid_value(
+                                __serde::de::Unexpected::Unsigned(__variant),
+                                &__EXPECTING_IDENTIFIERS,
+                            ))
+                        }
+                    }
+                }
+                fn visit_str<__E>(self, __value: &str) -> ::core::result::Result<Self::Value, __E>
+                where
+                    __E: __serde::de::Error,
+                {
+                    match __value {
+                        "Unknown" => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                        "HeartbeatTimeout" => {
+                            ::core::result::Result::Ok(__Identifier::__Identifier1)
+                        }
+                        "Shutdown" => ::core::result::Result::Ok(__Identifier::__Identifier2),
+                        __variant => ::core::result::Result::Err(
+                            __serde::de::Error::unknown_variant(__variant, __IDENTIFIERS),
+                        ),
+                    }
+                }
+                fn visit_bytes<__E>(
+                    self,
+                    __value: &[u8],
+                ) -> ::core::result::Result<Self::Value, __E>
+                where
+                    __E: __serde::de::Error,
+                {
+                    match __value {
+                        b"Unknown" => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                        b"HeartbeatTimeout" => {
+                            ::core::result::Result::Ok(__Identifier::__Identifier1)
+                        }
+                        b"Shutdown" => ::core::result::Result::Ok(__Identifier::__Identifier2),
+                        __variant => {
+                            ::core::result::Result::Err(__serde::de::Error::invalid_value(
+                                __serde::de::Unexpected::Bytes(__variant),
+                                &__EXPECTING_IDENTIFIERS,
+                            ))
+                        }
+                    }
+                }
+            }
+            impl<'de> __serde::Deserialize<'de> for __Identifier {
+                #[inline]
+                fn deserialize<__D>(__deserializer: __D) -> ::core::result::Result<Self, __D::Error>
+                where
+                    __D: __serde::Deserializer<'de>,
+                {
+                    __serde::Deserializer::deserialize_identifier(
+                        __deserializer,
+                        __IdentifierVisitor,
+                    )
+                }
+            }
+            #[doc(hidden)]
+            const __VARIANTS: &'static [&'static str] =
+                &["Unknown", "HeartbeatTimeout", "Shutdown"];
+            #[doc(hidden)]
+            struct __Visitor {
+                __phantom_vars: ::core::marker::PhantomData<fn(&())>,
+            }
+            impl<'de> __serde::de::Visitor<'de> for __Visitor {
+                type Value = ClusterNodeTerminationReason;
+                fn expecting(
+                    &self,
+                    __formatter: &mut ::core::fmt::Formatter,
+                ) -> ::core::fmt::Result {
+                    ::core::fmt::Formatter::write_str(
+                        __formatter,
+                        "enum ClusterNodeTerminationReason",
+                    )
+                }
+                #[inline]
+                fn visit_str<__E>(self, __value: &str) -> ::core::result::Result<Self::Value, __E>
+                where
+                    __E: __serde::de::Error,
+                {
+                    let __identifier = __IdentifierVisitor.visit_str(__value)?;
+                    #[allow(unreachable_patterns)]
+                    match __identifier {
+                        __Identifier::__Identifier0 => {
+                            ::core::result::Result::Ok(ClusterNodeTerminationReason::Unknown)
+                        }
+                        __Identifier::__Identifier1 => ::core::result::Result::Ok(
+                            ClusterNodeTerminationReason::HeartbeatTimeout,
+                        ),
+                        __Identifier::__Identifier2 => {
+                            ::core::result::Result::Ok(ClusterNodeTerminationReason::Shutdown)
+                        }
+                        _ => Err(__E::invalid_value(
+                            __serde::de::Unexpected::Str(__value),
+                            &self,
+                        )),
+                    }
+                }
+                #[inline]
+                fn visit_enum<__A>(
+                    self,
+                    __data: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::EnumAccess<'de>,
+                {
+                    match __serde::de::EnumAccess::variant::<__Identifier>(__data)? {
+                        (__Identifier::__Identifier0, __variant) => {
+                            __serde::de::VariantAccess::unit_variant(__variant)?;
+                            ::core::result::Result::Ok(ClusterNodeTerminationReason::Unknown)
+                        }
+                        (__Identifier::__Identifier1, __variant) => {
+                            __serde::de::VariantAccess::unit_variant(__variant)?;
+                            ::core::result::Result::Ok(
+                                ClusterNodeTerminationReason::HeartbeatTimeout,
+                            )
+                        }
+                        (__Identifier::__Identifier2, __variant) => {
+                            __serde::de::VariantAccess::unit_variant(__variant)?;
+                            ::core::result::Result::Ok(ClusterNodeTerminationReason::Shutdown)
+                        }
+                    }
+                }
+            }
+            __serde::Deserializer::deserialize_enum(
+                __deserializer,
+                "ClusterNodeTerminationReason",
+                __VARIANTS,
+                __Visitor {
+                    __phantom_vars: ::core::marker::PhantomData,
+                },
+            )
+        }
+    }
     #[doc = "Get information about the cluster.\n"]
     #[derive(Clone, Debug)]
-    pub struct GetClusterDetailsAction {}
+    pub struct GetClusterDetailsAction {
+        #[doc = "Include terminated nodes in the response.\n"]
+        pub include_terminated: ::std::option::Option<bool>,
+    }
     impl GetClusterDetailsAction {
         #[doc = "Creates a new [`GetClusterDetailsAction`]."]
         pub fn new() -> Self {
-            Self {}
+            Self {
+                include_terminated: ::std::default::Default::default(),
+            }
+        }
+        #[doc = "Sets the value of `include_terminated`."]
+        pub fn set_include_terminated(
+            &mut self,
+            include_terminated: ::std::option::Option<bool>,
+        ) -> &mut Self {
+            self.include_terminated = include_terminated;
+            self
+        }
+        #[doc = "Sets the value of `include_terminated`."]
+        pub fn with_include_terminated(
+            mut self,
+            include_terminated: ::std::option::Option<bool>,
+        ) -> Self {
+            self.include_terminated = include_terminated;
+            self
         }
     }
     impl ::std::default::Default for GetClusterDetailsAction {
@@ -4365,7 +4753,11 @@ pub mod cluster {
             let mut __record = __sidex_serde::ser::RecordSerializer::new(
                 __serializer,
                 "GetClusterDetailsAction",
-                0usize,
+                1usize,
+            )?;
+            __record.serialize_optional_field(
+                "includeTerminated",
+                ::core::option::Option::as_ref(&self.include_terminated),
             )?;
             __record.end()
         }
@@ -4395,7 +4787,20 @@ pub mod cluster {
                 where
                     __A: __serde::de::SeqAccess<'de>,
                 {
-                    ::core::result::Result::Ok(GetClusterDetailsAction {})
+                    let __field0 = match __serde::de::SeqAccess::next_element::<
+                        ::std::option::Option<bool>,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(0usize, &"record with 1 fields"),
+                            );
+                        }
+                    };
+                    ::core::result::Result::Ok(GetClusterDetailsAction {
+                        include_terminated: __field0,
+                    })
                 }
                 #[inline]
                 fn visit_map<__A>(
@@ -4406,12 +4811,14 @@ pub mod cluster {
                     __A: __serde::de::MapAccess<'de>,
                 {
                     #[doc(hidden)]
-                    const __IDENTIFIERS: &'static [&'static str] = &[];
+                    const __IDENTIFIERS: &'static [&'static str] = &["includeTerminated"];
                     #[doc(hidden)]
-                    const __EXPECTING_IDENTIFIERS: &'static str = "an identifier in []";
+                    const __EXPECTING_IDENTIFIERS: &'static str =
+                        "an identifier in [\"includeTerminated\"]";
                     #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
                     #[doc(hidden)]
                     enum __Identifier {
+                        __Identifier0,
                         __Unknown,
                     }
                     #[doc(hidden)]
@@ -4432,6 +4839,7 @@ pub mod cluster {
                             __E: __serde::de::Error,
                         {
                             match __value {
+                                0u64 => ::core::result::Result::Ok(__Identifier::__Identifier0),
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
                         }
@@ -4443,6 +4851,9 @@ pub mod cluster {
                             __E: __serde::de::Error,
                         {
                             match __value {
+                                "includeTerminated" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
+                                }
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
                         }
@@ -4454,6 +4865,9 @@ pub mod cluster {
                             __E: __serde::de::Error,
                         {
                             match __value {
+                                b"includeTerminated" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
+                                }
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
                         }
@@ -4472,10 +4886,26 @@ pub mod cluster {
                             )
                         }
                     }
+                    let mut __field0: ::core::option::Option<::std::option::Option<bool>> =
+                        ::core::option::Option::None;
                     while let ::core::option::Option::Some(__key) =
                         __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
                     {
                         match __key {
+                            __Identifier::__Identifier0 => {
+                                if ::core::option::Option::is_some(&__field0) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "includeTerminated",
+                                        ),
+                                    );
+                                }
+                                __field0 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<
+                                        ::std::option::Option<bool>,
+                                    >(&mut __map)?,
+                                );
+                            }
                             _ => {
                                 __serde::de::MapAccess::next_value::<__serde::de::IgnoredAny>(
                                     &mut __map,
@@ -4483,11 +4913,17 @@ pub mod cluster {
                             }
                         }
                     }
-                    ::core::result::Result::Ok(GetClusterDetailsAction {})
+                    let __field0 = match __field0 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => ::core::option::Option::None,
+                    };
+                    ::core::result::Result::Ok(GetClusterDetailsAction {
+                        include_terminated: __field0,
+                    })
                 }
             }
             #[doc(hidden)]
-            const __FIELDS: &'static [&'static str] = &[];
+            const __FIELDS: &'static [&'static str] = &["includeTerminated"];
             __serde::Deserializer::deserialize_struct(
                 __deserializer,
                 "GetClusterDetailsAction",
@@ -4501,7 +4937,7 @@ pub mod cluster {
     #[doc = "Information about the cluster.\n"]
     #[derive(Clone, Debug)]
     pub struct GetClusterDetailsOutput {
-        #[doc = "Active nodes of the cluster.\n"]
+        #[doc = "Nodes of the cluster.\n"]
         pub nodes: ::std::vec::Vec<ClusterNode>,
     }
     impl GetClusterDetailsOutput {
@@ -4709,27 +5145,37 @@ pub mod cluster {
         pub node_id: ClusterNodeId,
         #[doc = "Name of the cluster node.\n"]
         pub name: ::std::option::Option<::std::string::String>,
+        #[doc = "Status of the cluster node.\n"]
+        pub status: ClusterNodeStatus,
         #[doc = "Timestamp when the node joined the cluster.\n"]
         pub joined_at: super::datetime::Timestamp,
         #[doc = "Uptime of the node in seconds.\n"]
         pub uptime_secs: u32,
         #[doc = "Timestamp when the node last reported a heartbeat.\n"]
         pub last_heartbeat: super::datetime::Timestamp,
+        #[doc = "Timestamp when the node was terminated.\n"]
+        pub terminated_at: ::std::option::Option<super::datetime::Timestamp>,
+        #[doc = "Reason why the node was terminated.\n"]
+        pub termination_reason: ::std::option::Option<ClusterNodeTerminationReason>,
     }
     impl ClusterNode {
         #[doc = "Creates a new [`ClusterNode`]."]
         pub fn new(
             node_id: ClusterNodeId,
+            status: ClusterNodeStatus,
             joined_at: super::datetime::Timestamp,
             uptime_secs: u32,
             last_heartbeat: super::datetime::Timestamp,
         ) -> Self {
             Self {
                 node_id,
+                status,
                 joined_at,
                 uptime_secs,
                 last_heartbeat,
                 name: ::std::default::Default::default(),
+                terminated_at: ::std::default::Default::default(),
+                termination_reason: ::std::default::Default::default(),
             }
         }
         #[doc = "Sets the value of `node_id`."]
@@ -4753,6 +5199,16 @@ pub mod cluster {
         #[doc = "Sets the value of `name`."]
         pub fn with_name(mut self, name: ::std::option::Option<::std::string::String>) -> Self {
             self.name = name;
+            self
+        }
+        #[doc = "Sets the value of `status`."]
+        pub fn set_status(&mut self, status: ClusterNodeStatus) -> &mut Self {
+            self.status = status;
+            self
+        }
+        #[doc = "Sets the value of `status`."]
+        pub fn with_status(mut self, status: ClusterNodeStatus) -> Self {
+            self.status = status;
             self
         }
         #[doc = "Sets the value of `joined_at`."]
@@ -4788,6 +5244,38 @@ pub mod cluster {
             self.last_heartbeat = last_heartbeat;
             self
         }
+        #[doc = "Sets the value of `terminated_at`."]
+        pub fn set_terminated_at(
+            &mut self,
+            terminated_at: ::std::option::Option<super::datetime::Timestamp>,
+        ) -> &mut Self {
+            self.terminated_at = terminated_at;
+            self
+        }
+        #[doc = "Sets the value of `terminated_at`."]
+        pub fn with_terminated_at(
+            mut self,
+            terminated_at: ::std::option::Option<super::datetime::Timestamp>,
+        ) -> Self {
+            self.terminated_at = terminated_at;
+            self
+        }
+        #[doc = "Sets the value of `termination_reason`."]
+        pub fn set_termination_reason(
+            &mut self,
+            termination_reason: ::std::option::Option<ClusterNodeTerminationReason>,
+        ) -> &mut Self {
+            self.termination_reason = termination_reason;
+            self
+        }
+        #[doc = "Sets the value of `termination_reason`."]
+        pub fn with_termination_reason(
+            mut self,
+            termination_reason: ::std::option::Option<ClusterNodeTerminationReason>,
+        ) -> Self {
+            self.termination_reason = termination_reason;
+            self
+        }
     }
     #[automatically_derived]
     impl __serde::Serialize for ClusterNode {
@@ -4796,13 +5284,22 @@ pub mod cluster {
             __serializer: __S,
         ) -> ::std::result::Result<__S::Ok, __S::Error> {
             let mut __record =
-                __sidex_serde::ser::RecordSerializer::new(__serializer, "ClusterNode", 5usize)?;
+                __sidex_serde::ser::RecordSerializer::new(__serializer, "ClusterNode", 8usize)?;
             __record.serialize_field("nodeId", &self.node_id)?;
             __record
                 .serialize_optional_field("name", ::core::option::Option::as_ref(&self.name))?;
+            __record.serialize_field("status", &self.status)?;
             __record.serialize_field("joinedAt", &self.joined_at)?;
             __record.serialize_field("uptimeSecs", &self.uptime_secs)?;
             __record.serialize_field("lastHeartbeat", &self.last_heartbeat)?;
+            __record.serialize_optional_field(
+                "terminatedAt",
+                ::core::option::Option::as_ref(&self.terminated_at),
+            )?;
+            __record.serialize_optional_field(
+                "terminationReason",
+                ::core::option::Option::as_ref(&self.termination_reason),
+            )?;
             __record.end()
         }
     }
@@ -4838,7 +5335,7 @@ pub mod cluster {
                                 return ::core::result::Result::Err(
                                     __serde::de::Error::invalid_length(
                                         0usize,
-                                        &"record with 5 fields",
+                                        &"record with 8 fields",
                                     ),
                                 );
                             }
@@ -4850,46 +5347,81 @@ pub mod cluster {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(1usize, &"record with 5 fields"),
+                                __serde::de::Error::invalid_length(1usize, &"record with 8 fields"),
                             );
                         }
                     };
-                    let __field2 = match __serde::de::SeqAccess::next_element::<
+                    let __field2 = match __serde::de::SeqAccess::next_element::<ClusterNodeStatus>(
+                        &mut __seq,
+                    )? {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(2usize, &"record with 8 fields"),
+                            );
+                        }
+                    };
+                    let __field3 = match __serde::de::SeqAccess::next_element::<
                         super::datetime::Timestamp,
                     >(&mut __seq)?
                     {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(2usize, &"record with 5 fields"),
+                                __serde::de::Error::invalid_length(3usize, &"record with 8 fields"),
                             );
                         }
                     };
-                    let __field3 = match __serde::de::SeqAccess::next_element::<u32>(&mut __seq)? {
+                    let __field4 = match __serde::de::SeqAccess::next_element::<u32>(&mut __seq)? {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(3usize, &"record with 5 fields"),
+                                __serde::de::Error::invalid_length(4usize, &"record with 8 fields"),
                             );
                         }
                     };
-                    let __field4 = match __serde::de::SeqAccess::next_element::<
+                    let __field5 = match __serde::de::SeqAccess::next_element::<
                         super::datetime::Timestamp,
                     >(&mut __seq)?
                     {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(4usize, &"record with 5 fields"),
+                                __serde::de::Error::invalid_length(5usize, &"record with 8 fields"),
+                            );
+                        }
+                    };
+                    let __field6 = match __serde::de::SeqAccess::next_element::<
+                        ::std::option::Option<super::datetime::Timestamp>,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(6usize, &"record with 8 fields"),
+                            );
+                        }
+                    };
+                    let __field7 = match __serde::de::SeqAccess::next_element::<
+                        ::std::option::Option<ClusterNodeTerminationReason>,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(7usize, &"record with 8 fields"),
                             );
                         }
                     };
                     ::core::result::Result::Ok(ClusterNode {
                         node_id: __field0,
                         name: __field1,
-                        joined_at: __field2,
-                        uptime_secs: __field3,
-                        last_heartbeat: __field4,
+                        status: __field2,
+                        joined_at: __field3,
+                        uptime_secs: __field4,
+                        last_heartbeat: __field5,
+                        terminated_at: __field6,
+                        termination_reason: __field7,
                     })
                 }
                 #[inline]
@@ -4901,10 +5433,18 @@ pub mod cluster {
                     __A: __serde::de::MapAccess<'de>,
                 {
                     #[doc(hidden)]
-                    const __IDENTIFIERS: &'static [&'static str] =
-                        &["nodeId", "name", "joinedAt", "uptimeSecs", "lastHeartbeat"];
+                    const __IDENTIFIERS: &'static [&'static str] = &[
+                        "nodeId",
+                        "name",
+                        "status",
+                        "joinedAt",
+                        "uptimeSecs",
+                        "lastHeartbeat",
+                        "terminatedAt",
+                        "terminationReason",
+                    ];
                     #[doc(hidden)]
-                    const __EXPECTING_IDENTIFIERS: &'static str = "an identifier in [\"nodeId\", \"name\", \"joinedAt\", \"uptimeSecs\", \"lastHeartbeat\"]";
+                    const __EXPECTING_IDENTIFIERS: &'static str = "an identifier in [\"nodeId\", \"name\", \"status\", \"joinedAt\", \"uptimeSecs\", \"lastHeartbeat\", \"terminatedAt\", \"terminationReason\"]";
                     #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
                     #[doc(hidden)]
                     enum __Identifier {
@@ -4913,6 +5453,9 @@ pub mod cluster {
                         __Identifier2,
                         __Identifier3,
                         __Identifier4,
+                        __Identifier5,
+                        __Identifier6,
+                        __Identifier7,
                         __Unknown,
                     }
                     #[doc(hidden)]
@@ -4938,6 +5481,9 @@ pub mod cluster {
                                 2u64 => ::core::result::Result::Ok(__Identifier::__Identifier2),
                                 3u64 => ::core::result::Result::Ok(__Identifier::__Identifier3),
                                 4u64 => ::core::result::Result::Ok(__Identifier::__Identifier4),
+                                5u64 => ::core::result::Result::Ok(__Identifier::__Identifier5),
+                                6u64 => ::core::result::Result::Ok(__Identifier::__Identifier6),
+                                7u64 => ::core::result::Result::Ok(__Identifier::__Identifier7),
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
                         }
@@ -4951,14 +5497,21 @@ pub mod cluster {
                             match __value {
                                 "nodeId" => ::core::result::Result::Ok(__Identifier::__Identifier0),
                                 "name" => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                                "status" => ::core::result::Result::Ok(__Identifier::__Identifier2),
                                 "joinedAt" => {
-                                    ::core::result::Result::Ok(__Identifier::__Identifier2)
-                                }
-                                "uptimeSecs" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier3)
                                 }
-                                "lastHeartbeat" => {
+                                "uptimeSecs" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier4)
+                                }
+                                "lastHeartbeat" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier5)
+                                }
+                                "terminatedAt" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier6)
+                                }
+                                "terminationReason" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier7)
                                 }
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
@@ -4975,14 +5528,23 @@ pub mod cluster {
                                     ::core::result::Result::Ok(__Identifier::__Identifier0)
                                 }
                                 b"name" => ::core::result::Result::Ok(__Identifier::__Identifier1),
-                                b"joinedAt" => {
+                                b"status" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier2)
                                 }
-                                b"uptimeSecs" => {
+                                b"joinedAt" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier3)
                                 }
-                                b"lastHeartbeat" => {
+                                b"uptimeSecs" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier4)
+                                }
+                                b"lastHeartbeat" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier5)
+                                }
+                                b"terminatedAt" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier6)
+                                }
+                                b"terminationReason" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier7)
                                 }
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
@@ -5007,11 +5569,19 @@ pub mod cluster {
                     let mut __field1: ::core::option::Option<
                         ::std::option::Option<::std::string::String>,
                     > = ::core::option::Option::None;
-                    let mut __field2: ::core::option::Option<super::datetime::Timestamp> =
+                    let mut __field2: ::core::option::Option<ClusterNodeStatus> =
                         ::core::option::Option::None;
-                    let mut __field3: ::core::option::Option<u32> = ::core::option::Option::None;
-                    let mut __field4: ::core::option::Option<super::datetime::Timestamp> =
+                    let mut __field3: ::core::option::Option<super::datetime::Timestamp> =
                         ::core::option::Option::None;
+                    let mut __field4: ::core::option::Option<u32> = ::core::option::Option::None;
+                    let mut __field5: ::core::option::Option<super::datetime::Timestamp> =
+                        ::core::option::Option::None;
+                    let mut __field6: ::core::option::Option<
+                        ::std::option::Option<super::datetime::Timestamp>,
+                    > = ::core::option::Option::None;
+                    let mut __field7: ::core::option::Option<
+                        ::std::option::Option<ClusterNodeTerminationReason>,
+                    > = ::core::option::Option::None;
                     while let ::core::option::Option::Some(__key) =
                         __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
                     {
@@ -5046,12 +5616,12 @@ pub mod cluster {
                                 if ::core::option::Option::is_some(&__field2) {
                                     return ::core::result::Result::Err(
                                         <__A::Error as __serde::de::Error>::duplicate_field(
-                                            "joinedAt",
+                                            "status",
                                         ),
                                     );
                                 }
                                 __field2 = ::core::option::Option::Some(
-                                    __serde::de::MapAccess::next_value::<super::datetime::Timestamp>(
+                                    __serde::de::MapAccess::next_value::<ClusterNodeStatus>(
                                         &mut __map,
                                     )?,
                                 );
@@ -5060,26 +5630,68 @@ pub mod cluster {
                                 if ::core::option::Option::is_some(&__field3) {
                                     return ::core::result::Result::Err(
                                         <__A::Error as __serde::de::Error>::duplicate_field(
-                                            "uptimeSecs",
+                                            "joinedAt",
                                         ),
                                     );
                                 }
                                 __field3 = ::core::option::Option::Some(
-                                    __serde::de::MapAccess::next_value::<u32>(&mut __map)?,
+                                    __serde::de::MapAccess::next_value::<super::datetime::Timestamp>(
+                                        &mut __map,
+                                    )?,
                                 );
                             }
                             __Identifier::__Identifier4 => {
                                 if ::core::option::Option::is_some(&__field4) {
                                     return ::core::result::Result::Err(
                                         <__A::Error as __serde::de::Error>::duplicate_field(
-                                            "lastHeartbeat",
+                                            "uptimeSecs",
                                         ),
                                     );
                                 }
                                 __field4 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<u32>(&mut __map)?,
+                                );
+                            }
+                            __Identifier::__Identifier5 => {
+                                if ::core::option::Option::is_some(&__field5) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "lastHeartbeat",
+                                        ),
+                                    );
+                                }
+                                __field5 = ::core::option::Option::Some(
                                     __serde::de::MapAccess::next_value::<super::datetime::Timestamp>(
                                         &mut __map,
                                     )?,
+                                );
+                            }
+                            __Identifier::__Identifier6 => {
+                                if ::core::option::Option::is_some(&__field6) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "terminatedAt",
+                                        ),
+                                    );
+                                }
+                                __field6 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<
+                                        ::std::option::Option<super::datetime::Timestamp>,
+                                    >(&mut __map)?,
+                                );
+                            }
+                            __Identifier::__Identifier7 => {
+                                if ::core::option::Option::is_some(&__field7) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "terminationReason",
+                                        ),
+                                    );
+                                }
+                                __field7 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<
+                                        ::std::option::Option<ClusterNodeTerminationReason>,
+                                    >(&mut __map)?,
                                 );
                             }
                             _ => {
@@ -5105,7 +5717,7 @@ pub mod cluster {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                <__A::Error as __serde::de::Error>::missing_field("joinedAt"),
+                                <__A::Error as __serde::de::Error>::missing_field("status"),
                             );
                         }
                     };
@@ -5113,7 +5725,7 @@ pub mod cluster {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                <__A::Error as __serde::de::Error>::missing_field("uptimeSecs"),
+                                <__A::Error as __serde::de::Error>::missing_field("joinedAt"),
                             );
                         }
                     };
@@ -5121,22 +5733,49 @@ pub mod cluster {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
+                                <__A::Error as __serde::de::Error>::missing_field("uptimeSecs"),
+                            );
+                        }
+                    };
+                    let __field5 = match __field5 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
                                 <__A::Error as __serde::de::Error>::missing_field("lastHeartbeat"),
                             );
                         }
                     };
+                    let __field6 = match __field6 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => ::core::option::Option::None,
+                    };
+                    let __field7 = match __field7 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => ::core::option::Option::None,
+                    };
                     ::core::result::Result::Ok(ClusterNode {
                         node_id: __field0,
                         name: __field1,
-                        joined_at: __field2,
-                        uptime_secs: __field3,
-                        last_heartbeat: __field4,
+                        status: __field2,
+                        joined_at: __field3,
+                        uptime_secs: __field4,
+                        last_heartbeat: __field5,
+                        terminated_at: __field6,
+                        termination_reason: __field7,
                     })
                 }
             }
             #[doc(hidden)]
-            const __FIELDS: &'static [&'static str] =
-                &["nodeId", "name", "joinedAt", "uptimeSecs", "lastHeartbeat"];
+            const __FIELDS: &'static [&'static str] = &[
+                "nodeId",
+                "name",
+                "status",
+                "joinedAt",
+                "uptimeSecs",
+                "lastHeartbeat",
+                "terminatedAt",
+                "terminationReason",
+            ];
             __serde::Deserializer::deserialize_struct(
                 __deserializer,
                 "ClusterNode",
@@ -6537,13 +7176,26 @@ pub mod devices {
         pub device_id: DeviceId,
         #[doc = "Project ID of the device.\n"]
         pub project_id: super::projects::ProjectId,
+        #[doc = "Indicates whether the device is currently connected.\n"]
+        pub is_connected: bool,
+        #[doc = "Timestamp when the device was last connected (current or most recent connection).\n"]
+        pub last_connected_at: ::std::option::Option<super::datetime::Timestamp>,
+        #[doc = "Duration of the current connection in seconds (null if not connected).\n"]
+        pub current_connection_duration_secs: ::std::option::Option<u32>,
     }
     impl QueryDevicesItem {
         #[doc = "Creates a new [`QueryDevicesItem`]."]
-        pub fn new(device_id: DeviceId, project_id: super::projects::ProjectId) -> Self {
+        pub fn new(
+            device_id: DeviceId,
+            project_id: super::projects::ProjectId,
+            is_connected: bool,
+        ) -> Self {
             Self {
                 device_id,
                 project_id,
+                is_connected,
+                last_connected_at: ::std::default::Default::default(),
+                current_connection_duration_secs: ::std::default::Default::default(),
             }
         }
         #[doc = "Sets the value of `device_id`."]
@@ -6566,6 +7218,48 @@ pub mod devices {
             self.project_id = project_id;
             self
         }
+        #[doc = "Sets the value of `is_connected`."]
+        pub fn set_is_connected(&mut self, is_connected: bool) -> &mut Self {
+            self.is_connected = is_connected;
+            self
+        }
+        #[doc = "Sets the value of `is_connected`."]
+        pub fn with_is_connected(mut self, is_connected: bool) -> Self {
+            self.is_connected = is_connected;
+            self
+        }
+        #[doc = "Sets the value of `last_connected_at`."]
+        pub fn set_last_connected_at(
+            &mut self,
+            last_connected_at: ::std::option::Option<super::datetime::Timestamp>,
+        ) -> &mut Self {
+            self.last_connected_at = last_connected_at;
+            self
+        }
+        #[doc = "Sets the value of `last_connected_at`."]
+        pub fn with_last_connected_at(
+            mut self,
+            last_connected_at: ::std::option::Option<super::datetime::Timestamp>,
+        ) -> Self {
+            self.last_connected_at = last_connected_at;
+            self
+        }
+        #[doc = "Sets the value of `current_connection_duration_secs`."]
+        pub fn set_current_connection_duration_secs(
+            &mut self,
+            current_connection_duration_secs: ::std::option::Option<u32>,
+        ) -> &mut Self {
+            self.current_connection_duration_secs = current_connection_duration_secs;
+            self
+        }
+        #[doc = "Sets the value of `current_connection_duration_secs`."]
+        pub fn with_current_connection_duration_secs(
+            mut self,
+            current_connection_duration_secs: ::std::option::Option<u32>,
+        ) -> Self {
+            self.current_connection_duration_secs = current_connection_duration_secs;
+            self
+        }
     }
     #[automatically_derived]
     impl __serde::Serialize for QueryDevicesItem {
@@ -6576,10 +7270,19 @@ pub mod devices {
             let mut __record = __sidex_serde::ser::RecordSerializer::new(
                 __serializer,
                 "QueryDevicesItem",
-                2usize,
+                5usize,
             )?;
             __record.serialize_field("deviceId", &self.device_id)?;
             __record.serialize_field("projectId", &self.project_id)?;
+            __record.serialize_field("isConnected", &self.is_connected)?;
+            __record.serialize_optional_field(
+                "lastConnectedAt",
+                ::core::option::Option::as_ref(&self.last_connected_at),
+            )?;
+            __record.serialize_optional_field(
+                "currentConnectionDurationSecs",
+                ::core::option::Option::as_ref(&self.current_connection_duration_secs),
+            )?;
             __record.end()
         }
     }
@@ -6615,7 +7318,7 @@ pub mod devices {
                                 return ::core::result::Result::Err(
                                     __serde::de::Error::invalid_length(
                                         0usize,
-                                        &"record with 2 fields",
+                                        &"record with 5 fields",
                                     ),
                                 );
                             }
@@ -6627,13 +7330,46 @@ pub mod devices {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(1usize, &"record with 2 fields"),
+                                __serde::de::Error::invalid_length(1usize, &"record with 5 fields"),
+                            );
+                        }
+                    };
+                    let __field2 = match __serde::de::SeqAccess::next_element::<bool>(&mut __seq)? {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(2usize, &"record with 5 fields"),
+                            );
+                        }
+                    };
+                    let __field3 = match __serde::de::SeqAccess::next_element::<
+                        ::std::option::Option<super::datetime::Timestamp>,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(3usize, &"record with 5 fields"),
+                            );
+                        }
+                    };
+                    let __field4 = match __serde::de::SeqAccess::next_element::<
+                        ::std::option::Option<u32>,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(4usize, &"record with 5 fields"),
                             );
                         }
                     };
                     ::core::result::Result::Ok(QueryDevicesItem {
                         device_id: __field0,
                         project_id: __field1,
+                        is_connected: __field2,
+                        last_connected_at: __field3,
+                        current_connection_duration_secs: __field4,
                     })
                 }
                 #[inline]
@@ -6645,15 +7381,23 @@ pub mod devices {
                     __A: __serde::de::MapAccess<'de>,
                 {
                     #[doc(hidden)]
-                    const __IDENTIFIERS: &'static [&'static str] = &["deviceId", "projectId"];
+                    const __IDENTIFIERS: &'static [&'static str] = &[
+                        "deviceId",
+                        "projectId",
+                        "isConnected",
+                        "lastConnectedAt",
+                        "currentConnectionDurationSecs",
+                    ];
                     #[doc(hidden)]
-                    const __EXPECTING_IDENTIFIERS: &'static str =
-                        "an identifier in [\"deviceId\", \"projectId\"]";
+                    const __EXPECTING_IDENTIFIERS: &'static str = "an identifier in [\"deviceId\", \"projectId\", \"isConnected\", \"lastConnectedAt\", \"currentConnectionDurationSecs\"]";
                     #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
                     #[doc(hidden)]
                     enum __Identifier {
                         __Identifier0,
                         __Identifier1,
+                        __Identifier2,
+                        __Identifier3,
+                        __Identifier4,
                         __Unknown,
                     }
                     #[doc(hidden)]
@@ -6676,6 +7420,9 @@ pub mod devices {
                             match __value {
                                 0u64 => ::core::result::Result::Ok(__Identifier::__Identifier0),
                                 1u64 => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                                2u64 => ::core::result::Result::Ok(__Identifier::__Identifier2),
+                                3u64 => ::core::result::Result::Ok(__Identifier::__Identifier3),
+                                4u64 => ::core::result::Result::Ok(__Identifier::__Identifier4),
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
                         }
@@ -6693,6 +7440,15 @@ pub mod devices {
                                 "projectId" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier1)
                                 }
+                                "isConnected" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier2)
+                                }
+                                "lastConnectedAt" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier3)
+                                }
+                                "currentConnectionDurationSecs" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier4)
+                                }
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
                         }
@@ -6709,6 +7465,15 @@ pub mod devices {
                                 }
                                 b"projectId" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier1)
+                                }
+                                b"isConnected" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier2)
+                                }
+                                b"lastConnectedAt" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier3)
+                                }
+                                b"currentConnectionDurationSecs" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier4)
                                 }
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
@@ -6731,6 +7496,12 @@ pub mod devices {
                     let mut __field0: ::core::option::Option<DeviceId> =
                         ::core::option::Option::None;
                     let mut __field1: ::core::option::Option<super::projects::ProjectId> =
+                        ::core::option::Option::None;
+                    let mut __field2: ::core::option::Option<bool> = ::core::option::Option::None;
+                    let mut __field3: ::core::option::Option<
+                        ::std::option::Option<super::datetime::Timestamp>,
+                    > = ::core::option::Option::None;
+                    let mut __field4: ::core::option::Option<::std::option::Option<u32>> =
                         ::core::option::Option::None;
                     while let ::core::option::Option::Some(__key) =
                         __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
@@ -6762,6 +7533,46 @@ pub mod devices {
                                     )?,
                                 );
                             }
+                            __Identifier::__Identifier2 => {
+                                if ::core::option::Option::is_some(&__field2) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "isConnected",
+                                        ),
+                                    );
+                                }
+                                __field2 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<bool>(&mut __map)?,
+                                );
+                            }
+                            __Identifier::__Identifier3 => {
+                                if ::core::option::Option::is_some(&__field3) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "lastConnectedAt",
+                                        ),
+                                    );
+                                }
+                                __field3 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<
+                                        ::std::option::Option<super::datetime::Timestamp>,
+                                    >(&mut __map)?,
+                                );
+                            }
+                            __Identifier::__Identifier4 => {
+                                if ::core::option::Option::is_some(&__field4) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "currentConnectionDurationSecs",
+                                        ),
+                                    );
+                                }
+                                __field4 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<::std::option::Option<u32>>(
+                                        &mut __map,
+                                    )?,
+                                );
+                            }
                             _ => {
                                 __serde::de::MapAccess::next_value::<__serde::de::IgnoredAny>(
                                     &mut __map,
@@ -6785,14 +7596,39 @@ pub mod devices {
                             );
                         }
                     };
+                    let __field2 = match __field2 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                <__A::Error as __serde::de::Error>::missing_field("isConnected"),
+                            );
+                        }
+                    };
+                    let __field3 = match __field3 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => ::core::option::Option::None,
+                    };
+                    let __field4 = match __field4 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => ::core::option::Option::None,
+                    };
                     ::core::result::Result::Ok(QueryDevicesItem {
                         device_id: __field0,
                         project_id: __field1,
+                        is_connected: __field2,
+                        last_connected_at: __field3,
+                        current_connection_duration_secs: __field4,
                     })
                 }
             }
             #[doc(hidden)]
-            const __FIELDS: &'static [&'static str] = &["deviceId", "projectId"];
+            const __FIELDS: &'static [&'static str] = &[
+                "deviceId",
+                "projectId",
+                "isConnected",
+                "lastConnectedAt",
+                "currentConnectionDurationSecs",
+            ];
             __serde::Deserializer::deserialize_struct(
                 __deserializer,
                 "QueryDevicesItem",
@@ -8581,6 +9417,738 @@ pub mod devices {
                 __deserializer,
                 "DeviceCertificateStatus",
                 __VARIANTS,
+                __Visitor {
+                    __phantom_vars: ::core::marker::PhantomData,
+                },
+            )
+        }
+    }
+    #[doc = "Reason why a device connection ended.\n"]
+    #[derive(Clone, Debug)]
+    pub enum ConnectionEndReason {
+        #[doc = "Unknown reason (fallback).\n"]
+        Unknown,
+        #[doc = "Device disconnected normally.\n"]
+        Disconnected,
+        #[doc = "Connection ended due to cluster node crash or heartbeat timeout.\n"]
+        NodeCrashed,
+        #[doc = "Connection ended due to graceful server shutdown.\n"]
+        ServerShutdown,
+    }
+    #[automatically_derived]
+    impl __serde::Serialize for ConnectionEndReason {
+        fn serialize<__S: __serde::Serializer>(
+            &self,
+            __serializer: __S,
+        ) -> ::std::result::Result<__S::Ok, __S::Error> {
+            let __serializer =
+                __sidex_serde::ser::VariantSerializer::new(__serializer, "ConnectionEndReason");
+            match self {
+                Self::Unknown => __serializer.serialize_tag("Unknown", 0u32),
+                Self::Disconnected => __serializer.serialize_tag("Disconnected", 1u32),
+                Self::NodeCrashed => __serializer.serialize_tag("NodeCrashed", 2u32),
+                Self::ServerShutdown => __serializer.serialize_tag("ServerShutdown", 3u32),
+            }
+        }
+    }
+    #[automatically_derived]
+    impl<'de> __serde::Deserialize<'de> for ConnectionEndReason {
+        fn deserialize<__D: __serde::Deserializer<'de>>(
+            __deserializer: __D,
+        ) -> ::std::result::Result<Self, __D::Error> {
+            #[doc(hidden)]
+            const __IDENTIFIERS: &'static [&'static str] =
+                &["Unknown", "Disconnected", "NodeCrashed", "ServerShutdown"];
+            #[doc(hidden)]
+            const __EXPECTING_IDENTIFIERS: &'static str = "an identifier in [\"Unknown\", \"Disconnected\", \"NodeCrashed\", \"ServerShutdown\"]";
+            #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
+            #[doc(hidden)]
+            enum __Identifier {
+                __Identifier0,
+                __Identifier1,
+                __Identifier2,
+                __Identifier3,
+            }
+            #[doc(hidden)]
+            struct __IdentifierVisitor;
+            impl<'de> __serde::de::Visitor<'de> for __IdentifierVisitor {
+                type Value = __Identifier;
+                fn expecting(
+                    &self,
+                    __formatter: &mut ::core::fmt::Formatter,
+                ) -> ::core::fmt::Result {
+                    ::core::fmt::Formatter::write_str(__formatter, __EXPECTING_IDENTIFIERS)
+                }
+                fn visit_u64<__E>(self, __value: u64) -> ::core::result::Result<Self::Value, __E>
+                where
+                    __E: __serde::de::Error,
+                {
+                    match __value {
+                        0u64 => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                        1u64 => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                        2u64 => ::core::result::Result::Ok(__Identifier::__Identifier2),
+                        3u64 => ::core::result::Result::Ok(__Identifier::__Identifier3),
+                        __variant => {
+                            ::core::result::Result::Err(__serde::de::Error::invalid_value(
+                                __serde::de::Unexpected::Unsigned(__variant),
+                                &__EXPECTING_IDENTIFIERS,
+                            ))
+                        }
+                    }
+                }
+                fn visit_str<__E>(self, __value: &str) -> ::core::result::Result<Self::Value, __E>
+                where
+                    __E: __serde::de::Error,
+                {
+                    match __value {
+                        "Unknown" => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                        "Disconnected" => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                        "NodeCrashed" => ::core::result::Result::Ok(__Identifier::__Identifier2),
+                        "ServerShutdown" => ::core::result::Result::Ok(__Identifier::__Identifier3),
+                        __variant => ::core::result::Result::Err(
+                            __serde::de::Error::unknown_variant(__variant, __IDENTIFIERS),
+                        ),
+                    }
+                }
+                fn visit_bytes<__E>(
+                    self,
+                    __value: &[u8],
+                ) -> ::core::result::Result<Self::Value, __E>
+                where
+                    __E: __serde::de::Error,
+                {
+                    match __value {
+                        b"Unknown" => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                        b"Disconnected" => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                        b"NodeCrashed" => ::core::result::Result::Ok(__Identifier::__Identifier2),
+                        b"ServerShutdown" => {
+                            ::core::result::Result::Ok(__Identifier::__Identifier3)
+                        }
+                        __variant => {
+                            ::core::result::Result::Err(__serde::de::Error::invalid_value(
+                                __serde::de::Unexpected::Bytes(__variant),
+                                &__EXPECTING_IDENTIFIERS,
+                            ))
+                        }
+                    }
+                }
+            }
+            impl<'de> __serde::Deserialize<'de> for __Identifier {
+                #[inline]
+                fn deserialize<__D>(__deserializer: __D) -> ::core::result::Result<Self, __D::Error>
+                where
+                    __D: __serde::Deserializer<'de>,
+                {
+                    __serde::Deserializer::deserialize_identifier(
+                        __deserializer,
+                        __IdentifierVisitor,
+                    )
+                }
+            }
+            #[doc(hidden)]
+            const __VARIANTS: &'static [&'static str] =
+                &["Unknown", "Disconnected", "NodeCrashed", "ServerShutdown"];
+            #[doc(hidden)]
+            struct __Visitor {
+                __phantom_vars: ::core::marker::PhantomData<fn(&())>,
+            }
+            impl<'de> __serde::de::Visitor<'de> for __Visitor {
+                type Value = ConnectionEndReason;
+                fn expecting(
+                    &self,
+                    __formatter: &mut ::core::fmt::Formatter,
+                ) -> ::core::fmt::Result {
+                    ::core::fmt::Formatter::write_str(__formatter, "enum ConnectionEndReason")
+                }
+                #[inline]
+                fn visit_str<__E>(self, __value: &str) -> ::core::result::Result<Self::Value, __E>
+                where
+                    __E: __serde::de::Error,
+                {
+                    let __identifier = __IdentifierVisitor.visit_str(__value)?;
+                    #[allow(unreachable_patterns)]
+                    match __identifier {
+                        __Identifier::__Identifier0 => {
+                            ::core::result::Result::Ok(ConnectionEndReason::Unknown)
+                        }
+                        __Identifier::__Identifier1 => {
+                            ::core::result::Result::Ok(ConnectionEndReason::Disconnected)
+                        }
+                        __Identifier::__Identifier2 => {
+                            ::core::result::Result::Ok(ConnectionEndReason::NodeCrashed)
+                        }
+                        __Identifier::__Identifier3 => {
+                            ::core::result::Result::Ok(ConnectionEndReason::ServerShutdown)
+                        }
+                        _ => Err(__E::invalid_value(
+                            __serde::de::Unexpected::Str(__value),
+                            &self,
+                        )),
+                    }
+                }
+                #[inline]
+                fn visit_enum<__A>(
+                    self,
+                    __data: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::EnumAccess<'de>,
+                {
+                    match __serde::de::EnumAccess::variant::<__Identifier>(__data)? {
+                        (__Identifier::__Identifier0, __variant) => {
+                            __serde::de::VariantAccess::unit_variant(__variant)?;
+                            ::core::result::Result::Ok(ConnectionEndReason::Unknown)
+                        }
+                        (__Identifier::__Identifier1, __variant) => {
+                            __serde::de::VariantAccess::unit_variant(__variant)?;
+                            ::core::result::Result::Ok(ConnectionEndReason::Disconnected)
+                        }
+                        (__Identifier::__Identifier2, __variant) => {
+                            __serde::de::VariantAccess::unit_variant(__variant)?;
+                            ::core::result::Result::Ok(ConnectionEndReason::NodeCrashed)
+                        }
+                        (__Identifier::__Identifier3, __variant) => {
+                            __serde::de::VariantAccess::unit_variant(__variant)?;
+                            ::core::result::Result::Ok(ConnectionEndReason::ServerShutdown)
+                        }
+                    }
+                }
+            }
+            __serde::Deserializer::deserialize_enum(
+                __deserializer,
+                "ConnectionEndReason",
+                __VARIANTS,
+                __Visitor {
+                    __phantom_vars: ::core::marker::PhantomData,
+                },
+            )
+        }
+    }
+    #[doc = "Device connection log entry (for connection history).\n"]
+    #[derive(Clone, Debug)]
+    pub struct DeviceConnectionLog {
+        #[doc = "ID of the connection.\n"]
+        pub connection_id: DeviceConnectionId,
+        #[doc = "ID of the cluster node.\n"]
+        pub node_id: super::cluster::ClusterNodeId,
+        #[doc = "Timestamp when the connection was established.\n"]
+        pub connected_at: super::datetime::Timestamp,
+        #[doc = "Timestamp when the connection ended (null if still connected).\n"]
+        pub ended_at: ::std::option::Option<super::datetime::Timestamp>,
+        #[doc = "Reason why the connection ended (null if still connected).\n"]
+        pub end_reason: ::std::option::Option<ConnectionEndReason>,
+        #[doc = "Duration of the connection in seconds.\n"]
+        pub duration_secs: u32,
+    }
+    impl DeviceConnectionLog {
+        #[doc = "Creates a new [`DeviceConnectionLog`]."]
+        pub fn new(
+            connection_id: DeviceConnectionId,
+            node_id: super::cluster::ClusterNodeId,
+            connected_at: super::datetime::Timestamp,
+            duration_secs: u32,
+        ) -> Self {
+            Self {
+                connection_id,
+                node_id,
+                connected_at,
+                duration_secs,
+                ended_at: ::std::default::Default::default(),
+                end_reason: ::std::default::Default::default(),
+            }
+        }
+        #[doc = "Sets the value of `connection_id`."]
+        pub fn set_connection_id(&mut self, connection_id: DeviceConnectionId) -> &mut Self {
+            self.connection_id = connection_id;
+            self
+        }
+        #[doc = "Sets the value of `connection_id`."]
+        pub fn with_connection_id(mut self, connection_id: DeviceConnectionId) -> Self {
+            self.connection_id = connection_id;
+            self
+        }
+        #[doc = "Sets the value of `node_id`."]
+        pub fn set_node_id(&mut self, node_id: super::cluster::ClusterNodeId) -> &mut Self {
+            self.node_id = node_id;
+            self
+        }
+        #[doc = "Sets the value of `node_id`."]
+        pub fn with_node_id(mut self, node_id: super::cluster::ClusterNodeId) -> Self {
+            self.node_id = node_id;
+            self
+        }
+        #[doc = "Sets the value of `connected_at`."]
+        pub fn set_connected_at(&mut self, connected_at: super::datetime::Timestamp) -> &mut Self {
+            self.connected_at = connected_at;
+            self
+        }
+        #[doc = "Sets the value of `connected_at`."]
+        pub fn with_connected_at(mut self, connected_at: super::datetime::Timestamp) -> Self {
+            self.connected_at = connected_at;
+            self
+        }
+        #[doc = "Sets the value of `ended_at`."]
+        pub fn set_ended_at(
+            &mut self,
+            ended_at: ::std::option::Option<super::datetime::Timestamp>,
+        ) -> &mut Self {
+            self.ended_at = ended_at;
+            self
+        }
+        #[doc = "Sets the value of `ended_at`."]
+        pub fn with_ended_at(
+            mut self,
+            ended_at: ::std::option::Option<super::datetime::Timestamp>,
+        ) -> Self {
+            self.ended_at = ended_at;
+            self
+        }
+        #[doc = "Sets the value of `end_reason`."]
+        pub fn set_end_reason(
+            &mut self,
+            end_reason: ::std::option::Option<ConnectionEndReason>,
+        ) -> &mut Self {
+            self.end_reason = end_reason;
+            self
+        }
+        #[doc = "Sets the value of `end_reason`."]
+        pub fn with_end_reason(
+            mut self,
+            end_reason: ::std::option::Option<ConnectionEndReason>,
+        ) -> Self {
+            self.end_reason = end_reason;
+            self
+        }
+        #[doc = "Sets the value of `duration_secs`."]
+        pub fn set_duration_secs(&mut self, duration_secs: u32) -> &mut Self {
+            self.duration_secs = duration_secs;
+            self
+        }
+        #[doc = "Sets the value of `duration_secs`."]
+        pub fn with_duration_secs(mut self, duration_secs: u32) -> Self {
+            self.duration_secs = duration_secs;
+            self
+        }
+    }
+    #[automatically_derived]
+    impl __serde::Serialize for DeviceConnectionLog {
+        fn serialize<__S: __serde::Serializer>(
+            &self,
+            __serializer: __S,
+        ) -> ::std::result::Result<__S::Ok, __S::Error> {
+            let mut __record = __sidex_serde::ser::RecordSerializer::new(
+                __serializer,
+                "DeviceConnectionLog",
+                6usize,
+            )?;
+            __record.serialize_field("connectionId", &self.connection_id)?;
+            __record.serialize_field("nodeId", &self.node_id)?;
+            __record.serialize_field("connectedAt", &self.connected_at)?;
+            __record.serialize_optional_field(
+                "endedAt",
+                ::core::option::Option::as_ref(&self.ended_at),
+            )?;
+            __record.serialize_optional_field(
+                "endReason",
+                ::core::option::Option::as_ref(&self.end_reason),
+            )?;
+            __record.serialize_field("durationSecs", &self.duration_secs)?;
+            __record.end()
+        }
+    }
+    #[automatically_derived]
+    impl<'de> __serde::Deserialize<'de> for DeviceConnectionLog {
+        fn deserialize<__D: __serde::Deserializer<'de>>(
+            __deserializer: __D,
+        ) -> ::std::result::Result<Self, __D::Error> {
+            #[doc(hidden)]
+            struct __Visitor {
+                __phantom_vars: ::core::marker::PhantomData<fn(&())>,
+            }
+            impl<'de> __serde::de::Visitor<'de> for __Visitor {
+                type Value = DeviceConnectionLog;
+                fn expecting(
+                    &self,
+                    __formatter: &mut ::core::fmt::Formatter,
+                ) -> ::core::fmt::Result {
+                    ::core::fmt::Formatter::write_str(__formatter, "record DeviceConnectionLog")
+                }
+                #[inline]
+                fn visit_seq<__A>(
+                    self,
+                    mut __seq: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::SeqAccess<'de>,
+                {
+                    let __field0 = match __serde::de::SeqAccess::next_element::<DeviceConnectionId>(
+                        &mut __seq,
+                    )? {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(0usize, &"record with 6 fields"),
+                            );
+                        }
+                    };
+                    let __field1 = match __serde::de::SeqAccess::next_element::<
+                        super::cluster::ClusterNodeId,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(1usize, &"record with 6 fields"),
+                            );
+                        }
+                    };
+                    let __field2 = match __serde::de::SeqAccess::next_element::<
+                        super::datetime::Timestamp,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(2usize, &"record with 6 fields"),
+                            );
+                        }
+                    };
+                    let __field3 = match __serde::de::SeqAccess::next_element::<
+                        ::std::option::Option<super::datetime::Timestamp>,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(3usize, &"record with 6 fields"),
+                            );
+                        }
+                    };
+                    let __field4 = match __serde::de::SeqAccess::next_element::<
+                        ::std::option::Option<ConnectionEndReason>,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(4usize, &"record with 6 fields"),
+                            );
+                        }
+                    };
+                    let __field5 = match __serde::de::SeqAccess::next_element::<u32>(&mut __seq)? {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(5usize, &"record with 6 fields"),
+                            );
+                        }
+                    };
+                    ::core::result::Result::Ok(DeviceConnectionLog {
+                        connection_id: __field0,
+                        node_id: __field1,
+                        connected_at: __field2,
+                        ended_at: __field3,
+                        end_reason: __field4,
+                        duration_secs: __field5,
+                    })
+                }
+                #[inline]
+                fn visit_map<__A>(
+                    self,
+                    mut __map: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::MapAccess<'de>,
+                {
+                    #[doc(hidden)]
+                    const __IDENTIFIERS: &'static [&'static str] = &[
+                        "connectionId",
+                        "nodeId",
+                        "connectedAt",
+                        "endedAt",
+                        "endReason",
+                        "durationSecs",
+                    ];
+                    #[doc(hidden)]
+                    const __EXPECTING_IDENTIFIERS: &'static str = "an identifier in [\"connectionId\", \"nodeId\", \"connectedAt\", \"endedAt\", \"endReason\", \"durationSecs\"]";
+                    #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
+                    #[doc(hidden)]
+                    enum __Identifier {
+                        __Identifier0,
+                        __Identifier1,
+                        __Identifier2,
+                        __Identifier3,
+                        __Identifier4,
+                        __Identifier5,
+                        __Unknown,
+                    }
+                    #[doc(hidden)]
+                    struct __IdentifierVisitor;
+                    impl<'de> __serde::de::Visitor<'de> for __IdentifierVisitor {
+                        type Value = __Identifier;
+                        fn expecting(
+                            &self,
+                            __formatter: &mut ::core::fmt::Formatter,
+                        ) -> ::core::fmt::Result {
+                            ::core::fmt::Formatter::write_str(__formatter, __EXPECTING_IDENTIFIERS)
+                        }
+                        fn visit_u64<__E>(
+                            self,
+                            __value: u64,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                0u64 => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                                1u64 => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                                2u64 => ::core::result::Result::Ok(__Identifier::__Identifier2),
+                                3u64 => ::core::result::Result::Ok(__Identifier::__Identifier3),
+                                4u64 => ::core::result::Result::Ok(__Identifier::__Identifier4),
+                                5u64 => ::core::result::Result::Ok(__Identifier::__Identifier5),
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_str<__E>(
+                            self,
+                            __value: &str,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                "connectionId" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
+                                }
+                                "nodeId" => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                                "connectedAt" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier2)
+                                }
+                                "endedAt" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier3)
+                                }
+                                "endReason" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier4)
+                                }
+                                "durationSecs" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier5)
+                                }
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_bytes<__E>(
+                            self,
+                            __value: &[u8],
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                b"connectionId" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
+                                }
+                                b"nodeId" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier1)
+                                }
+                                b"connectedAt" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier2)
+                                }
+                                b"endedAt" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier3)
+                                }
+                                b"endReason" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier4)
+                                }
+                                b"durationSecs" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier5)
+                                }
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                    }
+                    impl<'de> __serde::Deserialize<'de> for __Identifier {
+                        #[inline]
+                        fn deserialize<__D>(
+                            __deserializer: __D,
+                        ) -> ::core::result::Result<Self, __D::Error>
+                        where
+                            __D: __serde::Deserializer<'de>,
+                        {
+                            __serde::Deserializer::deserialize_identifier(
+                                __deserializer,
+                                __IdentifierVisitor,
+                            )
+                        }
+                    }
+                    let mut __field0: ::core::option::Option<DeviceConnectionId> =
+                        ::core::option::Option::None;
+                    let mut __field1: ::core::option::Option<super::cluster::ClusterNodeId> =
+                        ::core::option::Option::None;
+                    let mut __field2: ::core::option::Option<super::datetime::Timestamp> =
+                        ::core::option::Option::None;
+                    let mut __field3: ::core::option::Option<
+                        ::std::option::Option<super::datetime::Timestamp>,
+                    > = ::core::option::Option::None;
+                    let mut __field4: ::core::option::Option<
+                        ::std::option::Option<ConnectionEndReason>,
+                    > = ::core::option::Option::None;
+                    let mut __field5: ::core::option::Option<u32> = ::core::option::Option::None;
+                    while let ::core::option::Option::Some(__key) =
+                        __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
+                    {
+                        match __key {
+                            __Identifier::__Identifier0 => {
+                                if ::core::option::Option::is_some(&__field0) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "connectionId",
+                                        ),
+                                    );
+                                }
+                                __field0 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<DeviceConnectionId>(
+                                        &mut __map,
+                                    )?,
+                                );
+                            }
+                            __Identifier::__Identifier1 => {
+                                if ::core::option::Option::is_some(&__field1) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "nodeId",
+                                        ),
+                                    );
+                                }
+                                __field1 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<
+                                        super::cluster::ClusterNodeId,
+                                    >(&mut __map)?,
+                                );
+                            }
+                            __Identifier::__Identifier2 => {
+                                if ::core::option::Option::is_some(&__field2) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "connectedAt",
+                                        ),
+                                    );
+                                }
+                                __field2 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<super::datetime::Timestamp>(
+                                        &mut __map,
+                                    )?,
+                                );
+                            }
+                            __Identifier::__Identifier3 => {
+                                if ::core::option::Option::is_some(&__field3) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "endedAt",
+                                        ),
+                                    );
+                                }
+                                __field3 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<
+                                        ::std::option::Option<super::datetime::Timestamp>,
+                                    >(&mut __map)?,
+                                );
+                            }
+                            __Identifier::__Identifier4 => {
+                                if ::core::option::Option::is_some(&__field4) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "endReason",
+                                        ),
+                                    );
+                                }
+                                __field4 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<
+                                        ::std::option::Option<ConnectionEndReason>,
+                                    >(&mut __map)?,
+                                );
+                            }
+                            __Identifier::__Identifier5 => {
+                                if ::core::option::Option::is_some(&__field5) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "durationSecs",
+                                        ),
+                                    );
+                                }
+                                __field5 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<u32>(&mut __map)?,
+                                );
+                            }
+                            _ => {
+                                __serde::de::MapAccess::next_value::<__serde::de::IgnoredAny>(
+                                    &mut __map,
+                                )?;
+                            }
+                        }
+                    }
+                    let __field0 = match __field0 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                <__A::Error as __serde::de::Error>::missing_field("connectionId"),
+                            );
+                        }
+                    };
+                    let __field1 = match __field1 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                <__A::Error as __serde::de::Error>::missing_field("nodeId"),
+                            );
+                        }
+                    };
+                    let __field2 = match __field2 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                <__A::Error as __serde::de::Error>::missing_field("connectedAt"),
+                            );
+                        }
+                    };
+                    let __field3 = match __field3 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => ::core::option::Option::None,
+                    };
+                    let __field4 = match __field4 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => ::core::option::Option::None,
+                    };
+                    let __field5 = match __field5 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                <__A::Error as __serde::de::Error>::missing_field("durationSecs"),
+                            );
+                        }
+                    };
+                    ::core::result::Result::Ok(DeviceConnectionLog {
+                        connection_id: __field0,
+                        node_id: __field1,
+                        connected_at: __field2,
+                        ended_at: __field3,
+                        end_reason: __field4,
+                        duration_secs: __field5,
+                    })
+                }
+            }
+            #[doc(hidden)]
+            const __FIELDS: &'static [&'static str] = &[
+                "connectionId",
+                "nodeId",
+                "connectedAt",
+                "endedAt",
+                "endReason",
+                "durationSecs",
+            ];
+            __serde::Deserializer::deserialize_struct(
+                __deserializer,
+                "DeviceConnectionLog",
+                __FIELDS,
                 __Visitor {
                     __phantom_vars: ::core::marker::PhantomData,
                 },
@@ -13084,11 +14652,16 @@ pub mod devices {
     pub struct UnregisterDeviceConnectionAction {
         #[doc = "ID of the connection.\n"]
         pub connection_id: DeviceConnectionId,
+        #[doc = "Reason for ending the connection.\n"]
+        pub end_reason: ConnectionEndReason,
     }
     impl UnregisterDeviceConnectionAction {
         #[doc = "Creates a new [`UnregisterDeviceConnectionAction`]."]
-        pub fn new(connection_id: DeviceConnectionId) -> Self {
-            Self { connection_id }
+        pub fn new(connection_id: DeviceConnectionId, end_reason: ConnectionEndReason) -> Self {
+            Self {
+                connection_id,
+                end_reason,
+            }
         }
         #[doc = "Sets the value of `connection_id`."]
         pub fn set_connection_id(&mut self, connection_id: DeviceConnectionId) -> &mut Self {
@@ -13098,6 +14671,16 @@ pub mod devices {
         #[doc = "Sets the value of `connection_id`."]
         pub fn with_connection_id(mut self, connection_id: DeviceConnectionId) -> Self {
             self.connection_id = connection_id;
+            self
+        }
+        #[doc = "Sets the value of `end_reason`."]
+        pub fn set_end_reason(&mut self, end_reason: ConnectionEndReason) -> &mut Self {
+            self.end_reason = end_reason;
+            self
+        }
+        #[doc = "Sets the value of `end_reason`."]
+        pub fn with_end_reason(mut self, end_reason: ConnectionEndReason) -> Self {
+            self.end_reason = end_reason;
             self
         }
     }
@@ -13110,9 +14693,10 @@ pub mod devices {
             let mut __record = __sidex_serde::ser::RecordSerializer::new(
                 __serializer,
                 "UnregisterDeviceConnectionAction",
-                1usize,
+                2usize,
             )?;
             __record.serialize_field("connectionId", &self.connection_id)?;
+            __record.serialize_field("endReason", &self.end_reason)?;
             __record.end()
         }
     }
@@ -13150,12 +14734,23 @@ pub mod devices {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(0usize, &"record with 1 fields"),
+                                __serde::de::Error::invalid_length(0usize, &"record with 2 fields"),
+                            );
+                        }
+                    };
+                    let __field1 = match __serde::de::SeqAccess::next_element::<ConnectionEndReason>(
+                        &mut __seq,
+                    )? {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(1usize, &"record with 2 fields"),
                             );
                         }
                     };
                     ::core::result::Result::Ok(UnregisterDeviceConnectionAction {
                         connection_id: __field0,
+                        end_reason: __field1,
                     })
                 }
                 #[inline]
@@ -13167,10 +14762,593 @@ pub mod devices {
                     __A: __serde::de::MapAccess<'de>,
                 {
                     #[doc(hidden)]
-                    const __IDENTIFIERS: &'static [&'static str] = &["connectionId"];
+                    const __IDENTIFIERS: &'static [&'static str] = &["connectionId", "endReason"];
                     #[doc(hidden)]
                     const __EXPECTING_IDENTIFIERS: &'static str =
-                        "an identifier in [\"connectionId\"]";
+                        "an identifier in [\"connectionId\", \"endReason\"]";
+                    #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
+                    #[doc(hidden)]
+                    enum __Identifier {
+                        __Identifier0,
+                        __Identifier1,
+                        __Unknown,
+                    }
+                    #[doc(hidden)]
+                    struct __IdentifierVisitor;
+                    impl<'de> __serde::de::Visitor<'de> for __IdentifierVisitor {
+                        type Value = __Identifier;
+                        fn expecting(
+                            &self,
+                            __formatter: &mut ::core::fmt::Formatter,
+                        ) -> ::core::fmt::Result {
+                            ::core::fmt::Formatter::write_str(__formatter, __EXPECTING_IDENTIFIERS)
+                        }
+                        fn visit_u64<__E>(
+                            self,
+                            __value: u64,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                0u64 => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                                1u64 => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_str<__E>(
+                            self,
+                            __value: &str,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                "connectionId" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
+                                }
+                                "endReason" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier1)
+                                }
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_bytes<__E>(
+                            self,
+                            __value: &[u8],
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                b"connectionId" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
+                                }
+                                b"endReason" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier1)
+                                }
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                    }
+                    impl<'de> __serde::Deserialize<'de> for __Identifier {
+                        #[inline]
+                        fn deserialize<__D>(
+                            __deserializer: __D,
+                        ) -> ::core::result::Result<Self, __D::Error>
+                        where
+                            __D: __serde::Deserializer<'de>,
+                        {
+                            __serde::Deserializer::deserialize_identifier(
+                                __deserializer,
+                                __IdentifierVisitor,
+                            )
+                        }
+                    }
+                    let mut __field0: ::core::option::Option<DeviceConnectionId> =
+                        ::core::option::Option::None;
+                    let mut __field1: ::core::option::Option<ConnectionEndReason> =
+                        ::core::option::Option::None;
+                    while let ::core::option::Option::Some(__key) =
+                        __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
+                    {
+                        match __key {
+                            __Identifier::__Identifier0 => {
+                                if ::core::option::Option::is_some(&__field0) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "connectionId",
+                                        ),
+                                    );
+                                }
+                                __field0 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<DeviceConnectionId>(
+                                        &mut __map,
+                                    )?,
+                                );
+                            }
+                            __Identifier::__Identifier1 => {
+                                if ::core::option::Option::is_some(&__field1) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "endReason",
+                                        ),
+                                    );
+                                }
+                                __field1 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<ConnectionEndReason>(
+                                        &mut __map,
+                                    )?,
+                                );
+                            }
+                            _ => {
+                                __serde::de::MapAccess::next_value::<__serde::de::IgnoredAny>(
+                                    &mut __map,
+                                )?;
+                            }
+                        }
+                    }
+                    let __field0 = match __field0 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                <__A::Error as __serde::de::Error>::missing_field("connectionId"),
+                            );
+                        }
+                    };
+                    let __field1 = match __field1 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                <__A::Error as __serde::de::Error>::missing_field("endReason"),
+                            );
+                        }
+                    };
+                    ::core::result::Result::Ok(UnregisterDeviceConnectionAction {
+                        connection_id: __field0,
+                        end_reason: __field1,
+                    })
+                }
+            }
+            #[doc(hidden)]
+            const __FIELDS: &'static [&'static str] = &["connectionId", "endReason"];
+            __serde::Deserializer::deserialize_struct(
+                __deserializer,
+                "UnregisterDeviceConnectionAction",
+                __FIELDS,
+                __Visitor {
+                    __phantom_vars: ::core::marker::PhantomData,
+                },
+            )
+        }
+    }
+    #[doc = "Query the connection history of a device.\n"]
+    #[derive(Clone, Debug)]
+    pub struct QueryDeviceConnectionsAction {
+        #[doc = "ID of the device.\n"]
+        pub device_id: DeviceId,
+        #[doc = "Limit results (default 100).\n"]
+        pub limit: ::std::option::Option<u32>,
+        #[doc = "Include only active connections.\n"]
+        pub active_only: ::std::option::Option<bool>,
+    }
+    impl QueryDeviceConnectionsAction {
+        #[doc = "Creates a new [`QueryDeviceConnectionsAction`]."]
+        pub fn new(device_id: DeviceId) -> Self {
+            Self {
+                device_id,
+                limit: ::std::default::Default::default(),
+                active_only: ::std::default::Default::default(),
+            }
+        }
+        #[doc = "Sets the value of `device_id`."]
+        pub fn set_device_id(&mut self, device_id: DeviceId) -> &mut Self {
+            self.device_id = device_id;
+            self
+        }
+        #[doc = "Sets the value of `device_id`."]
+        pub fn with_device_id(mut self, device_id: DeviceId) -> Self {
+            self.device_id = device_id;
+            self
+        }
+        #[doc = "Sets the value of `limit`."]
+        pub fn set_limit(&mut self, limit: ::std::option::Option<u32>) -> &mut Self {
+            self.limit = limit;
+            self
+        }
+        #[doc = "Sets the value of `limit`."]
+        pub fn with_limit(mut self, limit: ::std::option::Option<u32>) -> Self {
+            self.limit = limit;
+            self
+        }
+        #[doc = "Sets the value of `active_only`."]
+        pub fn set_active_only(&mut self, active_only: ::std::option::Option<bool>) -> &mut Self {
+            self.active_only = active_only;
+            self
+        }
+        #[doc = "Sets the value of `active_only`."]
+        pub fn with_active_only(mut self, active_only: ::std::option::Option<bool>) -> Self {
+            self.active_only = active_only;
+            self
+        }
+    }
+    #[automatically_derived]
+    impl __serde::Serialize for QueryDeviceConnectionsAction {
+        fn serialize<__S: __serde::Serializer>(
+            &self,
+            __serializer: __S,
+        ) -> ::std::result::Result<__S::Ok, __S::Error> {
+            let mut __record = __sidex_serde::ser::RecordSerializer::new(
+                __serializer,
+                "QueryDeviceConnectionsAction",
+                3usize,
+            )?;
+            __record.serialize_field("deviceId", &self.device_id)?;
+            __record
+                .serialize_optional_field("limit", ::core::option::Option::as_ref(&self.limit))?;
+            __record.serialize_optional_field(
+                "activeOnly",
+                ::core::option::Option::as_ref(&self.active_only),
+            )?;
+            __record.end()
+        }
+    }
+    #[automatically_derived]
+    impl<'de> __serde::Deserialize<'de> for QueryDeviceConnectionsAction {
+        fn deserialize<__D: __serde::Deserializer<'de>>(
+            __deserializer: __D,
+        ) -> ::std::result::Result<Self, __D::Error> {
+            #[doc(hidden)]
+            struct __Visitor {
+                __phantom_vars: ::core::marker::PhantomData<fn(&())>,
+            }
+            impl<'de> __serde::de::Visitor<'de> for __Visitor {
+                type Value = QueryDeviceConnectionsAction;
+                fn expecting(
+                    &self,
+                    __formatter: &mut ::core::fmt::Formatter,
+                ) -> ::core::fmt::Result {
+                    ::core::fmt::Formatter::write_str(
+                        __formatter,
+                        "record QueryDeviceConnectionsAction",
+                    )
+                }
+                #[inline]
+                fn visit_seq<__A>(
+                    self,
+                    mut __seq: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::SeqAccess<'de>,
+                {
+                    let __field0 =
+                        match __serde::de::SeqAccess::next_element::<DeviceId>(&mut __seq)? {
+                            ::core::option::Option::Some(__value) => __value,
+                            ::core::option::Option::None => {
+                                return ::core::result::Result::Err(
+                                    __serde::de::Error::invalid_length(
+                                        0usize,
+                                        &"record with 3 fields",
+                                    ),
+                                );
+                            }
+                        };
+                    let __field1 = match __serde::de::SeqAccess::next_element::<
+                        ::std::option::Option<u32>,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(1usize, &"record with 3 fields"),
+                            );
+                        }
+                    };
+                    let __field2 = match __serde::de::SeqAccess::next_element::<
+                        ::std::option::Option<bool>,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(2usize, &"record with 3 fields"),
+                            );
+                        }
+                    };
+                    ::core::result::Result::Ok(QueryDeviceConnectionsAction {
+                        device_id: __field0,
+                        limit: __field1,
+                        active_only: __field2,
+                    })
+                }
+                #[inline]
+                fn visit_map<__A>(
+                    self,
+                    mut __map: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::MapAccess<'de>,
+                {
+                    #[doc(hidden)]
+                    const __IDENTIFIERS: &'static [&'static str] =
+                        &["deviceId", "limit", "activeOnly"];
+                    #[doc(hidden)]
+                    const __EXPECTING_IDENTIFIERS: &'static str =
+                        "an identifier in [\"deviceId\", \"limit\", \"activeOnly\"]";
+                    #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
+                    #[doc(hidden)]
+                    enum __Identifier {
+                        __Identifier0,
+                        __Identifier1,
+                        __Identifier2,
+                        __Unknown,
+                    }
+                    #[doc(hidden)]
+                    struct __IdentifierVisitor;
+                    impl<'de> __serde::de::Visitor<'de> for __IdentifierVisitor {
+                        type Value = __Identifier;
+                        fn expecting(
+                            &self,
+                            __formatter: &mut ::core::fmt::Formatter,
+                        ) -> ::core::fmt::Result {
+                            ::core::fmt::Formatter::write_str(__formatter, __EXPECTING_IDENTIFIERS)
+                        }
+                        fn visit_u64<__E>(
+                            self,
+                            __value: u64,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                0u64 => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                                1u64 => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                                2u64 => ::core::result::Result::Ok(__Identifier::__Identifier2),
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_str<__E>(
+                            self,
+                            __value: &str,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                "deviceId" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
+                                }
+                                "limit" => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                                "activeOnly" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier2)
+                                }
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_bytes<__E>(
+                            self,
+                            __value: &[u8],
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                b"deviceId" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
+                                }
+                                b"limit" => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                                b"activeOnly" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier2)
+                                }
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                    }
+                    impl<'de> __serde::Deserialize<'de> for __Identifier {
+                        #[inline]
+                        fn deserialize<__D>(
+                            __deserializer: __D,
+                        ) -> ::core::result::Result<Self, __D::Error>
+                        where
+                            __D: __serde::Deserializer<'de>,
+                        {
+                            __serde::Deserializer::deserialize_identifier(
+                                __deserializer,
+                                __IdentifierVisitor,
+                            )
+                        }
+                    }
+                    let mut __field0: ::core::option::Option<DeviceId> =
+                        ::core::option::Option::None;
+                    let mut __field1: ::core::option::Option<::std::option::Option<u32>> =
+                        ::core::option::Option::None;
+                    let mut __field2: ::core::option::Option<::std::option::Option<bool>> =
+                        ::core::option::Option::None;
+                    while let ::core::option::Option::Some(__key) =
+                        __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
+                    {
+                        match __key {
+                            __Identifier::__Identifier0 => {
+                                if ::core::option::Option::is_some(&__field0) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "deviceId",
+                                        ),
+                                    );
+                                }
+                                __field0 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<DeviceId>(&mut __map)?,
+                                );
+                            }
+                            __Identifier::__Identifier1 => {
+                                if ::core::option::Option::is_some(&__field1) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "limit",
+                                        ),
+                                    );
+                                }
+                                __field1 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<::std::option::Option<u32>>(
+                                        &mut __map,
+                                    )?,
+                                );
+                            }
+                            __Identifier::__Identifier2 => {
+                                if ::core::option::Option::is_some(&__field2) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "activeOnly",
+                                        ),
+                                    );
+                                }
+                                __field2 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<
+                                        ::std::option::Option<bool>,
+                                    >(&mut __map)?,
+                                );
+                            }
+                            _ => {
+                                __serde::de::MapAccess::next_value::<__serde::de::IgnoredAny>(
+                                    &mut __map,
+                                )?;
+                            }
+                        }
+                    }
+                    let __field0 = match __field0 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                <__A::Error as __serde::de::Error>::missing_field("deviceId"),
+                            );
+                        }
+                    };
+                    let __field1 = match __field1 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => ::core::option::Option::None,
+                    };
+                    let __field2 = match __field2 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => ::core::option::Option::None,
+                    };
+                    ::core::result::Result::Ok(QueryDeviceConnectionsAction {
+                        device_id: __field0,
+                        limit: __field1,
+                        active_only: __field2,
+                    })
+                }
+            }
+            #[doc(hidden)]
+            const __FIELDS: &'static [&'static str] = &["deviceId", "limit", "activeOnly"];
+            __serde::Deserializer::deserialize_struct(
+                __deserializer,
+                "QueryDeviceConnectionsAction",
+                __FIELDS,
+                __Visitor {
+                    __phantom_vars: ::core::marker::PhantomData,
+                },
+            )
+        }
+    }
+    #[doc = "Output of querying device connections.\n"]
+    #[derive(Clone, Debug)]
+    pub struct QueryDeviceConnectionsOutput {
+        #[doc = "List of connections.\n"]
+        pub connections: ::std::vec::Vec<DeviceConnectionLog>,
+    }
+    impl QueryDeviceConnectionsOutput {
+        #[doc = "Creates a new [`QueryDeviceConnectionsOutput`]."]
+        pub fn new(connections: ::std::vec::Vec<DeviceConnectionLog>) -> Self {
+            Self { connections }
+        }
+        #[doc = "Sets the value of `connections`."]
+        pub fn set_connections(
+            &mut self,
+            connections: ::std::vec::Vec<DeviceConnectionLog>,
+        ) -> &mut Self {
+            self.connections = connections;
+            self
+        }
+        #[doc = "Sets the value of `connections`."]
+        pub fn with_connections(
+            mut self,
+            connections: ::std::vec::Vec<DeviceConnectionLog>,
+        ) -> Self {
+            self.connections = connections;
+            self
+        }
+    }
+    #[automatically_derived]
+    impl __serde::Serialize for QueryDeviceConnectionsOutput {
+        fn serialize<__S: __serde::Serializer>(
+            &self,
+            __serializer: __S,
+        ) -> ::std::result::Result<__S::Ok, __S::Error> {
+            let mut __record = __sidex_serde::ser::RecordSerializer::new(
+                __serializer,
+                "QueryDeviceConnectionsOutput",
+                1usize,
+            )?;
+            __record.serialize_field("connections", &self.connections)?;
+            __record.end()
+        }
+    }
+    #[automatically_derived]
+    impl<'de> __serde::Deserialize<'de> for QueryDeviceConnectionsOutput {
+        fn deserialize<__D: __serde::Deserializer<'de>>(
+            __deserializer: __D,
+        ) -> ::std::result::Result<Self, __D::Error> {
+            #[doc(hidden)]
+            struct __Visitor {
+                __phantom_vars: ::core::marker::PhantomData<fn(&())>,
+            }
+            impl<'de> __serde::de::Visitor<'de> for __Visitor {
+                type Value = QueryDeviceConnectionsOutput;
+                fn expecting(
+                    &self,
+                    __formatter: &mut ::core::fmt::Formatter,
+                ) -> ::core::fmt::Result {
+                    ::core::fmt::Formatter::write_str(
+                        __formatter,
+                        "record QueryDeviceConnectionsOutput",
+                    )
+                }
+                #[inline]
+                fn visit_seq<__A>(
+                    self,
+                    mut __seq: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::SeqAccess<'de>,
+                {
+                    let __field0 = match __serde::de::SeqAccess::next_element::<
+                        ::std::vec::Vec<DeviceConnectionLog>,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(0usize, &"record with 1 fields"),
+                            );
+                        }
+                    };
+                    ::core::result::Result::Ok(QueryDeviceConnectionsOutput {
+                        connections: __field0,
+                    })
+                }
+                #[inline]
+                fn visit_map<__A>(
+                    self,
+                    mut __map: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::MapAccess<'de>,
+                {
+                    #[doc(hidden)]
+                    const __IDENTIFIERS: &'static [&'static str] = &["connections"];
+                    #[doc(hidden)]
+                    const __EXPECTING_IDENTIFIERS: &'static str =
+                        "an identifier in [\"connections\"]";
                     #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
                     #[doc(hidden)]
                     enum __Identifier {
@@ -13207,7 +15385,7 @@ pub mod devices {
                             __E: __serde::de::Error,
                         {
                             match __value {
-                                "connectionId" => {
+                                "connections" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier0)
                                 }
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
@@ -13221,7 +15399,7 @@ pub mod devices {
                             __E: __serde::de::Error,
                         {
                             match __value {
-                                b"connectionId" => {
+                                b"connections" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier0)
                                 }
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
@@ -13242,7 +15420,7 @@ pub mod devices {
                             )
                         }
                     }
-                    let mut __field0: ::core::option::Option<DeviceConnectionId> =
+                    let mut __field0: ::core::option::Option<::std::vec::Vec<DeviceConnectionLog>> =
                         ::core::option::Option::None;
                     while let ::core::option::Option::Some(__key) =
                         __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
@@ -13252,14 +15430,14 @@ pub mod devices {
                                 if ::core::option::Option::is_some(&__field0) {
                                     return ::core::result::Result::Err(
                                         <__A::Error as __serde::de::Error>::duplicate_field(
-                                            "connectionId",
+                                            "connections",
                                         ),
                                     );
                                 }
                                 __field0 = ::core::option::Option::Some(
-                                    __serde::de::MapAccess::next_value::<DeviceConnectionId>(
-                                        &mut __map,
-                                    )?,
+                                    __serde::de::MapAccess::next_value::<
+                                        ::std::vec::Vec<DeviceConnectionLog>,
+                                    >(&mut __map)?,
                                 );
                             }
                             _ => {
@@ -13273,20 +15451,20 @@ pub mod devices {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                <__A::Error as __serde::de::Error>::missing_field("connectionId"),
+                                <__A::Error as __serde::de::Error>::missing_field("connections"),
                             );
                         }
                     };
-                    ::core::result::Result::Ok(UnregisterDeviceConnectionAction {
-                        connection_id: __field0,
+                    ::core::result::Result::Ok(QueryDeviceConnectionsOutput {
+                        connections: __field0,
                     })
                 }
             }
             #[doc(hidden)]
-            const __FIELDS: &'static [&'static str] = &["connectionId"];
+            const __FIELDS: &'static [&'static str] = &["connections"];
             __serde::Deserializer::deserialize_struct(
                 __deserializer,
-                "UnregisterDeviceConnectionAction",
+                "QueryDeviceConnectionsOutput",
                 __FIELDS,
                 __Visitor {
                     __phantom_vars: ::core::marker::PhantomData,
@@ -32996,6 +35174,10 @@ pub mod projects {
         pub is_connected: bool,
         #[doc = "Pending device certificates.\n"]
         pub pending_certificates_count: u32,
+        #[doc = "Timestamp when the device was last connected (current or most recent connection).\n"]
+        pub last_connected_at: ::std::option::Option<super::datetime::Timestamp>,
+        #[doc = "Duration of the current connection in seconds (null if not connected).\n"]
+        pub current_connection_duration_secs: ::std::option::Option<u32>,
     }
     impl QueryProjectDevicesItem {
         #[doc = "Creates a new [`QueryProjectDevicesItem`]."]
@@ -33011,6 +35193,8 @@ pub mod projects {
                 is_connected,
                 pending_certificates_count,
                 name: ::std::default::Default::default(),
+                last_connected_at: ::std::default::Default::default(),
+                current_connection_duration_secs: ::std::default::Default::default(),
             }
         }
         #[doc = "Sets the value of `device_id`."]
@@ -33069,6 +35253,38 @@ pub mod projects {
             self.pending_certificates_count = pending_certificates_count;
             self
         }
+        #[doc = "Sets the value of `last_connected_at`."]
+        pub fn set_last_connected_at(
+            &mut self,
+            last_connected_at: ::std::option::Option<super::datetime::Timestamp>,
+        ) -> &mut Self {
+            self.last_connected_at = last_connected_at;
+            self
+        }
+        #[doc = "Sets the value of `last_connected_at`."]
+        pub fn with_last_connected_at(
+            mut self,
+            last_connected_at: ::std::option::Option<super::datetime::Timestamp>,
+        ) -> Self {
+            self.last_connected_at = last_connected_at;
+            self
+        }
+        #[doc = "Sets the value of `current_connection_duration_secs`."]
+        pub fn set_current_connection_duration_secs(
+            &mut self,
+            current_connection_duration_secs: ::std::option::Option<u32>,
+        ) -> &mut Self {
+            self.current_connection_duration_secs = current_connection_duration_secs;
+            self
+        }
+        #[doc = "Sets the value of `current_connection_duration_secs`."]
+        pub fn with_current_connection_duration_secs(
+            mut self,
+            current_connection_duration_secs: ::std::option::Option<u32>,
+        ) -> Self {
+            self.current_connection_duration_secs = current_connection_duration_secs;
+            self
+        }
     }
     #[automatically_derived]
     impl __serde::Serialize for QueryProjectDevicesItem {
@@ -33079,7 +35295,7 @@ pub mod projects {
             let mut __record = __sidex_serde::ser::RecordSerializer::new(
                 __serializer,
                 "QueryProjectDevicesItem",
-                5usize,
+                7usize,
             )?;
             __record.serialize_field("deviceId", &self.device_id)?;
             __record
@@ -33088,6 +35304,14 @@ pub mod projects {
             __record.serialize_field("isConnected", &self.is_connected)?;
             __record
                 .serialize_field("pendingCertificatesCount", &self.pending_certificates_count)?;
+            __record.serialize_optional_field(
+                "lastConnectedAt",
+                ::core::option::Option::as_ref(&self.last_connected_at),
+            )?;
+            __record.serialize_optional_field(
+                "currentConnectionDurationSecs",
+                ::core::option::Option::as_ref(&self.current_connection_duration_secs),
+            )?;
             __record.end()
         }
     }
@@ -33123,7 +35347,7 @@ pub mod projects {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(0usize, &"record with 5 fields"),
+                                __serde::de::Error::invalid_length(0usize, &"record with 7 fields"),
                             );
                         }
                     };
@@ -33134,7 +35358,7 @@ pub mod projects {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(1usize, &"record with 5 fields"),
+                                __serde::de::Error::invalid_length(1usize, &"record with 7 fields"),
                             );
                         }
                     };
@@ -33145,7 +35369,7 @@ pub mod projects {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(2usize, &"record with 5 fields"),
+                                __serde::de::Error::invalid_length(2usize, &"record with 7 fields"),
                             );
                         }
                     };
@@ -33153,7 +35377,7 @@ pub mod projects {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(3usize, &"record with 5 fields"),
+                                __serde::de::Error::invalid_length(3usize, &"record with 7 fields"),
                             );
                         }
                     };
@@ -33161,7 +35385,29 @@ pub mod projects {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(4usize, &"record with 5 fields"),
+                                __serde::de::Error::invalid_length(4usize, &"record with 7 fields"),
+                            );
+                        }
+                    };
+                    let __field5 = match __serde::de::SeqAccess::next_element::<
+                        ::std::option::Option<super::datetime::Timestamp>,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(5usize, &"record with 7 fields"),
+                            );
+                        }
+                    };
+                    let __field6 = match __serde::de::SeqAccess::next_element::<
+                        ::std::option::Option<u32>,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(6usize, &"record with 7 fields"),
                             );
                         }
                     };
@@ -33171,6 +35417,8 @@ pub mod projects {
                         first_seen: __field2,
                         is_connected: __field3,
                         pending_certificates_count: __field4,
+                        last_connected_at: __field5,
+                        current_connection_duration_secs: __field6,
                     })
                 }
                 #[inline]
@@ -33188,9 +35436,11 @@ pub mod projects {
                         "firstSeen",
                         "isConnected",
                         "pendingCertificatesCount",
+                        "lastConnectedAt",
+                        "currentConnectionDurationSecs",
                     ];
                     #[doc(hidden)]
-                    const __EXPECTING_IDENTIFIERS: &'static str = "an identifier in [\"deviceId\", \"name\", \"firstSeen\", \"isConnected\", \"pendingCertificatesCount\"]";
+                    const __EXPECTING_IDENTIFIERS: &'static str = "an identifier in [\"deviceId\", \"name\", \"firstSeen\", \"isConnected\", \"pendingCertificatesCount\", \"lastConnectedAt\", \"currentConnectionDurationSecs\"]";
                     #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
                     #[doc(hidden)]
                     enum __Identifier {
@@ -33199,6 +35449,8 @@ pub mod projects {
                         __Identifier2,
                         __Identifier3,
                         __Identifier4,
+                        __Identifier5,
+                        __Identifier6,
                         __Unknown,
                     }
                     #[doc(hidden)]
@@ -33224,6 +35476,8 @@ pub mod projects {
                                 2u64 => ::core::result::Result::Ok(__Identifier::__Identifier2),
                                 3u64 => ::core::result::Result::Ok(__Identifier::__Identifier3),
                                 4u64 => ::core::result::Result::Ok(__Identifier::__Identifier4),
+                                5u64 => ::core::result::Result::Ok(__Identifier::__Identifier5),
+                                6u64 => ::core::result::Result::Ok(__Identifier::__Identifier6),
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
                         }
@@ -33248,6 +35502,12 @@ pub mod projects {
                                 "pendingCertificatesCount" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier4)
                                 }
+                                "lastConnectedAt" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier5)
+                                }
+                                "currentConnectionDurationSecs" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier6)
+                                }
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
                         }
@@ -33271,6 +35531,12 @@ pub mod projects {
                                 }
                                 b"pendingCertificatesCount" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier4)
+                                }
+                                b"lastConnectedAt" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier5)
+                                }
+                                b"currentConnectionDurationSecs" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier6)
                                 }
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
@@ -33299,6 +35565,11 @@ pub mod projects {
                         ::core::option::Option::None;
                     let mut __field3: ::core::option::Option<bool> = ::core::option::Option::None;
                     let mut __field4: ::core::option::Option<u32> = ::core::option::Option::None;
+                    let mut __field5: ::core::option::Option<
+                        ::std::option::Option<super::datetime::Timestamp>,
+                    > = ::core::option::Option::None;
+                    let mut __field6: ::core::option::Option<::std::option::Option<u32>> =
+                        ::core::option::Option::None;
                     while let ::core::option::Option::Some(__key) =
                         __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
                     {
@@ -33367,6 +35638,34 @@ pub mod projects {
                                     __serde::de::MapAccess::next_value::<u32>(&mut __map)?,
                                 );
                             }
+                            __Identifier::__Identifier5 => {
+                                if ::core::option::Option::is_some(&__field5) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "lastConnectedAt",
+                                        ),
+                                    );
+                                }
+                                __field5 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<
+                                        ::std::option::Option<super::datetime::Timestamp>,
+                                    >(&mut __map)?,
+                                );
+                            }
+                            __Identifier::__Identifier6 => {
+                                if ::core::option::Option::is_some(&__field6) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "currentConnectionDurationSecs",
+                                        ),
+                                    );
+                                }
+                                __field6 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<::std::option::Option<u32>>(
+                                        &mut __map,
+                                    )?,
+                                );
+                            }
                             _ => {
                                 __serde::de::MapAccess::next_value::<__serde::de::IgnoredAny>(
                                     &mut __map,
@@ -33412,12 +35711,22 @@ pub mod projects {
                             );
                         }
                     };
+                    let __field5 = match __field5 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => ::core::option::Option::None,
+                    };
+                    let __field6 = match __field6 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => ::core::option::Option::None,
+                    };
                     ::core::result::Result::Ok(QueryProjectDevicesItem {
                         device_id: __field0,
                         name: __field1,
                         first_seen: __field2,
                         is_connected: __field3,
                         pending_certificates_count: __field4,
+                        last_connected_at: __field5,
+                        current_connection_duration_secs: __field6,
                     })
                 }
             }
@@ -33428,6 +35737,8 @@ pub mod projects {
                 "firstSeen",
                 "isConnected",
                 "pendingCertificatesCount",
+                "lastConnectedAt",
+                "currentConnectionDurationSecs",
             ];
             __serde::Deserializer::deserialize_struct(
                 __deserializer,
