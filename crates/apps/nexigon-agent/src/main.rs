@@ -182,7 +182,7 @@ async fn main() -> anyhow::Result<()> {
                     executor
                         .execute(SetDevicePropertyAction::new(
                             device_id.clone(),
-                            "dev.nexigon.systemInfo".to_owned(),
+                            "dev.nexigon.system.info".to_owned(),
                             serde_json::to_value(system_info).unwrap(),
                         ))
                         .await
