@@ -1,13 +1,9 @@
 use std::any::Any;
 
-use nexigon_ids::ids::OrganizationId;
-use nexigon_ids::ids::ProjectId;
-use nexigon_ids::ids::RepositoryId;
 use serde::Serialize;
 use serde::de::DeserializeOwned;
 
 use crate::types::jwt::Jwt;
-use crate::types::users::UserId;
 
 pub mod types;
 
@@ -20,50 +16,8 @@ pub trait Action: Any + Serialize + DeserializeOwned + Send + std::fmt::Debug {
     const NAME: &'static str;
 }
 
-/// A resource that can be audited.
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum AuditEntity {
-    Project(ProjectId),
-    User(UserId),
-    Repository(RepositoryId),
-    Organization(OrganizationId),
-}
-
-impl From<ProjectId> for AuditEntity {
-    fn from(value: ProjectId) -> Self {
-        Self::Project(value)
-    }
-}
-
-impl From<UserId> for AuditEntity {
-    fn from(value: UserId) -> Self {
-        Self::User(value)
-    }
-}
-
-impl From<RepositoryId> for AuditEntity {
-    fn from(value: RepositoryId) -> Self {
-        Self::Repository(value)
-    }
-}
-
-impl From<OrganizationId> for AuditEntity {
-    fn from(value: OrganizationId) -> Self {
-        Self::Organization(value)
-    }
-}
-
-/// Represents an event that can be recorded in the audit log.
-pub trait Event: Any + Serialize + DeserializeOwned + Send + std::fmt::Debug {
-    /// Unique name of the event.
-    const NAME: &'static str;
-
-    /// Affected entities.
-    fn audit_entities(&self) -> impl Iterator<Item = AuditEntity>;
-}
-
 /// Macro for generating code for all actions.
-/// 
+///
 /// This macro takes another macro as an argument and invokes it with a list of actions.
 #[macro_export]
 #[rustfmt::skip]
@@ -269,102 +223,6 @@ macro_rules! impl_actions {
 }
 
 with_actions!(impl_actions);
-
-/// Macro for generating code for all events.
-/// 
-/// This macro takes another macro as an argument and invokes it with a list of events.
-#[rustfmt::skip]
-macro_rules! with_events {
-    ($name:ident) => {
-        $name![
-            // # Users
-            ("users_Created", users::UserCreatedEvent, { user_id }),
-            ("users_Deleted", users::UserDeletedEvent, {}),
-            ("users_SetIsAdmin", users::UserSetIsAdminEvent, { user_id }),
-            ("users_SetPassword", users::UserSetPasswordEvent, { user_id }),
-            ("users_TokenCreated", users::UserTokenCreatedEvent, { user_id }),
-            ("users_TokenDeleted", users::UserTokenDeletedEvent, { user_id }),
-            ("users_SessionInitiated", users::UserSessionInitiatedEvent, { user_id }),
-            ("users_SessionTerminated", users::UserSessionTerminatedEvent, { user_id }),
-            ("users_RegistrationCreated", users::UserRegistrationCreatedEvent, { user_id }),
-            ("users_RegistrationEmailSent", users::UserRegistrationEmailSentEvent, { user_id }),
-            ("users_RegistrationCompleted", users::UserRegistrationCompletedEvent, { user_id }),
-            ("users_DisplayNameChanged", users::UserDisplayNameChangedEvent, { user_id }),
-            ("users_PasswordResetCompleted", users::UserPasswordResetCompletedEvent, { user_id }),
-
-            // # Projects
-            ("projects_Created", projects::ProjectCreatedEvent, { project_id }),
-            ("projects_Deleted", projects::ProjectDeletedEvent, {}),
-            ("projects_NameChanged", projects::ProjectNameChangedEvent, { project_id }),
-            ("projects_OrganizationChanged", projects::ProjectOrganizationChangedEvent, { project_id }),
-            ("projects_DeploymentTokenCreated", projects::DeploymentTokenCreatedEvent, { project_id }),
-            ("projects_DeploymentTokenDeleted", projects::DeploymentTokenDeletedEvent, { project_id }),
-            ("projects_DeploymentTokenFlagsChanged", projects::DeploymentTokenFlagsChangedEvent, { project_id }),
-            ("projects_RepositoryAdded", projects::ProjectRepositoryAddedEvent, { project_id, repository_id }),
-            ("projects_RepositoryRemoved", projects::ProjectRepositoryRemovedEvent, { project_id, repository_id }),
-
-            // # Organizations
-            ("organizations_Created", organizations::OrganizationCreatedEvent, { organization_id }),
-            ("organizations_Deleted", organizations::OrganizationDeletedEvent, { organization_id }),
-            ("organizations_MemberAdded", organizations::OrganizationMemberAddedEvent, { organization_id, user_id }),
-            ("organizations_MemberRemoved", organizations::OrganizationMemberRemovedEvent, { organization_id, user_id }),
-            ("organizations_MemberAdminStatusChanged", organizations::OrganizationMemberAdminStatusChangedEvent, { organization_id, user_id }),
-            ("organizations_InvitationCreated", organizations::OrganizationInvitationCreatedEvent, { organization_id }),
-            ("organizations_InvitationDeleted", organizations::OrganizationInvitationDeletedEvent, { organization_id }),
-
-            // # Devices
-            ("devices_Created", devices::DeviceCreatedEvent, { project_id }),
-            ("devices_Deleted", devices::DeviceDeletedEvent, { project_id }),
-            ("devices_NameChanged", devices::DeviceNameChangedEvent, { project_id }),
-            ("devices_PropertySet", devices::DevicePropertySetEvent, { project_id }),
-            ("devices_PropertyRemoved", devices::DevicePropertyRemovedEvent, { project_id }),
-            ("devices_CertificateAdded", devices::DeviceCertificateAddedEvent, { project_id }),
-            ("devices_CertificateDeleted", devices::DeviceCertificateDeletedEvent, { project_id }),
-            ("devices_CertificateStatusChanged", devices::DeviceCertificateStatusChangedEvent, { project_id }),
-
-            // # Repositories
-            ("repositories_Created", repositories::RepositoryCreatedEvent, { repository_id, organization_id }),
-            ("repositories_Deleted", repositories::RepositoryDeletedEvent, { repository_id, organization_id }),
-            ("repositories_OrganizationChanged", repositories::RepositoryOrganizationChangedEvent, { repository_id }),
-            ("repositories_VisibilityChanged", repositories::RepositoryVisibilityChangedEvent, { repository_id }),
-            ("repositories_DisplayNameChanged", repositories::RepositoryDisplayNameChangedEvent, { repository_id }),
-            ("repositories_PublicNameChanged", repositories::RepositoryPublicNameChangedEvent, { repository_id }),
-            ("repositories_S3ConfigChanged", repositories::RepositoryS3ConfigChangedEvent, { repository_id }),
-            ("repositories_PackageCreated", repositories::PackageCreatedEvent, { repository_id }),
-            ("repositories_PackageDeleted", repositories::PackageDeletedEvent, { repository_id }),
-            ("repositories_PackageNameChanged", repositories::PackageNameChangedEvent, { repository_id }),
-            ("repositories_PackageVersionCreated", repositories::PackageVersionCreatedEvent, { repository_id }),
-            ("repositories_PackageVersionDeleted", repositories::PackageVersionDeletedEvent, { repository_id }),
-            ("repositories_PackageVersionNameChanged", repositories::PackageVersionNameChangedEvent, { repository_id }),
-            ("repositories_PackageVersionAssetAdded", repositories::PackageVersionAssetAddedEvent, { repository_id }),
-            ("repositories_PackageVersionAssetRemoved", repositories::PackageVersionAssetRemovedEvent, { repository_id }),
-            ("repositories_PackageVersionTagged", repositories::PackageVersionTaggedEvent, { repository_id }),
-            ("repositories_PackageVersionUntagged", repositories::PackageVersionUntaggedEvent, { repository_id }),
-            ("repositories_AssetCreated", repositories::AssetCreatedEvent, { repository_id }),
-            ("repositories_AssetDeleted", repositories::AssetDeletedEvent, { repository_id }),
-        ];
-    };
-}
-
-macro_rules! impl_events {
-    ($(($name:literal, $event:path, { $($entity:ident),* }),)*) => {
-        $(
-            impl Event for $event {
-                const NAME: &'static str = $name;
-
-                fn audit_entities(&self) -> impl Iterator<Item = AuditEntity> {
-                    [
-                        $(
-                            (self.$entity).clone().into(),
-                        )*
-                    ].into_iter()
-                }
-            }
-        )*
-    };
-}
-
-with_events!(impl_events);
 
 /// Executor for actions.
 pub trait Executor {

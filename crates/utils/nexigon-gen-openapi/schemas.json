@@ -648,52 +648,6 @@
     ],
     "unevaluatedProperties": false
   },
-  "nexigon_api.devices.DeviceCertificateAddedEvent": {
-    "type": "object",
-    "description": "Device certificate has been added.",
-    "properties": {
-      "projectId": {
-        "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
-      },
-      "deviceId": {
-        "$ref": "#/components/schemas/nexigon_api.devices.DeviceId"
-      },
-      "certificateId": {
-        "$ref": "#/components/schemas/nexigon_api.devices.DeviceCertificateId"
-      },
-      "status": {
-        "$ref": "#/components/schemas/nexigon_api.devices.DeviceCertificateStatus"
-      }
-    },
-    "required": [
-      "projectId",
-      "deviceId",
-      "certificateId",
-      "status"
-    ],
-    "unevaluatedProperties": false
-  },
-  "nexigon_api.devices.DeviceCertificateDeletedEvent": {
-    "type": "object",
-    "description": "Device certificate has been deleted.",
-    "properties": {
-      "projectId": {
-        "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
-      },
-      "deviceId": {
-        "$ref": "#/components/schemas/nexigon_api.devices.DeviceId"
-      },
-      "certificateId": {
-        "$ref": "#/components/schemas/nexigon_api.devices.DeviceCertificateId"
-      }
-    },
-    "required": [
-      "projectId",
-      "deviceId",
-      "certificateId"
-    ],
-    "unevaluatedProperties": false
-  },
   "nexigon_api.devices.DeviceCertificateId": {
     "type": [
       "string"
@@ -708,31 +662,6 @@
       "Revoked"
     ],
     "description": "Status of a device certificate."
-  },
-  "nexigon_api.devices.DeviceCertificateStatusChangedEvent": {
-    "type": "object",
-    "description": "Status of device certificate has been changed.",
-    "properties": {
-      "projectId": {
-        "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
-      },
-      "deviceId": {
-        "$ref": "#/components/schemas/nexigon_api.devices.DeviceId"
-      },
-      "certificateId": {
-        "$ref": "#/components/schemas/nexigon_api.devices.DeviceCertificateId"
-      },
-      "status": {
-        "$ref": "#/components/schemas/nexigon_api.devices.DeviceCertificateStatus"
-      }
-    },
-    "required": [
-      "projectId",
-      "deviceId",
-      "certificateId",
-      "status"
-    ],
-    "unevaluatedProperties": false
   },
   "nexigon_api.devices.DeviceConnection": {
     "type": "object",
@@ -765,40 +694,6 @@
       "string"
     ],
     "description": "Unique ID of a device connection."
-  },
-  "nexigon_api.devices.DeviceCreatedEvent": {
-    "type": "object",
-    "description": "Device has been created.",
-    "properties": {
-      "deviceId": {
-        "$ref": "#/components/schemas/nexigon_api.devices.DeviceId"
-      },
-      "projectId": {
-        "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
-      }
-    },
-    "required": [
-      "deviceId",
-      "projectId"
-    ],
-    "unevaluatedProperties": false
-  },
-  "nexigon_api.devices.DeviceDeletedEvent": {
-    "type": "object",
-    "description": "Device has been deleted.",
-    "properties": {
-      "deviceId": {
-        "$ref": "#/components/schemas/nexigon_api.devices.DeviceId"
-      },
-      "projectId": {
-        "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
-      }
-    },
-    "required": [
-      "deviceId",
-      "projectId"
-    ],
-    "unevaluatedProperties": false
   },
   "nexigon_api.devices.DeviceEvent": {
     "type": "object",
@@ -873,26 +768,6 @@
     ],
     "description": "Unique ID of a device."
   },
-  "nexigon_api.devices.DeviceNameChangedEvent": {
-    "type": "object",
-    "description": "Device name has been changed.",
-    "properties": {
-      "projectId": {
-        "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
-      },
-      "deviceId": {
-        "$ref": "#/components/schemas/nexigon_api.devices.DeviceId"
-      },
-      "name": {
-        "type": "string"
-      }
-    },
-    "required": [
-      "projectId",
-      "deviceId"
-    ],
-    "unevaluatedProperties": false
-  },
   "nexigon_api.devices.DeviceProperty": {
     "type": "object",
     "description": "Device property.",
@@ -915,48 +790,6 @@
       "value",
       "protected",
       "lastUpdated"
-    ],
-    "unevaluatedProperties": false
-  },
-  "nexigon_api.devices.DevicePropertyRemovedEvent": {
-    "type": "object",
-    "description": "Device property has been removed.",
-    "properties": {
-      "projectId": {
-        "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
-      },
-      "deviceId": {
-        "$ref": "#/components/schemas/nexigon_api.devices.DeviceId"
-      },
-      "propertyName": {
-        "type": "string"
-      }
-    },
-    "required": [
-      "projectId",
-      "deviceId",
-      "propertyName"
-    ],
-    "unevaluatedProperties": false
-  },
-  "nexigon_api.devices.DevicePropertySetEvent": {
-    "type": "object",
-    "description": "Device property has been set.",
-    "properties": {
-      "projectId": {
-        "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
-      },
-      "deviceId": {
-        "$ref": "#/components/schemas/nexigon_api.devices.DeviceId"
-      },
-      "propertyName": {
-        "type": "string"
-      }
-    },
-    "required": [
-      "projectId",
-      "deviceId",
-      "propertyName"
     ],
     "unevaluatedProperties": false
   },
@@ -1993,140 +1826,17 @@
     ],
     "unevaluatedProperties": false
   },
-  "nexigon_api.organizations.OrganizationCreatedEvent": {
-    "type": "object",
-    "description": "Event indicating the creation of an organization.",
-    "properties": {
-      "organizationId": {
-        "$ref": "#/components/schemas/nexigon_api.organizations.OrganizationId"
-      }
-    },
-    "required": [
-      "organizationId"
-    ],
-    "unevaluatedProperties": false
-  },
-  "nexigon_api.organizations.OrganizationDeletedEvent": {
-    "type": "object",
-    "description": "Event indicating the deletion of an organization.",
-    "properties": {
-      "organizationId": {
-        "$ref": "#/components/schemas/nexigon_api.organizations.OrganizationId"
-      }
-    },
-    "required": [
-      "organizationId"
-    ],
-    "unevaluatedProperties": false
-  },
   "nexigon_api.organizations.OrganizationId": {
     "type": [
       "string"
     ],
     "description": "Unique ID of an organization"
   },
-  "nexigon_api.organizations.OrganizationInvitationCreatedEvent": {
-    "type": "object",
-    "description": "Event indicating that a member has been invited to an organization.",
-    "properties": {
-      "organizationId": {
-        "$ref": "#/components/schemas/nexigon_api.organizations.OrganizationId"
-      },
-      "invitationId": {
-        "$ref": "#/components/schemas/nexigon_api.organizations.OrganizationInvitationId"
-      },
-      "email": {
-        "type": "string"
-      }
-    },
-    "required": [
-      "organizationId",
-      "invitationId",
-      "email"
-    ],
-    "unevaluatedProperties": false
-  },
-  "nexigon_api.organizations.OrganizationInvitationDeletedEvent": {
-    "type": "object",
-    "description": "Event indicating that an organization invitation has been deleted.",
-    "properties": {
-      "organizationId": {
-        "$ref": "#/components/schemas/nexigon_api.organizations.OrganizationId"
-      },
-      "invitationId": {
-        "$ref": "#/components/schemas/nexigon_api.organizations.OrganizationInvitationId"
-      }
-    },
-    "required": [
-      "organizationId",
-      "invitationId"
-    ],
-    "unevaluatedProperties": false
-  },
   "nexigon_api.organizations.OrganizationInvitationId": {
     "type": [
       "string"
     ],
     "description": "Unique ID of an invitation to an organization."
-  },
-  "nexigon_api.organizations.OrganizationMemberAddedEvent": {
-    "type": "object",
-    "description": "Event indicating that a member has been added to an organization.",
-    "properties": {
-      "organizationId": {
-        "$ref": "#/components/schemas/nexigon_api.organizations.OrganizationId"
-      },
-      "userId": {
-        "$ref": "#/components/schemas/nexigon_api.users.UserId"
-      },
-      "isAdmin": {
-        "type": "boolean"
-      }
-    },
-    "required": [
-      "organizationId",
-      "userId",
-      "isAdmin"
-    ],
-    "unevaluatedProperties": false
-  },
-  "nexigon_api.organizations.OrganizationMemberAdminStatusChangedEvent": {
-    "type": "object",
-    "description": "Event indicating that a member's admin status has changed.",
-    "properties": {
-      "organizationId": {
-        "$ref": "#/components/schemas/nexigon_api.organizations.OrganizationId"
-      },
-      "userId": {
-        "$ref": "#/components/schemas/nexigon_api.users.UserId"
-      },
-      "isAdmin": {
-        "type": "boolean"
-      }
-    },
-    "required": [
-      "organizationId",
-      "userId",
-      "isAdmin"
-    ],
-    "unevaluatedProperties": false
-  },
-  "nexigon_api.organizations.OrganizationMemberRemovedEvent": {
-    "type": "object",
-    "description": "Event indicating that a member has been removed from an organization.",
-    "properties": {
-      "organizationId": {
-        "$ref": "#/components/schemas/nexigon_api.organizations.OrganizationId"
-      },
-      "userId": {
-        "$ref": "#/components/schemas/nexigon_api.users.UserId"
-      }
-    },
-    "required": [
-      "organizationId",
-      "userId"
-    ],
-    "unevaluatedProperties": false
   },
   "nexigon_api.organizations.QueryOrganizationAuditLogAction": {
     "type": "object",
@@ -2575,44 +2285,6 @@
     ],
     "description": "Deployment token."
   },
-  "nexigon_api.projects.DeploymentTokenCreatedEvent": {
-    "type": "object",
-    "description": "Event indicating that a deployment token has been created.",
-    "properties": {
-      "projectId": {
-        "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
-      },
-      "tokenId": {
-        "$ref": "#/components/schemas/nexigon_api.projects.DeploymentTokenId"
-      },
-      "flags": {
-        "$ref": "#/components/schemas/nexigon_api.projects.DeploymentTokenFlags"
-      }
-    },
-    "required": [
-      "projectId",
-      "tokenId",
-      "flags"
-    ],
-    "unevaluatedProperties": false
-  },
-  "nexigon_api.projects.DeploymentTokenDeletedEvent": {
-    "type": "object",
-    "description": "Event indicating that a deployment token has been deleted.",
-    "properties": {
-      "projectId": {
-        "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
-      },
-      "tokenId": {
-        "$ref": "#/components/schemas/nexigon_api.projects.DeploymentTokenId"
-      }
-    },
-    "required": [
-      "projectId",
-      "tokenId"
-    ],
-    "unevaluatedProperties": false
-  },
   "nexigon_api.projects.DeploymentTokenFlags": {
     "type": "object",
     "description": "Flags for deployment tokens.",
@@ -2622,27 +2294,6 @@
       }
     },
     "required": [],
-    "unevaluatedProperties": false
-  },
-  "nexigon_api.projects.DeploymentTokenFlagsChangedEvent": {
-    "type": "object",
-    "description": "Event indicating that deployment token flags have been changed.",
-    "properties": {
-      "projectId": {
-        "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
-      },
-      "tokenId": {
-        "$ref": "#/components/schemas/nexigon_api.projects.DeploymentTokenId"
-      },
-      "flags": {
-        "$ref": "#/components/schemas/nexigon_api.projects.DeploymentTokenFlags"
-      }
-    },
-    "required": [
-      "projectId",
-      "tokenId",
-      "flags"
-    ],
     "unevaluatedProperties": false
   },
   "nexigon_api.projects.DeploymentTokenId": {
@@ -2686,109 +2337,11 @@
     ],
     "unevaluatedProperties": false
   },
-  "nexigon_api.projects.ProjectCreatedEvent": {
-    "type": "object",
-    "description": "Event indicating the creation of a project.",
-    "properties": {
-      "projectId": {
-        "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
-      }
-    },
-    "required": [
-      "projectId"
-    ],
-    "unevaluatedProperties": false
-  },
-  "nexigon_api.projects.ProjectDeletedEvent": {
-    "type": "object",
-    "description": "Event indicating the deletion of a project.",
-    "properties": {
-      "projectId": {
-        "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
-      }
-    },
-    "required": [
-      "projectId"
-    ],
-    "unevaluatedProperties": false
-  },
   "nexigon_api.projects.ProjectId": {
     "type": [
       "string"
     ],
     "description": "Unique ID of a project."
-  },
-  "nexigon_api.projects.ProjectNameChangedEvent": {
-    "type": "object",
-    "description": "Event indicating that a project's name has been changed.",
-    "properties": {
-      "projectId": {
-        "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
-      },
-      "name": {
-        "type": "string"
-      }
-    },
-    "required": [
-      "projectId",
-      "name"
-    ],
-    "unevaluatedProperties": false
-  },
-  "nexigon_api.projects.ProjectOrganizationChangedEvent": {
-    "type": "object",
-    "description": "Event indicating that a project has been moved to a different organization.",
-    "properties": {
-      "projectId": {
-        "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
-      },
-      "previousOrganizationId": {
-        "$ref": "#/components/schemas/nexigon_api.organizations.OrganizationId"
-      },
-      "newOrganizationId": {
-        "$ref": "#/components/schemas/nexigon_api.organizations.OrganizationId"
-      }
-    },
-    "required": [
-      "projectId",
-      "previousOrganizationId",
-      "newOrganizationId"
-    ],
-    "unevaluatedProperties": false
-  },
-  "nexigon_api.projects.ProjectRepositoryAddedEvent": {
-    "type": "object",
-    "description": "Event indicating that a repository has been added to a project.",
-    "properties": {
-      "projectId": {
-        "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
-      },
-      "repositoryId": {
-        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryId"
-      }
-    },
-    "required": [
-      "projectId",
-      "repositoryId"
-    ],
-    "unevaluatedProperties": false
-  },
-  "nexigon_api.projects.ProjectRepositoryRemovedEvent": {
-    "type": "object",
-    "description": "Event indicating that a repository has been removed from a project.",
-    "properties": {
-      "projectId": {
-        "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
-      },
-      "repositoryId": {
-        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryId"
-      }
-    },
-    "required": [
-      "projectId",
-      "repositoryId"
-    ],
-    "unevaluatedProperties": false
   },
   "nexigon_api.projects.QueryAuditLogEventsAction": {
     "type": "object",
@@ -3275,40 +2828,6 @@
     },
     "required": [
       "tag"
-    ],
-    "unevaluatedProperties": false
-  },
-  "nexigon_api.repositories.AssetCreatedEvent": {
-    "type": "object",
-    "description": "Event indicating that an asset has been created.",
-    "properties": {
-      "repositoryId": {
-        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryId"
-      },
-      "assetId": {
-        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryAssetId"
-      }
-    },
-    "required": [
-      "repositoryId",
-      "assetId"
-    ],
-    "unevaluatedProperties": false
-  },
-  "nexigon_api.repositories.AssetDeletedEvent": {
-    "type": "object",
-    "description": "Event indicating that an asset has been deleted.",
-    "properties": {
-      "repositoryId": {
-        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryId"
-      },
-      "assetId": {
-        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryAssetId"
-      }
-    },
-    "required": [
-      "repositoryId",
-      "assetId"
     ],
     "unevaluatedProperties": false
   },
@@ -3851,70 +3370,11 @@
     ],
     "unevaluatedProperties": false
   },
-  "nexigon_api.repositories.PackageCreatedEvent": {
-    "type": "object",
-    "description": "Event indicating that a package has been created.",
-    "properties": {
-      "repositoryId": {
-        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryId"
-      },
-      "packageId": {
-        "$ref": "#/components/schemas/nexigon_api.repositories.PackageId"
-      },
-      "name": {
-        "type": "string"
-      }
-    },
-    "required": [
-      "repositoryId",
-      "packageId",
-      "name"
-    ],
-    "unevaluatedProperties": false
-  },
-  "nexigon_api.repositories.PackageDeletedEvent": {
-    "type": "object",
-    "description": "Event indicating that a package has been deleted.",
-    "properties": {
-      "repositoryId": {
-        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryId"
-      },
-      "packageId": {
-        "$ref": "#/components/schemas/nexigon_api.repositories.PackageId"
-      }
-    },
-    "required": [
-      "repositoryId",
-      "packageId"
-    ],
-    "unevaluatedProperties": false
-  },
   "nexigon_api.repositories.PackageId": {
     "type": [
       "string"
     ],
     "description": "Unique ID of a package."
-  },
-  "nexigon_api.repositories.PackageNameChangedEvent": {
-    "type": "object",
-    "description": "Event indicating that a package's name has been changed.",
-    "properties": {
-      "repositoryId": {
-        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryId"
-      },
-      "packageId": {
-        "$ref": "#/components/schemas/nexigon_api.repositories.PackageId"
-      },
-      "name": {
-        "type": "string"
-      }
-    },
-    "required": [
-      "repositoryId",
-      "packageId",
-      "name"
-    ],
-    "unevaluatedProperties": false
   },
   "nexigon_api.repositories.PackageVersionAsset": {
     "type": "object",
@@ -3946,119 +3406,11 @@
     ],
     "unevaluatedProperties": false
   },
-  "nexigon_api.repositories.PackageVersionAssetAddedEvent": {
-    "type": "object",
-    "description": "Event indicating that an asset has been added to a package version.",
-    "properties": {
-      "repositoryId": {
-        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryId"
-      },
-      "versionId": {
-        "$ref": "#/components/schemas/nexigon_api.repositories.PackageVersionId"
-      },
-      "assetId": {
-        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryAssetId"
-      },
-      "filename": {
-        "type": "string"
-      }
-    },
-    "required": [
-      "repositoryId",
-      "versionId",
-      "assetId",
-      "filename"
-    ],
-    "unevaluatedProperties": false
-  },
-  "nexigon_api.repositories.PackageVersionAssetRemovedEvent": {
-    "type": "object",
-    "description": "Event indicating that an asset has been removed from a package version.",
-    "properties": {
-      "repositoryId": {
-        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryId"
-      },
-      "versionId": {
-        "$ref": "#/components/schemas/nexigon_api.repositories.PackageVersionId"
-      },
-      "filename": {
-        "type": "string"
-      }
-    },
-    "required": [
-      "repositoryId",
-      "versionId",
-      "filename"
-    ],
-    "unevaluatedProperties": false
-  },
-  "nexigon_api.repositories.PackageVersionCreatedEvent": {
-    "type": "object",
-    "description": "Event indicating that a package version has been created.",
-    "properties": {
-      "repositoryId": {
-        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryId"
-      },
-      "packageId": {
-        "$ref": "#/components/schemas/nexigon_api.repositories.PackageId"
-      },
-      "versionId": {
-        "$ref": "#/components/schemas/nexigon_api.repositories.PackageVersionId"
-      }
-    },
-    "required": [
-      "repositoryId",
-      "packageId",
-      "versionId"
-    ],
-    "unevaluatedProperties": false
-  },
-  "nexigon_api.repositories.PackageVersionDeletedEvent": {
-    "type": "object",
-    "description": "Event indicating that a package version has been deleted.",
-    "properties": {
-      "repositoryId": {
-        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryId"
-      },
-      "packageId": {
-        "$ref": "#/components/schemas/nexigon_api.repositories.PackageId"
-      },
-      "versionId": {
-        "$ref": "#/components/schemas/nexigon_api.repositories.PackageVersionId"
-      }
-    },
-    "required": [
-      "repositoryId",
-      "packageId",
-      "versionId"
-    ],
-    "unevaluatedProperties": false
-  },
   "nexigon_api.repositories.PackageVersionId": {
     "type": [
       "string"
     ],
     "description": "Unique ID of a package version."
-  },
-  "nexigon_api.repositories.PackageVersionNameChangedEvent": {
-    "type": "object",
-    "description": "Event indicating that a package version's name has been changed.",
-    "properties": {
-      "repositoryId": {
-        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryId"
-      },
-      "versionId": {
-        "$ref": "#/components/schemas/nexigon_api.repositories.PackageVersionId"
-      },
-      "name": {
-        "type": "string"
-      }
-    },
-    "required": [
-      "repositoryId",
-      "versionId"
-    ],
-    "unevaluatedProperties": false
   },
   "nexigon_api.repositories.PackageVersionTag": {
     "type": "object",
@@ -4074,54 +3426,6 @@
     "required": [
       "tag",
       "locked"
-    ],
-    "unevaluatedProperties": false
-  },
-  "nexigon_api.repositories.PackageVersionTaggedEvent": {
-    "type": "object",
-    "description": "Event indicating that a package version has been tagged.",
-    "properties": {
-      "repositoryId": {
-        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryId"
-      },
-      "versionId": {
-        "$ref": "#/components/schemas/nexigon_api.repositories.PackageVersionId"
-      },
-      "tags": {
-        "type": "array",
-        "items": {
-          "type": "string"
-        }
-      }
-    },
-    "required": [
-      "repositoryId",
-      "versionId",
-      "tags"
-    ],
-    "unevaluatedProperties": false
-  },
-  "nexigon_api.repositories.PackageVersionUntaggedEvent": {
-    "type": "object",
-    "description": "Event indicating that tags have been removed from a package version.",
-    "properties": {
-      "repositoryId": {
-        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryId"
-      },
-      "versionId": {
-        "$ref": "#/components/schemas/nexigon_api.repositories.PackageVersionId"
-      },
-      "tags": {
-        "type": "array",
-        "items": {
-          "type": "string"
-        }
-      }
-    },
-    "required": [
-      "repositoryId",
-      "versionId",
-      "tags"
     ],
     "unevaluatedProperties": false
   },
@@ -4401,99 +3705,11 @@
     ],
     "description": "Asset status."
   },
-  "nexigon_api.repositories.RepositoryCreatedEvent": {
-    "type": "object",
-    "description": "Event indicating that a repository has been created.",
-    "properties": {
-      "repositoryId": {
-        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryId"
-      },
-      "organizationId": {
-        "$ref": "#/components/schemas/nexigon_api.organizations.OrganizationId"
-      }
-    },
-    "required": [
-      "repositoryId",
-      "organizationId"
-    ],
-    "unevaluatedProperties": false
-  },
-  "nexigon_api.repositories.RepositoryDeletedEvent": {
-    "type": "object",
-    "description": "Event indicating that a repository has been deleted.",
-    "properties": {
-      "repositoryId": {
-        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryId"
-      },
-      "organizationId": {
-        "$ref": "#/components/schemas/nexigon_api.organizations.OrganizationId"
-      }
-    },
-    "required": [
-      "repositoryId",
-      "organizationId"
-    ],
-    "unevaluatedProperties": false
-  },
-  "nexigon_api.repositories.RepositoryDisplayNameChangedEvent": {
-    "type": "object",
-    "description": "Event indicating that a repository's display name has been changed.",
-    "properties": {
-      "repositoryId": {
-        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryId"
-      },
-      "displayName": {
-        "type": "string"
-      }
-    },
-    "required": [
-      "repositoryId"
-    ],
-    "unevaluatedProperties": false
-  },
   "nexigon_api.repositories.RepositoryId": {
     "type": [
       "string"
     ],
     "description": "Unique ID of a repository."
-  },
-  "nexigon_api.repositories.RepositoryOrganizationChangedEvent": {
-    "type": "object",
-    "description": "Event indicating that a repository has been moved to a different organization.",
-    "properties": {
-      "repositoryId": {
-        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryId"
-      },
-      "previousOrganizationId": {
-        "$ref": "#/components/schemas/nexigon_api.organizations.OrganizationId"
-      },
-      "newOrganizationId": {
-        "$ref": "#/components/schemas/nexigon_api.organizations.OrganizationId"
-      }
-    },
-    "required": [
-      "repositoryId",
-      "previousOrganizationId",
-      "newOrganizationId"
-    ],
-    "unevaluatedProperties": false
-  },
-  "nexigon_api.repositories.RepositoryPublicNameChangedEvent": {
-    "type": "object",
-    "description": "Event indicating that a repository's public name has been changed.",
-    "properties": {
-      "repositoryId": {
-        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryId"
-      },
-      "publicName": {
-        "type": "string"
-      }
-    },
-    "required": [
-      "repositoryId",
-      "publicName"
-    ],
-    "unevaluatedProperties": false
   },
   "nexigon_api.repositories.RepositoryS3Config": {
     "type": "object",
@@ -4525,42 +3741,12 @@
     ],
     "unevaluatedProperties": false
   },
-  "nexigon_api.repositories.RepositoryS3ConfigChangedEvent": {
-    "type": "object",
-    "description": "Event indicating that a repository's S3 configuration has been changed.",
-    "properties": {
-      "repositoryId": {
-        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryId"
-      }
-    },
-    "required": [
-      "repositoryId"
-    ],
-    "unevaluatedProperties": false
-  },
   "nexigon_api.repositories.RepositoryVisibility": {
     "enum": [
       "Public",
       "Private"
     ],
     "description": "Repository visibility."
-  },
-  "nexigon_api.repositories.RepositoryVisibilityChangedEvent": {
-    "type": "object",
-    "description": "Event indicating that a repository's visibility has been changed.",
-    "properties": {
-      "repositoryId": {
-        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryId"
-      },
-      "visibility": {
-        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryVisibility"
-      }
-    },
-    "required": [
-      "repositoryId",
-      "visibility"
-    ],
-    "unevaluatedProperties": false
   },
   "nexigon_api.repositories.ResolvePackageByPathAction": {
     "type": "object",
@@ -5940,71 +5126,11 @@
     ],
     "unevaluatedProperties": false
   },
-  "nexigon_api.users.UserCreatedEvent": {
-    "type": "object",
-    "description": "Event indicating that a user has been created.",
-    "properties": {
-      "userId": {
-        "$ref": "#/components/schemas/nexigon_api.users.UserId"
-      },
-      "email": {
-        "type": "string"
-      }
-    },
-    "required": [
-      "userId",
-      "email"
-    ],
-    "unevaluatedProperties": false
-  },
-  "nexigon_api.users.UserDeletedEvent": {
-    "type": "object",
-    "description": "Event indicating that a user has been deleted.",
-    "properties": {
-      "userId": {
-        "$ref": "#/components/schemas/nexigon_api.users.UserId"
-      }
-    },
-    "required": [
-      "userId"
-    ],
-    "unevaluatedProperties": false
-  },
-  "nexigon_api.users.UserDisplayNameChangedEvent": {
-    "type": "object",
-    "description": "Event indicating that a user's display name has been changed.",
-    "properties": {
-      "userId": {
-        "$ref": "#/components/schemas/nexigon_api.users.UserId"
-      },
-      "displayName": {
-        "type": "string"
-      }
-    },
-    "required": [
-      "userId",
-      "displayName"
-    ],
-    "unevaluatedProperties": false
-  },
   "nexigon_api.users.UserId": {
     "type": [
       "string"
     ],
     "description": "Unique ID of a user."
-  },
-  "nexigon_api.users.UserPasswordResetCompletedEvent": {
-    "type": "object",
-    "description": "Event indicating that a user's password has been reset.",
-    "properties": {
-      "userId": {
-        "$ref": "#/components/schemas/nexigon_api.users.UserId"
-      }
-    },
-    "required": [
-      "userId"
-    ],
-    "unevaluatedProperties": false
   },
   "nexigon_api.users.UserRegistration": {
     "type": "object",
@@ -6023,53 +5149,6 @@
     "required": [
       "status",
       "createdAt"
-    ],
-    "unevaluatedProperties": false
-  },
-  "nexigon_api.users.UserRegistrationCompletedEvent": {
-    "type": "object",
-    "description": "Event indicating that the registration of a user has been completed.",
-    "properties": {
-      "userId": {
-        "$ref": "#/components/schemas/nexigon_api.users.UserId"
-      }
-    },
-    "required": [
-      "userId"
-    ],
-    "unevaluatedProperties": false
-  },
-  "nexigon_api.users.UserRegistrationCreatedEvent": {
-    "type": "object",
-    "description": "Event indicating that a new user has registered.",
-    "properties": {
-      "userId": {
-        "$ref": "#/components/schemas/nexigon_api.users.UserId"
-      },
-      "email": {
-        "type": "string"
-      }
-    },
-    "required": [
-      "userId",
-      "email"
-    ],
-    "unevaluatedProperties": false
-  },
-  "nexigon_api.users.UserRegistrationEmailSentEvent": {
-    "type": "object",
-    "description": "Event indicating that a registration email has been sent.",
-    "properties": {
-      "userId": {
-        "$ref": "#/components/schemas/nexigon_api.users.UserId"
-      },
-      "email": {
-        "type": "string"
-      }
-    },
-    "required": [
-      "userId",
-      "email"
     ],
     "unevaluatedProperties": false
   },
@@ -6121,115 +5200,17 @@
     ],
     "description": "User session ID."
   },
-  "nexigon_api.users.UserSessionInitiatedEvent": {
-    "type": "object",
-    "description": "Event indicating that a user session has been initiated.",
-    "properties": {
-      "userId": {
-        "$ref": "#/components/schemas/nexigon_api.users.UserId"
-      },
-      "sessionId": {
-        "$ref": "#/components/schemas/nexigon_api.users.UserSessionId"
-      }
-    },
-    "required": [
-      "userId",
-      "sessionId"
-    ],
-    "unevaluatedProperties": false
-  },
-  "nexigon_api.users.UserSessionTerminatedEvent": {
-    "type": "object",
-    "description": "Event indicating that a user session has been terminated.",
-    "properties": {
-      "userId": {
-        "$ref": "#/components/schemas/nexigon_api.users.UserId"
-      },
-      "sessionId": {
-        "$ref": "#/components/schemas/nexigon_api.users.UserSessionId"
-      }
-    },
-    "required": [
-      "userId",
-      "sessionId"
-    ],
-    "unevaluatedProperties": false
-  },
   "nexigon_api.users.UserSessionToken": {
     "type": [
       "string"
     ],
     "description": "User session token."
   },
-  "nexigon_api.users.UserSetIsAdminEvent": {
-    "type": "object",
-    "description": "Event indicating that administrator privileges have been granted or revoked.",
-    "properties": {
-      "userId": {
-        "$ref": "#/components/schemas/nexigon_api.users.UserId"
-      },
-      "isAdmin": {
-        "type": "boolean"
-      }
-    },
-    "required": [
-      "userId",
-      "isAdmin"
-    ],
-    "unevaluatedProperties": false
-  },
-  "nexigon_api.users.UserSetPasswordEvent": {
-    "type": "object",
-    "description": "Event indicating that a user password has been changed.",
-    "properties": {
-      "userId": {
-        "$ref": "#/components/schemas/nexigon_api.users.UserId"
-      }
-    },
-    "required": [
-      "userId"
-    ],
-    "unevaluatedProperties": false
-  },
   "nexigon_api.users.UserToken": {
     "type": [
       "string"
     ],
     "description": "User token."
-  },
-  "nexigon_api.users.UserTokenCreatedEvent": {
-    "type": "object",
-    "description": "Event indicating that a user token has been created.",
-    "properties": {
-      "userId": {
-        "$ref": "#/components/schemas/nexigon_api.users.UserId"
-      },
-      "tokenId": {
-        "$ref": "#/components/schemas/nexigon_api.users.UserTokenId"
-      }
-    },
-    "required": [
-      "userId",
-      "tokenId"
-    ],
-    "unevaluatedProperties": false
-  },
-  "nexigon_api.users.UserTokenDeletedEvent": {
-    "type": "object",
-    "description": "Event indicating that a user token has been deleted.",
-    "properties": {
-      "userId": {
-        "$ref": "#/components/schemas/nexigon_api.users.UserId"
-      },
-      "tokenId": {
-        "$ref": "#/components/schemas/nexigon_api.users.UserTokenId"
-      }
-    },
-    "required": [
-      "userId",
-      "tokenId"
-    ],
-    "unevaluatedProperties": false
   },
   "nexigon_api.users.UserTokenId": {
     "type": [
