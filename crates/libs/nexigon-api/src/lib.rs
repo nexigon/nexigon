@@ -83,7 +83,6 @@ macro_rules! with_actions {
             ("projects_QueryDevices", QueryProjectDevices, projects::QueryProjectDevicesAction, projects::QueryProjectDevicesOutput),
             ("projects_QueryDeploymentTokens", QueryProjectDeploymentTokens, projects::QueryProjectDeploymentTokensAction, projects::QueryProjectDeploymentTokensOutput),
             ("projects_QueryLinkedRepositories", QueryProjectRepositories, projects::QueryProjectRepositoriesAction, projects::QueryProjectRepositoriesOutput),
-            ("projects_SetOrganization", SetProjectOrganization, projects::SetProjectOrganizationAction, outputs::Empty),
             ("projects_SetName", SetProjectName, projects::SetProjectNameAction, outputs::Empty),
             // ## Deployment Tokens
             ("projects_CreateDeploymentToken", CreateDeploymentToken, projects::CreateDeploymentTokenAction, projects::CreateDeploymentTokenOutput),
@@ -131,7 +130,6 @@ macro_rules! with_actions {
             ("repositories_GetDetails", GetRepositoryDetails, repositories::GetRepositoryDetailsAction, repositories::GetRepositoryDetailsOutput),
             ("repositories_Create", CreateRepository, repositories::CreateRepositoryAction, repositories::CreateRepositoryOutput),
             ("repositories_Delete", DeleteRepository, repositories::DeleteRepositoryAction, outputs::Empty),
-            ("repositories_SetOrganization", SetRepositoryOrganization, repositories::SetRepositoryOrganizationAction, outputs::Empty),
             ("repositories_SetVisibility", SetRepositoryVisibility, repositories::SetRepositoryVisibilityAction, outputs::Empty),
             ("repositories_SetDisplayName", SetRepositoryDisplayName, repositories::SetRepositoryDisplayNameAction, outputs::Empty),
             ("repositories_SetPublicName", SetRepositoryPublicName, repositories::SetRepositoryPublicNameAction, repositories::SetRepositoryPublicNameOutput),

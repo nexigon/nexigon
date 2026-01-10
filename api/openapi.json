@@ -1432,37 +1432,6 @@
         }
       }
     },
-    "/api/v1/actions/invoke/projects_SetOrganization": {
-      "post": {
-        "tags": [
-          "projects"
-        ],
-        "summary": "SetOrganization",
-        "description": "Set the organization of a project.",
-        "operationId": "projects_SetOrganization",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/nexigon_api.projects.SetProjectOrganizationAction"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/nexigon_api.outputs.Empty"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/api/v1/actions/invoke/projects_SetName": {
       "post": {
         "tags": [
@@ -2499,37 +2468,6 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/nexigon_api.repositories.DeleteRepositoryAction"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/nexigon_api.outputs.Empty"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v1/actions/invoke/repositories_SetOrganization": {
-      "post": {
-        "tags": [
-          "repositories"
-        ],
-        "summary": "SetOrganization",
-        "description": "Set the organization of a repository.",
-        "operationId": "repositories_SetOrganization",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/nexigon_api.repositories.SetRepositoryOrganizationAction"
               }
             }
           }
@@ -6346,22 +6284,6 @@
         ],
         "unevaluatedProperties": false
       },
-      "nexigon_api.projects.SetProjectOrganizationAction": {
-        "type": "object",
-        "properties": {
-          "projectId": {
-            "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
-          },
-          "organizationId": {
-            "$ref": "#/components/schemas/nexigon_api.organizations.OrganizationId"
-          }
-        },
-        "required": [
-          "projectId",
-          "organizationId"
-        ],
-        "unevaluatedProperties": false
-      },
       "nexigon_api.properties.DiskInfo": {
         "type": "object",
         "description": "Disk information.",
@@ -7773,22 +7695,6 @@
         },
         "required": [
           "repositoryId"
-        ],
-        "unevaluatedProperties": false
-      },
-      "nexigon_api.repositories.SetRepositoryOrganizationAction": {
-        "type": "object",
-        "properties": {
-          "repositoryId": {
-            "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryId"
-          },
-          "organizationId": {
-            "$ref": "#/components/schemas/nexigon_api.organizations.OrganizationId"
-          }
-        },
-        "required": [
-          "repositoryId",
-          "organizationId"
         ],
         "unevaluatedProperties": false
       },

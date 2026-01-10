@@ -137,14 +137,6 @@ record DeleteRepositoryAction {
     repository_id: RepositoryId,
 }
 
-/// Set the organization of a repository.
-record SetRepositoryOrganizationAction {
-    /// ID of the repository.
-    repository_id: RepositoryId,
-    /// ID of the organization.
-    organization_id: OrganizationId,
-}
-
 /// Set the visibility of a repository.
 record SetRepositoryVisibilityAction {
     /// ID of the repository.

@@ -161,14 +161,6 @@ record QueryProjectRepositoriesItem {
     display_name?: string,
 }
 
-/// Set the organization of a project.
-record SetProjectOrganizationAction {
-    /// ID of the project.
-    project_id: ProjectId,
-    /// ID of the organization.
-    organization_id: OrganizationId,
-}
-
 /// Flags for deployment tokens.
 record DeploymentTokenFlags {
     /// Whether to automatically accept new devices.
