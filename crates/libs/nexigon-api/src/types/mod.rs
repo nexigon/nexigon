@@ -65,3 +65,16 @@ impl Actor {
         }
     }
 }
+
+impl std::fmt::Display for Actor {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Actor::Anonymous(_) => write!(f, "anonymous"),
+            Actor::System(_) => write!(f, "system"),
+            Actor::Device(device) => write!(f, "{}", device.device_id),
+            Actor::User(user) => write!(f, "{}", user.user_id),
+            Actor::UserToken(user) => write!(f, "{}:{}", user.user_id, user.token_id),
+            Actor::ClusterNode(node) => write!(f, "{}", node.node_id),
+        }
+    }
+}
