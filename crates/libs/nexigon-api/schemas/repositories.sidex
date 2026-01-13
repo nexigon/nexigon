@@ -5,7 +5,6 @@ import datetime::Timestamp
 import digest::Digest
 import organizations::OrganizationId
 import projects::ProjectId
-import resources::ResourceUsage
 import users::UserId
 
 /// Unique ID of a repository.

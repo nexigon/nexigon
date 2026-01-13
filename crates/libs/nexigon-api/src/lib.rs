@@ -72,8 +72,6 @@ macro_rules! with_actions {
             ("organizations_DeleteInvitation", DeleteOrganizationInvitation, organizations::DeleteOrganizationInvitationAction, outputs::Empty),
             // ## Organization Audit Log
             ("organizations_QueryAuditLog", QueryOrganizationAuditLog, organizations::QueryOrganizationAuditLogAction, organizations::QueryOrganizationAuditLogOutput),
-            // ## Organization Resources
-            ("organizations_GetResourceUsage", GetOrganizationResourceUsage, organizations::GetOrganizationResourceUsageAction, organizations::GetOrganizationResourceUsageOutput),
 
             // # Projects
             ("projects_Query", QueryProjects, projects::QueryProjectsAction, projects::QueryProjectsOutput),
@@ -122,9 +120,6 @@ macro_rules! with_actions {
             ("devices_GetProperty", GetDeviceProperty, devices::GetDevicePropertyAction, devices::GetDevicePropertyOutput),
             ("devices_RemoveProperty", RemoveDeviceProperty, devices::RemoveDevicePropertyAction, devices::RemoveDevicePropertyOutput),
             ("devices_QueryProperties", QueryDeviceProperties, devices::QueryDevicePropertiesAction, devices::QueryDevicePropertiesOutput),
-            // ## Device Resources
-            ("devices_GetResourceUsage", GetDeviceResourceUsage, devices::GetDeviceResourceUsageAction, devices::GetDeviceResourceUsageOutput),
-            ("devices_GetConsumption", GetDeviceConsumption, devices::GetDeviceConsumptionAction, devices::GetDeviceConsumptionOutput),
 
             // # Repositories
             ("repositories_ResolveName", ResolveRepositoryName, repositories::ResolveRepositoryNameAction, repositories::ResolveRepositoryNameOutput),

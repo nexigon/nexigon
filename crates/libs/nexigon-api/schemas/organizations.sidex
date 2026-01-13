@@ -3,7 +3,6 @@
 import audit::AuditLogEvent
 import projects::ProjectId
 import repositories::RepositoryId
-import resources::ResourceUsage
 import users::UserId
 
 /// Unique ID of an organization
@@ -187,22 +186,6 @@ record InviteOrganizationMemberOutput {
 record DeleteOrganizationInvitationAction {
     /// ID of the invitation.
     invitation_id: OrganizationInvitationId,
-}
-
-/// Get the resources used by the organization and their limits.
-record GetOrganizationResourceUsageAction {
-    /// ID of the organization.
-    organization_id: OrganizationId,
-}
-
-/// Output of getting the resources used by the organization.
-#[rust(derive(Default))]
-record GetOrganizationResourceUsageOutput {
-    seats: ResourceUsage,
-    projects: ResourceUsage,
-    devices: ResourceUsage,
-    repositories: ResourceUsage,
-    packages: ResourceUsage,
 }
 
 /// Query the audit log of an organization.
