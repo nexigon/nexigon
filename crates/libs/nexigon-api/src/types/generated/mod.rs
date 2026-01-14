@@ -27776,12 +27776,15 @@ pub mod organizations {
         pub name: ::std::string::String,
         #[doc = "Admins of the organization.\n"]
         pub admins: ::std::option::Option<::std::vec::Vec<super::users::UserId>>,
+        #[doc = "Whether the organization requires a subscription.\n"]
+        pub requires_subscription: bool,
     }
     impl CreateOrganizationAction {
         #[doc = "Creates a new [`CreateOrganizationAction`]."]
-        pub fn new(name: ::std::string::String) -> Self {
+        pub fn new(name: ::std::string::String, requires_subscription: bool) -> Self {
             Self {
                 name,
+                requires_subscription,
                 admins: ::std::default::Default::default(),
             }
         }
@@ -27811,6 +27814,16 @@ pub mod organizations {
             self.admins = admins;
             self
         }
+        #[doc = "Sets the value of `requires_subscription`."]
+        pub fn set_requires_subscription(&mut self, requires_subscription: bool) -> &mut Self {
+            self.requires_subscription = requires_subscription;
+            self
+        }
+        #[doc = "Sets the value of `requires_subscription`."]
+        pub fn with_requires_subscription(mut self, requires_subscription: bool) -> Self {
+            self.requires_subscription = requires_subscription;
+            self
+        }
     }
     #[automatically_derived]
     impl __serde::Serialize for CreateOrganizationAction {
@@ -27821,11 +27834,12 @@ pub mod organizations {
             let mut __record = __sidex_serde::ser::RecordSerializer::new(
                 __serializer,
                 "CreateOrganizationAction",
-                2usize,
+                3usize,
             )?;
             __record.serialize_field("name", &self.name)?;
             __record
                 .serialize_optional_field("admins", ::core::option::Option::as_ref(&self.admins))?;
+            __record.serialize_field("requiresSubscription", &self.requires_subscription)?;
             __record.end()
         }
     }
@@ -27864,7 +27878,7 @@ pub mod organizations {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(0usize, &"record with 2 fields"),
+                                __serde::de::Error::invalid_length(0usize, &"record with 3 fields"),
                             );
                         }
                     };
@@ -27875,13 +27889,22 @@ pub mod organizations {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(1usize, &"record with 2 fields"),
+                                __serde::de::Error::invalid_length(1usize, &"record with 3 fields"),
+                            );
+                        }
+                    };
+                    let __field2 = match __serde::de::SeqAccess::next_element::<bool>(&mut __seq)? {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(2usize, &"record with 3 fields"),
                             );
                         }
                     };
                     ::core::result::Result::Ok(CreateOrganizationAction {
                         name: __field0,
                         admins: __field1,
+                        requires_subscription: __field2,
                     })
                 }
                 #[inline]
@@ -27893,15 +27916,17 @@ pub mod organizations {
                     __A: __serde::de::MapAccess<'de>,
                 {
                     #[doc(hidden)]
-                    const __IDENTIFIERS: &'static [&'static str] = &["name", "admins"];
+                    const __IDENTIFIERS: &'static [&'static str] =
+                        &["name", "admins", "requiresSubscription"];
                     #[doc(hidden)]
                     const __EXPECTING_IDENTIFIERS: &'static str =
-                        "an identifier in [\"name\", \"admins\"]";
+                        "an identifier in [\"name\", \"admins\", \"requiresSubscription\"]";
                     #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
                     #[doc(hidden)]
                     enum __Identifier {
                         __Identifier0,
                         __Identifier1,
+                        __Identifier2,
                         __Unknown,
                     }
                     #[doc(hidden)]
@@ -27924,6 +27949,7 @@ pub mod organizations {
                             match __value {
                                 0u64 => ::core::result::Result::Ok(__Identifier::__Identifier0),
                                 1u64 => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                                2u64 => ::core::result::Result::Ok(__Identifier::__Identifier2),
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
                         }
@@ -27937,6 +27963,9 @@ pub mod organizations {
                             match __value {
                                 "name" => ::core::result::Result::Ok(__Identifier::__Identifier0),
                                 "admins" => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                                "requiresSubscription" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier2)
+                                }
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
                         }
@@ -27951,6 +27980,9 @@ pub mod organizations {
                                 b"name" => ::core::result::Result::Ok(__Identifier::__Identifier0),
                                 b"admins" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier1)
+                                }
+                                b"requiresSubscription" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier2)
                                 }
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
@@ -27975,6 +28007,7 @@ pub mod organizations {
                     let mut __field1: ::core::option::Option<
                         ::std::option::Option<::std::vec::Vec<super::users::UserId>>,
                     > = ::core::option::Option::None;
+                    let mut __field2: ::core::option::Option<bool> = ::core::option::Option::None;
                     while let ::core::option::Option::Some(__key) =
                         __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
                     {
@@ -28007,6 +28040,18 @@ pub mod organizations {
                                     >(&mut __map)?,
                                 );
                             }
+                            __Identifier::__Identifier2 => {
+                                if ::core::option::Option::is_some(&__field2) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "requiresSubscription",
+                                        ),
+                                    );
+                                }
+                                __field2 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<bool>(&mut __map)?,
+                                );
+                            }
                             _ => {
                                 __serde::de::MapAccess::next_value::<__serde::de::IgnoredAny>(
                                     &mut __map,
@@ -28026,14 +28071,25 @@ pub mod organizations {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => ::core::option::Option::None,
                     };
+                    let __field2 = match __field2 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                <__A::Error as __serde::de::Error>::missing_field(
+                                    "requiresSubscription",
+                                ),
+                            );
+                        }
+                    };
                     ::core::result::Result::Ok(CreateOrganizationAction {
                         name: __field0,
                         admins: __field1,
+                        requires_subscription: __field2,
                     })
                 }
             }
             #[doc(hidden)]
-            const __FIELDS: &'static [&'static str] = &["name", "admins"];
+            const __FIELDS: &'static [&'static str] = &["name", "admins", "requiresSubscription"];
             __serde::Deserializer::deserialize_struct(
                 __deserializer,
                 "CreateOrganizationAction",

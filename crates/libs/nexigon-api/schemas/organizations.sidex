@@ -126,6 +126,8 @@ record CreateOrganizationAction {
     name: string,
     /// Admins of the organization.
     admins?: [UserId],
+    /// Whether the organization requires a subscription.
+    requires_subscription: bool,
 }
 
 /// Output of creating an organization.

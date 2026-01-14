@@ -1761,10 +1761,14 @@
         "items": {
           "$ref": "#/components/schemas/nexigon_api.users.UserId"
         }
+      },
+      "requiresSubscription": {
+        "type": "boolean"
       }
     },
     "required": [
-      "name"
+      "name",
+      "requiresSubscription"
     ],
     "unevaluatedProperties": false
   },
