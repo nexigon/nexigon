@@ -8314,11 +8314,18 @@
           },
           "name": {
             "type": "string"
+          },
+          "requiresSubscription": {
+            "type": "boolean"
+          },
+          "subscriptionPlanName": {
+            "type": "string"
           }
         },
         "required": [
           "organizationId",
-          "name"
+          "name",
+          "requiresSubscription"
         ],
         "unevaluatedProperties": false
       },

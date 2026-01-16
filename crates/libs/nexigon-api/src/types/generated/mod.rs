@@ -64707,16 +64707,23 @@ pub mod users {
         pub organization_id: super::organizations::OrganizationId,
         #[doc = "Name of the organization.\n"]
         pub name: ::std::string::String,
+        #[doc = "Whether the organization requires a paid subscription.\n"]
+        pub requires_subscription: bool,
+        #[doc = "Name of the active subscription plan, if any.\n"]
+        pub subscription_plan_name: ::std::option::Option<::std::string::String>,
     }
     impl QueryUserOrganizationsItem {
         #[doc = "Creates a new [`QueryUserOrganizationsItem`]."]
         pub fn new(
             organization_id: super::organizations::OrganizationId,
             name: ::std::string::String,
+            requires_subscription: bool,
         ) -> Self {
             Self {
                 organization_id,
                 name,
+                requires_subscription,
+                subscription_plan_name: ::std::default::Default::default(),
             }
         }
         #[doc = "Sets the value of `organization_id`."]
@@ -64745,6 +64752,32 @@ pub mod users {
             self.name = name;
             self
         }
+        #[doc = "Sets the value of `requires_subscription`."]
+        pub fn set_requires_subscription(&mut self, requires_subscription: bool) -> &mut Self {
+            self.requires_subscription = requires_subscription;
+            self
+        }
+        #[doc = "Sets the value of `requires_subscription`."]
+        pub fn with_requires_subscription(mut self, requires_subscription: bool) -> Self {
+            self.requires_subscription = requires_subscription;
+            self
+        }
+        #[doc = "Sets the value of `subscription_plan_name`."]
+        pub fn set_subscription_plan_name(
+            &mut self,
+            subscription_plan_name: ::std::option::Option<::std::string::String>,
+        ) -> &mut Self {
+            self.subscription_plan_name = subscription_plan_name;
+            self
+        }
+        #[doc = "Sets the value of `subscription_plan_name`."]
+        pub fn with_subscription_plan_name(
+            mut self,
+            subscription_plan_name: ::std::option::Option<::std::string::String>,
+        ) -> Self {
+            self.subscription_plan_name = subscription_plan_name;
+            self
+        }
     }
     #[automatically_derived]
     impl __serde::Serialize for QueryUserOrganizationsItem {
@@ -64755,10 +64788,15 @@ pub mod users {
             let mut __record = __sidex_serde::ser::RecordSerializer::new(
                 __serializer,
                 "QueryUserOrganizationsItem",
-                2usize,
+                4usize,
             )?;
             __record.serialize_field("organizationId", &self.organization_id)?;
             __record.serialize_field("name", &self.name)?;
+            __record.serialize_field("requiresSubscription", &self.requires_subscription)?;
+            __record.serialize_optional_field(
+                "subscriptionPlanName",
+                ::core::option::Option::as_ref(&self.subscription_plan_name),
+            )?;
             __record.end()
         }
     }
@@ -64797,7 +64835,7 @@ pub mod users {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(0usize, &"record with 2 fields"),
+                                __serde::de::Error::invalid_length(0usize, &"record with 4 fields"),
                             );
                         }
                     };
@@ -64808,13 +64846,34 @@ pub mod users {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(1usize, &"record with 2 fields"),
+                                __serde::de::Error::invalid_length(1usize, &"record with 4 fields"),
+                            );
+                        }
+                    };
+                    let __field2 = match __serde::de::SeqAccess::next_element::<bool>(&mut __seq)? {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(2usize, &"record with 4 fields"),
+                            );
+                        }
+                    };
+                    let __field3 = match __serde::de::SeqAccess::next_element::<
+                        ::std::option::Option<::std::string::String>,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(3usize, &"record with 4 fields"),
                             );
                         }
                     };
                     ::core::result::Result::Ok(QueryUserOrganizationsItem {
                         organization_id: __field0,
                         name: __field1,
+                        requires_subscription: __field2,
+                        subscription_plan_name: __field3,
                     })
                 }
                 #[inline]
@@ -64826,15 +64885,21 @@ pub mod users {
                     __A: __serde::de::MapAccess<'de>,
                 {
                     #[doc(hidden)]
-                    const __IDENTIFIERS: &'static [&'static str] = &["organizationId", "name"];
+                    const __IDENTIFIERS: &'static [&'static str] = &[
+                        "organizationId",
+                        "name",
+                        "requiresSubscription",
+                        "subscriptionPlanName",
+                    ];
                     #[doc(hidden)]
-                    const __EXPECTING_IDENTIFIERS: &'static str =
-                        "an identifier in [\"organizationId\", \"name\"]";
+                    const __EXPECTING_IDENTIFIERS: &'static str = "an identifier in [\"organizationId\", \"name\", \"requiresSubscription\", \"subscriptionPlanName\"]";
                     #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
                     #[doc(hidden)]
                     enum __Identifier {
                         __Identifier0,
                         __Identifier1,
+                        __Identifier2,
+                        __Identifier3,
                         __Unknown,
                     }
                     #[doc(hidden)]
@@ -64857,6 +64922,8 @@ pub mod users {
                             match __value {
                                 0u64 => ::core::result::Result::Ok(__Identifier::__Identifier0),
                                 1u64 => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                                2u64 => ::core::result::Result::Ok(__Identifier::__Identifier2),
+                                3u64 => ::core::result::Result::Ok(__Identifier::__Identifier3),
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
                         }
@@ -64872,6 +64939,12 @@ pub mod users {
                                     ::core::result::Result::Ok(__Identifier::__Identifier0)
                                 }
                                 "name" => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                                "requiresSubscription" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier2)
+                                }
+                                "subscriptionPlanName" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier3)
+                                }
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
                         }
@@ -64887,6 +64960,12 @@ pub mod users {
                                     ::core::result::Result::Ok(__Identifier::__Identifier0)
                                 }
                                 b"name" => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                                b"requiresSubscription" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier2)
+                                }
+                                b"subscriptionPlanName" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier3)
+                                }
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
                         }
@@ -64909,6 +64988,10 @@ pub mod users {
                         ::core::option::Option::None;
                     let mut __field1: ::core::option::Option<::std::string::String> =
                         ::core::option::Option::None;
+                    let mut __field2: ::core::option::Option<bool> = ::core::option::Option::None;
+                    let mut __field3: ::core::option::Option<
+                        ::std::option::Option<::std::string::String>,
+                    > = ::core::option::Option::None;
                     while let ::core::option::Option::Some(__key) =
                         __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
                     {
@@ -64939,6 +65022,32 @@ pub mod users {
                                     )?,
                                 );
                             }
+                            __Identifier::__Identifier2 => {
+                                if ::core::option::Option::is_some(&__field2) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "requiresSubscription",
+                                        ),
+                                    );
+                                }
+                                __field2 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<bool>(&mut __map)?,
+                                );
+                            }
+                            __Identifier::__Identifier3 => {
+                                if ::core::option::Option::is_some(&__field3) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "subscriptionPlanName",
+                                        ),
+                                    );
+                                }
+                                __field3 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<
+                                        ::std::option::Option<::std::string::String>,
+                                    >(&mut __map)?,
+                                );
+                            }
                             _ => {
                                 __serde::de::MapAccess::next_value::<__serde::de::IgnoredAny>(
                                     &mut __map,
@@ -64962,14 +65071,35 @@ pub mod users {
                             );
                         }
                     };
+                    let __field2 = match __field2 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                <__A::Error as __serde::de::Error>::missing_field(
+                                    "requiresSubscription",
+                                ),
+                            );
+                        }
+                    };
+                    let __field3 = match __field3 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => ::core::option::Option::None,
+                    };
                     ::core::result::Result::Ok(QueryUserOrganizationsItem {
                         organization_id: __field0,
                         name: __field1,
+                        requires_subscription: __field2,
+                        subscription_plan_name: __field3,
                     })
                 }
             }
             #[doc(hidden)]
-            const __FIELDS: &'static [&'static str] = &["organizationId", "name"];
+            const __FIELDS: &'static [&'static str] = &[
+                "organizationId",
+                "name",
+                "requiresSubscription",
+                "subscriptionPlanName",
+            ];
             __serde::Deserializer::deserialize_struct(
                 __deserializer,
                 "QueryUserOrganizationsItem",

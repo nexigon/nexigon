@@ -195,6 +195,10 @@ record QueryUserOrganizationsItem {
     organization_id: OrganizationId,
     /// Name of the organization.
     name: string,
+    /// Whether the organization requires a paid subscription.
+    requires_subscription: bool,
+    /// Name of the active subscription plan, if any.
+    subscription_plan_name?: string,
 }
 
 /// Query the organization invitations of a user.
