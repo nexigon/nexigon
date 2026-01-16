@@ -4883,11 +4883,15 @@
           },
           "nodeId": {
             "$ref": "#/components/schemas/nexigon_api.cluster.ClusterNodeId"
+          },
+          "connectionId": {
+            "$ref": "#/components/schemas/nexigon_api.devices.DeviceConnectionId"
           }
         },
         "required": [
           "deviceId",
-          "nodeId"
+          "nodeId",
+          "connectionId"
         ],
         "unevaluatedProperties": false
       },

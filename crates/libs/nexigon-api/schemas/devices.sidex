@@ -292,6 +292,8 @@ record RegisterDeviceConnectionAction {
     device_id: DeviceId,
     /// ID of the cluster node.
     node_id: ClusterNodeId,
+    /// Pre-generated ID of the connection.
+    connection_id: DeviceConnectionId,
 }
 
 /// Output of registering a connection of a device to a cluster node.

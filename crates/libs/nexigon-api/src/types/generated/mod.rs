@@ -14168,11 +14168,21 @@ pub mod devices {
         pub device_id: DeviceId,
         #[doc = "ID of the cluster node.\n"]
         pub node_id: super::cluster::ClusterNodeId,
+        #[doc = "Pre-generated ID of the connection.\n"]
+        pub connection_id: DeviceConnectionId,
     }
     impl RegisterDeviceConnectionAction {
         #[doc = "Creates a new [`RegisterDeviceConnectionAction`]."]
-        pub fn new(device_id: DeviceId, node_id: super::cluster::ClusterNodeId) -> Self {
-            Self { device_id, node_id }
+        pub fn new(
+            device_id: DeviceId,
+            node_id: super::cluster::ClusterNodeId,
+            connection_id: DeviceConnectionId,
+        ) -> Self {
+            Self {
+                device_id,
+                node_id,
+                connection_id,
+            }
         }
         #[doc = "Sets the value of `device_id`."]
         pub fn set_device_id(&mut self, device_id: DeviceId) -> &mut Self {
@@ -14194,6 +14204,16 @@ pub mod devices {
             self.node_id = node_id;
             self
         }
+        #[doc = "Sets the value of `connection_id`."]
+        pub fn set_connection_id(&mut self, connection_id: DeviceConnectionId) -> &mut Self {
+            self.connection_id = connection_id;
+            self
+        }
+        #[doc = "Sets the value of `connection_id`."]
+        pub fn with_connection_id(mut self, connection_id: DeviceConnectionId) -> Self {
+            self.connection_id = connection_id;
+            self
+        }
     }
     #[automatically_derived]
     impl __serde::Serialize for RegisterDeviceConnectionAction {
@@ -14204,10 +14224,11 @@ pub mod devices {
             let mut __record = __sidex_serde::ser::RecordSerializer::new(
                 __serializer,
                 "RegisterDeviceConnectionAction",
-                2usize,
+                3usize,
             )?;
             __record.serialize_field("deviceId", &self.device_id)?;
             __record.serialize_field("nodeId", &self.node_id)?;
+            __record.serialize_field("connectionId", &self.connection_id)?;
             __record.end()
         }
     }
@@ -14246,7 +14267,7 @@ pub mod devices {
                                 return ::core::result::Result::Err(
                                     __serde::de::Error::invalid_length(
                                         0usize,
-                                        &"record with 2 fields",
+                                        &"record with 3 fields",
                                     ),
                                 );
                             }
@@ -14258,13 +14279,24 @@ pub mod devices {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(1usize, &"record with 2 fields"),
+                                __serde::de::Error::invalid_length(1usize, &"record with 3 fields"),
+                            );
+                        }
+                    };
+                    let __field2 = match __serde::de::SeqAccess::next_element::<DeviceConnectionId>(
+                        &mut __seq,
+                    )? {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(2usize, &"record with 3 fields"),
                             );
                         }
                     };
                     ::core::result::Result::Ok(RegisterDeviceConnectionAction {
                         device_id: __field0,
                         node_id: __field1,
+                        connection_id: __field2,
                     })
                 }
                 #[inline]
@@ -14276,15 +14308,17 @@ pub mod devices {
                     __A: __serde::de::MapAccess<'de>,
                 {
                     #[doc(hidden)]
-                    const __IDENTIFIERS: &'static [&'static str] = &["deviceId", "nodeId"];
+                    const __IDENTIFIERS: &'static [&'static str] =
+                        &["deviceId", "nodeId", "connectionId"];
                     #[doc(hidden)]
                     const __EXPECTING_IDENTIFIERS: &'static str =
-                        "an identifier in [\"deviceId\", \"nodeId\"]";
+                        "an identifier in [\"deviceId\", \"nodeId\", \"connectionId\"]";
                     #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
                     #[doc(hidden)]
                     enum __Identifier {
                         __Identifier0,
                         __Identifier1,
+                        __Identifier2,
                         __Unknown,
                     }
                     #[doc(hidden)]
@@ -14307,6 +14341,7 @@ pub mod devices {
                             match __value {
                                 0u64 => ::core::result::Result::Ok(__Identifier::__Identifier0),
                                 1u64 => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                                2u64 => ::core::result::Result::Ok(__Identifier::__Identifier2),
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
                         }
@@ -14322,6 +14357,9 @@ pub mod devices {
                                     ::core::result::Result::Ok(__Identifier::__Identifier0)
                                 }
                                 "nodeId" => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                                "connectionId" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier2)
+                                }
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
                         }
@@ -14338,6 +14376,9 @@ pub mod devices {
                                 }
                                 b"nodeId" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier1)
+                                }
+                                b"connectionId" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier2)
                                 }
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
@@ -14360,6 +14401,8 @@ pub mod devices {
                     let mut __field0: ::core::option::Option<DeviceId> =
                         ::core::option::Option::None;
                     let mut __field1: ::core::option::Option<super::cluster::ClusterNodeId> =
+                        ::core::option::Option::None;
+                    let mut __field2: ::core::option::Option<DeviceConnectionId> =
                         ::core::option::Option::None;
                     while let ::core::option::Option::Some(__key) =
                         __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
@@ -14391,6 +14434,20 @@ pub mod devices {
                                     >(&mut __map)?,
                                 );
                             }
+                            __Identifier::__Identifier2 => {
+                                if ::core::option::Option::is_some(&__field2) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "connectionId",
+                                        ),
+                                    );
+                                }
+                                __field2 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<DeviceConnectionId>(
+                                        &mut __map,
+                                    )?,
+                                );
+                            }
                             _ => {
                                 __serde::de::MapAccess::next_value::<__serde::de::IgnoredAny>(
                                     &mut __map,
@@ -14414,14 +14471,23 @@ pub mod devices {
                             );
                         }
                     };
+                    let __field2 = match __field2 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                <__A::Error as __serde::de::Error>::missing_field("connectionId"),
+                            );
+                        }
+                    };
                     ::core::result::Result::Ok(RegisterDeviceConnectionAction {
                         device_id: __field0,
                         node_id: __field1,
+                        connection_id: __field2,
                     })
                 }
             }
             #[doc(hidden)]
-            const __FIELDS: &'static [&'static str] = &["deviceId", "nodeId"];
+            const __FIELDS: &'static [&'static str] = &["deviceId", "nodeId", "connectionId"];
             __serde::Deserializer::deserialize_struct(
                 __deserializer,
                 "RegisterDeviceConnectionAction",
