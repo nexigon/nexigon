@@ -14,8 +14,8 @@ default:
 # Linting and check formatting.
 check:
     cargo deny check
-    cargo +nightly fmt --check
-    cargo +nightly clippy --all-targets --all-features -- -D warnings
+    cargo fmt --check
+    cargo clippy --all-targets --all-features -- -D warnings
     taplo fmt --check
 
 # Format all files.

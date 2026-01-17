@@ -2680,6 +2680,49 @@
     ],
     "unevaluatedProperties": false
   },
+  "nexigon_api.properties.ExportInfo": {
+    "description": "Service export information.",
+    "oneOf": [
+      {
+        "type": "object",
+        "properties": {
+          "protocol": {
+            "const": "http"
+          },
+          "name": {
+            "type": "string"
+          },
+          "port": {},
+          "path": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "protocol",
+          "name",
+          "port"
+        ]
+      }
+    ]
+  },
+  "nexigon_api.properties.HttpExportInfo": {
+    "type": "object",
+    "description": "HTTP export information.",
+    "properties": {
+      "name": {
+        "type": "string"
+      },
+      "port": {},
+      "path": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "name",
+      "port"
+    ],
+    "unevaluatedProperties": false
+  },
   "nexigon_api.properties.MemoryInfo": {
     "type": "object",
     "description": "Memory information.",
@@ -2779,6 +2822,12 @@
         "type": "array",
         "items": {
           "$ref": "#/components/schemas/nexigon_api.properties.DiskInfo"
+        }
+      },
+      "exports": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.properties.ExportInfo"
         }
       }
     },

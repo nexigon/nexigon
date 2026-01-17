@@ -21,6 +21,12 @@
     },
     "dangerous-disable-tls": {
       "type": "boolean"
+    },
+    "exports": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/nexigon_agent.config.ExportConfig"
+      }
     }
   },
   "required": [
@@ -36,6 +42,51 @@
         "string"
       ],
       "description": "Deployment token."
+    },
+    "nexigon_agent.config.ExportConfig": {
+      "$id": "nexigon_agent.config.ExportConfig",
+      "description": "Service export configuration.",
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "protocol": {
+              "const": "http"
+            },
+            "name": {
+              "type": "string"
+            },
+            "port": {},
+            "path": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "protocol",
+            "name",
+            "port"
+          ]
+        }
+      ]
+    },
+    "nexigon_agent.config.HttpExportConfig": {
+      "$id": "nexigon_agent.config.HttpExportConfig",
+      "type": "object",
+      "description": "HTTP export configuration.",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "port": {},
+        "path": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "port"
+      ],
+      "unevaluatedProperties": false
     },
     "nexigon_agent.config.PathBuf": {
       "$id": "nexigon_agent.config.PathBuf",

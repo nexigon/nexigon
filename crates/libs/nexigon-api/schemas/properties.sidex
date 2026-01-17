@@ -18,6 +18,8 @@ record SystemInfo {
     networks: [NetworkInterfaceInfo],
     /// Disk information.
     disks: [DiskInfo],
+    /// Exported services.
+    exports?: [ExportInfo],
 }
 
 /// Memory information.
@@ -73,4 +75,21 @@ variant OtaUpdateState {
     Failed,
     /// Device is rebooting.
     Rebooting,
+}
+
+/// Service export information.
+#[json(tag = "protocol", rename_all = "lowercase")]
+variant ExportInfo {
+    /// HTTP export information.
+    Http: HttpExportInfo,
+}
+
+/// HTTP export information.
+record HttpExportInfo {
+    /// Name of the export.
+    name: string,
+    /// Port the service listens on.
+    port: u16,
+    /// URL path prefix.
+    path?: string,
 }

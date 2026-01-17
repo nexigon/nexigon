@@ -178,7 +178,7 @@ async fn main() -> anyhow::Result<()> {
         Cmd::Run => {
             tokio::spawn(async move {
                 loop {
-                    let system_info = get_system_info();
+                    let system_info = get_system_info(&config);
                     executor
                         .execute(SetDevicePropertyAction::new(
                             device_id.clone(),

@@ -24,4 +24,24 @@ record Config {
     ssl_key?: PathBuf,
     /// Disable TLS.
     dangerous_disable_tls?: bool,
+    /// Exported services.
+    exports?: [ExportConfig],
+}
+
+/// Service export configuration.
+#[json(tag = "protocol", rename_all = "lowercase")]
+variant ExportConfig {
+    /// HTTP export configuration.
+    Http: HttpExportConfig,
+}
+
+/// HTTP export configuration.
+#[json(rename_all = "kebab-case")]
+record HttpExportConfig {
+    /// Name of the export.
+    name: string,
+    /// Port the service listens on.
+    port: u16,
+    /// URL path prefix for the service.
+    path?: string,
 }

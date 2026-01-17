@@ -38101,6 +38101,8 @@ pub mod properties {
         pub networks: ::std::vec::Vec<NetworkInterfaceInfo>,
         #[doc = "Disk information.\n"]
         pub disks: ::std::vec::Vec<DiskInfo>,
+        #[doc = "Exported services.\n"]
+        pub exports: ::std::option::Option<::std::vec::Vec<ExportInfo>>,
     }
     impl SystemInfo {
         #[doc = "Creates a new [`SystemInfo`]."]
@@ -38118,6 +38120,7 @@ pub mod properties {
                 kernel: ::std::default::Default::default(),
                 hostname: ::std::default::Default::default(),
                 arch: ::std::default::Default::default(),
+                exports: ::std::default::Default::default(),
             }
         }
         #[doc = "Sets the value of `name`."]
@@ -38224,6 +38227,22 @@ pub mod properties {
             self.disks = disks;
             self
         }
+        #[doc = "Sets the value of `exports`."]
+        pub fn set_exports(
+            &mut self,
+            exports: ::std::option::Option<::std::vec::Vec<ExportInfo>>,
+        ) -> &mut Self {
+            self.exports = exports;
+            self
+        }
+        #[doc = "Sets the value of `exports`."]
+        pub fn with_exports(
+            mut self,
+            exports: ::std::option::Option<::std::vec::Vec<ExportInfo>>,
+        ) -> Self {
+            self.exports = exports;
+            self
+        }
     }
     #[automatically_derived]
     impl __serde::Serialize for SystemInfo {
@@ -38232,7 +38251,7 @@ pub mod properties {
             __serializer: __S,
         ) -> ::std::result::Result<__S::Ok, __S::Error> {
             let mut __record =
-                __sidex_serde::ser::RecordSerializer::new(__serializer, "SystemInfo", 8usize)?;
+                __sidex_serde::ser::RecordSerializer::new(__serializer, "SystemInfo", 9usize)?;
             __record
                 .serialize_optional_field("name", ::core::option::Option::as_ref(&self.name))?;
             __record.serialize_optional_field(
@@ -38250,6 +38269,10 @@ pub mod properties {
             __record.serialize_field("memory", &self.memory)?;
             __record.serialize_field("networks", &self.networks)?;
             __record.serialize_field("disks", &self.disks)?;
+            __record.serialize_optional_field(
+                "exports",
+                ::core::option::Option::as_ref(&self.exports),
+            )?;
             __record.end()
         }
     }
@@ -38285,7 +38308,7 @@ pub mod properties {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(0usize, &"record with 8 fields"),
+                                __serde::de::Error::invalid_length(0usize, &"record with 9 fields"),
                             );
                         }
                     };
@@ -38296,7 +38319,7 @@ pub mod properties {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(1usize, &"record with 8 fields"),
+                                __serde::de::Error::invalid_length(1usize, &"record with 9 fields"),
                             );
                         }
                     };
@@ -38307,7 +38330,7 @@ pub mod properties {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(2usize, &"record with 8 fields"),
+                                __serde::de::Error::invalid_length(2usize, &"record with 9 fields"),
                             );
                         }
                     };
@@ -38318,7 +38341,7 @@ pub mod properties {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(3usize, &"record with 8 fields"),
+                                __serde::de::Error::invalid_length(3usize, &"record with 9 fields"),
                             );
                         }
                     };
@@ -38329,7 +38352,7 @@ pub mod properties {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(4usize, &"record with 8 fields"),
+                                __serde::de::Error::invalid_length(4usize, &"record with 9 fields"),
                             );
                         }
                     };
@@ -38340,7 +38363,7 @@ pub mod properties {
                                 return ::core::result::Result::Err(
                                     __serde::de::Error::invalid_length(
                                         5usize,
-                                        &"record with 8 fields",
+                                        &"record with 9 fields",
                                     ),
                                 );
                             }
@@ -38352,7 +38375,7 @@ pub mod properties {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(6usize, &"record with 8 fields"),
+                                __serde::de::Error::invalid_length(6usize, &"record with 9 fields"),
                             );
                         }
                     };
@@ -38363,7 +38386,18 @@ pub mod properties {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(7usize, &"record with 8 fields"),
+                                __serde::de::Error::invalid_length(7usize, &"record with 9 fields"),
+                            );
+                        }
+                    };
+                    let __field8 = match __serde::de::SeqAccess::next_element::<
+                        ::std::option::Option<::std::vec::Vec<ExportInfo>>,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(8usize, &"record with 9 fields"),
                             );
                         }
                     };
@@ -38376,6 +38410,7 @@ pub mod properties {
                         memory: __field5,
                         networks: __field6,
                         disks: __field7,
+                        exports: __field8,
                     })
                 }
                 #[inline]
@@ -38389,10 +38424,10 @@ pub mod properties {
                     #[doc(hidden)]
                     const __IDENTIFIERS: &'static [&'static str] = &[
                         "name", "version", "kernel", "hostname", "arch", "memory", "networks",
-                        "disks",
+                        "disks", "exports",
                     ];
                     #[doc(hidden)]
-                    const __EXPECTING_IDENTIFIERS: &'static str = "an identifier in [\"name\", \"version\", \"kernel\", \"hostname\", \"arch\", \"memory\", \"networks\", \"disks\"]";
+                    const __EXPECTING_IDENTIFIERS: &'static str = "an identifier in [\"name\", \"version\", \"kernel\", \"hostname\", \"arch\", \"memory\", \"networks\", \"disks\", \"exports\"]";
                     #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
                     #[doc(hidden)]
                     enum __Identifier {
@@ -38404,6 +38439,7 @@ pub mod properties {
                         __Identifier5,
                         __Identifier6,
                         __Identifier7,
+                        __Identifier8,
                         __Unknown,
                     }
                     #[doc(hidden)]
@@ -38432,6 +38468,7 @@ pub mod properties {
                                 5u64 => ::core::result::Result::Ok(__Identifier::__Identifier5),
                                 6u64 => ::core::result::Result::Ok(__Identifier::__Identifier6),
                                 7u64 => ::core::result::Result::Ok(__Identifier::__Identifier7),
+                                8u64 => ::core::result::Result::Ok(__Identifier::__Identifier8),
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
                         }
@@ -38457,6 +38494,9 @@ pub mod properties {
                                     ::core::result::Result::Ok(__Identifier::__Identifier6)
                                 }
                                 "disks" => ::core::result::Result::Ok(__Identifier::__Identifier7),
+                                "exports" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier8)
+                                }
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
                         }
@@ -38486,6 +38526,9 @@ pub mod properties {
                                     ::core::result::Result::Ok(__Identifier::__Identifier6)
                                 }
                                 b"disks" => ::core::result::Result::Ok(__Identifier::__Identifier7),
+                                b"exports" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier8)
+                                }
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
                         }
@@ -38526,6 +38569,9 @@ pub mod properties {
                     > = ::core::option::Option::None;
                     let mut __field7: ::core::option::Option<::std::vec::Vec<DiskInfo>> =
                         ::core::option::Option::None;
+                    let mut __field8: ::core::option::Option<
+                        ::std::option::Option<::std::vec::Vec<ExportInfo>>,
+                    > = ::core::option::Option::None;
                     while let ::core::option::Option::Some(__key) =
                         __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
                     {
@@ -38636,6 +38682,20 @@ pub mod properties {
                                     )?,
                                 );
                             }
+                            __Identifier::__Identifier8 => {
+                                if ::core::option::Option::is_some(&__field8) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "exports",
+                                        ),
+                                    );
+                                }
+                                __field8 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<
+                                        ::std::option::Option<::std::vec::Vec<ExportInfo>>,
+                                    >(&mut __map)?,
+                                );
+                            }
                             _ => {
                                 __serde::de::MapAccess::next_value::<__serde::de::IgnoredAny>(
                                     &mut __map,
@@ -38687,6 +38747,10 @@ pub mod properties {
                             );
                         }
                     };
+                    let __field8 = match __field8 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => ::core::option::Option::None,
+                    };
                     ::core::result::Result::Ok(SystemInfo {
                         name: __field0,
                         version: __field1,
@@ -38696,12 +38760,14 @@ pub mod properties {
                         memory: __field5,
                         networks: __field6,
                         disks: __field7,
+                        exports: __field8,
                     })
                 }
             }
             #[doc(hidden)]
             const __FIELDS: &'static [&'static str] = &[
                 "name", "version", "kernel", "hostname", "arch", "memory", "networks", "disks",
+                "exports",
             ];
             __serde::Deserializer::deserialize_struct(
                 __deserializer,
@@ -40284,6 +40350,484 @@ pub mod properties {
                 __deserializer,
                 "OtaUpdateState",
                 __VARIANTS,
+                __Visitor {
+                    __phantom_vars: ::core::marker::PhantomData,
+                },
+            )
+        }
+    }
+    #[doc = "Service export information.\n"]
+    #[derive(Clone, Debug)]
+    pub enum ExportInfo {
+        #[doc = "HTTP export information.\n"]
+        Http(HttpExportInfo),
+    }
+    #[automatically_derived]
+    impl __serde::Serialize for ExportInfo {
+        fn serialize<__S: __serde::Serializer>(
+            &self,
+            __serializer: __S,
+        ) -> ::std::result::Result<__S::Ok, __S::Error> {
+            let __serializer =
+                __sidex_serde::ser::VariantSerializer::new(__serializer, "ExportInfo");
+            match self {
+                Self::Http(__value) => {
+                    __serializer.serialize_internally_tagged("protocol", "http", 0u32, __value)
+                }
+            }
+        }
+    }
+    #[automatically_derived]
+    impl<'de> __serde::Deserialize<'de> for ExportInfo {
+        fn deserialize<__D: __serde::Deserializer<'de>>(
+            __deserializer: __D,
+        ) -> ::std::result::Result<Self, __D::Error> {
+            #[doc(hidden)]
+            const __IDENTIFIERS: &'static [&'static str] = &["http"];
+            #[doc(hidden)]
+            const __EXPECTING_IDENTIFIERS: &'static str = "an identifier in [\"http\"]";
+            #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
+            #[doc(hidden)]
+            enum __Identifier {
+                __Identifier0,
+            }
+            #[doc(hidden)]
+            struct __IdentifierVisitor;
+            impl<'de> __serde::de::Visitor<'de> for __IdentifierVisitor {
+                type Value = __Identifier;
+                fn expecting(
+                    &self,
+                    __formatter: &mut ::core::fmt::Formatter,
+                ) -> ::core::fmt::Result {
+                    ::core::fmt::Formatter::write_str(__formatter, __EXPECTING_IDENTIFIERS)
+                }
+                fn visit_u64<__E>(self, __value: u64) -> ::core::result::Result<Self::Value, __E>
+                where
+                    __E: __serde::de::Error,
+                {
+                    match __value {
+                        0u64 => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                        __variant => {
+                            ::core::result::Result::Err(__serde::de::Error::invalid_value(
+                                __serde::de::Unexpected::Unsigned(__variant),
+                                &__EXPECTING_IDENTIFIERS,
+                            ))
+                        }
+                    }
+                }
+                fn visit_str<__E>(self, __value: &str) -> ::core::result::Result<Self::Value, __E>
+                where
+                    __E: __serde::de::Error,
+                {
+                    match __value {
+                        "http" => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                        __variant => ::core::result::Result::Err(
+                            __serde::de::Error::unknown_variant(__variant, __IDENTIFIERS),
+                        ),
+                    }
+                }
+                fn visit_bytes<__E>(
+                    self,
+                    __value: &[u8],
+                ) -> ::core::result::Result<Self::Value, __E>
+                where
+                    __E: __serde::de::Error,
+                {
+                    match __value {
+                        b"http" => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                        __variant => {
+                            ::core::result::Result::Err(__serde::de::Error::invalid_value(
+                                __serde::de::Unexpected::Bytes(__variant),
+                                &__EXPECTING_IDENTIFIERS,
+                            ))
+                        }
+                    }
+                }
+            }
+            impl<'de> __serde::Deserialize<'de> for __Identifier {
+                #[inline]
+                fn deserialize<__D>(__deserializer: __D) -> ::core::result::Result<Self, __D::Error>
+                where
+                    __D: __serde::Deserializer<'de>,
+                {
+                    __serde::Deserializer::deserialize_identifier(
+                        __deserializer,
+                        __IdentifierVisitor,
+                    )
+                }
+            }
+            #[doc(hidden)]
+            const __VARIANTS: &'static [&'static str] = &["http"];
+            if __serde::Deserializer::is_human_readable(&__deserializer) {
+                let __tagged = __sidex_serde::de::tagged::deserialize_tagged_variant::<
+                    __Identifier,
+                    __D,
+                >(__deserializer, "protocol")?;
+                match __tagged.tag {
+                    __Identifier::__Identifier0 => ::core::result::Result::Ok(ExportInfo::Http(
+                        __tagged.deserialize_internally_tagged::<HttpExportInfo, __D::Error>()?,
+                    )),
+                }
+            } else {
+                #[doc(hidden)]
+                struct __Visitor {
+                    __phantom_vars: ::core::marker::PhantomData<fn(&())>,
+                }
+                impl<'de> __serde::de::Visitor<'de> for __Visitor {
+                    type Value = ExportInfo;
+                    fn expecting(
+                        &self,
+                        __formatter: &mut ::core::fmt::Formatter,
+                    ) -> ::core::fmt::Result {
+                        ::core::fmt::Formatter::write_str(__formatter, "enum ExportInfo")
+                    }
+                    #[inline]
+                    fn visit_str<__E>(
+                        self,
+                        __value: &str,
+                    ) -> ::core::result::Result<Self::Value, __E>
+                    where
+                        __E: __serde::de::Error,
+                    {
+                        let __identifier = __IdentifierVisitor.visit_str(__value)?;
+                        #[allow(unreachable_patterns)]
+                        match __identifier {
+                            _ => Err(__E::invalid_value(
+                                __serde::de::Unexpected::Str(__value),
+                                &self,
+                            )),
+                        }
+                    }
+                    #[inline]
+                    fn visit_enum<__A>(
+                        self,
+                        __data: __A,
+                    ) -> ::core::result::Result<Self::Value, __A::Error>
+                    where
+                        __A: __serde::de::EnumAccess<'de>,
+                    {
+                        match __serde::de::EnumAccess::variant::<__Identifier>(__data)? {
+                            (__Identifier::__Identifier0, __variant) => {
+                                let __value = __serde::de::VariantAccess::newtype_variant::<
+                                    HttpExportInfo,
+                                >(__variant)?;
+                                ::core::result::Result::Ok(ExportInfo::Http(__value))
+                            }
+                        }
+                    }
+                }
+                __serde::Deserializer::deserialize_enum(
+                    __deserializer,
+                    "ExportInfo",
+                    __VARIANTS,
+                    __Visitor {
+                        __phantom_vars: ::core::marker::PhantomData,
+                    },
+                )
+            }
+        }
+    }
+    #[doc = "HTTP export information.\n"]
+    #[derive(Clone, Debug)]
+    pub struct HttpExportInfo {
+        #[doc = "Name of the export.\n"]
+        pub name: ::std::string::String,
+        #[doc = "Port the service listens on.\n"]
+        pub port: u16,
+        #[doc = "URL path prefix.\n"]
+        pub path: ::std::option::Option<::std::string::String>,
+    }
+    impl HttpExportInfo {
+        #[doc = "Creates a new [`HttpExportInfo`]."]
+        pub fn new(name: ::std::string::String, port: u16) -> Self {
+            Self {
+                name,
+                port,
+                path: ::std::default::Default::default(),
+            }
+        }
+        #[doc = "Sets the value of `name`."]
+        pub fn set_name(&mut self, name: ::std::string::String) -> &mut Self {
+            self.name = name;
+            self
+        }
+        #[doc = "Sets the value of `name`."]
+        pub fn with_name(mut self, name: ::std::string::String) -> Self {
+            self.name = name;
+            self
+        }
+        #[doc = "Sets the value of `port`."]
+        pub fn set_port(&mut self, port: u16) -> &mut Self {
+            self.port = port;
+            self
+        }
+        #[doc = "Sets the value of `port`."]
+        pub fn with_port(mut self, port: u16) -> Self {
+            self.port = port;
+            self
+        }
+        #[doc = "Sets the value of `path`."]
+        pub fn set_path(
+            &mut self,
+            path: ::std::option::Option<::std::string::String>,
+        ) -> &mut Self {
+            self.path = path;
+            self
+        }
+        #[doc = "Sets the value of `path`."]
+        pub fn with_path(mut self, path: ::std::option::Option<::std::string::String>) -> Self {
+            self.path = path;
+            self
+        }
+    }
+    #[automatically_derived]
+    impl __serde::Serialize for HttpExportInfo {
+        fn serialize<__S: __serde::Serializer>(
+            &self,
+            __serializer: __S,
+        ) -> ::std::result::Result<__S::Ok, __S::Error> {
+            let mut __record =
+                __sidex_serde::ser::RecordSerializer::new(__serializer, "HttpExportInfo", 3usize)?;
+            __record.serialize_field("name", &self.name)?;
+            __record.serialize_field("port", &self.port)?;
+            __record
+                .serialize_optional_field("path", ::core::option::Option::as_ref(&self.path))?;
+            __record.end()
+        }
+    }
+    #[automatically_derived]
+    impl<'de> __serde::Deserialize<'de> for HttpExportInfo {
+        fn deserialize<__D: __serde::Deserializer<'de>>(
+            __deserializer: __D,
+        ) -> ::std::result::Result<Self, __D::Error> {
+            #[doc(hidden)]
+            struct __Visitor {
+                __phantom_vars: ::core::marker::PhantomData<fn(&())>,
+            }
+            impl<'de> __serde::de::Visitor<'de> for __Visitor {
+                type Value = HttpExportInfo;
+                fn expecting(
+                    &self,
+                    __formatter: &mut ::core::fmt::Formatter,
+                ) -> ::core::fmt::Result {
+                    ::core::fmt::Formatter::write_str(__formatter, "record HttpExportInfo")
+                }
+                #[inline]
+                fn visit_seq<__A>(
+                    self,
+                    mut __seq: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::SeqAccess<'de>,
+                {
+                    let __field0 = match __serde::de::SeqAccess::next_element::<
+                        ::std::string::String,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(0usize, &"record with 3 fields"),
+                            );
+                        }
+                    };
+                    let __field1 = match __serde::de::SeqAccess::next_element::<u16>(&mut __seq)? {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(1usize, &"record with 3 fields"),
+                            );
+                        }
+                    };
+                    let __field2 = match __serde::de::SeqAccess::next_element::<
+                        ::std::option::Option<::std::string::String>,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(2usize, &"record with 3 fields"),
+                            );
+                        }
+                    };
+                    ::core::result::Result::Ok(HttpExportInfo {
+                        name: __field0,
+                        port: __field1,
+                        path: __field2,
+                    })
+                }
+                #[inline]
+                fn visit_map<__A>(
+                    self,
+                    mut __map: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::MapAccess<'de>,
+                {
+                    #[doc(hidden)]
+                    const __IDENTIFIERS: &'static [&'static str] = &["name", "port", "path"];
+                    #[doc(hidden)]
+                    const __EXPECTING_IDENTIFIERS: &'static str =
+                        "an identifier in [\"name\", \"port\", \"path\"]";
+                    #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
+                    #[doc(hidden)]
+                    enum __Identifier {
+                        __Identifier0,
+                        __Identifier1,
+                        __Identifier2,
+                        __Unknown,
+                    }
+                    #[doc(hidden)]
+                    struct __IdentifierVisitor;
+                    impl<'de> __serde::de::Visitor<'de> for __IdentifierVisitor {
+                        type Value = __Identifier;
+                        fn expecting(
+                            &self,
+                            __formatter: &mut ::core::fmt::Formatter,
+                        ) -> ::core::fmt::Result {
+                            ::core::fmt::Formatter::write_str(__formatter, __EXPECTING_IDENTIFIERS)
+                        }
+                        fn visit_u64<__E>(
+                            self,
+                            __value: u64,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                0u64 => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                                1u64 => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                                2u64 => ::core::result::Result::Ok(__Identifier::__Identifier2),
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_str<__E>(
+                            self,
+                            __value: &str,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                "name" => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                                "port" => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                                "path" => ::core::result::Result::Ok(__Identifier::__Identifier2),
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_bytes<__E>(
+                            self,
+                            __value: &[u8],
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                b"name" => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                                b"port" => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                                b"path" => ::core::result::Result::Ok(__Identifier::__Identifier2),
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                    }
+                    impl<'de> __serde::Deserialize<'de> for __Identifier {
+                        #[inline]
+                        fn deserialize<__D>(
+                            __deserializer: __D,
+                        ) -> ::core::result::Result<Self, __D::Error>
+                        where
+                            __D: __serde::Deserializer<'de>,
+                        {
+                            __serde::Deserializer::deserialize_identifier(
+                                __deserializer,
+                                __IdentifierVisitor,
+                            )
+                        }
+                    }
+                    let mut __field0: ::core::option::Option<::std::string::String> =
+                        ::core::option::Option::None;
+                    let mut __field1: ::core::option::Option<u16> = ::core::option::Option::None;
+                    let mut __field2: ::core::option::Option<
+                        ::std::option::Option<::std::string::String>,
+                    > = ::core::option::Option::None;
+                    while let ::core::option::Option::Some(__key) =
+                        __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
+                    {
+                        match __key {
+                            __Identifier::__Identifier0 => {
+                                if ::core::option::Option::is_some(&__field0) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field("name"),
+                                    );
+                                }
+                                __field0 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<::std::string::String>(
+                                        &mut __map,
+                                    )?,
+                                );
+                            }
+                            __Identifier::__Identifier1 => {
+                                if ::core::option::Option::is_some(&__field1) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field("port"),
+                                    );
+                                }
+                                __field1 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<u16>(&mut __map)?,
+                                );
+                            }
+                            __Identifier::__Identifier2 => {
+                                if ::core::option::Option::is_some(&__field2) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field("path"),
+                                    );
+                                }
+                                __field2 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<
+                                        ::std::option::Option<::std::string::String>,
+                                    >(&mut __map)?,
+                                );
+                            }
+                            _ => {
+                                __serde::de::MapAccess::next_value::<__serde::de::IgnoredAny>(
+                                    &mut __map,
+                                )?;
+                            }
+                        }
+                    }
+                    let __field0 = match __field0 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                <__A::Error as __serde::de::Error>::missing_field("name"),
+                            );
+                        }
+                    };
+                    let __field1 = match __field1 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                <__A::Error as __serde::de::Error>::missing_field("port"),
+                            );
+                        }
+                    };
+                    let __field2 = match __field2 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => ::core::option::Option::None,
+                    };
+                    ::core::result::Result::Ok(HttpExportInfo {
+                        name: __field0,
+                        port: __field1,
+                        path: __field2,
+                    })
+                }
+            }
+            #[doc(hidden)]
+            const __FIELDS: &'static [&'static str] = &["name", "port", "path"];
+            __serde::Deserializer::deserialize_struct(
+                __deserializer,
+                "HttpExportInfo",
+                __FIELDS,
                 __Visitor {
                     __phantom_vars: ::core::marker::PhantomData,
                 },

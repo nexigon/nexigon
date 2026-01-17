@@ -1,9 +1,14 @@
 use nexigon_api::types::properties::DiskInfo;
+use nexigon_api::types::properties::ExportInfo;
+use nexigon_api::types::properties::HttpExportInfo;
 use nexigon_api::types::properties::MemoryInfo;
 use nexigon_api::types::properties::NetworkInterfaceInfo;
 use nexigon_api::types::properties::SystemInfo;
 
-pub fn get_system_info() -> SystemInfo {
+use crate::config::Config;
+use crate::config::ExportConfig;
+
+pub fn get_system_info(config: &Config) -> SystemInfo {
     let mut system = sysinfo::System::new();
     system.refresh_memory();
     let memory = MemoryInfo {
@@ -31,6 +36,10 @@ pub fn get_system_info() -> SystemInfo {
             available_space: disk.available_space(),
         })
         .collect();
+    let exports = config
+        .exports
+        .as_ref()
+        .map(|exports| exports.iter().map(convert_export).collect::<Vec<_>>());
     SystemInfo {
         name: sysinfo::System::name(),
         version: sysinfo::System::long_os_version(),
@@ -40,5 +49,16 @@ pub fn get_system_info() -> SystemInfo {
         memory,
         networks,
         disks,
+        exports,
+    }
+}
+
+fn convert_export(export: &ExportConfig) -> ExportInfo {
+    match export {
+        ExportConfig::Http(config) => ExportInfo::Http(HttpExportInfo {
+            name: config.name.clone(),
+            port: config.port,
+            path: config.path.clone(),
+        }),
     }
 }
