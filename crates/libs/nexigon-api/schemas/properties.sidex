@@ -20,6 +20,10 @@ record SystemInfo {
     disks: [DiskInfo],
     /// Exported services.
     exports?: [ExportInfo],
+    /// Rugix-specific system information.
+    rugix?: RugixSystemInfo,
+    /// Yocto-specific system information.
+    yocto?: YoctoSystemInfo,
 }
 
 /// Memory information.
@@ -92,4 +96,84 @@ record HttpExportInfo {
     port: u16,
     /// URL path prefix.
     path?: string,
+}
+
+/// Rugix-specific system information.
+record RugixSystemInfo {
+    /// Information about the update slots.
+    slots: [string: RugixSlotInfo],
+    /// Rugix-specific boot information.
+    boot?: RugixBootInfo,
+    /// Information about the state management mechanism.
+    state: RugixStateManagementInfo,
+    /// Rugix Bakery build information (only when built with Rugix Bakery).
+    build?: RugixBakeryBuildInfo,
+}
+
+/// Information about a Rugix update slot.
+record RugixSlotInfo {
+    /// Indicates whether the slot is active, i.e., in use.
+    active?: bool,
+    /// Hashes of the slot data according to the slot database.
+    hashes?: [string: string],
+    /// Size of the slot data according to the slot database.
+    size?: u64,
+    /// Last time the slot has been updated according to the slot database.
+    updated_at?: string,
+}
+
+/// Rugix-specific boot information.
+record RugixBootInfo {
+    /// Name of the boot flow.
+    boot_flow: string,
+    /// Active boot group.
+    active_group?: string,
+    /// Default boot group.
+    default_group?: string,
+    /// Information about the boot groups.
+    groups: [string: RugixBootGroupInfo],
+}
+
+/// Information about a Rugix boot group.
+record RugixBootGroupInfo {}
+
+/// Information about Rugix's state management mechanism.
+#[json(tag = "status")]
+variant RugixStateManagementInfo {
+    /// State management is disabled.
+    Disabled,
+    /// State management is active.
+    Active: RugixActiveStateManagementInfo,
+    /// State management is inactive due to an error.
+    /// 
+    /// State is stored in memory and will fail to persist even if declared.
+    Error,
+}
+
+/// Information about the state management mechanism, if state management is active.
+record RugixActiveStateManagementInfo {
+    /// Device backing the data partition, if any.
+    data_partition?: string,
+}
+
+/// Rugix Bakery build information.
+record RugixBakeryBuildInfo {
+    /// System name.
+    name: string,
+    /// Rugix Bakery build release information.
+    release: RugixBakeryReleaseInfo,
+}
+
+/// Rugix Bakery build release information.
+record RugixBakeryReleaseInfo {
+    /// Release ID.
+    id: string,
+    /// Release version.
+    version: string,
+}
+
+/// Yocto-specific system information.
+record YoctoSystemInfo {
+    /// Build information key-value pairs read from `/etc/buildinfo`.
+    build_info: [string: string],
 }

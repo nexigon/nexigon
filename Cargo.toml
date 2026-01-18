@@ -40,6 +40,7 @@ urlencoding = "2.1"
 x509-cert = "0.2"
 
 # In-House Crates
+reportify = { git = "https://github.com/silitics/si-rust-libs.git" }
 si-crypto-hashes = "0.1"
 si-observability = { version = "0.1", features = ["otlp", "clap4"] }
 sidex-serde = { git = "https://github.com/silitics/sidex.git" }

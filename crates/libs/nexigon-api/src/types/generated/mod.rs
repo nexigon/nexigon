@@ -38103,6 +38103,10 @@ pub mod properties {
         pub disks: ::std::vec::Vec<DiskInfo>,
         #[doc = "Exported services.\n"]
         pub exports: ::std::option::Option<::std::vec::Vec<ExportInfo>>,
+        #[doc = "Rugix-specific system information.\n"]
+        pub rugix: ::std::option::Option<RugixSystemInfo>,
+        #[doc = "Yocto-specific system information.\n"]
+        pub yocto: ::std::option::Option<YoctoSystemInfo>,
     }
     impl SystemInfo {
         #[doc = "Creates a new [`SystemInfo`]."]
@@ -38121,6 +38125,8 @@ pub mod properties {
                 hostname: ::std::default::Default::default(),
                 arch: ::std::default::Default::default(),
                 exports: ::std::default::Default::default(),
+                rugix: ::std::default::Default::default(),
+                yocto: ::std::default::Default::default(),
             }
         }
         #[doc = "Sets the value of `name`."]
@@ -38243,6 +38249,26 @@ pub mod properties {
             self.exports = exports;
             self
         }
+        #[doc = "Sets the value of `rugix`."]
+        pub fn set_rugix(&mut self, rugix: ::std::option::Option<RugixSystemInfo>) -> &mut Self {
+            self.rugix = rugix;
+            self
+        }
+        #[doc = "Sets the value of `rugix`."]
+        pub fn with_rugix(mut self, rugix: ::std::option::Option<RugixSystemInfo>) -> Self {
+            self.rugix = rugix;
+            self
+        }
+        #[doc = "Sets the value of `yocto`."]
+        pub fn set_yocto(&mut self, yocto: ::std::option::Option<YoctoSystemInfo>) -> &mut Self {
+            self.yocto = yocto;
+            self
+        }
+        #[doc = "Sets the value of `yocto`."]
+        pub fn with_yocto(mut self, yocto: ::std::option::Option<YoctoSystemInfo>) -> Self {
+            self.yocto = yocto;
+            self
+        }
     }
     #[automatically_derived]
     impl __serde::Serialize for SystemInfo {
@@ -38251,7 +38277,7 @@ pub mod properties {
             __serializer: __S,
         ) -> ::std::result::Result<__S::Ok, __S::Error> {
             let mut __record =
-                __sidex_serde::ser::RecordSerializer::new(__serializer, "SystemInfo", 9usize)?;
+                __sidex_serde::ser::RecordSerializer::new(__serializer, "SystemInfo", 11usize)?;
             __record
                 .serialize_optional_field("name", ::core::option::Option::as_ref(&self.name))?;
             __record.serialize_optional_field(
@@ -38273,6 +38299,10 @@ pub mod properties {
                 "exports",
                 ::core::option::Option::as_ref(&self.exports),
             )?;
+            __record
+                .serialize_optional_field("rugix", ::core::option::Option::as_ref(&self.rugix))?;
+            __record
+                .serialize_optional_field("yocto", ::core::option::Option::as_ref(&self.yocto))?;
             __record.end()
         }
     }
@@ -38308,7 +38338,10 @@ pub mod properties {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(0usize, &"record with 9 fields"),
+                                __serde::de::Error::invalid_length(
+                                    0usize,
+                                    &"record with 11 fields",
+                                ),
                             );
                         }
                     };
@@ -38319,7 +38352,10 @@ pub mod properties {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(1usize, &"record with 9 fields"),
+                                __serde::de::Error::invalid_length(
+                                    1usize,
+                                    &"record with 11 fields",
+                                ),
                             );
                         }
                     };
@@ -38330,7 +38366,10 @@ pub mod properties {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(2usize, &"record with 9 fields"),
+                                __serde::de::Error::invalid_length(
+                                    2usize,
+                                    &"record with 11 fields",
+                                ),
                             );
                         }
                     };
@@ -38341,7 +38380,10 @@ pub mod properties {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(3usize, &"record with 9 fields"),
+                                __serde::de::Error::invalid_length(
+                                    3usize,
+                                    &"record with 11 fields",
+                                ),
                             );
                         }
                     };
@@ -38352,7 +38394,10 @@ pub mod properties {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(4usize, &"record with 9 fields"),
+                                __serde::de::Error::invalid_length(
+                                    4usize,
+                                    &"record with 11 fields",
+                                ),
                             );
                         }
                     };
@@ -38363,7 +38408,7 @@ pub mod properties {
                                 return ::core::result::Result::Err(
                                     __serde::de::Error::invalid_length(
                                         5usize,
-                                        &"record with 9 fields",
+                                        &"record with 11 fields",
                                     ),
                                 );
                             }
@@ -38375,7 +38420,10 @@ pub mod properties {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(6usize, &"record with 9 fields"),
+                                __serde::de::Error::invalid_length(
+                                    6usize,
+                                    &"record with 11 fields",
+                                ),
                             );
                         }
                     };
@@ -38386,7 +38434,10 @@ pub mod properties {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(7usize, &"record with 9 fields"),
+                                __serde::de::Error::invalid_length(
+                                    7usize,
+                                    &"record with 11 fields",
+                                ),
                             );
                         }
                     };
@@ -38397,7 +38448,38 @@ pub mod properties {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(8usize, &"record with 9 fields"),
+                                __serde::de::Error::invalid_length(
+                                    8usize,
+                                    &"record with 11 fields",
+                                ),
+                            );
+                        }
+                    };
+                    let __field9 = match __serde::de::SeqAccess::next_element::<
+                        ::std::option::Option<RugixSystemInfo>,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(
+                                    9usize,
+                                    &"record with 11 fields",
+                                ),
+                            );
+                        }
+                    };
+                    let __field10 = match __serde::de::SeqAccess::next_element::<
+                        ::std::option::Option<YoctoSystemInfo>,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(
+                                    10usize,
+                                    &"record with 11 fields",
+                                ),
                             );
                         }
                     };
@@ -38411,6 +38493,8 @@ pub mod properties {
                         networks: __field6,
                         disks: __field7,
                         exports: __field8,
+                        rugix: __field9,
+                        yocto: __field10,
                     })
                 }
                 #[inline]
@@ -38424,10 +38508,10 @@ pub mod properties {
                     #[doc(hidden)]
                     const __IDENTIFIERS: &'static [&'static str] = &[
                         "name", "version", "kernel", "hostname", "arch", "memory", "networks",
-                        "disks", "exports",
+                        "disks", "exports", "rugix", "yocto",
                     ];
                     #[doc(hidden)]
-                    const __EXPECTING_IDENTIFIERS: &'static str = "an identifier in [\"name\", \"version\", \"kernel\", \"hostname\", \"arch\", \"memory\", \"networks\", \"disks\", \"exports\"]";
+                    const __EXPECTING_IDENTIFIERS: &'static str = "an identifier in [\"name\", \"version\", \"kernel\", \"hostname\", \"arch\", \"memory\", \"networks\", \"disks\", \"exports\", \"rugix\", \"yocto\"]";
                     #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
                     #[doc(hidden)]
                     enum __Identifier {
@@ -38440,6 +38524,8 @@ pub mod properties {
                         __Identifier6,
                         __Identifier7,
                         __Identifier8,
+                        __Identifier9,
+                        __Identifier10,
                         __Unknown,
                     }
                     #[doc(hidden)]
@@ -38469,6 +38555,8 @@ pub mod properties {
                                 6u64 => ::core::result::Result::Ok(__Identifier::__Identifier6),
                                 7u64 => ::core::result::Result::Ok(__Identifier::__Identifier7),
                                 8u64 => ::core::result::Result::Ok(__Identifier::__Identifier8),
+                                9u64 => ::core::result::Result::Ok(__Identifier::__Identifier9),
+                                10u64 => ::core::result::Result::Ok(__Identifier::__Identifier10),
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
                         }
@@ -38497,6 +38585,8 @@ pub mod properties {
                                 "exports" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier8)
                                 }
+                                "rugix" => ::core::result::Result::Ok(__Identifier::__Identifier9),
+                                "yocto" => ::core::result::Result::Ok(__Identifier::__Identifier10),
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
                         }
@@ -38528,6 +38618,10 @@ pub mod properties {
                                 b"disks" => ::core::result::Result::Ok(__Identifier::__Identifier7),
                                 b"exports" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier8)
+                                }
+                                b"rugix" => ::core::result::Result::Ok(__Identifier::__Identifier9),
+                                b"yocto" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier10)
                                 }
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
@@ -38571,6 +38665,12 @@ pub mod properties {
                         ::core::option::Option::None;
                     let mut __field8: ::core::option::Option<
                         ::std::option::Option<::std::vec::Vec<ExportInfo>>,
+                    > = ::core::option::Option::None;
+                    let mut __field9: ::core::option::Option<
+                        ::std::option::Option<RugixSystemInfo>,
+                    > = ::core::option::Option::None;
+                    let mut __field10: ::core::option::Option<
+                        ::std::option::Option<YoctoSystemInfo>,
                     > = ::core::option::Option::None;
                     while let ::core::option::Option::Some(__key) =
                         __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
@@ -38696,6 +38796,34 @@ pub mod properties {
                                     >(&mut __map)?,
                                 );
                             }
+                            __Identifier::__Identifier9 => {
+                                if ::core::option::Option::is_some(&__field9) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "rugix",
+                                        ),
+                                    );
+                                }
+                                __field9 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<
+                                        ::std::option::Option<RugixSystemInfo>,
+                                    >(&mut __map)?,
+                                );
+                            }
+                            __Identifier::__Identifier10 => {
+                                if ::core::option::Option::is_some(&__field10) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "yocto",
+                                        ),
+                                    );
+                                }
+                                __field10 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<
+                                        ::std::option::Option<YoctoSystemInfo>,
+                                    >(&mut __map)?,
+                                );
+                            }
                             _ => {
                                 __serde::de::MapAccess::next_value::<__serde::de::IgnoredAny>(
                                     &mut __map,
@@ -38751,6 +38879,14 @@ pub mod properties {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => ::core::option::Option::None,
                     };
+                    let __field9 = match __field9 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => ::core::option::Option::None,
+                    };
+                    let __field10 = match __field10 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => ::core::option::Option::None,
+                    };
                     ::core::result::Result::Ok(SystemInfo {
                         name: __field0,
                         version: __field1,
@@ -38761,13 +38897,15 @@ pub mod properties {
                         networks: __field6,
                         disks: __field7,
                         exports: __field8,
+                        rugix: __field9,
+                        yocto: __field10,
                     })
                 }
             }
             #[doc(hidden)]
             const __FIELDS: &'static [&'static str] = &[
                 "name", "version", "kernel", "hostname", "arch", "memory", "networks", "disks",
-                "exports",
+                "exports", "rugix", "yocto",
             ];
             __serde::Deserializer::deserialize_struct(
                 __deserializer,
@@ -40827,6 +40965,2552 @@ pub mod properties {
             __serde::Deserializer::deserialize_struct(
                 __deserializer,
                 "HttpExportInfo",
+                __FIELDS,
+                __Visitor {
+                    __phantom_vars: ::core::marker::PhantomData,
+                },
+            )
+        }
+    }
+    #[doc = "Rugix-specific system information.\n"]
+    #[derive(Clone, Debug)]
+    pub struct RugixSystemInfo {
+        #[doc = "Information about the update slots.\n"]
+        pub slots: ::std::collections::HashMap<::std::string::String, RugixSlotInfo>,
+        #[doc = "Rugix-specific boot information.\n"]
+        pub boot: ::std::option::Option<RugixBootInfo>,
+        #[doc = "Information about the state management mechanism.\n"]
+        pub state: RugixStateManagementInfo,
+        #[doc = "Rugix Bakery build information (only when built with Rugix Bakery).\n"]
+        pub build: ::std::option::Option<RugixBakeryBuildInfo>,
+    }
+    impl RugixSystemInfo {
+        #[doc = "Creates a new [`RugixSystemInfo`]."]
+        pub fn new(
+            slots: ::std::collections::HashMap<::std::string::String, RugixSlotInfo>,
+            state: RugixStateManagementInfo,
+        ) -> Self {
+            Self {
+                slots,
+                state,
+                boot: ::std::default::Default::default(),
+                build: ::std::default::Default::default(),
+            }
+        }
+        #[doc = "Sets the value of `slots`."]
+        pub fn set_slots(
+            &mut self,
+            slots: ::std::collections::HashMap<::std::string::String, RugixSlotInfo>,
+        ) -> &mut Self {
+            self.slots = slots;
+            self
+        }
+        #[doc = "Sets the value of `slots`."]
+        pub fn with_slots(
+            mut self,
+            slots: ::std::collections::HashMap<::std::string::String, RugixSlotInfo>,
+        ) -> Self {
+            self.slots = slots;
+            self
+        }
+        #[doc = "Sets the value of `boot`."]
+        pub fn set_boot(&mut self, boot: ::std::option::Option<RugixBootInfo>) -> &mut Self {
+            self.boot = boot;
+            self
+        }
+        #[doc = "Sets the value of `boot`."]
+        pub fn with_boot(mut self, boot: ::std::option::Option<RugixBootInfo>) -> Self {
+            self.boot = boot;
+            self
+        }
+        #[doc = "Sets the value of `state`."]
+        pub fn set_state(&mut self, state: RugixStateManagementInfo) -> &mut Self {
+            self.state = state;
+            self
+        }
+        #[doc = "Sets the value of `state`."]
+        pub fn with_state(mut self, state: RugixStateManagementInfo) -> Self {
+            self.state = state;
+            self
+        }
+        #[doc = "Sets the value of `build`."]
+        pub fn set_build(
+            &mut self,
+            build: ::std::option::Option<RugixBakeryBuildInfo>,
+        ) -> &mut Self {
+            self.build = build;
+            self
+        }
+        #[doc = "Sets the value of `build`."]
+        pub fn with_build(mut self, build: ::std::option::Option<RugixBakeryBuildInfo>) -> Self {
+            self.build = build;
+            self
+        }
+    }
+    #[automatically_derived]
+    impl __serde::Serialize for RugixSystemInfo {
+        fn serialize<__S: __serde::Serializer>(
+            &self,
+            __serializer: __S,
+        ) -> ::std::result::Result<__S::Ok, __S::Error> {
+            let mut __record =
+                __sidex_serde::ser::RecordSerializer::new(__serializer, "RugixSystemInfo", 4usize)?;
+            __record.serialize_field("slots", &self.slots)?;
+            __record
+                .serialize_optional_field("boot", ::core::option::Option::as_ref(&self.boot))?;
+            __record.serialize_field("state", &self.state)?;
+            __record
+                .serialize_optional_field("build", ::core::option::Option::as_ref(&self.build))?;
+            __record.end()
+        }
+    }
+    #[automatically_derived]
+    impl<'de> __serde::Deserialize<'de> for RugixSystemInfo {
+        fn deserialize<__D: __serde::Deserializer<'de>>(
+            __deserializer: __D,
+        ) -> ::std::result::Result<Self, __D::Error> {
+            #[doc(hidden)]
+            struct __Visitor {
+                __phantom_vars: ::core::marker::PhantomData<fn(&())>,
+            }
+            impl<'de> __serde::de::Visitor<'de> for __Visitor {
+                type Value = RugixSystemInfo;
+                fn expecting(
+                    &self,
+                    __formatter: &mut ::core::fmt::Formatter,
+                ) -> ::core::fmt::Result {
+                    ::core::fmt::Formatter::write_str(__formatter, "record RugixSystemInfo")
+                }
+                #[inline]
+                fn visit_seq<__A>(
+                    self,
+                    mut __seq: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::SeqAccess<'de>,
+                {
+                    let __field0 = match __serde::de::SeqAccess::next_element::<
+                        ::std::collections::HashMap<::std::string::String, RugixSlotInfo>,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(0usize, &"record with 4 fields"),
+                            );
+                        }
+                    };
+                    let __field1 = match __serde::de::SeqAccess::next_element::<
+                        ::std::option::Option<RugixBootInfo>,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(1usize, &"record with 4 fields"),
+                            );
+                        }
+                    };
+                    let __field2 = match __serde::de::SeqAccess::next_element::<
+                        RugixStateManagementInfo,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(2usize, &"record with 4 fields"),
+                            );
+                        }
+                    };
+                    let __field3 = match __serde::de::SeqAccess::next_element::<
+                        ::std::option::Option<RugixBakeryBuildInfo>,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(3usize, &"record with 4 fields"),
+                            );
+                        }
+                    };
+                    ::core::result::Result::Ok(RugixSystemInfo {
+                        slots: __field0,
+                        boot: __field1,
+                        state: __field2,
+                        build: __field3,
+                    })
+                }
+                #[inline]
+                fn visit_map<__A>(
+                    self,
+                    mut __map: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::MapAccess<'de>,
+                {
+                    #[doc(hidden)]
+                    const __IDENTIFIERS: &'static [&'static str] =
+                        &["slots", "boot", "state", "build"];
+                    #[doc(hidden)]
+                    const __EXPECTING_IDENTIFIERS: &'static str =
+                        "an identifier in [\"slots\", \"boot\", \"state\", \"build\"]";
+                    #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
+                    #[doc(hidden)]
+                    enum __Identifier {
+                        __Identifier0,
+                        __Identifier1,
+                        __Identifier2,
+                        __Identifier3,
+                        __Unknown,
+                    }
+                    #[doc(hidden)]
+                    struct __IdentifierVisitor;
+                    impl<'de> __serde::de::Visitor<'de> for __IdentifierVisitor {
+                        type Value = __Identifier;
+                        fn expecting(
+                            &self,
+                            __formatter: &mut ::core::fmt::Formatter,
+                        ) -> ::core::fmt::Result {
+                            ::core::fmt::Formatter::write_str(__formatter, __EXPECTING_IDENTIFIERS)
+                        }
+                        fn visit_u64<__E>(
+                            self,
+                            __value: u64,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                0u64 => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                                1u64 => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                                2u64 => ::core::result::Result::Ok(__Identifier::__Identifier2),
+                                3u64 => ::core::result::Result::Ok(__Identifier::__Identifier3),
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_str<__E>(
+                            self,
+                            __value: &str,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                "slots" => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                                "boot" => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                                "state" => ::core::result::Result::Ok(__Identifier::__Identifier2),
+                                "build" => ::core::result::Result::Ok(__Identifier::__Identifier3),
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_bytes<__E>(
+                            self,
+                            __value: &[u8],
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                b"slots" => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                                b"boot" => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                                b"state" => ::core::result::Result::Ok(__Identifier::__Identifier2),
+                                b"build" => ::core::result::Result::Ok(__Identifier::__Identifier3),
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                    }
+                    impl<'de> __serde::Deserialize<'de> for __Identifier {
+                        #[inline]
+                        fn deserialize<__D>(
+                            __deserializer: __D,
+                        ) -> ::core::result::Result<Self, __D::Error>
+                        where
+                            __D: __serde::Deserializer<'de>,
+                        {
+                            __serde::Deserializer::deserialize_identifier(
+                                __deserializer,
+                                __IdentifierVisitor,
+                            )
+                        }
+                    }
+                    let mut __field0: ::core::option::Option<
+                        ::std::collections::HashMap<::std::string::String, RugixSlotInfo>,
+                    > = ::core::option::Option::None;
+                    let mut __field1: ::core::option::Option<::std::option::Option<RugixBootInfo>> =
+                        ::core::option::Option::None;
+                    let mut __field2: ::core::option::Option<RugixStateManagementInfo> =
+                        ::core::option::Option::None;
+                    let mut __field3: ::core::option::Option<
+                        ::std::option::Option<RugixBakeryBuildInfo>,
+                    > = ::core::option::Option::None;
+                    while let ::core::option::Option::Some(__key) =
+                        __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
+                    {
+                        match __key {
+                            __Identifier::__Identifier0 => {
+                                if ::core::option::Option::is_some(&__field0) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "slots",
+                                        ),
+                                    );
+                                }
+                                __field0 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<
+                                        ::std::collections::HashMap<
+                                            ::std::string::String,
+                                            RugixSlotInfo,
+                                        >,
+                                    >(&mut __map)?,
+                                );
+                            }
+                            __Identifier::__Identifier1 => {
+                                if ::core::option::Option::is_some(&__field1) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field("boot"),
+                                    );
+                                }
+                                __field1 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<
+                                        ::std::option::Option<RugixBootInfo>,
+                                    >(&mut __map)?,
+                                );
+                            }
+                            __Identifier::__Identifier2 => {
+                                if ::core::option::Option::is_some(&__field2) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "state",
+                                        ),
+                                    );
+                                }
+                                __field2 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<RugixStateManagementInfo>(
+                                        &mut __map,
+                                    )?,
+                                );
+                            }
+                            __Identifier::__Identifier3 => {
+                                if ::core::option::Option::is_some(&__field3) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "build",
+                                        ),
+                                    );
+                                }
+                                __field3 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<
+                                        ::std::option::Option<RugixBakeryBuildInfo>,
+                                    >(&mut __map)?,
+                                );
+                            }
+                            _ => {
+                                __serde::de::MapAccess::next_value::<__serde::de::IgnoredAny>(
+                                    &mut __map,
+                                )?;
+                            }
+                        }
+                    }
+                    let __field0 = match __field0 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                <__A::Error as __serde::de::Error>::missing_field("slots"),
+                            );
+                        }
+                    };
+                    let __field1 = match __field1 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => ::core::option::Option::None,
+                    };
+                    let __field2 = match __field2 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                <__A::Error as __serde::de::Error>::missing_field("state"),
+                            );
+                        }
+                    };
+                    let __field3 = match __field3 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => ::core::option::Option::None,
+                    };
+                    ::core::result::Result::Ok(RugixSystemInfo {
+                        slots: __field0,
+                        boot: __field1,
+                        state: __field2,
+                        build: __field3,
+                    })
+                }
+            }
+            #[doc(hidden)]
+            const __FIELDS: &'static [&'static str] = &["slots", "boot", "state", "build"];
+            __serde::Deserializer::deserialize_struct(
+                __deserializer,
+                "RugixSystemInfo",
+                __FIELDS,
+                __Visitor {
+                    __phantom_vars: ::core::marker::PhantomData,
+                },
+            )
+        }
+    }
+    #[doc = "Information about a Rugix update slot.\n"]
+    #[derive(Clone, Debug)]
+    pub struct RugixSlotInfo {
+        #[doc = "Indicates whether the slot is active, i.e., in use.\n"]
+        pub active: ::std::option::Option<bool>,
+        #[doc = "Hashes of the slot data according to the slot database.\n"]
+        pub hashes: ::std::option::Option<
+            ::std::collections::HashMap<::std::string::String, ::std::string::String>,
+        >,
+        #[doc = "Size of the slot data according to the slot database.\n"]
+        pub size: ::std::option::Option<u64>,
+        #[doc = "Last time the slot has been updated according to the slot database.\n"]
+        pub updated_at: ::std::option::Option<::std::string::String>,
+    }
+    impl RugixSlotInfo {
+        #[doc = "Creates a new [`RugixSlotInfo`]."]
+        pub fn new() -> Self {
+            Self {
+                active: ::std::default::Default::default(),
+                hashes: ::std::default::Default::default(),
+                size: ::std::default::Default::default(),
+                updated_at: ::std::default::Default::default(),
+            }
+        }
+        #[doc = "Sets the value of `active`."]
+        pub fn set_active(&mut self, active: ::std::option::Option<bool>) -> &mut Self {
+            self.active = active;
+            self
+        }
+        #[doc = "Sets the value of `active`."]
+        pub fn with_active(mut self, active: ::std::option::Option<bool>) -> Self {
+            self.active = active;
+            self
+        }
+        #[doc = "Sets the value of `hashes`."]
+        pub fn set_hashes(
+            &mut self,
+            hashes: ::std::option::Option<
+                ::std::collections::HashMap<::std::string::String, ::std::string::String>,
+            >,
+        ) -> &mut Self {
+            self.hashes = hashes;
+            self
+        }
+        #[doc = "Sets the value of `hashes`."]
+        pub fn with_hashes(
+            mut self,
+            hashes: ::std::option::Option<
+                ::std::collections::HashMap<::std::string::String, ::std::string::String>,
+            >,
+        ) -> Self {
+            self.hashes = hashes;
+            self
+        }
+        #[doc = "Sets the value of `size`."]
+        pub fn set_size(&mut self, size: ::std::option::Option<u64>) -> &mut Self {
+            self.size = size;
+            self
+        }
+        #[doc = "Sets the value of `size`."]
+        pub fn with_size(mut self, size: ::std::option::Option<u64>) -> Self {
+            self.size = size;
+            self
+        }
+        #[doc = "Sets the value of `updated_at`."]
+        pub fn set_updated_at(
+            &mut self,
+            updated_at: ::std::option::Option<::std::string::String>,
+        ) -> &mut Self {
+            self.updated_at = updated_at;
+            self
+        }
+        #[doc = "Sets the value of `updated_at`."]
+        pub fn with_updated_at(
+            mut self,
+            updated_at: ::std::option::Option<::std::string::String>,
+        ) -> Self {
+            self.updated_at = updated_at;
+            self
+        }
+    }
+    impl ::std::default::Default for RugixSlotInfo {
+        fn default() -> Self {
+            Self::new()
+        }
+    }
+    #[automatically_derived]
+    impl __serde::Serialize for RugixSlotInfo {
+        fn serialize<__S: __serde::Serializer>(
+            &self,
+            __serializer: __S,
+        ) -> ::std::result::Result<__S::Ok, __S::Error> {
+            let mut __record =
+                __sidex_serde::ser::RecordSerializer::new(__serializer, "RugixSlotInfo", 4usize)?;
+            __record
+                .serialize_optional_field("active", ::core::option::Option::as_ref(&self.active))?;
+            __record
+                .serialize_optional_field("hashes", ::core::option::Option::as_ref(&self.hashes))?;
+            __record
+                .serialize_optional_field("size", ::core::option::Option::as_ref(&self.size))?;
+            __record.serialize_optional_field(
+                "updatedAt",
+                ::core::option::Option::as_ref(&self.updated_at),
+            )?;
+            __record.end()
+        }
+    }
+    #[automatically_derived]
+    impl<'de> __serde::Deserialize<'de> for RugixSlotInfo {
+        fn deserialize<__D: __serde::Deserializer<'de>>(
+            __deserializer: __D,
+        ) -> ::std::result::Result<Self, __D::Error> {
+            #[doc(hidden)]
+            struct __Visitor {
+                __phantom_vars: ::core::marker::PhantomData<fn(&())>,
+            }
+            impl<'de> __serde::de::Visitor<'de> for __Visitor {
+                type Value = RugixSlotInfo;
+                fn expecting(
+                    &self,
+                    __formatter: &mut ::core::fmt::Formatter,
+                ) -> ::core::fmt::Result {
+                    ::core::fmt::Formatter::write_str(__formatter, "record RugixSlotInfo")
+                }
+                #[inline]
+                fn visit_seq<__A>(
+                    self,
+                    mut __seq: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::SeqAccess<'de>,
+                {
+                    let __field0 = match __serde::de::SeqAccess::next_element::<
+                        ::std::option::Option<bool>,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(0usize, &"record with 4 fields"),
+                            );
+                        }
+                    };
+                    let __field1 = match __serde::de::SeqAccess::next_element::<
+                        ::std::option::Option<
+                            ::std::collections::HashMap<
+                                ::std::string::String,
+                                ::std::string::String,
+                            >,
+                        >,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(1usize, &"record with 4 fields"),
+                            );
+                        }
+                    };
+                    let __field2 = match __serde::de::SeqAccess::next_element::<
+                        ::std::option::Option<u64>,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(2usize, &"record with 4 fields"),
+                            );
+                        }
+                    };
+                    let __field3 = match __serde::de::SeqAccess::next_element::<
+                        ::std::option::Option<::std::string::String>,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(3usize, &"record with 4 fields"),
+                            );
+                        }
+                    };
+                    ::core::result::Result::Ok(RugixSlotInfo {
+                        active: __field0,
+                        hashes: __field1,
+                        size: __field2,
+                        updated_at: __field3,
+                    })
+                }
+                #[inline]
+                fn visit_map<__A>(
+                    self,
+                    mut __map: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::MapAccess<'de>,
+                {
+                    #[doc(hidden)]
+                    const __IDENTIFIERS: &'static [&'static str] =
+                        &["active", "hashes", "size", "updatedAt"];
+                    #[doc(hidden)]
+                    const __EXPECTING_IDENTIFIERS: &'static str =
+                        "an identifier in [\"active\", \"hashes\", \"size\", \"updatedAt\"]";
+                    #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
+                    #[doc(hidden)]
+                    enum __Identifier {
+                        __Identifier0,
+                        __Identifier1,
+                        __Identifier2,
+                        __Identifier3,
+                        __Unknown,
+                    }
+                    #[doc(hidden)]
+                    struct __IdentifierVisitor;
+                    impl<'de> __serde::de::Visitor<'de> for __IdentifierVisitor {
+                        type Value = __Identifier;
+                        fn expecting(
+                            &self,
+                            __formatter: &mut ::core::fmt::Formatter,
+                        ) -> ::core::fmt::Result {
+                            ::core::fmt::Formatter::write_str(__formatter, __EXPECTING_IDENTIFIERS)
+                        }
+                        fn visit_u64<__E>(
+                            self,
+                            __value: u64,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                0u64 => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                                1u64 => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                                2u64 => ::core::result::Result::Ok(__Identifier::__Identifier2),
+                                3u64 => ::core::result::Result::Ok(__Identifier::__Identifier3),
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_str<__E>(
+                            self,
+                            __value: &str,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                "active" => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                                "hashes" => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                                "size" => ::core::result::Result::Ok(__Identifier::__Identifier2),
+                                "updatedAt" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier3)
+                                }
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_bytes<__E>(
+                            self,
+                            __value: &[u8],
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                b"active" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
+                                }
+                                b"hashes" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier1)
+                                }
+                                b"size" => ::core::result::Result::Ok(__Identifier::__Identifier2),
+                                b"updatedAt" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier3)
+                                }
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                    }
+                    impl<'de> __serde::Deserialize<'de> for __Identifier {
+                        #[inline]
+                        fn deserialize<__D>(
+                            __deserializer: __D,
+                        ) -> ::core::result::Result<Self, __D::Error>
+                        where
+                            __D: __serde::Deserializer<'de>,
+                        {
+                            __serde::Deserializer::deserialize_identifier(
+                                __deserializer,
+                                __IdentifierVisitor,
+                            )
+                        }
+                    }
+                    let mut __field0: ::core::option::Option<::std::option::Option<bool>> =
+                        ::core::option::Option::None;
+                    let mut __field1: ::core::option::Option<
+                        ::std::option::Option<
+                            ::std::collections::HashMap<
+                                ::std::string::String,
+                                ::std::string::String,
+                            >,
+                        >,
+                    > = ::core::option::Option::None;
+                    let mut __field2: ::core::option::Option<::std::option::Option<u64>> =
+                        ::core::option::Option::None;
+                    let mut __field3: ::core::option::Option<
+                        ::std::option::Option<::std::string::String>,
+                    > = ::core::option::Option::None;
+                    while let ::core::option::Option::Some(__key) =
+                        __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
+                    {
+                        match __key {
+                            __Identifier::__Identifier0 => {
+                                if ::core::option::Option::is_some(&__field0) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "active",
+                                        ),
+                                    );
+                                }
+                                __field0 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<
+                                        ::std::option::Option<bool>,
+                                    >(&mut __map)?,
+                                );
+                            }
+                            __Identifier::__Identifier1 => {
+                                if ::core::option::Option::is_some(&__field1) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "hashes",
+                                        ),
+                                    );
+                                }
+                                __field1 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<
+                                        ::std::option::Option<
+                                            ::std::collections::HashMap<
+                                                ::std::string::String,
+                                                ::std::string::String,
+                                            >,
+                                        >,
+                                    >(&mut __map)?,
+                                );
+                            }
+                            __Identifier::__Identifier2 => {
+                                if ::core::option::Option::is_some(&__field2) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field("size"),
+                                    );
+                                }
+                                __field2 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<::std::option::Option<u64>>(
+                                        &mut __map,
+                                    )?,
+                                );
+                            }
+                            __Identifier::__Identifier3 => {
+                                if ::core::option::Option::is_some(&__field3) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "updatedAt",
+                                        ),
+                                    );
+                                }
+                                __field3 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<
+                                        ::std::option::Option<::std::string::String>,
+                                    >(&mut __map)?,
+                                );
+                            }
+                            _ => {
+                                __serde::de::MapAccess::next_value::<__serde::de::IgnoredAny>(
+                                    &mut __map,
+                                )?;
+                            }
+                        }
+                    }
+                    let __field0 = match __field0 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => ::core::option::Option::None,
+                    };
+                    let __field1 = match __field1 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => ::core::option::Option::None,
+                    };
+                    let __field2 = match __field2 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => ::core::option::Option::None,
+                    };
+                    let __field3 = match __field3 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => ::core::option::Option::None,
+                    };
+                    ::core::result::Result::Ok(RugixSlotInfo {
+                        active: __field0,
+                        hashes: __field1,
+                        size: __field2,
+                        updated_at: __field3,
+                    })
+                }
+            }
+            #[doc(hidden)]
+            const __FIELDS: &'static [&'static str] = &["active", "hashes", "size", "updatedAt"];
+            __serde::Deserializer::deserialize_struct(
+                __deserializer,
+                "RugixSlotInfo",
+                __FIELDS,
+                __Visitor {
+                    __phantom_vars: ::core::marker::PhantomData,
+                },
+            )
+        }
+    }
+    #[doc = "Rugix-specific boot information.\n"]
+    #[derive(Clone, Debug)]
+    pub struct RugixBootInfo {
+        #[doc = "Name of the boot flow.\n"]
+        pub boot_flow: ::std::string::String,
+        #[doc = "Active boot group.\n"]
+        pub active_group: ::std::option::Option<::std::string::String>,
+        #[doc = "Default boot group.\n"]
+        pub default_group: ::std::option::Option<::std::string::String>,
+        #[doc = "Information about the boot groups.\n"]
+        pub groups: ::std::collections::HashMap<::std::string::String, RugixBootGroupInfo>,
+    }
+    impl RugixBootInfo {
+        #[doc = "Creates a new [`RugixBootInfo`]."]
+        pub fn new(
+            boot_flow: ::std::string::String,
+            groups: ::std::collections::HashMap<::std::string::String, RugixBootGroupInfo>,
+        ) -> Self {
+            Self {
+                boot_flow,
+                groups,
+                active_group: ::std::default::Default::default(),
+                default_group: ::std::default::Default::default(),
+            }
+        }
+        #[doc = "Sets the value of `boot_flow`."]
+        pub fn set_boot_flow(&mut self, boot_flow: ::std::string::String) -> &mut Self {
+            self.boot_flow = boot_flow;
+            self
+        }
+        #[doc = "Sets the value of `boot_flow`."]
+        pub fn with_boot_flow(mut self, boot_flow: ::std::string::String) -> Self {
+            self.boot_flow = boot_flow;
+            self
+        }
+        #[doc = "Sets the value of `active_group`."]
+        pub fn set_active_group(
+            &mut self,
+            active_group: ::std::option::Option<::std::string::String>,
+        ) -> &mut Self {
+            self.active_group = active_group;
+            self
+        }
+        #[doc = "Sets the value of `active_group`."]
+        pub fn with_active_group(
+            mut self,
+            active_group: ::std::option::Option<::std::string::String>,
+        ) -> Self {
+            self.active_group = active_group;
+            self
+        }
+        #[doc = "Sets the value of `default_group`."]
+        pub fn set_default_group(
+            &mut self,
+            default_group: ::std::option::Option<::std::string::String>,
+        ) -> &mut Self {
+            self.default_group = default_group;
+            self
+        }
+        #[doc = "Sets the value of `default_group`."]
+        pub fn with_default_group(
+            mut self,
+            default_group: ::std::option::Option<::std::string::String>,
+        ) -> Self {
+            self.default_group = default_group;
+            self
+        }
+        #[doc = "Sets the value of `groups`."]
+        pub fn set_groups(
+            &mut self,
+            groups: ::std::collections::HashMap<::std::string::String, RugixBootGroupInfo>,
+        ) -> &mut Self {
+            self.groups = groups;
+            self
+        }
+        #[doc = "Sets the value of `groups`."]
+        pub fn with_groups(
+            mut self,
+            groups: ::std::collections::HashMap<::std::string::String, RugixBootGroupInfo>,
+        ) -> Self {
+            self.groups = groups;
+            self
+        }
+    }
+    #[automatically_derived]
+    impl __serde::Serialize for RugixBootInfo {
+        fn serialize<__S: __serde::Serializer>(
+            &self,
+            __serializer: __S,
+        ) -> ::std::result::Result<__S::Ok, __S::Error> {
+            let mut __record =
+                __sidex_serde::ser::RecordSerializer::new(__serializer, "RugixBootInfo", 4usize)?;
+            __record.serialize_field("bootFlow", &self.boot_flow)?;
+            __record.serialize_optional_field(
+                "activeGroup",
+                ::core::option::Option::as_ref(&self.active_group),
+            )?;
+            __record.serialize_optional_field(
+                "defaultGroup",
+                ::core::option::Option::as_ref(&self.default_group),
+            )?;
+            __record.serialize_field("groups", &self.groups)?;
+            __record.end()
+        }
+    }
+    #[automatically_derived]
+    impl<'de> __serde::Deserialize<'de> for RugixBootInfo {
+        fn deserialize<__D: __serde::Deserializer<'de>>(
+            __deserializer: __D,
+        ) -> ::std::result::Result<Self, __D::Error> {
+            #[doc(hidden)]
+            struct __Visitor {
+                __phantom_vars: ::core::marker::PhantomData<fn(&())>,
+            }
+            impl<'de> __serde::de::Visitor<'de> for __Visitor {
+                type Value = RugixBootInfo;
+                fn expecting(
+                    &self,
+                    __formatter: &mut ::core::fmt::Formatter,
+                ) -> ::core::fmt::Result {
+                    ::core::fmt::Formatter::write_str(__formatter, "record RugixBootInfo")
+                }
+                #[inline]
+                fn visit_seq<__A>(
+                    self,
+                    mut __seq: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::SeqAccess<'de>,
+                {
+                    let __field0 = match __serde::de::SeqAccess::next_element::<
+                        ::std::string::String,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(0usize, &"record with 4 fields"),
+                            );
+                        }
+                    };
+                    let __field1 = match __serde::de::SeqAccess::next_element::<
+                        ::std::option::Option<::std::string::String>,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(1usize, &"record with 4 fields"),
+                            );
+                        }
+                    };
+                    let __field2 = match __serde::de::SeqAccess::next_element::<
+                        ::std::option::Option<::std::string::String>,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(2usize, &"record with 4 fields"),
+                            );
+                        }
+                    };
+                    let __field3 = match __serde::de::SeqAccess::next_element::<
+                        ::std::collections::HashMap<::std::string::String, RugixBootGroupInfo>,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(3usize, &"record with 4 fields"),
+                            );
+                        }
+                    };
+                    ::core::result::Result::Ok(RugixBootInfo {
+                        boot_flow: __field0,
+                        active_group: __field1,
+                        default_group: __field2,
+                        groups: __field3,
+                    })
+                }
+                #[inline]
+                fn visit_map<__A>(
+                    self,
+                    mut __map: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::MapAccess<'de>,
+                {
+                    #[doc(hidden)]
+                    const __IDENTIFIERS: &'static [&'static str] =
+                        &["bootFlow", "activeGroup", "defaultGroup", "groups"];
+                    #[doc(hidden)]
+                    const __EXPECTING_IDENTIFIERS: &'static str = "an identifier in [\"bootFlow\", \"activeGroup\", \"defaultGroup\", \"groups\"]";
+                    #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
+                    #[doc(hidden)]
+                    enum __Identifier {
+                        __Identifier0,
+                        __Identifier1,
+                        __Identifier2,
+                        __Identifier3,
+                        __Unknown,
+                    }
+                    #[doc(hidden)]
+                    struct __IdentifierVisitor;
+                    impl<'de> __serde::de::Visitor<'de> for __IdentifierVisitor {
+                        type Value = __Identifier;
+                        fn expecting(
+                            &self,
+                            __formatter: &mut ::core::fmt::Formatter,
+                        ) -> ::core::fmt::Result {
+                            ::core::fmt::Formatter::write_str(__formatter, __EXPECTING_IDENTIFIERS)
+                        }
+                        fn visit_u64<__E>(
+                            self,
+                            __value: u64,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                0u64 => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                                1u64 => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                                2u64 => ::core::result::Result::Ok(__Identifier::__Identifier2),
+                                3u64 => ::core::result::Result::Ok(__Identifier::__Identifier3),
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_str<__E>(
+                            self,
+                            __value: &str,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                "bootFlow" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
+                                }
+                                "activeGroup" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier1)
+                                }
+                                "defaultGroup" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier2)
+                                }
+                                "groups" => ::core::result::Result::Ok(__Identifier::__Identifier3),
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_bytes<__E>(
+                            self,
+                            __value: &[u8],
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                b"bootFlow" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
+                                }
+                                b"activeGroup" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier1)
+                                }
+                                b"defaultGroup" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier2)
+                                }
+                                b"groups" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier3)
+                                }
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                    }
+                    impl<'de> __serde::Deserialize<'de> for __Identifier {
+                        #[inline]
+                        fn deserialize<__D>(
+                            __deserializer: __D,
+                        ) -> ::core::result::Result<Self, __D::Error>
+                        where
+                            __D: __serde::Deserializer<'de>,
+                        {
+                            __serde::Deserializer::deserialize_identifier(
+                                __deserializer,
+                                __IdentifierVisitor,
+                            )
+                        }
+                    }
+                    let mut __field0: ::core::option::Option<::std::string::String> =
+                        ::core::option::Option::None;
+                    let mut __field1: ::core::option::Option<
+                        ::std::option::Option<::std::string::String>,
+                    > = ::core::option::Option::None;
+                    let mut __field2: ::core::option::Option<
+                        ::std::option::Option<::std::string::String>,
+                    > = ::core::option::Option::None;
+                    let mut __field3: ::core::option::Option<
+                        ::std::collections::HashMap<::std::string::String, RugixBootGroupInfo>,
+                    > = ::core::option::Option::None;
+                    while let ::core::option::Option::Some(__key) =
+                        __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
+                    {
+                        match __key {
+                            __Identifier::__Identifier0 => {
+                                if ::core::option::Option::is_some(&__field0) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "bootFlow",
+                                        ),
+                                    );
+                                }
+                                __field0 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<::std::string::String>(
+                                        &mut __map,
+                                    )?,
+                                );
+                            }
+                            __Identifier::__Identifier1 => {
+                                if ::core::option::Option::is_some(&__field1) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "activeGroup",
+                                        ),
+                                    );
+                                }
+                                __field1 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<
+                                        ::std::option::Option<::std::string::String>,
+                                    >(&mut __map)?,
+                                );
+                            }
+                            __Identifier::__Identifier2 => {
+                                if ::core::option::Option::is_some(&__field2) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "defaultGroup",
+                                        ),
+                                    );
+                                }
+                                __field2 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<
+                                        ::std::option::Option<::std::string::String>,
+                                    >(&mut __map)?,
+                                );
+                            }
+                            __Identifier::__Identifier3 => {
+                                if ::core::option::Option::is_some(&__field3) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "groups",
+                                        ),
+                                    );
+                                }
+                                __field3 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<
+                                        ::std::collections::HashMap<
+                                            ::std::string::String,
+                                            RugixBootGroupInfo,
+                                        >,
+                                    >(&mut __map)?,
+                                );
+                            }
+                            _ => {
+                                __serde::de::MapAccess::next_value::<__serde::de::IgnoredAny>(
+                                    &mut __map,
+                                )?;
+                            }
+                        }
+                    }
+                    let __field0 = match __field0 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                <__A::Error as __serde::de::Error>::missing_field("bootFlow"),
+                            );
+                        }
+                    };
+                    let __field1 = match __field1 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => ::core::option::Option::None,
+                    };
+                    let __field2 = match __field2 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => ::core::option::Option::None,
+                    };
+                    let __field3 = match __field3 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                <__A::Error as __serde::de::Error>::missing_field("groups"),
+                            );
+                        }
+                    };
+                    ::core::result::Result::Ok(RugixBootInfo {
+                        boot_flow: __field0,
+                        active_group: __field1,
+                        default_group: __field2,
+                        groups: __field3,
+                    })
+                }
+            }
+            #[doc(hidden)]
+            const __FIELDS: &'static [&'static str] =
+                &["bootFlow", "activeGroup", "defaultGroup", "groups"];
+            __serde::Deserializer::deserialize_struct(
+                __deserializer,
+                "RugixBootInfo",
+                __FIELDS,
+                __Visitor {
+                    __phantom_vars: ::core::marker::PhantomData,
+                },
+            )
+        }
+    }
+    #[doc = "Information about a Rugix boot group.\n"]
+    #[derive(Clone, Debug)]
+    pub struct RugixBootGroupInfo {}
+    impl RugixBootGroupInfo {
+        #[doc = "Creates a new [`RugixBootGroupInfo`]."]
+        pub fn new() -> Self {
+            Self {}
+        }
+    }
+    impl ::std::default::Default for RugixBootGroupInfo {
+        fn default() -> Self {
+            Self::new()
+        }
+    }
+    #[automatically_derived]
+    impl __serde::Serialize for RugixBootGroupInfo {
+        fn serialize<__S: __serde::Serializer>(
+            &self,
+            __serializer: __S,
+        ) -> ::std::result::Result<__S::Ok, __S::Error> {
+            let mut __record = __sidex_serde::ser::RecordSerializer::new(
+                __serializer,
+                "RugixBootGroupInfo",
+                0usize,
+            )?;
+            __record.end()
+        }
+    }
+    #[automatically_derived]
+    impl<'de> __serde::Deserialize<'de> for RugixBootGroupInfo {
+        fn deserialize<__D: __serde::Deserializer<'de>>(
+            __deserializer: __D,
+        ) -> ::std::result::Result<Self, __D::Error> {
+            #[doc(hidden)]
+            struct __Visitor {
+                __phantom_vars: ::core::marker::PhantomData<fn(&())>,
+            }
+            impl<'de> __serde::de::Visitor<'de> for __Visitor {
+                type Value = RugixBootGroupInfo;
+                fn expecting(
+                    &self,
+                    __formatter: &mut ::core::fmt::Formatter,
+                ) -> ::core::fmt::Result {
+                    ::core::fmt::Formatter::write_str(__formatter, "record RugixBootGroupInfo")
+                }
+                #[inline]
+                fn visit_seq<__A>(
+                    self,
+                    mut __seq: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::SeqAccess<'de>,
+                {
+                    ::core::result::Result::Ok(RugixBootGroupInfo {})
+                }
+                #[inline]
+                fn visit_map<__A>(
+                    self,
+                    mut __map: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::MapAccess<'de>,
+                {
+                    #[doc(hidden)]
+                    const __IDENTIFIERS: &'static [&'static str] = &[];
+                    #[doc(hidden)]
+                    const __EXPECTING_IDENTIFIERS: &'static str = "an identifier in []";
+                    #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
+                    #[doc(hidden)]
+                    enum __Identifier {
+                        __Unknown,
+                    }
+                    #[doc(hidden)]
+                    struct __IdentifierVisitor;
+                    impl<'de> __serde::de::Visitor<'de> for __IdentifierVisitor {
+                        type Value = __Identifier;
+                        fn expecting(
+                            &self,
+                            __formatter: &mut ::core::fmt::Formatter,
+                        ) -> ::core::fmt::Result {
+                            ::core::fmt::Formatter::write_str(__formatter, __EXPECTING_IDENTIFIERS)
+                        }
+                        fn visit_u64<__E>(
+                            self,
+                            __value: u64,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_str<__E>(
+                            self,
+                            __value: &str,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_bytes<__E>(
+                            self,
+                            __value: &[u8],
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                    }
+                    impl<'de> __serde::Deserialize<'de> for __Identifier {
+                        #[inline]
+                        fn deserialize<__D>(
+                            __deserializer: __D,
+                        ) -> ::core::result::Result<Self, __D::Error>
+                        where
+                            __D: __serde::Deserializer<'de>,
+                        {
+                            __serde::Deserializer::deserialize_identifier(
+                                __deserializer,
+                                __IdentifierVisitor,
+                            )
+                        }
+                    }
+                    while let ::core::option::Option::Some(__key) =
+                        __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
+                    {
+                        match __key {
+                            _ => {
+                                __serde::de::MapAccess::next_value::<__serde::de::IgnoredAny>(
+                                    &mut __map,
+                                )?;
+                            }
+                        }
+                    }
+                    ::core::result::Result::Ok(RugixBootGroupInfo {})
+                }
+            }
+            #[doc(hidden)]
+            const __FIELDS: &'static [&'static str] = &[];
+            __serde::Deserializer::deserialize_struct(
+                __deserializer,
+                "RugixBootGroupInfo",
+                __FIELDS,
+                __Visitor {
+                    __phantom_vars: ::core::marker::PhantomData,
+                },
+            )
+        }
+    }
+    #[doc = "Information about Rugix's state management mechanism.\n"]
+    #[derive(Clone, Debug)]
+    pub enum RugixStateManagementInfo {
+        #[doc = "State management is disabled.\n"]
+        Disabled,
+        #[doc = "State management is active.\n"]
+        Active(RugixActiveStateManagementInfo),
+        #[doc = "State management is inactive due to an error.\n\nState is stored in memory and will fail to persist even if declared.\n"]
+        Error,
+    }
+    #[automatically_derived]
+    impl __serde::Serialize for RugixStateManagementInfo {
+        fn serialize<__S: __serde::Serializer>(
+            &self,
+            __serializer: __S,
+        ) -> ::std::result::Result<__S::Ok, __S::Error> {
+            let __serializer = __sidex_serde::ser::VariantSerializer::new(
+                __serializer,
+                "RugixStateManagementInfo",
+            );
+            match self {
+                Self::Disabled => __serializer.serialize_internal_tag("status", "Disabled", 0u32),
+                Self::Active(__value) => {
+                    __serializer.serialize_internally_tagged("status", "Active", 1u32, __value)
+                }
+                Self::Error => __serializer.serialize_internal_tag("status", "Error", 2u32),
+            }
+        }
+    }
+    #[automatically_derived]
+    impl<'de> __serde::Deserialize<'de> for RugixStateManagementInfo {
+        fn deserialize<__D: __serde::Deserializer<'de>>(
+            __deserializer: __D,
+        ) -> ::std::result::Result<Self, __D::Error> {
+            #[doc(hidden)]
+            const __IDENTIFIERS: &'static [&'static str] = &["Disabled", "Active", "Error"];
+            #[doc(hidden)]
+            const __EXPECTING_IDENTIFIERS: &'static str =
+                "an identifier in [\"Disabled\", \"Active\", \"Error\"]";
+            #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
+            #[doc(hidden)]
+            enum __Identifier {
+                __Identifier0,
+                __Identifier1,
+                __Identifier2,
+            }
+            #[doc(hidden)]
+            struct __IdentifierVisitor;
+            impl<'de> __serde::de::Visitor<'de> for __IdentifierVisitor {
+                type Value = __Identifier;
+                fn expecting(
+                    &self,
+                    __formatter: &mut ::core::fmt::Formatter,
+                ) -> ::core::fmt::Result {
+                    ::core::fmt::Formatter::write_str(__formatter, __EXPECTING_IDENTIFIERS)
+                }
+                fn visit_u64<__E>(self, __value: u64) -> ::core::result::Result<Self::Value, __E>
+                where
+                    __E: __serde::de::Error,
+                {
+                    match __value {
+                        0u64 => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                        1u64 => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                        2u64 => ::core::result::Result::Ok(__Identifier::__Identifier2),
+                        __variant => {
+                            ::core::result::Result::Err(__serde::de::Error::invalid_value(
+                                __serde::de::Unexpected::Unsigned(__variant),
+                                &__EXPECTING_IDENTIFIERS,
+                            ))
+                        }
+                    }
+                }
+                fn visit_str<__E>(self, __value: &str) -> ::core::result::Result<Self::Value, __E>
+                where
+                    __E: __serde::de::Error,
+                {
+                    match __value {
+                        "Disabled" => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                        "Active" => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                        "Error" => ::core::result::Result::Ok(__Identifier::__Identifier2),
+                        __variant => ::core::result::Result::Err(
+                            __serde::de::Error::unknown_variant(__variant, __IDENTIFIERS),
+                        ),
+                    }
+                }
+                fn visit_bytes<__E>(
+                    self,
+                    __value: &[u8],
+                ) -> ::core::result::Result<Self::Value, __E>
+                where
+                    __E: __serde::de::Error,
+                {
+                    match __value {
+                        b"Disabled" => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                        b"Active" => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                        b"Error" => ::core::result::Result::Ok(__Identifier::__Identifier2),
+                        __variant => {
+                            ::core::result::Result::Err(__serde::de::Error::invalid_value(
+                                __serde::de::Unexpected::Bytes(__variant),
+                                &__EXPECTING_IDENTIFIERS,
+                            ))
+                        }
+                    }
+                }
+            }
+            impl<'de> __serde::Deserialize<'de> for __Identifier {
+                #[inline]
+                fn deserialize<__D>(__deserializer: __D) -> ::core::result::Result<Self, __D::Error>
+                where
+                    __D: __serde::Deserializer<'de>,
+                {
+                    __serde::Deserializer::deserialize_identifier(
+                        __deserializer,
+                        __IdentifierVisitor,
+                    )
+                }
+            }
+            #[doc(hidden)]
+            const __VARIANTS: &'static [&'static str] = &["Disabled", "Active", "Error"];
+            if __serde::Deserializer::is_human_readable(&__deserializer) {
+                let __tagged = __sidex_serde::de::tagged::deserialize_tagged_variant::<
+                    __Identifier,
+                    __D,
+                >(__deserializer, "status")?;
+                match __tagged . tag { __Identifier :: __Identifier0 => { :: core :: result :: Result :: Ok (RugixStateManagementInfo :: Disabled) } , __Identifier :: __Identifier1 => { :: core :: result :: Result :: Ok (RugixStateManagementInfo :: Active (__tagged . deserialize_internally_tagged :: < RugixActiveStateManagementInfo < > , __D :: Error > () ?)) } , __Identifier :: __Identifier2 => { :: core :: result :: Result :: Ok (RugixStateManagementInfo :: Error) } , }
+            } else {
+                #[doc(hidden)]
+                struct __Visitor {
+                    __phantom_vars: ::core::marker::PhantomData<fn(&())>,
+                }
+                impl<'de> __serde::de::Visitor<'de> for __Visitor {
+                    type Value = RugixStateManagementInfo;
+                    fn expecting(
+                        &self,
+                        __formatter: &mut ::core::fmt::Formatter,
+                    ) -> ::core::fmt::Result {
+                        ::core::fmt::Formatter::write_str(
+                            __formatter,
+                            "enum RugixStateManagementInfo",
+                        )
+                    }
+                    #[inline]
+                    fn visit_str<__E>(
+                        self,
+                        __value: &str,
+                    ) -> ::core::result::Result<Self::Value, __E>
+                    where
+                        __E: __serde::de::Error,
+                    {
+                        let __identifier = __IdentifierVisitor.visit_str(__value)?;
+                        #[allow(unreachable_patterns)]
+                        match __identifier {
+                            __Identifier::__Identifier0 => {
+                                ::core::result::Result::Ok(RugixStateManagementInfo::Disabled)
+                            }
+                            __Identifier::__Identifier2 => {
+                                ::core::result::Result::Ok(RugixStateManagementInfo::Error)
+                            }
+                            _ => Err(__E::invalid_value(
+                                __serde::de::Unexpected::Str(__value),
+                                &self,
+                            )),
+                        }
+                    }
+                    #[inline]
+                    fn visit_enum<__A>(
+                        self,
+                        __data: __A,
+                    ) -> ::core::result::Result<Self::Value, __A::Error>
+                    where
+                        __A: __serde::de::EnumAccess<'de>,
+                    {
+                        match __serde::de::EnumAccess::variant::<__Identifier>(__data)? {
+                            (__Identifier::__Identifier0, __variant) => {
+                                __serde::de::VariantAccess::unit_variant(__variant)?;
+                                ::core::result::Result::Ok(RugixStateManagementInfo::Disabled)
+                            }
+                            (__Identifier::__Identifier1, __variant) => {
+                                let __value = __serde::de::VariantAccess::newtype_variant::<
+                                    RugixActiveStateManagementInfo,
+                                >(__variant)?;
+                                ::core::result::Result::Ok(RugixStateManagementInfo::Active(
+                                    __value,
+                                ))
+                            }
+                            (__Identifier::__Identifier2, __variant) => {
+                                __serde::de::VariantAccess::unit_variant(__variant)?;
+                                ::core::result::Result::Ok(RugixStateManagementInfo::Error)
+                            }
+                        }
+                    }
+                }
+                __serde::Deserializer::deserialize_enum(
+                    __deserializer,
+                    "RugixStateManagementInfo",
+                    __VARIANTS,
+                    __Visitor {
+                        __phantom_vars: ::core::marker::PhantomData,
+                    },
+                )
+            }
+        }
+    }
+    #[doc = "Information about the state management mechanism, if state management is active.\n"]
+    #[derive(Clone, Debug)]
+    pub struct RugixActiveStateManagementInfo {
+        #[doc = "Device backing the data partition, if any.\n"]
+        pub data_partition: ::std::option::Option<::std::string::String>,
+    }
+    impl RugixActiveStateManagementInfo {
+        #[doc = "Creates a new [`RugixActiveStateManagementInfo`]."]
+        pub fn new() -> Self {
+            Self {
+                data_partition: ::std::default::Default::default(),
+            }
+        }
+        #[doc = "Sets the value of `data_partition`."]
+        pub fn set_data_partition(
+            &mut self,
+            data_partition: ::std::option::Option<::std::string::String>,
+        ) -> &mut Self {
+            self.data_partition = data_partition;
+            self
+        }
+        #[doc = "Sets the value of `data_partition`."]
+        pub fn with_data_partition(
+            mut self,
+            data_partition: ::std::option::Option<::std::string::String>,
+        ) -> Self {
+            self.data_partition = data_partition;
+            self
+        }
+    }
+    impl ::std::default::Default for RugixActiveStateManagementInfo {
+        fn default() -> Self {
+            Self::new()
+        }
+    }
+    #[automatically_derived]
+    impl __serde::Serialize for RugixActiveStateManagementInfo {
+        fn serialize<__S: __serde::Serializer>(
+            &self,
+            __serializer: __S,
+        ) -> ::std::result::Result<__S::Ok, __S::Error> {
+            let mut __record = __sidex_serde::ser::RecordSerializer::new(
+                __serializer,
+                "RugixActiveStateManagementInfo",
+                1usize,
+            )?;
+            __record.serialize_optional_field(
+                "dataPartition",
+                ::core::option::Option::as_ref(&self.data_partition),
+            )?;
+            __record.end()
+        }
+    }
+    #[automatically_derived]
+    impl<'de> __serde::Deserialize<'de> for RugixActiveStateManagementInfo {
+        fn deserialize<__D: __serde::Deserializer<'de>>(
+            __deserializer: __D,
+        ) -> ::std::result::Result<Self, __D::Error> {
+            #[doc(hidden)]
+            struct __Visitor {
+                __phantom_vars: ::core::marker::PhantomData<fn(&())>,
+            }
+            impl<'de> __serde::de::Visitor<'de> for __Visitor {
+                type Value = RugixActiveStateManagementInfo;
+                fn expecting(
+                    &self,
+                    __formatter: &mut ::core::fmt::Formatter,
+                ) -> ::core::fmt::Result {
+                    ::core::fmt::Formatter::write_str(
+                        __formatter,
+                        "record RugixActiveStateManagementInfo",
+                    )
+                }
+                #[inline]
+                fn visit_seq<__A>(
+                    self,
+                    mut __seq: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::SeqAccess<'de>,
+                {
+                    let __field0 = match __serde::de::SeqAccess::next_element::<
+                        ::std::option::Option<::std::string::String>,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(0usize, &"record with 1 fields"),
+                            );
+                        }
+                    };
+                    ::core::result::Result::Ok(RugixActiveStateManagementInfo {
+                        data_partition: __field0,
+                    })
+                }
+                #[inline]
+                fn visit_map<__A>(
+                    self,
+                    mut __map: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::MapAccess<'de>,
+                {
+                    #[doc(hidden)]
+                    const __IDENTIFIERS: &'static [&'static str] = &["dataPartition"];
+                    #[doc(hidden)]
+                    const __EXPECTING_IDENTIFIERS: &'static str =
+                        "an identifier in [\"dataPartition\"]";
+                    #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
+                    #[doc(hidden)]
+                    enum __Identifier {
+                        __Identifier0,
+                        __Unknown,
+                    }
+                    #[doc(hidden)]
+                    struct __IdentifierVisitor;
+                    impl<'de> __serde::de::Visitor<'de> for __IdentifierVisitor {
+                        type Value = __Identifier;
+                        fn expecting(
+                            &self,
+                            __formatter: &mut ::core::fmt::Formatter,
+                        ) -> ::core::fmt::Result {
+                            ::core::fmt::Formatter::write_str(__formatter, __EXPECTING_IDENTIFIERS)
+                        }
+                        fn visit_u64<__E>(
+                            self,
+                            __value: u64,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                0u64 => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_str<__E>(
+                            self,
+                            __value: &str,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                "dataPartition" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
+                                }
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_bytes<__E>(
+                            self,
+                            __value: &[u8],
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                b"dataPartition" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
+                                }
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                    }
+                    impl<'de> __serde::Deserialize<'de> for __Identifier {
+                        #[inline]
+                        fn deserialize<__D>(
+                            __deserializer: __D,
+                        ) -> ::core::result::Result<Self, __D::Error>
+                        where
+                            __D: __serde::Deserializer<'de>,
+                        {
+                            __serde::Deserializer::deserialize_identifier(
+                                __deserializer,
+                                __IdentifierVisitor,
+                            )
+                        }
+                    }
+                    let mut __field0: ::core::option::Option<
+                        ::std::option::Option<::std::string::String>,
+                    > = ::core::option::Option::None;
+                    while let ::core::option::Option::Some(__key) =
+                        __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
+                    {
+                        match __key {
+                            __Identifier::__Identifier0 => {
+                                if ::core::option::Option::is_some(&__field0) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "dataPartition",
+                                        ),
+                                    );
+                                }
+                                __field0 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<
+                                        ::std::option::Option<::std::string::String>,
+                                    >(&mut __map)?,
+                                );
+                            }
+                            _ => {
+                                __serde::de::MapAccess::next_value::<__serde::de::IgnoredAny>(
+                                    &mut __map,
+                                )?;
+                            }
+                        }
+                    }
+                    let __field0 = match __field0 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => ::core::option::Option::None,
+                    };
+                    ::core::result::Result::Ok(RugixActiveStateManagementInfo {
+                        data_partition: __field0,
+                    })
+                }
+            }
+            #[doc(hidden)]
+            const __FIELDS: &'static [&'static str] = &["dataPartition"];
+            __serde::Deserializer::deserialize_struct(
+                __deserializer,
+                "RugixActiveStateManagementInfo",
+                __FIELDS,
+                __Visitor {
+                    __phantom_vars: ::core::marker::PhantomData,
+                },
+            )
+        }
+    }
+    #[doc = "Rugix Bakery build information.\n"]
+    #[derive(Clone, Debug)]
+    pub struct RugixBakeryBuildInfo {
+        #[doc = "System name.\n"]
+        pub name: ::std::string::String,
+        #[doc = "Rugix Bakery build release information.\n"]
+        pub release: RugixBakeryReleaseInfo,
+    }
+    impl RugixBakeryBuildInfo {
+        #[doc = "Creates a new [`RugixBakeryBuildInfo`]."]
+        pub fn new(name: ::std::string::String, release: RugixBakeryReleaseInfo) -> Self {
+            Self { name, release }
+        }
+        #[doc = "Sets the value of `name`."]
+        pub fn set_name(&mut self, name: ::std::string::String) -> &mut Self {
+            self.name = name;
+            self
+        }
+        #[doc = "Sets the value of `name`."]
+        pub fn with_name(mut self, name: ::std::string::String) -> Self {
+            self.name = name;
+            self
+        }
+        #[doc = "Sets the value of `release`."]
+        pub fn set_release(&mut self, release: RugixBakeryReleaseInfo) -> &mut Self {
+            self.release = release;
+            self
+        }
+        #[doc = "Sets the value of `release`."]
+        pub fn with_release(mut self, release: RugixBakeryReleaseInfo) -> Self {
+            self.release = release;
+            self
+        }
+    }
+    #[automatically_derived]
+    impl __serde::Serialize for RugixBakeryBuildInfo {
+        fn serialize<__S: __serde::Serializer>(
+            &self,
+            __serializer: __S,
+        ) -> ::std::result::Result<__S::Ok, __S::Error> {
+            let mut __record = __sidex_serde::ser::RecordSerializer::new(
+                __serializer,
+                "RugixBakeryBuildInfo",
+                2usize,
+            )?;
+            __record.serialize_field("name", &self.name)?;
+            __record.serialize_field("release", &self.release)?;
+            __record.end()
+        }
+    }
+    #[automatically_derived]
+    impl<'de> __serde::Deserialize<'de> for RugixBakeryBuildInfo {
+        fn deserialize<__D: __serde::Deserializer<'de>>(
+            __deserializer: __D,
+        ) -> ::std::result::Result<Self, __D::Error> {
+            #[doc(hidden)]
+            struct __Visitor {
+                __phantom_vars: ::core::marker::PhantomData<fn(&())>,
+            }
+            impl<'de> __serde::de::Visitor<'de> for __Visitor {
+                type Value = RugixBakeryBuildInfo;
+                fn expecting(
+                    &self,
+                    __formatter: &mut ::core::fmt::Formatter,
+                ) -> ::core::fmt::Result {
+                    ::core::fmt::Formatter::write_str(__formatter, "record RugixBakeryBuildInfo")
+                }
+                #[inline]
+                fn visit_seq<__A>(
+                    self,
+                    mut __seq: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::SeqAccess<'de>,
+                {
+                    let __field0 = match __serde::de::SeqAccess::next_element::<
+                        ::std::string::String,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(0usize, &"record with 2 fields"),
+                            );
+                        }
+                    };
+                    let __field1 = match __serde::de::SeqAccess::next_element::<
+                        RugixBakeryReleaseInfo,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(1usize, &"record with 2 fields"),
+                            );
+                        }
+                    };
+                    ::core::result::Result::Ok(RugixBakeryBuildInfo {
+                        name: __field0,
+                        release: __field1,
+                    })
+                }
+                #[inline]
+                fn visit_map<__A>(
+                    self,
+                    mut __map: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::MapAccess<'de>,
+                {
+                    #[doc(hidden)]
+                    const __IDENTIFIERS: &'static [&'static str] = &["name", "release"];
+                    #[doc(hidden)]
+                    const __EXPECTING_IDENTIFIERS: &'static str =
+                        "an identifier in [\"name\", \"release\"]";
+                    #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
+                    #[doc(hidden)]
+                    enum __Identifier {
+                        __Identifier0,
+                        __Identifier1,
+                        __Unknown,
+                    }
+                    #[doc(hidden)]
+                    struct __IdentifierVisitor;
+                    impl<'de> __serde::de::Visitor<'de> for __IdentifierVisitor {
+                        type Value = __Identifier;
+                        fn expecting(
+                            &self,
+                            __formatter: &mut ::core::fmt::Formatter,
+                        ) -> ::core::fmt::Result {
+                            ::core::fmt::Formatter::write_str(__formatter, __EXPECTING_IDENTIFIERS)
+                        }
+                        fn visit_u64<__E>(
+                            self,
+                            __value: u64,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                0u64 => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                                1u64 => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_str<__E>(
+                            self,
+                            __value: &str,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                "name" => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                                "release" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier1)
+                                }
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_bytes<__E>(
+                            self,
+                            __value: &[u8],
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                b"name" => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                                b"release" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier1)
+                                }
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                    }
+                    impl<'de> __serde::Deserialize<'de> for __Identifier {
+                        #[inline]
+                        fn deserialize<__D>(
+                            __deserializer: __D,
+                        ) -> ::core::result::Result<Self, __D::Error>
+                        where
+                            __D: __serde::Deserializer<'de>,
+                        {
+                            __serde::Deserializer::deserialize_identifier(
+                                __deserializer,
+                                __IdentifierVisitor,
+                            )
+                        }
+                    }
+                    let mut __field0: ::core::option::Option<::std::string::String> =
+                        ::core::option::Option::None;
+                    let mut __field1: ::core::option::Option<RugixBakeryReleaseInfo> =
+                        ::core::option::Option::None;
+                    while let ::core::option::Option::Some(__key) =
+                        __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
+                    {
+                        match __key {
+                            __Identifier::__Identifier0 => {
+                                if ::core::option::Option::is_some(&__field0) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field("name"),
+                                    );
+                                }
+                                __field0 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<::std::string::String>(
+                                        &mut __map,
+                                    )?,
+                                );
+                            }
+                            __Identifier::__Identifier1 => {
+                                if ::core::option::Option::is_some(&__field1) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "release",
+                                        ),
+                                    );
+                                }
+                                __field1 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<RugixBakeryReleaseInfo>(
+                                        &mut __map,
+                                    )?,
+                                );
+                            }
+                            _ => {
+                                __serde::de::MapAccess::next_value::<__serde::de::IgnoredAny>(
+                                    &mut __map,
+                                )?;
+                            }
+                        }
+                    }
+                    let __field0 = match __field0 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                <__A::Error as __serde::de::Error>::missing_field("name"),
+                            );
+                        }
+                    };
+                    let __field1 = match __field1 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                <__A::Error as __serde::de::Error>::missing_field("release"),
+                            );
+                        }
+                    };
+                    ::core::result::Result::Ok(RugixBakeryBuildInfo {
+                        name: __field0,
+                        release: __field1,
+                    })
+                }
+            }
+            #[doc(hidden)]
+            const __FIELDS: &'static [&'static str] = &["name", "release"];
+            __serde::Deserializer::deserialize_struct(
+                __deserializer,
+                "RugixBakeryBuildInfo",
+                __FIELDS,
+                __Visitor {
+                    __phantom_vars: ::core::marker::PhantomData,
+                },
+            )
+        }
+    }
+    #[doc = "Rugix Bakery build release information.\n"]
+    #[derive(Clone, Debug)]
+    pub struct RugixBakeryReleaseInfo {
+        #[doc = "Release ID.\n"]
+        pub id: ::std::string::String,
+        #[doc = "Release version.\n"]
+        pub version: ::std::string::String,
+    }
+    impl RugixBakeryReleaseInfo {
+        #[doc = "Creates a new [`RugixBakeryReleaseInfo`]."]
+        pub fn new(id: ::std::string::String, version: ::std::string::String) -> Self {
+            Self { id, version }
+        }
+        #[doc = "Sets the value of `id`."]
+        pub fn set_id(&mut self, id: ::std::string::String) -> &mut Self {
+            self.id = id;
+            self
+        }
+        #[doc = "Sets the value of `id`."]
+        pub fn with_id(mut self, id: ::std::string::String) -> Self {
+            self.id = id;
+            self
+        }
+        #[doc = "Sets the value of `version`."]
+        pub fn set_version(&mut self, version: ::std::string::String) -> &mut Self {
+            self.version = version;
+            self
+        }
+        #[doc = "Sets the value of `version`."]
+        pub fn with_version(mut self, version: ::std::string::String) -> Self {
+            self.version = version;
+            self
+        }
+    }
+    #[automatically_derived]
+    impl __serde::Serialize for RugixBakeryReleaseInfo {
+        fn serialize<__S: __serde::Serializer>(
+            &self,
+            __serializer: __S,
+        ) -> ::std::result::Result<__S::Ok, __S::Error> {
+            let mut __record = __sidex_serde::ser::RecordSerializer::new(
+                __serializer,
+                "RugixBakeryReleaseInfo",
+                2usize,
+            )?;
+            __record.serialize_field("id", &self.id)?;
+            __record.serialize_field("version", &self.version)?;
+            __record.end()
+        }
+    }
+    #[automatically_derived]
+    impl<'de> __serde::Deserialize<'de> for RugixBakeryReleaseInfo {
+        fn deserialize<__D: __serde::Deserializer<'de>>(
+            __deserializer: __D,
+        ) -> ::std::result::Result<Self, __D::Error> {
+            #[doc(hidden)]
+            struct __Visitor {
+                __phantom_vars: ::core::marker::PhantomData<fn(&())>,
+            }
+            impl<'de> __serde::de::Visitor<'de> for __Visitor {
+                type Value = RugixBakeryReleaseInfo;
+                fn expecting(
+                    &self,
+                    __formatter: &mut ::core::fmt::Formatter,
+                ) -> ::core::fmt::Result {
+                    ::core::fmt::Formatter::write_str(__formatter, "record RugixBakeryReleaseInfo")
+                }
+                #[inline]
+                fn visit_seq<__A>(
+                    self,
+                    mut __seq: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::SeqAccess<'de>,
+                {
+                    let __field0 = match __serde::de::SeqAccess::next_element::<
+                        ::std::string::String,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(0usize, &"record with 2 fields"),
+                            );
+                        }
+                    };
+                    let __field1 = match __serde::de::SeqAccess::next_element::<
+                        ::std::string::String,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(1usize, &"record with 2 fields"),
+                            );
+                        }
+                    };
+                    ::core::result::Result::Ok(RugixBakeryReleaseInfo {
+                        id: __field0,
+                        version: __field1,
+                    })
+                }
+                #[inline]
+                fn visit_map<__A>(
+                    self,
+                    mut __map: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::MapAccess<'de>,
+                {
+                    #[doc(hidden)]
+                    const __IDENTIFIERS: &'static [&'static str] = &["id", "version"];
+                    #[doc(hidden)]
+                    const __EXPECTING_IDENTIFIERS: &'static str =
+                        "an identifier in [\"id\", \"version\"]";
+                    #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
+                    #[doc(hidden)]
+                    enum __Identifier {
+                        __Identifier0,
+                        __Identifier1,
+                        __Unknown,
+                    }
+                    #[doc(hidden)]
+                    struct __IdentifierVisitor;
+                    impl<'de> __serde::de::Visitor<'de> for __IdentifierVisitor {
+                        type Value = __Identifier;
+                        fn expecting(
+                            &self,
+                            __formatter: &mut ::core::fmt::Formatter,
+                        ) -> ::core::fmt::Result {
+                            ::core::fmt::Formatter::write_str(__formatter, __EXPECTING_IDENTIFIERS)
+                        }
+                        fn visit_u64<__E>(
+                            self,
+                            __value: u64,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                0u64 => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                                1u64 => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_str<__E>(
+                            self,
+                            __value: &str,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                "id" => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                                "version" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier1)
+                                }
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_bytes<__E>(
+                            self,
+                            __value: &[u8],
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                b"id" => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                                b"version" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier1)
+                                }
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                    }
+                    impl<'de> __serde::Deserialize<'de> for __Identifier {
+                        #[inline]
+                        fn deserialize<__D>(
+                            __deserializer: __D,
+                        ) -> ::core::result::Result<Self, __D::Error>
+                        where
+                            __D: __serde::Deserializer<'de>,
+                        {
+                            __serde::Deserializer::deserialize_identifier(
+                                __deserializer,
+                                __IdentifierVisitor,
+                            )
+                        }
+                    }
+                    let mut __field0: ::core::option::Option<::std::string::String> =
+                        ::core::option::Option::None;
+                    let mut __field1: ::core::option::Option<::std::string::String> =
+                        ::core::option::Option::None;
+                    while let ::core::option::Option::Some(__key) =
+                        __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
+                    {
+                        match __key {
+                            __Identifier::__Identifier0 => {
+                                if ::core::option::Option::is_some(&__field0) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field("id"),
+                                    );
+                                }
+                                __field0 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<::std::string::String>(
+                                        &mut __map,
+                                    )?,
+                                );
+                            }
+                            __Identifier::__Identifier1 => {
+                                if ::core::option::Option::is_some(&__field1) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "version",
+                                        ),
+                                    );
+                                }
+                                __field1 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<::std::string::String>(
+                                        &mut __map,
+                                    )?,
+                                );
+                            }
+                            _ => {
+                                __serde::de::MapAccess::next_value::<__serde::de::IgnoredAny>(
+                                    &mut __map,
+                                )?;
+                            }
+                        }
+                    }
+                    let __field0 = match __field0 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                <__A::Error as __serde::de::Error>::missing_field("id"),
+                            );
+                        }
+                    };
+                    let __field1 = match __field1 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                <__A::Error as __serde::de::Error>::missing_field("version"),
+                            );
+                        }
+                    };
+                    ::core::result::Result::Ok(RugixBakeryReleaseInfo {
+                        id: __field0,
+                        version: __field1,
+                    })
+                }
+            }
+            #[doc(hidden)]
+            const __FIELDS: &'static [&'static str] = &["id", "version"];
+            __serde::Deserializer::deserialize_struct(
+                __deserializer,
+                "RugixBakeryReleaseInfo",
+                __FIELDS,
+                __Visitor {
+                    __phantom_vars: ::core::marker::PhantomData,
+                },
+            )
+        }
+    }
+    #[doc = "Yocto-specific system information.\n"]
+    #[derive(Clone, Debug)]
+    pub struct YoctoSystemInfo {
+        #[doc = "Build information key-value pairs read from `/etc/buildinfo`.\n"]
+        pub build_info: ::std::collections::HashMap<::std::string::String, ::std::string::String>,
+    }
+    impl YoctoSystemInfo {
+        #[doc = "Creates a new [`YoctoSystemInfo`]."]
+        pub fn new(
+            build_info: ::std::collections::HashMap<::std::string::String, ::std::string::String>,
+        ) -> Self {
+            Self { build_info }
+        }
+        #[doc = "Sets the value of `build_info`."]
+        pub fn set_build_info(
+            &mut self,
+            build_info: ::std::collections::HashMap<::std::string::String, ::std::string::String>,
+        ) -> &mut Self {
+            self.build_info = build_info;
+            self
+        }
+        #[doc = "Sets the value of `build_info`."]
+        pub fn with_build_info(
+            mut self,
+            build_info: ::std::collections::HashMap<::std::string::String, ::std::string::String>,
+        ) -> Self {
+            self.build_info = build_info;
+            self
+        }
+    }
+    #[automatically_derived]
+    impl __serde::Serialize for YoctoSystemInfo {
+        fn serialize<__S: __serde::Serializer>(
+            &self,
+            __serializer: __S,
+        ) -> ::std::result::Result<__S::Ok, __S::Error> {
+            let mut __record =
+                __sidex_serde::ser::RecordSerializer::new(__serializer, "YoctoSystemInfo", 1usize)?;
+            __record.serialize_field("buildInfo", &self.build_info)?;
+            __record.end()
+        }
+    }
+    #[automatically_derived]
+    impl<'de> __serde::Deserialize<'de> for YoctoSystemInfo {
+        fn deserialize<__D: __serde::Deserializer<'de>>(
+            __deserializer: __D,
+        ) -> ::std::result::Result<Self, __D::Error> {
+            #[doc(hidden)]
+            struct __Visitor {
+                __phantom_vars: ::core::marker::PhantomData<fn(&())>,
+            }
+            impl<'de> __serde::de::Visitor<'de> for __Visitor {
+                type Value = YoctoSystemInfo;
+                fn expecting(
+                    &self,
+                    __formatter: &mut ::core::fmt::Formatter,
+                ) -> ::core::fmt::Result {
+                    ::core::fmt::Formatter::write_str(__formatter, "record YoctoSystemInfo")
+                }
+                #[inline]
+                fn visit_seq<__A>(
+                    self,
+                    mut __seq: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::SeqAccess<'de>,
+                {
+                    let __field0 = match __serde::de::SeqAccess::next_element::<
+                        ::std::collections::HashMap<::std::string::String, ::std::string::String>,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(0usize, &"record with 1 fields"),
+                            );
+                        }
+                    };
+                    ::core::result::Result::Ok(YoctoSystemInfo {
+                        build_info: __field0,
+                    })
+                }
+                #[inline]
+                fn visit_map<__A>(
+                    self,
+                    mut __map: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::MapAccess<'de>,
+                {
+                    #[doc(hidden)]
+                    const __IDENTIFIERS: &'static [&'static str] = &["buildInfo"];
+                    #[doc(hidden)]
+                    const __EXPECTING_IDENTIFIERS: &'static str =
+                        "an identifier in [\"buildInfo\"]";
+                    #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
+                    #[doc(hidden)]
+                    enum __Identifier {
+                        __Identifier0,
+                        __Unknown,
+                    }
+                    #[doc(hidden)]
+                    struct __IdentifierVisitor;
+                    impl<'de> __serde::de::Visitor<'de> for __IdentifierVisitor {
+                        type Value = __Identifier;
+                        fn expecting(
+                            &self,
+                            __formatter: &mut ::core::fmt::Formatter,
+                        ) -> ::core::fmt::Result {
+                            ::core::fmt::Formatter::write_str(__formatter, __EXPECTING_IDENTIFIERS)
+                        }
+                        fn visit_u64<__E>(
+                            self,
+                            __value: u64,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                0u64 => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_str<__E>(
+                            self,
+                            __value: &str,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                "buildInfo" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
+                                }
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_bytes<__E>(
+                            self,
+                            __value: &[u8],
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                b"buildInfo" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
+                                }
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                    }
+                    impl<'de> __serde::Deserialize<'de> for __Identifier {
+                        #[inline]
+                        fn deserialize<__D>(
+                            __deserializer: __D,
+                        ) -> ::core::result::Result<Self, __D::Error>
+                        where
+                            __D: __serde::Deserializer<'de>,
+                        {
+                            __serde::Deserializer::deserialize_identifier(
+                                __deserializer,
+                                __IdentifierVisitor,
+                            )
+                        }
+                    }
+                    let mut __field0: ::core::option::Option<
+                        ::std::collections::HashMap<::std::string::String, ::std::string::String>,
+                    > = ::core::option::Option::None;
+                    while let ::core::option::Option::Some(__key) =
+                        __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
+                    {
+                        match __key {
+                            __Identifier::__Identifier0 => {
+                                if ::core::option::Option::is_some(&__field0) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "buildInfo",
+                                        ),
+                                    );
+                                }
+                                __field0 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<
+                                        ::std::collections::HashMap<
+                                            ::std::string::String,
+                                            ::std::string::String,
+                                        >,
+                                    >(&mut __map)?,
+                                );
+                            }
+                            _ => {
+                                __serde::de::MapAccess::next_value::<__serde::de::IgnoredAny>(
+                                    &mut __map,
+                                )?;
+                            }
+                        }
+                    }
+                    let __field0 = match __field0 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                <__A::Error as __serde::de::Error>::missing_field("buildInfo"),
+                            );
+                        }
+                    };
+                    ::core::result::Result::Ok(YoctoSystemInfo {
+                        build_info: __field0,
+                    })
+                }
+            }
+            #[doc(hidden)]
+            const __FIELDS: &'static [&'static str] = &["buildInfo"];
+            __serde::Deserializer::deserialize_struct(
+                __deserializer,
+                "YoctoSystemInfo",
                 __FIELDS,
                 __Visitor {
                     __phantom_vars: ::core::marker::PhantomData,

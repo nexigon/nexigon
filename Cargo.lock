@@ -970,6 +970,7 @@ dependencies = [
  "nexigon-common",
  "nexigon-ids",
  "nexigon-multiplex",
+ "reportify",
  "serde",
  "serde_json",
  "si-observability",
@@ -1559,6 +1560,15 @@ name = "regex-syntax"
 version = "0.8.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7a2d987857b319362043e95f5353c0535c1f58eec5336fdfcf626430af7def58"
+
+[[package]]
+name = "reportify"
+version = "0.1.0"
+source = "git+https://github.com/silitics/si-rust-libs.git#5063cff798f086e06e48af508cbfd69da65ab715"
+dependencies = [
+ "tracing",
+ "tracing-error",
+]
 
 [[package]]
 name = "reqwest"
@@ -2340,6 +2350,16 @@ checksum = "7a04e24fab5c89c6a36eb8558c9656f30d81de51dfa4d3b45f26b21d61fa0a6c"
 dependencies = [
  "once_cell",
  "valuable",
+]
+
+[[package]]
+name = "tracing-error"
+version = "0.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8b1581020d7a273442f5b45074a6a57d5757ad0a47dac0e9f0bd57b81936f3db"
+dependencies = [
+ "tracing",
+ "tracing-subscriber",
 ]
 
 [[package]]

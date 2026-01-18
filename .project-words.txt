@@ -16,9 +16,11 @@ NTRU
 oneshot
 pkcs
 rcgen
+reportify
 repr
 reqwest
 rngs
+Rugix
 rustls
 RUSTSEC
 sidex

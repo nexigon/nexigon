@@ -6391,6 +6391,175 @@
         "required": [],
         "unevaluatedProperties": false
       },
+      "nexigon_api.properties.RugixActiveStateManagementInfo": {
+        "type": "object",
+        "description": "Information about the state management mechanism, if state management is active.",
+        "properties": {
+          "dataPartition": {
+            "type": "string"
+          }
+        },
+        "required": [],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.properties.RugixBakeryBuildInfo": {
+        "type": "object",
+        "description": "Rugix Bakery build information.",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "release": {
+            "$ref": "#/components/schemas/nexigon_api.properties.RugixBakeryReleaseInfo"
+          }
+        },
+        "required": [
+          "name",
+          "release"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.properties.RugixBakeryReleaseInfo": {
+        "type": "object",
+        "description": "Rugix Bakery build release information.",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "version"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.properties.RugixBootGroupInfo": {
+        "type": "object",
+        "description": "Information about a Rugix boot group.",
+        "properties": {},
+        "required": [],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.properties.RugixBootInfo": {
+        "type": "object",
+        "description": "Rugix-specific boot information.",
+        "properties": {
+          "bootFlow": {
+            "type": "string"
+          },
+          "activeGroup": {
+            "type": "string"
+          },
+          "defaultGroup": {
+            "type": "string"
+          },
+          "groups": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/nexigon_api.properties.RugixBootGroupInfo"
+            }
+          }
+        },
+        "required": [
+          "bootFlow",
+          "groups"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.properties.RugixSlotInfo": {
+        "type": "object",
+        "description": "Information about a Rugix update slot.",
+        "properties": {
+          "active": {
+            "type": "boolean"
+          },
+          "hashes": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "size": {
+            "type": "integer",
+            "format": "uint64"
+          },
+          "updatedAt": {
+            "type": "string"
+          }
+        },
+        "required": [],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.properties.RugixStateManagementInfo": {
+        "description": "Information about Rugix's state management mechanism.",
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "status": {
+                "const": "Disabled"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "status": {
+                "const": "Active"
+              },
+              "dataPartition": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "status": {
+                "const": "Error"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          }
+        ]
+      },
+      "nexigon_api.properties.RugixSystemInfo": {
+        "type": "object",
+        "description": "Rugix-specific system information.",
+        "properties": {
+          "slots": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/nexigon_api.properties.RugixSlotInfo"
+            }
+          },
+          "boot": {
+            "$ref": "#/components/schemas/nexigon_api.properties.RugixBootInfo"
+          },
+          "state": {
+            "$ref": "#/components/schemas/nexigon_api.properties.RugixStateManagementInfo"
+          },
+          "build": {
+            "$ref": "#/components/schemas/nexigon_api.properties.RugixBakeryBuildInfo"
+          }
+        },
+        "required": [
+          "slots",
+          "state"
+        ],
+        "unevaluatedProperties": false
+      },
       "nexigon_api.properties.SystemInfo": {
         "type": "object",
         "description": "System information.",
@@ -6430,12 +6599,34 @@
             "items": {
               "$ref": "#/components/schemas/nexigon_api.properties.ExportInfo"
             }
+          },
+          "rugix": {
+            "$ref": "#/components/schemas/nexigon_api.properties.RugixSystemInfo"
+          },
+          "yocto": {
+            "$ref": "#/components/schemas/nexigon_api.properties.YoctoSystemInfo"
           }
         },
         "required": [
           "memory",
           "networks",
           "disks"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.properties.YoctoSystemInfo": {
+        "type": "object",
+        "description": "Yocto-specific system information.",
+        "properties": {
+          "buildInfo": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "buildInfo"
         ],
         "unevaluatedProperties": false
       },
