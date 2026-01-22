@@ -11,7 +11,7 @@ VERSION=${VERSION:-"latest"}
 # Indicates whether to use the MUSL version of the agent.
 USE_MUSL=${USE_MUSL:-"false"}
 # Hub URL to use to configure the agent.
-HUB_URL=${HUB_URL:-"https://demo.nexigon.dev"}
+HUB_URL=${HUB_URL:-"https://eu.nexigon.cloud"}
 
 if [ "$(id -u)" -eq 0 ]; then
   sudo=''

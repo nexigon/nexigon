@@ -75,7 +75,7 @@ async fn main() -> anyhow::Result<()> {
         let config = tokio::task::spawn_blocking(|| -> anyhow::Result<Config> {
             let hub_url = dialoguer::Input::new()
                 .with_prompt("Nexigon Hub URL")
-                .default("https://demo.nexigon.dev".to_owned())
+                .default("https://eu.nexigon.cloud".to_owned())
                 .interact()?;
             let token = dialoguer::Password::new()
                 .with_prompt("User Access Token")
