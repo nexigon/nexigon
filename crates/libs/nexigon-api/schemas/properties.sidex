@@ -81,6 +81,23 @@ variant OtaUpdateState {
     Rebooting,
 }
 
+/// Device health information (`dev.nexigon.health`).
+record DeviceHealth {
+    /// Health status of the device.
+    status: DeviceHealthStatus,
+}
+
+/// Device health status.
+#[json(tagged = externally, rename_all = "lowercase")]
+variant DeviceHealthStatus {
+    /// Device is operating normally.
+    Healthy,
+    /// Device is experiencing degraded performance.
+    Degraded,
+    /// Device is in an error state.
+    Error,
+}
+
 /// Service export information.
 #[json(tag = "protocol", rename_all = "lowercase")]
 variant ExportInfo {

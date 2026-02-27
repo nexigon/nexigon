@@ -2649,6 +2649,27 @@
     ],
     "unevaluatedProperties": false
   },
+  "nexigon_api.properties.DeviceHealth": {
+    "type": "object",
+    "description": "Device health information (`dev.nexigon.health`).",
+    "properties": {
+      "status": {
+        "$ref": "#/components/schemas/nexigon_api.properties.DeviceHealthStatus"
+      }
+    },
+    "required": [
+      "status"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.properties.DeviceHealthStatus": {
+    "enum": [
+      "healthy",
+      "degraded",
+      "error"
+    ],
+    "description": "Device health status."
+  },
   "nexigon_api.properties.DiskInfo": {
     "type": "object",
     "description": "Disk information.",
