@@ -40494,7 +40494,7 @@ pub mod properties {
             )
         }
     }
-    #[doc = "Device health information (`dev.nexigon.health`).\n"]
+    #[doc = "Device health information (`dev.nexigon.system.health`).\n"]
     #[derive(Clone, Debug)]
     pub struct DeviceHealth {
         #[doc = "Health status of the device.\n"]

@@ -2651,7 +2651,7 @@
   },
   "nexigon_api.properties.DeviceHealth": {
     "type": "object",
-    "description": "Device health information (`dev.nexigon.health`).",
+    "description": "Device health information (`dev.nexigon.system.health`).",
     "properties": {
       "status": {
         "$ref": "#/components/schemas/nexigon_api.properties.DeviceHealthStatus"

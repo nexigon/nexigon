@@ -81,7 +81,7 @@ variant OtaUpdateState {
     Rebooting,
 }
 
-/// Device health information (`dev.nexigon.health`).
+/// Device health information (`dev.nexigon.system.health`).
 record DeviceHealth {
     /// Health status of the device.
     status: DeviceHealthStatus,
