@@ -2,3 +2,9 @@ target
 build
 playground
 .nexigon-cli.toml
+
+.devenv*
+devenv.local.nix
+devenv.local.yaml
+.direnv
+.pre-commit-config.yaml
