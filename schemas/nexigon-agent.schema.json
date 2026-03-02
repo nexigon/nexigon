@@ -22,6 +22,9 @@
     "dangerous-disable-tls": {
       "type": "boolean"
     },
+    "disable-system-info": {
+      "type": "boolean"
+    },
     "exports": {
       "type": "array",
       "items": {
