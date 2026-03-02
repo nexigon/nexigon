@@ -24,6 +24,8 @@ record Config {
     ssl_key?: PathBuf,
     /// Disable TLS.
     dangerous_disable_tls?: bool,
+    /// Disable system info telemetry.
+    disable_system_info?: bool,
     /// Exported services.
     exports?: [ExportConfig],
 }

@@ -25,6 +25,8 @@ pub mod config {
         pub ssl_key: ::std::option::Option<PathBuf>,
         #[doc = "Disable TLS.\n"]
         pub dangerous_disable_tls: ::std::option::Option<bool>,
+        #[doc = "Disable system info telemetry.\n"]
+        pub disable_system_info: ::std::option::Option<bool>,
         #[doc = "Exported services.\n"]
         pub exports: ::std::option::Option<::std::vec::Vec<ExportConfig>>,
     }
@@ -42,6 +44,7 @@ pub mod config {
                 ssl_cert: ::std::default::Default::default(),
                 ssl_key: ::std::default::Default::default(),
                 dangerous_disable_tls: ::std::default::Default::default(),
+                disable_system_info: ::std::default::Default::default(),
                 exports: ::std::default::Default::default(),
             }
         }
@@ -111,6 +114,22 @@ pub mod config {
             self.dangerous_disable_tls = dangerous_disable_tls;
             self
         }
+        #[doc = "Sets the value of `disable_system_info`."]
+        pub fn set_disable_system_info(
+            &mut self,
+            disable_system_info: ::std::option::Option<bool>,
+        ) -> &mut Self {
+            self.disable_system_info = disable_system_info;
+            self
+        }
+        #[doc = "Sets the value of `disable_system_info`."]
+        pub fn with_disable_system_info(
+            mut self,
+            disable_system_info: ::std::option::Option<bool>,
+        ) -> Self {
+            self.disable_system_info = disable_system_info;
+            self
+        }
         #[doc = "Sets the value of `exports`."]
         pub fn set_exports(
             &mut self,
@@ -135,7 +154,7 @@ pub mod config {
             __serializer: __S,
         ) -> ::std::result::Result<__S::Ok, __S::Error> {
             let mut __record =
-                __sidex_serde::ser::RecordSerializer::new(__serializer, "Config", 7usize)?;
+                __sidex_serde::ser::RecordSerializer::new(__serializer, "Config", 8usize)?;
             __record.serialize_field("hub-url", &self.hub_url)?;
             __record.serialize_field("token", &self.token)?;
             __record.serialize_field("fingerprint-script", &self.fingerprint_script)?;
@@ -150,6 +169,10 @@ pub mod config {
             __record.serialize_optional_field(
                 "dangerous-disable-tls",
                 ::core::option::Option::as_ref(&self.dangerous_disable_tls),
+            )?;
+            __record.serialize_optional_field(
+                "disable-system-info",
+                ::core::option::Option::as_ref(&self.disable_system_info),
             )?;
             __record.serialize_optional_field(
                 "exports",
@@ -190,7 +213,7 @@ pub mod config {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(0usize, &"record with 7 fields"),
+                                __serde::de::Error::invalid_length(0usize, &"record with 8 fields"),
                             );
                         }
                     };
@@ -200,7 +223,7 @@ pub mod config {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(1usize, &"record with 7 fields"),
+                                __serde::de::Error::invalid_length(1usize, &"record with 8 fields"),
                             );
                         }
                     };
@@ -211,7 +234,7 @@ pub mod config {
                                 return ::core::result::Result::Err(
                                     __serde::de::Error::invalid_length(
                                         2usize,
-                                        &"record with 7 fields",
+                                        &"record with 8 fields",
                                     ),
                                 );
                             }
@@ -223,7 +246,7 @@ pub mod config {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(3usize, &"record with 7 fields"),
+                                __serde::de::Error::invalid_length(3usize, &"record with 8 fields"),
                             );
                         }
                     };
@@ -234,7 +257,7 @@ pub mod config {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(4usize, &"record with 7 fields"),
+                                __serde::de::Error::invalid_length(4usize, &"record with 8 fields"),
                             );
                         }
                     };
@@ -245,18 +268,29 @@ pub mod config {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(5usize, &"record with 7 fields"),
+                                __serde::de::Error::invalid_length(5usize, &"record with 8 fields"),
                             );
                         }
                     };
                     let __field6 = match __serde::de::SeqAccess::next_element::<
+                        ::std::option::Option<bool>,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(6usize, &"record with 8 fields"),
+                            );
+                        }
+                    };
+                    let __field7 = match __serde::de::SeqAccess::next_element::<
                         ::std::option::Option<::std::vec::Vec<ExportConfig>>,
                     >(&mut __seq)?
                     {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(6usize, &"record with 7 fields"),
+                                __serde::de::Error::invalid_length(7usize, &"record with 8 fields"),
                             );
                         }
                     };
@@ -267,7 +301,8 @@ pub mod config {
                         ssl_cert: __field3,
                         ssl_key: __field4,
                         dangerous_disable_tls: __field5,
-                        exports: __field6,
+                        disable_system_info: __field6,
+                        exports: __field7,
                     })
                 }
                 #[inline]
@@ -286,10 +321,11 @@ pub mod config {
                         "ssl-cert",
                         "ssl-key",
                         "dangerous-disable-tls",
+                        "disable-system-info",
                         "exports",
                     ];
                     #[doc(hidden)]
-                    const __EXPECTING_IDENTIFIERS: &'static str = "an identifier in [\"hub-url\", \"token\", \"fingerprint-script\", \"ssl-cert\", \"ssl-key\", \"dangerous-disable-tls\", \"exports\"]";
+                    const __EXPECTING_IDENTIFIERS: &'static str = "an identifier in [\"hub-url\", \"token\", \"fingerprint-script\", \"ssl-cert\", \"ssl-key\", \"dangerous-disable-tls\", \"disable-system-info\", \"exports\"]";
                     #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
                     #[doc(hidden)]
                     enum __Identifier {
@@ -300,6 +336,7 @@ pub mod config {
                         __Identifier4,
                         __Identifier5,
                         __Identifier6,
+                        __Identifier7,
                         __Unknown,
                     }
                     #[doc(hidden)]
@@ -327,6 +364,7 @@ pub mod config {
                                 4u64 => ::core::result::Result::Ok(__Identifier::__Identifier4),
                                 5u64 => ::core::result::Result::Ok(__Identifier::__Identifier5),
                                 6u64 => ::core::result::Result::Ok(__Identifier::__Identifier6),
+                                7u64 => ::core::result::Result::Ok(__Identifier::__Identifier7),
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
                         }
@@ -354,8 +392,11 @@ pub mod config {
                                 "dangerous-disable-tls" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier5)
                                 }
-                                "exports" => {
+                                "disable-system-info" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier6)
+                                }
+                                "exports" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier7)
                                 }
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
@@ -384,8 +425,11 @@ pub mod config {
                                 b"dangerous-disable-tls" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier5)
                                 }
-                                b"exports" => {
+                                b"disable-system-info" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier6)
+                                }
+                                b"exports" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier7)
                                 }
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
@@ -417,7 +461,9 @@ pub mod config {
                         ::core::option::Option::None;
                     let mut __field5: ::core::option::Option<::std::option::Option<bool>> =
                         ::core::option::Option::None;
-                    let mut __field6: ::core::option::Option<
+                    let mut __field6: ::core::option::Option<::std::option::Option<bool>> =
+                        ::core::option::Option::None;
+                    let mut __field7: ::core::option::Option<
                         ::std::option::Option<::std::vec::Vec<ExportConfig>>,
                     > = ::core::option::Option::None;
                     while let ::core::option::Option::Some(__key) =
@@ -510,11 +556,25 @@ pub mod config {
                                 if ::core::option::Option::is_some(&__field6) {
                                     return ::core::result::Result::Err(
                                         <__A::Error as __serde::de::Error>::duplicate_field(
-                                            "exports",
+                                            "disable-system-info",
                                         ),
                                     );
                                 }
                                 __field6 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<
+                                        ::std::option::Option<bool>,
+                                    >(&mut __map)?,
+                                );
+                            }
+                            __Identifier::__Identifier7 => {
+                                if ::core::option::Option::is_some(&__field7) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "exports",
+                                        ),
+                                    );
+                                }
+                                __field7 = ::core::option::Option::Some(
                                     __serde::de::MapAccess::next_value::<
                                         ::std::option::Option<::std::vec::Vec<ExportConfig>>,
                                     >(&mut __map)?,
@@ -569,6 +629,10 @@ pub mod config {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => ::core::option::Option::None,
                     };
+                    let __field7 = match __field7 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => ::core::option::Option::None,
+                    };
                     ::core::result::Result::Ok(Config {
                         hub_url: __field0,
                         token: __field1,
@@ -576,7 +640,8 @@ pub mod config {
                         ssl_cert: __field3,
                         ssl_key: __field4,
                         dangerous_disable_tls: __field5,
-                        exports: __field6,
+                        disable_system_info: __field6,
+                        exports: __field7,
                     })
                 }
             }
@@ -588,6 +653,7 @@ pub mod config {
                 "ssl-cert",
                 "ssl-key",
                 "dangerous-disable-tls",
+                "disable-system-info",
                 "exports",
             ];
             __serde::Deserializer::deserialize_struct(

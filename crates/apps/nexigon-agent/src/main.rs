@@ -176,20 +176,22 @@ async fn main() -> anyhow::Result<()> {
     };
     match &args.cmd {
         Cmd::Run => {
-            tokio::spawn(async move {
-                loop {
-                    let system_info = get_system_info(&config);
-                    executor
-                        .execute(SetDevicePropertyAction::new(
-                            device_id.clone(),
-                            "dev.nexigon.system.info".to_owned(),
-                            serde_json::to_value(system_info).unwrap(),
-                        ))
-                        .await
-                        .ok();
-                    tokio::time::sleep(Duration::from_secs(30 * 60)).await;
-                }
-            });
+            if !config.disable_system_info.unwrap_or(false) {
+                tokio::spawn(async move {
+                    loop {
+                        let system_info = get_system_info(&config);
+                        executor
+                            .execute(SetDevicePropertyAction::new(
+                                device_id.clone(),
+                                "dev.nexigon.system.info".to_owned(),
+                                serde_json::to_value(system_info).unwrap(),
+                            ))
+                            .await
+                            .ok();
+                        tokio::time::sleep(Duration::from_secs(30 * 60)).await;
+                    }
+                });
+            }
             connection_handle.await??;
         }
         Cmd::Device(cmd) => match cmd {
