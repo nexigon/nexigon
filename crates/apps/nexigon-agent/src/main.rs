@@ -4,6 +4,7 @@ use std::net::SocketAddr;
 use std::path::Path;
 use std::path::PathBuf;
 use std::process::Stdio;
+use std::sync::Arc;
 use std::time::Duration;
 
 use anyhow::Context;
@@ -17,6 +18,7 @@ use nexigon_common::resolve_asset;
 use tokio::net::TcpStream;
 use tracing::debug;
 use tracing::info;
+use tracing::warn;
 
 use nexigon_api::types::actor::GetActorAction;
 use nexigon_api::types::datetime::Timestamp;
@@ -37,6 +39,8 @@ use crate::system_info::get_system_info;
 
 pub mod config;
 pub mod system_info;
+#[cfg(unix)]
+pub mod terminal;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
@@ -60,6 +64,7 @@ async fn main() -> anyhow::Result<()> {
             .context("cannot read config")?,
     )
     .context("cannot parse config")?;
+    let config = Arc::new(config);
     nexigon_client::install_crypto_provider();
     let cert_path = config_dir.join(
         config
@@ -116,34 +121,72 @@ async fn main() -> anyhow::Result<()> {
     .await
     .context("cannot connect to Nexigon Hub")?;
     let mut connection_ref = connection.make_ref();
+    let connection_config = config.clone();
     let connection_handle = tokio::spawn(async move {
+        let config = connection_config;
         while let Some(event) = connection.next().await {
             match event {
                 Ok(ConnectionEvent::RequestChannel(request)) => {
                     debug!("channel request: {request:?}");
                     let endpoint = std::str::from_utf8(request.endpoint())
                         .context("invalid UTF-8 in endpoint")?;
-                    // TODO: Handle other endpoints and errors.
-                    let port: u16 = endpoint
-                        .strip_prefix("forward/tcp/")
-                        .context("invalid endpoint")?
-                        .parse()
-                        .context("invalid port")?;
-                    request.accept(move |mut channel| {
-                        tokio::spawn(async move {
-                            let mut tcp = TcpStream::connect(SocketAddr::new(
-                                Ipv4Addr::LOCALHOST.into(),
-                                port,
-                            ))
-                            .await
-                            .unwrap();
-                            if let Err(error) =
-                                tokio::io::copy_bidirectional(&mut channel, &mut tcp).await
-                            {
-                                debug!("forwarding error: {error}");
-                            }
+
+                    if let Some(port_str) = endpoint.strip_prefix("forward/tcp/") {
+                        let port: u16 = port_str.parse().context("invalid port")?;
+                        request.accept(move |mut channel| {
+                            tokio::spawn(async move {
+                                let mut tcp = TcpStream::connect(SocketAddr::new(
+                                    Ipv4Addr::LOCALHOST.into(),
+                                    port,
+                                ))
+                                .await
+                                .unwrap();
+                                if let Err(error) =
+                                    tokio::io::copy_bidirectional(&mut channel, &mut tcp).await
+                                {
+                                    debug!("forwarding error: {error}");
+                                }
+                            });
                         });
-                    });
+                    } else if endpoint == "terminal" || endpoint.starts_with("terminal/") {
+                        #[cfg(unix)]
+                        {
+                            let terminal_enabled = config
+                                .terminal
+                                .as_ref()
+                                .and_then(|t| t.enabled)
+                                .unwrap_or(false);
+                            if !terminal_enabled {
+                                request.reject(b"terminal not enabled");
+                                continue;
+                            }
+                            let requested_user = endpoint
+                                .strip_prefix("terminal/")
+                                .filter(|s| !s.is_empty())
+                                .map(|s| s.to_owned());
+                            let config = config.clone();
+                            request.accept(move |channel| {
+                                tokio::spawn(async move {
+                                    if let Err(e) = terminal::handle_terminal_session(
+                                        channel,
+                                        &config,
+                                        requested_user.as_deref(),
+                                    )
+                                    .await
+                                    {
+                                        warn!("terminal session error: {e:?}");
+                                    }
+                                });
+                            });
+                        }
+                        #[cfg(not(unix))]
+                        {
+                            request.reject(b"terminal not supported on this platform");
+                        }
+                    } else {
+                        warn!(endpoint, "unknown endpoint requested");
+                        request.reject(b"unknown endpoint");
+                    }
                 }
                 Ok(ConnectionEvent::Connected) => { /* ignore */ }
                 Ok(ConnectionEvent::Closed) => {
@@ -177,9 +220,10 @@ async fn main() -> anyhow::Result<()> {
     match &args.cmd {
         Cmd::Run => {
             if !config.disable_system_info.unwrap_or(false) {
+                let sysinfo_config = config.clone();
                 tokio::spawn(async move {
                     loop {
-                        let system_info = get_system_info(&config);
+                        let system_info = get_system_info(&sysinfo_config);
                         executor
                             .execute(SetDevicePropertyAction::new(
                                 device_id.clone(),
