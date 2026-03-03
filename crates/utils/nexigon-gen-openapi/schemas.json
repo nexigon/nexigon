@@ -1072,6 +1072,35 @@
     ],
     "unevaluatedProperties": false
   },
+  "nexigon_api.devices.QueryDeviceAuditLogAction": {
+    "type": "object",
+    "description": "Query the audit log of a device.",
+    "properties": {
+      "deviceId": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceId"
+      }
+    },
+    "required": [
+      "deviceId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.devices.QueryDeviceAuditLogOutput": {
+    "type": "object",
+    "description": "Output of querying the audit log of a device.",
+    "properties": {
+      "events": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.audit.AuditLogEvent"
+        }
+      }
+    },
+    "required": [
+      "events"
+    ],
+    "unevaluatedProperties": false
+  },
   "nexigon_api.devices.QueryDeviceConnectionsAction": {
     "type": "object",
     "description": "Query the connection history of a device.",

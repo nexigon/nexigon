@@ -1,6 +1,7 @@
 //! Actions and types related to devices.
 
 import actor::Actor
+import audit::AuditLogEvent
 import cluster::ClusterNodeId
 import datetime::Timestamp
 import json::JsonValue
@@ -510,4 +511,16 @@ record DeviceProperty {
     protected: bool,
     /// Last time the property was updated.
     last_updated: Timestamp,
+}
+
+/// Query the audit log of a device.
+record QueryDeviceAuditLogAction {
+    /// ID of the device.
+    device_id: DeviceId,
+}
+
+/// Output of querying the audit log of a device.
+record QueryDeviceAuditLogOutput {
+    /// List of audit log events.
+    events: [AuditLogEvent],
 }

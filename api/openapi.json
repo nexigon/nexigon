@@ -2300,6 +2300,37 @@
         }
       }
     },
+    "/api/v1/actions/invoke/devices_QueryAuditLog": {
+      "post": {
+        "tags": [
+          "devices"
+        ],
+        "summary": "QueryAuditLog",
+        "description": "Query the audit log of a device.",
+        "operationId": "devices_QueryAuditLog",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/nexigon_api.devices.QueryDeviceAuditLogAction"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/nexigon_api.devices.QueryDeviceAuditLogOutput"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/actions/invoke/repositories_ResolveName": {
       "post": {
         "tags": [
@@ -4726,6 +4757,34 @@
         },
         "required": [
           "deviceId",
+          "events"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.devices.QueryDeviceAuditLogAction": {
+        "type": "object",
+        "properties": {
+          "deviceId": {
+            "$ref": "#/components/schemas/nexigon_api.devices.DeviceId"
+          }
+        },
+        "required": [
+          "deviceId"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.devices.QueryDeviceAuditLogOutput": {
+        "type": "object",
+        "description": "Output of querying the audit log of a device.",
+        "properties": {
+          "events": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/nexigon_api.audit.AuditLogEvent"
+            }
+          }
+        },
+        "required": [
           "events"
         ],
         "unevaluatedProperties": false

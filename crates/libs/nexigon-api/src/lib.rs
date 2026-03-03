@@ -120,6 +120,8 @@ macro_rules! with_actions {
             ("devices_GetProperty", GetDeviceProperty, devices::GetDevicePropertyAction, devices::GetDevicePropertyOutput),
             ("devices_RemoveProperty", RemoveDeviceProperty, devices::RemoveDevicePropertyAction, devices::RemoveDevicePropertyOutput),
             ("devices_QueryProperties", QueryDeviceProperties, devices::QueryDevicePropertiesAction, devices::QueryDevicePropertiesOutput),
+            // ## Audit Log
+            ("devices_QueryAuditLog", QueryDeviceAuditLog, devices::QueryDeviceAuditLogAction, devices::QueryDeviceAuditLogOutput),
 
             // # Repositories
             ("repositories_ResolveName", ResolveRepositoryName, repositories::ResolveRepositoryNameAction, repositories::ResolveRepositoryNameOutput),
