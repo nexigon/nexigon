@@ -160,10 +160,8 @@ async fn main() -> anyhow::Result<()> {
                                 request.reject(b"terminal not enabled");
                                 continue;
                             }
-                            let requested_user = endpoint
-                                .strip_prefix("terminal/")
-                                .filter(|s| !s.is_empty())
-                                .map(|s| s.to_owned());
+                            let requested_user =
+                                endpoint.strip_prefix("terminal/").map(|u| u.to_owned());
                             let config = config.clone();
                             request.accept(move |channel| {
                                 tokio::spawn(async move {
