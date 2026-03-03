@@ -13,6 +13,7 @@ clap.workspace = true
 dialoguer.workspace = true
 nexigon-api.workspace = true
 nexigon-client.workspace = true
+nexigon-common.workspace = true
 nexigon-ids.workspace = true
 nexigon-multiplex.workspace = true
 reqwest.workspace = true
