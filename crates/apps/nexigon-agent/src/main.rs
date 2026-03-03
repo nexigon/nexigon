@@ -39,7 +39,7 @@ use crate::system_info::get_system_info;
 
 pub mod config;
 pub mod system_info;
-#[cfg(unix)]
+#[cfg(target_os = "linux")]
 pub mod terminal;
 
 #[tokio::main]
@@ -149,7 +149,7 @@ async fn main() -> anyhow::Result<()> {
                             });
                         });
                     } else if endpoint == "terminal" || endpoint.starts_with("terminal/") {
-                        #[cfg(unix)]
+                        #[cfg(target_os = "linux")]
                         {
                             let terminal_enabled = config
                                 .terminal
@@ -177,7 +177,7 @@ async fn main() -> anyhow::Result<()> {
                                 });
                             });
                         }
-                        #[cfg(not(unix))]
+                        #[cfg(not(target_os = "linux"))]
                         {
                             request.reject(b"terminal not supported on this platform");
                         }
