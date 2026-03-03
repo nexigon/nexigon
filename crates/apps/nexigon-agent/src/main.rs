@@ -277,7 +277,7 @@ async fn main() -> anyhow::Result<()> {
             }
         },
         Cmd::Repositories(cmd) => {
-            execute_repositories_cmd(&cmd, &mut executor).await?;
+            execute_repositories_cmd(cmd, &mut executor).await?;
         }
     }
     Ok(())
