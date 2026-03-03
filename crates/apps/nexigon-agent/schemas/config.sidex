@@ -28,6 +28,8 @@ record Config {
     disable_system_info?: bool,
     /// Exported services.
     exports?: [ExportConfig],
+    /// Remote terminal configuration.
+    terminal?: TerminalConfig,
 }
 
 /// Service export configuration.
@@ -46,4 +48,17 @@ record HttpExportConfig {
     port: u16,
     /// URL path prefix for the service.
     path?: string,
+}
+
+/// Remote terminal configuration.
+#[json(rename_all = "kebab-case")]
+record TerminalConfig {
+    /// Whether terminal access is enabled (defaults to false).
+    enabled?: bool,
+    /// Default Unix user for terminal sessions.
+    user?: string,
+    /// Default shell to use (fallback: user's login shell, then /bin/sh).
+    shell?: string,
+    /// Allowed users for terminal sessions. If not set, any user is allowed.
+    allowed_users?: [string],
 }

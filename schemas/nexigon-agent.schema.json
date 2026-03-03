@@ -30,6 +30,9 @@
       "items": {
         "$ref": "#/$defs/nexigon_agent.config.ExportConfig"
       }
+    },
+    "terminal": {
+      "$ref": "#/$defs/nexigon_agent.config.TerminalConfig"
     }
   },
   "required": [
@@ -97,6 +100,30 @@
         "string"
       ],
       "description": "Filesystem path."
+    },
+    "nexigon_agent.config.TerminalConfig": {
+      "$id": "nexigon_agent.config.TerminalConfig",
+      "type": "object",
+      "description": "Remote terminal configuration.",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "user": {
+          "type": "string"
+        },
+        "shell": {
+          "type": "string"
+        },
+        "allowed-users": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [],
+      "unevaluatedProperties": false
     }
   }
 }
