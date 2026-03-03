@@ -9,5 +9,11 @@ homepage.workspace = true
 
 [dependencies]
 anyhow.workspace = true
+clap.workspace = true
 nexigon-api.workspace = true
 nexigon-client.workspace = true
+nexigon-ids.workspace = true
+reqwest.workspace = true
+serde_json.workspace = true
+si-crypto-hashes.workspace = true
+tokio.workspace = true

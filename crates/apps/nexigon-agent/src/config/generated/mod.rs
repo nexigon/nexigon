@@ -29,8 +29,6 @@ pub mod config {
         pub disable_system_info: ::std::option::Option<bool>,
         #[doc = "Exported services.\n"]
         pub exports: ::std::option::Option<::std::vec::Vec<ExportConfig>>,
-        #[doc = "Remote terminal configuration.\n"]
-        pub terminal: ::std::option::Option<TerminalConfig>,
     }
     impl Config {
         #[doc = "Creates a new [`Config`]."]
@@ -48,7 +46,6 @@ pub mod config {
                 dangerous_disable_tls: ::std::default::Default::default(),
                 disable_system_info: ::std::default::Default::default(),
                 exports: ::std::default::Default::default(),
-                terminal: ::std::default::Default::default(),
             }
         }
         #[doc = "Sets the value of `hub_url`."]
@@ -149,19 +146,6 @@ pub mod config {
             self.exports = exports;
             self
         }
-        #[doc = "Sets the value of `terminal`."]
-        pub fn set_terminal(
-            &mut self,
-            terminal: ::std::option::Option<TerminalConfig>,
-        ) -> &mut Self {
-            self.terminal = terminal;
-            self
-        }
-        #[doc = "Sets the value of `terminal`."]
-        pub fn with_terminal(mut self, terminal: ::std::option::Option<TerminalConfig>) -> Self {
-            self.terminal = terminal;
-            self
-        }
     }
     #[automatically_derived]
     impl __serde::Serialize for Config {
@@ -170,7 +154,7 @@ pub mod config {
             __serializer: __S,
         ) -> ::std::result::Result<__S::Ok, __S::Error> {
             let mut __record =
-                __sidex_serde::ser::RecordSerializer::new(__serializer, "Config", 9usize)?;
+                __sidex_serde::ser::RecordSerializer::new(__serializer, "Config", 8usize)?;
             __record.serialize_field("hub-url", &self.hub_url)?;
             __record.serialize_field("token", &self.token)?;
             __record.serialize_field("fingerprint-script", &self.fingerprint_script)?;
@@ -193,10 +177,6 @@ pub mod config {
             __record.serialize_optional_field(
                 "exports",
                 ::core::option::Option::as_ref(&self.exports),
-            )?;
-            __record.serialize_optional_field(
-                "terminal",
-                ::core::option::Option::as_ref(&self.terminal),
             )?;
             __record.end()
         }
@@ -233,7 +213,7 @@ pub mod config {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(0usize, &"record with 9 fields"),
+                                __serde::de::Error::invalid_length(0usize, &"record with 8 fields"),
                             );
                         }
                     };
@@ -243,7 +223,7 @@ pub mod config {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(1usize, &"record with 9 fields"),
+                                __serde::de::Error::invalid_length(1usize, &"record with 8 fields"),
                             );
                         }
                     };
@@ -254,7 +234,7 @@ pub mod config {
                                 return ::core::result::Result::Err(
                                     __serde::de::Error::invalid_length(
                                         2usize,
-                                        &"record with 9 fields",
+                                        &"record with 8 fields",
                                     ),
                                 );
                             }
@@ -266,7 +246,7 @@ pub mod config {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(3usize, &"record with 9 fields"),
+                                __serde::de::Error::invalid_length(3usize, &"record with 8 fields"),
                             );
                         }
                     };
@@ -277,7 +257,7 @@ pub mod config {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(4usize, &"record with 9 fields"),
+                                __serde::de::Error::invalid_length(4usize, &"record with 8 fields"),
                             );
                         }
                     };
@@ -288,7 +268,7 @@ pub mod config {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(5usize, &"record with 9 fields"),
+                                __serde::de::Error::invalid_length(5usize, &"record with 8 fields"),
                             );
                         }
                     };
@@ -299,7 +279,7 @@ pub mod config {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(6usize, &"record with 9 fields"),
+                                __serde::de::Error::invalid_length(6usize, &"record with 8 fields"),
                             );
                         }
                     };
@@ -310,18 +290,7 @@ pub mod config {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(7usize, &"record with 9 fields"),
-                            );
-                        }
-                    };
-                    let __field8 = match __serde::de::SeqAccess::next_element::<
-                        ::std::option::Option<TerminalConfig>,
-                    >(&mut __seq)?
-                    {
-                        ::core::option::Option::Some(__value) => __value,
-                        ::core::option::Option::None => {
-                            return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(8usize, &"record with 9 fields"),
+                                __serde::de::Error::invalid_length(7usize, &"record with 8 fields"),
                             );
                         }
                     };
@@ -334,7 +303,6 @@ pub mod config {
                         dangerous_disable_tls: __field5,
                         disable_system_info: __field6,
                         exports: __field7,
-                        terminal: __field8,
                     })
                 }
                 #[inline]
@@ -355,10 +323,9 @@ pub mod config {
                         "dangerous-disable-tls",
                         "disable-system-info",
                         "exports",
-                        "terminal",
                     ];
                     #[doc(hidden)]
-                    const __EXPECTING_IDENTIFIERS: &'static str = "an identifier in [\"hub-url\", \"token\", \"fingerprint-script\", \"ssl-cert\", \"ssl-key\", \"dangerous-disable-tls\", \"disable-system-info\", \"exports\", \"terminal\"]";
+                    const __EXPECTING_IDENTIFIERS: &'static str = "an identifier in [\"hub-url\", \"token\", \"fingerprint-script\", \"ssl-cert\", \"ssl-key\", \"dangerous-disable-tls\", \"disable-system-info\", \"exports\"]";
                     #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
                     #[doc(hidden)]
                     enum __Identifier {
@@ -370,7 +337,6 @@ pub mod config {
                         __Identifier5,
                         __Identifier6,
                         __Identifier7,
-                        __Identifier8,
                         __Unknown,
                     }
                     #[doc(hidden)]
@@ -399,7 +365,6 @@ pub mod config {
                                 5u64 => ::core::result::Result::Ok(__Identifier::__Identifier5),
                                 6u64 => ::core::result::Result::Ok(__Identifier::__Identifier6),
                                 7u64 => ::core::result::Result::Ok(__Identifier::__Identifier7),
-                                8u64 => ::core::result::Result::Ok(__Identifier::__Identifier8),
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
                         }
@@ -433,9 +398,6 @@ pub mod config {
                                 "exports" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier7)
                                 }
-                                "terminal" => {
-                                    ::core::result::Result::Ok(__Identifier::__Identifier8)
-                                }
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
                         }
@@ -468,9 +430,6 @@ pub mod config {
                                 }
                                 b"exports" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier7)
-                                }
-                                b"terminal" => {
-                                    ::core::result::Result::Ok(__Identifier::__Identifier8)
                                 }
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
@@ -506,9 +465,6 @@ pub mod config {
                         ::core::option::Option::None;
                     let mut __field7: ::core::option::Option<
                         ::std::option::Option<::std::vec::Vec<ExportConfig>>,
-                    > = ::core::option::Option::None;
-                    let mut __field8: ::core::option::Option<
-                        ::std::option::Option<TerminalConfig>,
                     > = ::core::option::Option::None;
                     while let ::core::option::Option::Some(__key) =
                         __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
@@ -624,20 +580,6 @@ pub mod config {
                                     >(&mut __map)?,
                                 );
                             }
-                            __Identifier::__Identifier8 => {
-                                if ::core::option::Option::is_some(&__field8) {
-                                    return ::core::result::Result::Err(
-                                        <__A::Error as __serde::de::Error>::duplicate_field(
-                                            "terminal",
-                                        ),
-                                    );
-                                }
-                                __field8 = ::core::option::Option::Some(
-                                    __serde::de::MapAccess::next_value::<
-                                        ::std::option::Option<TerminalConfig>,
-                                    >(&mut __map)?,
-                                );
-                            }
                             _ => {
                                 __serde::de::MapAccess::next_value::<__serde::de::IgnoredAny>(
                                     &mut __map,
@@ -691,10 +633,6 @@ pub mod config {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => ::core::option::Option::None,
                     };
-                    let __field8 = match __field8 {
-                        ::core::option::Option::Some(__value) => __value,
-                        ::core::option::Option::None => ::core::option::Option::None,
-                    };
                     ::core::result::Result::Ok(Config {
                         hub_url: __field0,
                         token: __field1,
@@ -704,7 +642,6 @@ pub mod config {
                         dangerous_disable_tls: __field5,
                         disable_system_info: __field6,
                         exports: __field7,
-                        terminal: __field8,
                     })
                 }
             }
@@ -718,7 +655,6 @@ pub mod config {
                 "dangerous-disable-tls",
                 "disable-system-info",
                 "exports",
-                "terminal",
             ];
             __serde::Deserializer::deserialize_struct(
                 __deserializer,
@@ -1204,401 +1140,6 @@ pub mod config {
             __serde::Deserializer::deserialize_struct(
                 __deserializer,
                 "HttpExportConfig",
-                __FIELDS,
-                __Visitor {
-                    __phantom_vars: ::core::marker::PhantomData,
-                },
-            )
-        }
-    }
-    #[doc = "Remote terminal configuration.\n"]
-    #[derive(Clone, Debug)]
-    pub struct TerminalConfig {
-        #[doc = "Whether terminal access is enabled (defaults to false).\n"]
-        pub enabled: ::std::option::Option<bool>,
-        #[doc = "Default Unix user for terminal sessions.\n"]
-        pub user: ::std::option::Option<::std::string::String>,
-        #[doc = "Default shell to use (fallback: user's login shell, then /bin/sh).\n"]
-        pub shell: ::std::option::Option<::std::string::String>,
-        #[doc = "Allowed users for terminal sessions. If not set, any user is allowed.\n"]
-        pub allowed_users: ::std::option::Option<::std::vec::Vec<::std::string::String>>,
-    }
-    impl TerminalConfig {
-        #[doc = "Creates a new [`TerminalConfig`]."]
-        pub fn new() -> Self {
-            Self {
-                enabled: ::std::default::Default::default(),
-                user: ::std::default::Default::default(),
-                shell: ::std::default::Default::default(),
-                allowed_users: ::std::default::Default::default(),
-            }
-        }
-        #[doc = "Sets the value of `enabled`."]
-        pub fn set_enabled(&mut self, enabled: ::std::option::Option<bool>) -> &mut Self {
-            self.enabled = enabled;
-            self
-        }
-        #[doc = "Sets the value of `enabled`."]
-        pub fn with_enabled(mut self, enabled: ::std::option::Option<bool>) -> Self {
-            self.enabled = enabled;
-            self
-        }
-        #[doc = "Sets the value of `user`."]
-        pub fn set_user(
-            &mut self,
-            user: ::std::option::Option<::std::string::String>,
-        ) -> &mut Self {
-            self.user = user;
-            self
-        }
-        #[doc = "Sets the value of `user`."]
-        pub fn with_user(mut self, user: ::std::option::Option<::std::string::String>) -> Self {
-            self.user = user;
-            self
-        }
-        #[doc = "Sets the value of `shell`."]
-        pub fn set_shell(
-            &mut self,
-            shell: ::std::option::Option<::std::string::String>,
-        ) -> &mut Self {
-            self.shell = shell;
-            self
-        }
-        #[doc = "Sets the value of `shell`."]
-        pub fn with_shell(mut self, shell: ::std::option::Option<::std::string::String>) -> Self {
-            self.shell = shell;
-            self
-        }
-        #[doc = "Sets the value of `allowed_users`."]
-        pub fn set_allowed_users(
-            &mut self,
-            allowed_users: ::std::option::Option<::std::vec::Vec<::std::string::String>>,
-        ) -> &mut Self {
-            self.allowed_users = allowed_users;
-            self
-        }
-        #[doc = "Sets the value of `allowed_users`."]
-        pub fn with_allowed_users(
-            mut self,
-            allowed_users: ::std::option::Option<::std::vec::Vec<::std::string::String>>,
-        ) -> Self {
-            self.allowed_users = allowed_users;
-            self
-        }
-    }
-    impl ::std::default::Default for TerminalConfig {
-        fn default() -> Self {
-            Self::new()
-        }
-    }
-    #[automatically_derived]
-    impl __serde::Serialize for TerminalConfig {
-        fn serialize<__S: __serde::Serializer>(
-            &self,
-            __serializer: __S,
-        ) -> ::std::result::Result<__S::Ok, __S::Error> {
-            let mut __record =
-                __sidex_serde::ser::RecordSerializer::new(__serializer, "TerminalConfig", 4usize)?;
-            __record.serialize_optional_field(
-                "enabled",
-                ::core::option::Option::as_ref(&self.enabled),
-            )?;
-            __record
-                .serialize_optional_field("user", ::core::option::Option::as_ref(&self.user))?;
-            __record
-                .serialize_optional_field("shell", ::core::option::Option::as_ref(&self.shell))?;
-            __record.serialize_optional_field(
-                "allowed-users",
-                ::core::option::Option::as_ref(&self.allowed_users),
-            )?;
-            __record.end()
-        }
-    }
-    #[automatically_derived]
-    impl<'de> __serde::Deserialize<'de> for TerminalConfig {
-        fn deserialize<__D: __serde::Deserializer<'de>>(
-            __deserializer: __D,
-        ) -> ::std::result::Result<Self, __D::Error> {
-            #[doc(hidden)]
-            struct __Visitor {
-                __phantom_vars: ::core::marker::PhantomData<fn(&())>,
-            }
-            impl<'de> __serde::de::Visitor<'de> for __Visitor {
-                type Value = TerminalConfig;
-                fn expecting(
-                    &self,
-                    __formatter: &mut ::core::fmt::Formatter,
-                ) -> ::core::fmt::Result {
-                    ::core::fmt::Formatter::write_str(__formatter, "record TerminalConfig")
-                }
-                #[inline]
-                fn visit_seq<__A>(
-                    self,
-                    mut __seq: __A,
-                ) -> ::core::result::Result<Self::Value, __A::Error>
-                where
-                    __A: __serde::de::SeqAccess<'de>,
-                {
-                    let __field0 = match __serde::de::SeqAccess::next_element::<
-                        ::std::option::Option<bool>,
-                    >(&mut __seq)?
-                    {
-                        ::core::option::Option::Some(__value) => __value,
-                        ::core::option::Option::None => {
-                            return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(0usize, &"record with 4 fields"),
-                            );
-                        }
-                    };
-                    let __field1 = match __serde::de::SeqAccess::next_element::<
-                        ::std::option::Option<::std::string::String>,
-                    >(&mut __seq)?
-                    {
-                        ::core::option::Option::Some(__value) => __value,
-                        ::core::option::Option::None => {
-                            return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(1usize, &"record with 4 fields"),
-                            );
-                        }
-                    };
-                    let __field2 = match __serde::de::SeqAccess::next_element::<
-                        ::std::option::Option<::std::string::String>,
-                    >(&mut __seq)?
-                    {
-                        ::core::option::Option::Some(__value) => __value,
-                        ::core::option::Option::None => {
-                            return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(2usize, &"record with 4 fields"),
-                            );
-                        }
-                    };
-                    let __field3 = match __serde::de::SeqAccess::next_element::<
-                        ::std::option::Option<::std::vec::Vec<::std::string::String>>,
-                    >(&mut __seq)?
-                    {
-                        ::core::option::Option::Some(__value) => __value,
-                        ::core::option::Option::None => {
-                            return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(3usize, &"record with 4 fields"),
-                            );
-                        }
-                    };
-                    ::core::result::Result::Ok(TerminalConfig {
-                        enabled: __field0,
-                        user: __field1,
-                        shell: __field2,
-                        allowed_users: __field3,
-                    })
-                }
-                #[inline]
-                fn visit_map<__A>(
-                    self,
-                    mut __map: __A,
-                ) -> ::core::result::Result<Self::Value, __A::Error>
-                where
-                    __A: __serde::de::MapAccess<'de>,
-                {
-                    #[doc(hidden)]
-                    const __IDENTIFIERS: &'static [&'static str] =
-                        &["enabled", "user", "shell", "allowed-users"];
-                    #[doc(hidden)]
-                    const __EXPECTING_IDENTIFIERS: &'static str =
-                        "an identifier in [\"enabled\", \"user\", \"shell\", \"allowed-users\"]";
-                    #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
-                    #[doc(hidden)]
-                    enum __Identifier {
-                        __Identifier0,
-                        __Identifier1,
-                        __Identifier2,
-                        __Identifier3,
-                        __Unknown,
-                    }
-                    #[doc(hidden)]
-                    struct __IdentifierVisitor;
-                    impl<'de> __serde::de::Visitor<'de> for __IdentifierVisitor {
-                        type Value = __Identifier;
-                        fn expecting(
-                            &self,
-                            __formatter: &mut ::core::fmt::Formatter,
-                        ) -> ::core::fmt::Result {
-                            ::core::fmt::Formatter::write_str(__formatter, __EXPECTING_IDENTIFIERS)
-                        }
-                        fn visit_u64<__E>(
-                            self,
-                            __value: u64,
-                        ) -> ::core::result::Result<Self::Value, __E>
-                        where
-                            __E: __serde::de::Error,
-                        {
-                            match __value {
-                                0u64 => ::core::result::Result::Ok(__Identifier::__Identifier0),
-                                1u64 => ::core::result::Result::Ok(__Identifier::__Identifier1),
-                                2u64 => ::core::result::Result::Ok(__Identifier::__Identifier2),
-                                3u64 => ::core::result::Result::Ok(__Identifier::__Identifier3),
-                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
-                            }
-                        }
-                        fn visit_str<__E>(
-                            self,
-                            __value: &str,
-                        ) -> ::core::result::Result<Self::Value, __E>
-                        where
-                            __E: __serde::de::Error,
-                        {
-                            match __value {
-                                "enabled" => {
-                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
-                                }
-                                "user" => ::core::result::Result::Ok(__Identifier::__Identifier1),
-                                "shell" => ::core::result::Result::Ok(__Identifier::__Identifier2),
-                                "allowed-users" => {
-                                    ::core::result::Result::Ok(__Identifier::__Identifier3)
-                                }
-                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
-                            }
-                        }
-                        fn visit_bytes<__E>(
-                            self,
-                            __value: &[u8],
-                        ) -> ::core::result::Result<Self::Value, __E>
-                        where
-                            __E: __serde::de::Error,
-                        {
-                            match __value {
-                                b"enabled" => {
-                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
-                                }
-                                b"user" => ::core::result::Result::Ok(__Identifier::__Identifier1),
-                                b"shell" => ::core::result::Result::Ok(__Identifier::__Identifier2),
-                                b"allowed-users" => {
-                                    ::core::result::Result::Ok(__Identifier::__Identifier3)
-                                }
-                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
-                            }
-                        }
-                    }
-                    impl<'de> __serde::Deserialize<'de> for __Identifier {
-                        #[inline]
-                        fn deserialize<__D>(
-                            __deserializer: __D,
-                        ) -> ::core::result::Result<Self, __D::Error>
-                        where
-                            __D: __serde::Deserializer<'de>,
-                        {
-                            __serde::Deserializer::deserialize_identifier(
-                                __deserializer,
-                                __IdentifierVisitor,
-                            )
-                        }
-                    }
-                    let mut __field0: ::core::option::Option<::std::option::Option<bool>> =
-                        ::core::option::Option::None;
-                    let mut __field1: ::core::option::Option<
-                        ::std::option::Option<::std::string::String>,
-                    > = ::core::option::Option::None;
-                    let mut __field2: ::core::option::Option<
-                        ::std::option::Option<::std::string::String>,
-                    > = ::core::option::Option::None;
-                    let mut __field3: ::core::option::Option<
-                        ::std::option::Option<::std::vec::Vec<::std::string::String>>,
-                    > = ::core::option::Option::None;
-                    while let ::core::option::Option::Some(__key) =
-                        __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
-                    {
-                        match __key {
-                            __Identifier::__Identifier0 => {
-                                if ::core::option::Option::is_some(&__field0) {
-                                    return ::core::result::Result::Err(
-                                        <__A::Error as __serde::de::Error>::duplicate_field(
-                                            "enabled",
-                                        ),
-                                    );
-                                }
-                                __field0 = ::core::option::Option::Some(
-                                    __serde::de::MapAccess::next_value::<
-                                        ::std::option::Option<bool>,
-                                    >(&mut __map)?,
-                                );
-                            }
-                            __Identifier::__Identifier1 => {
-                                if ::core::option::Option::is_some(&__field1) {
-                                    return ::core::result::Result::Err(
-                                        <__A::Error as __serde::de::Error>::duplicate_field("user"),
-                                    );
-                                }
-                                __field1 = ::core::option::Option::Some(
-                                    __serde::de::MapAccess::next_value::<
-                                        ::std::option::Option<::std::string::String>,
-                                    >(&mut __map)?,
-                                );
-                            }
-                            __Identifier::__Identifier2 => {
-                                if ::core::option::Option::is_some(&__field2) {
-                                    return ::core::result::Result::Err(
-                                        <__A::Error as __serde::de::Error>::duplicate_field(
-                                            "shell",
-                                        ),
-                                    );
-                                }
-                                __field2 = ::core::option::Option::Some(
-                                    __serde::de::MapAccess::next_value::<
-                                        ::std::option::Option<::std::string::String>,
-                                    >(&mut __map)?,
-                                );
-                            }
-                            __Identifier::__Identifier3 => {
-                                if ::core::option::Option::is_some(&__field3) {
-                                    return ::core::result::Result::Err(
-                                        <__A::Error as __serde::de::Error>::duplicate_field(
-                                            "allowed-users",
-                                        ),
-                                    );
-                                }
-                                __field3 = ::core::option::Option::Some(
-                                    __serde::de::MapAccess::next_value::<
-                                        ::std::option::Option<
-                                            ::std::vec::Vec<::std::string::String>,
-                                        >,
-                                    >(&mut __map)?,
-                                );
-                            }
-                            _ => {
-                                __serde::de::MapAccess::next_value::<__serde::de::IgnoredAny>(
-                                    &mut __map,
-                                )?;
-                            }
-                        }
-                    }
-                    let __field0 = match __field0 {
-                        ::core::option::Option::Some(__value) => __value,
-                        ::core::option::Option::None => ::core::option::Option::None,
-                    };
-                    let __field1 = match __field1 {
-                        ::core::option::Option::Some(__value) => __value,
-                        ::core::option::Option::None => ::core::option::Option::None,
-                    };
-                    let __field2 = match __field2 {
-                        ::core::option::Option::Some(__value) => __value,
-                        ::core::option::Option::None => ::core::option::Option::None,
-                    };
-                    let __field3 = match __field3 {
-                        ::core::option::Option::Some(__value) => __value,
-                        ::core::option::Option::None => ::core::option::Option::None,
-                    };
-                    ::core::result::Result::Ok(TerminalConfig {
-                        enabled: __field0,
-                        user: __field1,
-                        shell: __field2,
-                        allowed_users: __field3,
-                    })
-                }
-            }
-            #[doc(hidden)]
-            const __FIELDS: &'static [&'static str] =
-                &["enabled", "user", "shell", "allowed-users"];
-            __serde::Deserializer::deserialize_struct(
-                __deserializer,
-                "TerminalConfig",
                 __FIELDS,
                 __Visitor {
                     __phantom_vars: ::core::marker::PhantomData,
