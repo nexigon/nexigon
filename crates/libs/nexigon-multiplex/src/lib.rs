@@ -140,7 +140,12 @@ impl ConnectionRef {
     ///
     /// Returns `true` if the frame has been successfully queued for sending.
     fn send_frame(&self, frame: Frame) -> bool {
-        self.frame_tx.unbounded_send(frame).is_ok()
+        trace!(frame = %frame, "queuing frame for sending");
+        let ok = self.frame_tx.unbounded_send(frame).is_ok();
+        if !ok {
+            warn!("failed to queue frame: connection closed");
+        }
+        ok
     }
 
     /// Send a connection command.
@@ -152,14 +157,23 @@ impl ConnectionRef {
 
     /// Open a new channel over the connection.
     pub async fn open(&mut self, endpoint: &[u8]) -> Result<Channel, OpenError> {
+        debug!(
+            endpoint = ?std::str::from_utf8(endpoint).ok(),
+            "requesting channel open"
+        );
         // Channel id will be assigned by the connection when processing the command.
         let request = FrameChannelRequest::new(ChannelId::NULL, 128, (16 * KIB) as u32, endpoint);
         let (result_tx, result_rx) = oneshot::channel();
         self.send_cmd(ConnectionCmd::OpenChannel { request, result_tx });
-        match result_rx.await {
+        let result = match result_rx.await {
             Ok(result) => result,
             Err(_) => Err(OpenError::Closed),
+        };
+        match &result {
+            Ok(_) => debug!("channel opened successfully"),
+            Err(e) => debug!(%e, "channel open failed"),
         }
+        result
     }
 }
 
@@ -236,6 +250,7 @@ struct ConnectionShared {
 impl<T: ConnectionTransport> Connection<T> {
     /// Create a connection from the provided transport.
     pub fn new(transport: T) -> Self {
+        debug!("creating new multiplex connection");
         let (frame_tx, frame_rx) = mpsc::unbounded();
         let (cmd_tx, cmd_rx) = mpsc::unbounded();
         let _ = frame_tx.unbounded_send(FrameHello::new(&PROTOCOL_MAGIC, b"").into());
@@ -294,6 +309,11 @@ impl<T: ConnectionTransport> Connection<T> {
                 result_tx,
             } => {
                 let local_id = self.reserve_channel_id();
+                debug!(
+                    channel.local_id = local_id.0,
+                    endpoint = ?std::str::from_utf8(request.endpoint()).ok(),
+                    "cmd: opening channel"
+                );
                 request.set_sender_id(local_id);
                 self.this_ref.send_frame(request.into());
                 self.pending_requests.insert(local_id, result_tx);
@@ -304,6 +324,11 @@ impl<T: ConnectionTransport> Connection<T> {
             } => {
                 let remote_id = accept.receiver_id();
                 let local_id = self.reserve_channel_id();
+                debug!(
+                    channel.local_id = local_id.0,
+                    channel.remote_id = remote_id.0,
+                    "cmd: accepting channel"
+                );
                 accept.set_sender_id(local_id);
                 self.this_ref.send_frame(accept.into());
                 let channel = self.make_channel(local_id, remote_id);
@@ -368,33 +393,68 @@ impl<T: ConnectionTransport> Connection<T> {
             }
             Frame::ChannelData(frame) => {
                 let local_id = frame.receiver_id();
-                trace!(channel.local_id = local_id.0, "received data");
+                let payload_len = frame.payload().len();
+                trace!(channel.local_id = local_id.0, payload_len, "received data");
                 if let Some(handle) = self.channels.get_mut(&local_id) {
                     handle
                         .statistics
                         .bytes_received
-                        .fetch_add(frame.payload().len() as u64, atomic::Ordering::Relaxed);
+                        .fetch_add(payload_len as u64, atomic::Ordering::Relaxed);
                     let mut shared = handle.receiver_shared.lock();
                     if shared.remaining_frame_credit == 0 {
+                        error!(
+                            channel.local_id = local_id.0,
+                            "protocol violation: no frame credit remaining"
+                        );
                         return Err(ProtocolViolation("no frame credit remaining"));
                     }
-                    if shared.remaining_byte_credit < frame.payload().len() as u32 {
+                    if shared.remaining_byte_credit < payload_len as u32 {
+                        error!(
+                            channel.local_id = local_id.0,
+                            remaining_byte_credit = shared.remaining_byte_credit,
+                            payload_len,
+                            "protocol violation: not enough byte credit"
+                        );
                         return Err(ProtocolViolation("not enough byte credit"));
                     }
+                    trace!(
+                        channel.local_id = local_id.0,
+                        remaining_frame_credit = shared.remaining_frame_credit,
+                        remaining_byte_credit = shared.remaining_byte_credit,
+                        buffer_len = shared.buffer.len(),
+                        has_waker = shared.waker.is_some(),
+                        "buffering data frame"
+                    );
                     shared.buffer.push_back(frame);
                     if let Some(waker) = shared.waker.take() {
+                        trace!(channel.local_id = local_id.0, "waking receiver");
                         waker.wake();
                     }
+                } else {
+                    warn!(
+                        channel.local_id = local_id.0,
+                        "received data for unknown channel"
+                    );
                 };
                 None
             }
             Frame::ChannelAdjust(frame) => {
                 let local_id = frame.receiver_id();
-                trace!(channel.local_id = local_id.0, "adjust channel credits");
+                let add_frame_credit = frame.frame_credit();
+                let add_byte_credit = frame.byte_credit();
                 if let Some(handle) = self.channels.get_mut(&local_id) {
                     let mut shared = handle.sender_shared.lock();
-                    shared.remaining_frame_credit += frame.frame_credit();
-                    shared.remaining_byte_credit += frame.byte_credit();
+                    trace!(
+                        channel.local_id = local_id.0,
+                        add_frame_credit,
+                        add_byte_credit,
+                        before_frame_credit = shared.remaining_frame_credit,
+                        before_byte_credit = shared.remaining_byte_credit,
+                        has_waker = shared.waker.is_some(),
+                        "adjusting sender credits"
+                    );
+                    shared.remaining_frame_credit += add_frame_credit;
+                    shared.remaining_byte_credit += add_byte_credit;
                     let duration = shared.last_credit_update.elapsed().as_secs_f64();
                     let used_byte_credit = shared.used_byte_credit;
                     shared
@@ -408,13 +468,27 @@ impl<T: ConnectionTransport> Connection<T> {
                     shared.used_frame_credit = 0;
                     shared.last_credit_update = Instant::now();
                     if let Some(waker) = shared.waker.take() {
+                        trace!(
+                            channel.local_id = local_id.0,
+                            "waking sender after credit adjust"
+                        );
                         waker.wake();
                     }
+                } else {
+                    warn!(
+                        channel.local_id = local_id.0,
+                        "received credit adjust for unknown channel"
+                    );
                 }
                 None
             }
             Frame::ChannelClose(frame) => {
                 let local_id = frame.receiver_id();
+                debug!(
+                    channel.local_id = local_id.0,
+                    reason = ?std::str::from_utf8(frame.reason()).ok(),
+                    "channel close received (sender side)"
+                );
                 if let Some(handle) = self.channels.get_mut(&local_id) {
                     let mut shared = handle.sender_shared.lock();
                     shared.closed = Some(frame);
@@ -492,7 +566,9 @@ impl<T: ConnectionTransport> Connection<T> {
         &mut self,
         cx: &mut task::Context<'_>,
     ) -> Poll<Result<Option<ConnectionEvent>, ConnectionError<T>>> {
+        trace!("poll_event: enter");
         self.ping(cx);
+        // Phase 1: Process incoming commands.
         loop {
             match self.cmd_rx.poll_next_unpin(cx) {
                 Poll::Ready(Some(cmd)) => {
@@ -502,40 +578,62 @@ impl<T: ConnectionTransport> Connection<T> {
                 Poll::Pending => break,
             }
         }
+        // Phase 2: Send pending frames over the transport.
+        let mut frames_sent_phase2 = 0u32;
         loop {
             match self.transport.poll_ready_unpin(cx) {
                 Poll::Ready(Ok(())) => match self.frame_rx.poll_next_unpin(cx) {
                     Poll::Ready(Some(frame)) => {
+                        trace!(frame = %frame, "sending frame over transport");
+                        frames_sent_phase2 += 1;
                         self.this_ref
                             .shared
                             .frames_sent
                             .fetch_add(1, atomic::Ordering::Relaxed);
                         if let Err(error) = self.transport.start_send_unpin(frame.into()) {
+                            error!(%error, "transport send error");
                             return Poll::Ready(Err(ConnectionError::TransportError(
                                 TransportError::SendError(error),
                             )));
                         }
                     }
                     Poll::Ready(None) => unreachable!("the connection holds on to a sender"),
-                    Poll::Pending => break,
+                    Poll::Pending => {
+                        trace!(
+                            frames_sent_phase2,
+                            "phase 2: no more frames to send (frame_rx pending)"
+                        );
+                        break;
+                    }
                 },
                 Poll::Ready(Err(error)) => {
+                    error!(%error, "transport ready error");
                     return Poll::Ready(Err(ConnectionError::TransportError(
                         TransportError::SendError(error),
                     )));
                 }
-                Poll::Pending => break,
+                Poll::Pending => {
+                    trace!(
+                        frames_sent_phase2,
+                        "phase 2: transport not ready, skipping frame_rx poll"
+                    );
+                    break;
+                }
             }
         }
+        // Phase 3: Flush the transport.
         if let Poll::Ready(Err(error)) = self.transport.poll_flush_unpin(cx) {
+            error!(%error, "transport flush error");
             return Poll::Ready(Err(ConnectionError::TransportError(
                 TransportError::SendError(error),
             )));
         }
+        // Phase 4: Receive and process incoming frames.
         while !self.exhausted {
             match self.transport.poll_next_unpin(cx) {
                 Poll::Ready(Some(Ok(frame))) => match Frame::parse(frame) {
                     Ok(frame) => {
+                        trace!(frame = %frame, "received frame from transport");
                         self.this_ref
                             .shared
                             .frames_received
@@ -545,18 +643,20 @@ impl<T: ConnectionTransport> Connection<T> {
                         }
                     }
                     Err(error) => {
-                        error!("received invalid frame: {error}");
+                        error!(%error, "received invalid frame");
                         return Poll::Ready(Err(ConnectionError::ProtocolViolation(
                             ProtocolViolation("invalid frame"),
                         )));
                     }
                 },
                 Poll::Ready(Some(Err(error))) => {
+                    error!(%error, "transport recv error");
                     return Poll::Ready(Err(ConnectionError::TransportError(
                         TransportError::RecvError(error),
                     )));
                 }
                 Poll::Ready(None) => {
+                    debug!("transport exhausted (no more frames)");
                     self.exhausted = true;
                 }
                 Poll::Pending => {
@@ -766,6 +866,7 @@ impl Channel {
                 connection: connection.clone(),
                 pending: None,
                 statistics: statistics.clone(),
+                closed_sent: false,
             },
             receiver: Receiver {
                 shared: Arc::new(Mutex::new(ReceiverShared::new())),
@@ -1010,6 +1111,8 @@ pub struct Sender {
     pending: Option<Chunk>,
     /// Channel statistics.
     statistics: Arc<ChannelStatistics>,
+    /// Whether `ChannelClosed` has already been sent (via explicit close).
+    closed_sent: bool,
 }
 
 impl Sender {
@@ -1035,6 +1138,10 @@ impl Sender {
     fn poll_send_chunk(&mut self, cx: &mut task::Context) -> Poll<Result<(), ChannelSendError>> {
         let mut shared = self.shared.lock();
         if shared.closed.is_some() {
+            trace!(
+                channel.remote_id = self.remote_id.0,
+                "poll_send_chunk: channel closed"
+            );
             return Poll::Ready(Err(ChannelSendError::Closed));
         }
         let Some(chunk) = &self.pending else {
@@ -1047,6 +1154,13 @@ impl Sender {
             shared.remaining_byte_credit -= byte_credit;
             shared.used_frame_credit += 1;
             shared.used_byte_credit += byte_credit;
+            trace!(
+                channel.remote_id = self.remote_id.0,
+                payload_len = byte_credit,
+                remaining_frame_credit = shared.remaining_frame_credit,
+                remaining_byte_credit = shared.remaining_byte_credit,
+                "poll_send_chunk: sending chunk"
+            );
             let mut frame = self.pending.take().unwrap().frame;
             self.statistics
                 .bytes_sent
@@ -1055,6 +1169,12 @@ impl Sender {
             self.connection.send_frame(frame.into());
             Poll::Ready(Ok(()))
         } else {
+            trace!(
+                channel.remote_id = self.remote_id.0,
+                pending_bytes = byte_credit,
+                remaining_byte_credit = shared.remaining_byte_credit,
+                "poll_send_chunk: no frame credit, pending"
+            );
             shared.waker = Some(cx.waker().clone());
             Poll::Pending
         }
@@ -1070,10 +1190,24 @@ impl AsyncWrite for Sender {
         try_ready!(AsyncWrite::poll_flush(self.as_mut(), cx));
         let mut shared = self.shared.lock();
         if shared.remaining_byte_credit < 512 {
+            trace!(
+                channel.remote_id = self.remote_id.0,
+                remaining_byte_credit = shared.remaining_byte_credit,
+                buf_len = buf.len(),
+                "poll_write: insufficient byte credit, pending"
+            );
             shared.waker = Some(cx.waker().clone());
             return Poll::Pending;
         }
         let chunk_size = (shared.remaining_byte_credit as usize).min(buf.len());
+        trace!(
+            channel.remote_id = self.remote_id.0,
+            buf_len = buf.len(),
+            chunk_size,
+            remaining_byte_credit = shared.remaining_byte_credit,
+            remaining_frame_credit = shared.remaining_frame_credit,
+            "poll_write: creating chunk"
+        );
         let mut chunk = Chunk::with_capacity(chunk_size);
         chunk.extend(&buf[..chunk_size]);
         drop(shared);
@@ -1099,9 +1233,25 @@ impl AsyncWrite for Sender {
         cx: &mut task::Context<'_>,
     ) -> Poll<std::io::Result<()>> {
         try_ready!(self.as_mut().poll_flush(cx));
-        self.connection
-            .send_frame(FrameChannelClosed::new(self.remote_id, b"").into());
+        if !self.closed_sent {
+            self.closed_sent = true;
+            self.connection
+                .send_frame(FrameChannelClosed::new(self.remote_id, b"").into());
+        }
         Poll::Ready(Ok(()))
+    }
+}
+
+impl Drop for Sender {
+    fn drop(&mut self) {
+        if !self.closed_sent {
+            debug!(
+                channel.remote_id = self.remote_id.0,
+                "dropping sender, sending ChannelClosed"
+            );
+            self.connection
+                .send_frame(FrameChannelClosed::new(self.remote_id, b"").into());
+        }
     }
 }
 
@@ -1210,20 +1360,37 @@ impl Receiver {
     /// Poll the next chunk.
     fn poll_next_chunk(&mut self, cx: &mut task::Context) -> Poll<Option<Chunk>> {
         let mut shared = self.shared.lock();
-        if shared.closed {
-            return Poll::Ready(None);
-        }
+        // Important: check the buffer BEFORE checking closed, so that any data
+        // received before the close frame is still delivered to the reader.
         if let Some(frame) = shared.buffer.pop_front() {
+            let payload_len = frame.payload().len() as u32;
             shared.remaining_frame_credit -= 1;
-            shared.remaining_byte_credit -= frame.payload().len() as u32;
+            shared.remaining_byte_credit -= payload_len;
+            trace!(
+                channel.local_id = self.local_id.0,
+                payload_len,
+                remaining_frame_credit = shared.remaining_frame_credit,
+                remaining_byte_credit = shared.remaining_byte_credit,
+                max_frame_credit = shared.max_frame_credit,
+                max_byte_credit = shared.max_byte_credit,
+                buffer_remaining = shared.buffer.len(),
+                "poll_next_chunk: consumed frame"
+            );
             let mut update_credit = false;
             let smoothened_rtt = *self.connection.shared.smoothened_rtt.read();
             if shared.remaining_frame_credit < shared.max_frame_credit / 2 {
                 if let Some(smoothened_rtt) = smoothened_rtt
                     && shared.last_credit_update.elapsed() < 2 * smoothened_rtt
                 {
+                    let old = shared.max_frame_credit;
                     shared.max_frame_credit =
                         (shared.max_frame_credit * 2).min(CHANNEL_MAX_FRAME_CREDIT);
+                    trace!(
+                        channel.local_id = self.local_id.0,
+                        old_max = old,
+                        new_max = shared.max_frame_credit,
+                        "scaling up max frame credit"
+                    );
                 }
                 update_credit = true;
             }
@@ -1231,14 +1398,25 @@ impl Receiver {
                 if let Some(smoothened_rtt) = smoothened_rtt
                     && shared.last_credit_update.elapsed() < 2 * smoothened_rtt
                 {
+                    let old = shared.max_byte_credit;
                     shared.max_byte_credit =
                         (shared.max_byte_credit * 2).min(CHANNEL_MAX_BYTE_CREDIT);
+                    trace!(
+                        channel.local_id = self.local_id.0,
+                        old_max = old,
+                        new_max = shared.max_byte_credit,
+                        "scaling up max byte credit"
+                    );
                 }
                 update_credit = true;
             }
             if update_credit {
                 let add_frame_credit = shared.max_frame_credit - shared.remaining_frame_credit;
                 let add_byte_credit = shared.max_byte_credit - shared.remaining_byte_credit;
+                trace!(
+                    channel.local_id = self.local_id.0,
+                    add_frame_credit, add_byte_credit, "sending credit adjustment"
+                );
                 let duration = shared.last_credit_update.elapsed().as_secs_f64();
                 shared
                     .bandwidth_bytes
@@ -1256,6 +1434,17 @@ impl Receiver {
             }
             return Poll::Ready(Some(Chunk { frame }));
         }
+        if shared.closed {
+            trace!(
+                channel.local_id = self.local_id.0,
+                "poll_next_chunk: channel closed, buffer empty"
+            );
+            return Poll::Ready(None);
+        }
+        trace!(
+            channel.local_id = self.local_id.0,
+            "poll_next_chunk: buffer empty, pending"
+        );
         shared.waker = Some(cx.waker().clone());
         Poll::Pending
     }
@@ -1263,6 +1452,11 @@ impl Receiver {
 
 impl Drop for Receiver {
     fn drop(&mut self) {
+        debug!(
+            channel.local_id = self.local_id.0,
+            channel.remote_id = self.remote_id.0,
+            "dropping receiver, sending ChannelClose"
+        );
         self.connection
             .send_frame(FrameChannelClose::new(self.remote_id, b"").into());
     }

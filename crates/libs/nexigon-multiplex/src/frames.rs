@@ -88,6 +88,16 @@ macro_rules! define_frame_types {
                 }
             }
 
+            impl<B> std::fmt::Display for Frame<B> {
+                fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                    match self {
+                        $(
+                            Self::$name(_) => write!(f, stringify!($name)),
+                        )*
+                    }
+                }
+            }
+
             $(
                 define_frame_types!(@frame $(#[$meta])* $name($tag) [ $($fields)* ]);
 
