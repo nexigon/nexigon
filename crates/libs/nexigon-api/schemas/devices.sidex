@@ -116,6 +116,19 @@ record DeviceConnection {
     connected_for_secs: u32,
 }
 
+/// Combined device status (connection + health).
+#[json(tagged = externally, rename_all = "lowercase")]
+variant DeviceStatus {
+    /// Device is healthy and connected.
+    Healthy,
+    /// Device is connected but experiencing degraded performance.
+    Warning,
+    /// Device is connected but in an error state.
+    Error,
+    /// Device is not connected.
+    Offline,
+}
+
 /// Status of a device certificate.
 #[json(tagged = externally)]
 variant DeviceCertificateStatus {

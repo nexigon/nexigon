@@ -4557,6 +4557,15 @@
         ],
         "unevaluatedProperties": false
       },
+      "nexigon_api.devices.DeviceStatus": {
+        "enum": [
+          "healthy",
+          "warning",
+          "error",
+          "offline"
+        ],
+        "description": "Combined device status (connection + health)."
+      },
       "nexigon_api.devices.GetDeviceDetailsAction": {
         "type": "object",
         "properties": {
@@ -6135,6 +6144,9 @@
           "firstSeen": {
             "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
           },
+          "status": {
+            "$ref": "#/components/schemas/nexigon_api.devices.DeviceStatus"
+          },
           "isConnected": {
             "type": "boolean"
           },
@@ -6153,6 +6165,7 @@
         "required": [
           "deviceId",
           "firstSeen",
+          "status",
           "isConnected",
           "pendingCertificatesCount"
         ],

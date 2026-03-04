@@ -9223,6 +9223,205 @@ pub mod devices {
             )
         }
     }
+    #[doc = "Combined device status (connection + health).\n"]
+    #[derive(Clone, Debug)]
+    pub enum DeviceStatus {
+        #[doc = "Device is healthy and connected.\n"]
+        Healthy,
+        #[doc = "Device is connected but experiencing degraded performance.\n"]
+        Warning,
+        #[doc = "Device is connected but in an error state.\n"]
+        Error,
+        #[doc = "Device is not connected.\n"]
+        Offline,
+    }
+    #[automatically_derived]
+    impl __serde::Serialize for DeviceStatus {
+        fn serialize<__S: __serde::Serializer>(
+            &self,
+            __serializer: __S,
+        ) -> ::std::result::Result<__S::Ok, __S::Error> {
+            let __serializer =
+                __sidex_serde::ser::VariantSerializer::new(__serializer, "DeviceStatus");
+            match self {
+                Self::Healthy => __serializer.serialize_tag("healthy", 0u32),
+                Self::Warning => __serializer.serialize_tag("warning", 1u32),
+                Self::Error => __serializer.serialize_tag("error", 2u32),
+                Self::Offline => __serializer.serialize_tag("offline", 3u32),
+            }
+        }
+    }
+    #[automatically_derived]
+    impl<'de> __serde::Deserialize<'de> for DeviceStatus {
+        fn deserialize<__D: __serde::Deserializer<'de>>(
+            __deserializer: __D,
+        ) -> ::std::result::Result<Self, __D::Error> {
+            #[doc(hidden)]
+            const __IDENTIFIERS: &'static [&'static str] =
+                &["healthy", "warning", "error", "offline"];
+            #[doc(hidden)]
+            const __EXPECTING_IDENTIFIERS: &'static str =
+                "an identifier in [\"healthy\", \"warning\", \"error\", \"offline\"]";
+            #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
+            #[doc(hidden)]
+            enum __Identifier {
+                __Identifier0,
+                __Identifier1,
+                __Identifier2,
+                __Identifier3,
+            }
+            #[doc(hidden)]
+            struct __IdentifierVisitor;
+            impl<'de> __serde::de::Visitor<'de> for __IdentifierVisitor {
+                type Value = __Identifier;
+                fn expecting(
+                    &self,
+                    __formatter: &mut ::core::fmt::Formatter,
+                ) -> ::core::fmt::Result {
+                    ::core::fmt::Formatter::write_str(__formatter, __EXPECTING_IDENTIFIERS)
+                }
+                fn visit_u64<__E>(self, __value: u64) -> ::core::result::Result<Self::Value, __E>
+                where
+                    __E: __serde::de::Error,
+                {
+                    match __value {
+                        0u64 => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                        1u64 => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                        2u64 => ::core::result::Result::Ok(__Identifier::__Identifier2),
+                        3u64 => ::core::result::Result::Ok(__Identifier::__Identifier3),
+                        __variant => {
+                            ::core::result::Result::Err(__serde::de::Error::invalid_value(
+                                __serde::de::Unexpected::Unsigned(__variant),
+                                &__EXPECTING_IDENTIFIERS,
+                            ))
+                        }
+                    }
+                }
+                fn visit_str<__E>(self, __value: &str) -> ::core::result::Result<Self::Value, __E>
+                where
+                    __E: __serde::de::Error,
+                {
+                    match __value {
+                        "healthy" => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                        "warning" => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                        "error" => ::core::result::Result::Ok(__Identifier::__Identifier2),
+                        "offline" => ::core::result::Result::Ok(__Identifier::__Identifier3),
+                        __variant => ::core::result::Result::Err(
+                            __serde::de::Error::unknown_variant(__variant, __IDENTIFIERS),
+                        ),
+                    }
+                }
+                fn visit_bytes<__E>(
+                    self,
+                    __value: &[u8],
+                ) -> ::core::result::Result<Self::Value, __E>
+                where
+                    __E: __serde::de::Error,
+                {
+                    match __value {
+                        b"healthy" => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                        b"warning" => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                        b"error" => ::core::result::Result::Ok(__Identifier::__Identifier2),
+                        b"offline" => ::core::result::Result::Ok(__Identifier::__Identifier3),
+                        __variant => {
+                            ::core::result::Result::Err(__serde::de::Error::invalid_value(
+                                __serde::de::Unexpected::Bytes(__variant),
+                                &__EXPECTING_IDENTIFIERS,
+                            ))
+                        }
+                    }
+                }
+            }
+            impl<'de> __serde::Deserialize<'de> for __Identifier {
+                #[inline]
+                fn deserialize<__D>(__deserializer: __D) -> ::core::result::Result<Self, __D::Error>
+                where
+                    __D: __serde::Deserializer<'de>,
+                {
+                    __serde::Deserializer::deserialize_identifier(
+                        __deserializer,
+                        __IdentifierVisitor,
+                    )
+                }
+            }
+            #[doc(hidden)]
+            const __VARIANTS: &'static [&'static str] = &["healthy", "warning", "error", "offline"];
+            #[doc(hidden)]
+            struct __Visitor {
+                __phantom_vars: ::core::marker::PhantomData<fn(&())>,
+            }
+            impl<'de> __serde::de::Visitor<'de> for __Visitor {
+                type Value = DeviceStatus;
+                fn expecting(
+                    &self,
+                    __formatter: &mut ::core::fmt::Formatter,
+                ) -> ::core::fmt::Result {
+                    ::core::fmt::Formatter::write_str(__formatter, "enum DeviceStatus")
+                }
+                #[inline]
+                fn visit_str<__E>(self, __value: &str) -> ::core::result::Result<Self::Value, __E>
+                where
+                    __E: __serde::de::Error,
+                {
+                    let __identifier = __IdentifierVisitor.visit_str(__value)?;
+                    #[allow(unreachable_patterns)]
+                    match __identifier {
+                        __Identifier::__Identifier0 => {
+                            ::core::result::Result::Ok(DeviceStatus::Healthy)
+                        }
+                        __Identifier::__Identifier1 => {
+                            ::core::result::Result::Ok(DeviceStatus::Warning)
+                        }
+                        __Identifier::__Identifier2 => {
+                            ::core::result::Result::Ok(DeviceStatus::Error)
+                        }
+                        __Identifier::__Identifier3 => {
+                            ::core::result::Result::Ok(DeviceStatus::Offline)
+                        }
+                        _ => Err(__E::invalid_value(
+                            __serde::de::Unexpected::Str(__value),
+                            &self,
+                        )),
+                    }
+                }
+                #[inline]
+                fn visit_enum<__A>(
+                    self,
+                    __data: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::EnumAccess<'de>,
+                {
+                    match __serde::de::EnumAccess::variant::<__Identifier>(__data)? {
+                        (__Identifier::__Identifier0, __variant) => {
+                            __serde::de::VariantAccess::unit_variant(__variant)?;
+                            ::core::result::Result::Ok(DeviceStatus::Healthy)
+                        }
+                        (__Identifier::__Identifier1, __variant) => {
+                            __serde::de::VariantAccess::unit_variant(__variant)?;
+                            ::core::result::Result::Ok(DeviceStatus::Warning)
+                        }
+                        (__Identifier::__Identifier2, __variant) => {
+                            __serde::de::VariantAccess::unit_variant(__variant)?;
+                            ::core::result::Result::Ok(DeviceStatus::Error)
+                        }
+                        (__Identifier::__Identifier3, __variant) => {
+                            __serde::de::VariantAccess::unit_variant(__variant)?;
+                            ::core::result::Result::Ok(DeviceStatus::Offline)
+                        }
+                    }
+                }
+            }
+            __serde::Deserializer::deserialize_enum(
+                __deserializer,
+                "DeviceStatus",
+                __VARIANTS,
+                __Visitor {
+                    __phantom_vars: ::core::marker::PhantomData,
+                },
+            )
+        }
+    }
     #[doc = "Status of a device certificate.\n"]
     #[derive(Clone, Debug)]
     pub enum DeviceCertificateStatus {
@@ -34018,6 +34217,8 @@ pub mod projects {
         pub name: ::std::option::Option<::std::string::String>,
         #[doc = "Timestamp when the device was first seen.\n"]
         pub first_seen: super::datetime::Timestamp,
+        #[doc = "Combined device status (connection + health).\n"]
+        pub status: super::devices::DeviceStatus,
         #[doc = "Indicates whether the device is online.\n"]
         pub is_connected: bool,
         #[doc = "Pending device certificates.\n"]
@@ -34032,12 +34233,14 @@ pub mod projects {
         pub fn new(
             device_id: super::devices::DeviceId,
             first_seen: super::datetime::Timestamp,
+            status: super::devices::DeviceStatus,
             is_connected: bool,
             pending_certificates_count: u32,
         ) -> Self {
             Self {
                 device_id,
                 first_seen,
+                status,
                 is_connected,
                 pending_certificates_count,
                 name: ::std::default::Default::default(),
@@ -34076,6 +34279,16 @@ pub mod projects {
         #[doc = "Sets the value of `first_seen`."]
         pub fn with_first_seen(mut self, first_seen: super::datetime::Timestamp) -> Self {
             self.first_seen = first_seen;
+            self
+        }
+        #[doc = "Sets the value of `status`."]
+        pub fn set_status(&mut self, status: super::devices::DeviceStatus) -> &mut Self {
+            self.status = status;
+            self
+        }
+        #[doc = "Sets the value of `status`."]
+        pub fn with_status(mut self, status: super::devices::DeviceStatus) -> Self {
+            self.status = status;
             self
         }
         #[doc = "Sets the value of `is_connected`."]
@@ -34143,12 +34356,13 @@ pub mod projects {
             let mut __record = __sidex_serde::ser::RecordSerializer::new(
                 __serializer,
                 "QueryProjectDevicesItem",
-                7usize,
+                8usize,
             )?;
             __record.serialize_field("deviceId", &self.device_id)?;
             __record
                 .serialize_optional_field("name", ::core::option::Option::as_ref(&self.name))?;
             __record.serialize_field("firstSeen", &self.first_seen)?;
+            __record.serialize_field("status", &self.status)?;
             __record.serialize_field("isConnected", &self.is_connected)?;
             __record
                 .serialize_field("pendingCertificatesCount", &self.pending_certificates_count)?;
@@ -34195,7 +34409,7 @@ pub mod projects {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(0usize, &"record with 7 fields"),
+                                __serde::de::Error::invalid_length(0usize, &"record with 8 fields"),
                             );
                         }
                     };
@@ -34206,7 +34420,7 @@ pub mod projects {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(1usize, &"record with 7 fields"),
+                                __serde::de::Error::invalid_length(1usize, &"record with 8 fields"),
                             );
                         }
                     };
@@ -34217,45 +34431,56 @@ pub mod projects {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(2usize, &"record with 7 fields"),
+                                __serde::de::Error::invalid_length(2usize, &"record with 8 fields"),
                             );
                         }
                     };
-                    let __field3 = match __serde::de::SeqAccess::next_element::<bool>(&mut __seq)? {
+                    let __field3 = match __serde::de::SeqAccess::next_element::<
+                        super::devices::DeviceStatus,
+                    >(&mut __seq)?
+                    {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(3usize, &"record with 7 fields"),
+                                __serde::de::Error::invalid_length(3usize, &"record with 8 fields"),
                             );
                         }
                     };
-                    let __field4 = match __serde::de::SeqAccess::next_element::<u32>(&mut __seq)? {
+                    let __field4 = match __serde::de::SeqAccess::next_element::<bool>(&mut __seq)? {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(4usize, &"record with 7 fields"),
+                                __serde::de::Error::invalid_length(4usize, &"record with 8 fields"),
                             );
                         }
                     };
-                    let __field5 = match __serde::de::SeqAccess::next_element::<
+                    let __field5 = match __serde::de::SeqAccess::next_element::<u32>(&mut __seq)? {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(5usize, &"record with 8 fields"),
+                            );
+                        }
+                    };
+                    let __field6 = match __serde::de::SeqAccess::next_element::<
                         ::std::option::Option<super::datetime::Timestamp>,
                     >(&mut __seq)?
                     {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(5usize, &"record with 7 fields"),
+                                __serde::de::Error::invalid_length(6usize, &"record with 8 fields"),
                             );
                         }
                     };
-                    let __field6 = match __serde::de::SeqAccess::next_element::<
+                    let __field7 = match __serde::de::SeqAccess::next_element::<
                         ::std::option::Option<u32>,
                     >(&mut __seq)?
                     {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(6usize, &"record with 7 fields"),
+                                __serde::de::Error::invalid_length(7usize, &"record with 8 fields"),
                             );
                         }
                     };
@@ -34263,10 +34488,11 @@ pub mod projects {
                         device_id: __field0,
                         name: __field1,
                         first_seen: __field2,
-                        is_connected: __field3,
-                        pending_certificates_count: __field4,
-                        last_connected_at: __field5,
-                        current_connection_duration_secs: __field6,
+                        status: __field3,
+                        is_connected: __field4,
+                        pending_certificates_count: __field5,
+                        last_connected_at: __field6,
+                        current_connection_duration_secs: __field7,
                     })
                 }
                 #[inline]
@@ -34282,13 +34508,14 @@ pub mod projects {
                         "deviceId",
                         "name",
                         "firstSeen",
+                        "status",
                         "isConnected",
                         "pendingCertificatesCount",
                         "lastConnectedAt",
                         "currentConnectionDurationSecs",
                     ];
                     #[doc(hidden)]
-                    const __EXPECTING_IDENTIFIERS: &'static str = "an identifier in [\"deviceId\", \"name\", \"firstSeen\", \"isConnected\", \"pendingCertificatesCount\", \"lastConnectedAt\", \"currentConnectionDurationSecs\"]";
+                    const __EXPECTING_IDENTIFIERS: &'static str = "an identifier in [\"deviceId\", \"name\", \"firstSeen\", \"status\", \"isConnected\", \"pendingCertificatesCount\", \"lastConnectedAt\", \"currentConnectionDurationSecs\"]";
                     #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
                     #[doc(hidden)]
                     enum __Identifier {
@@ -34299,6 +34526,7 @@ pub mod projects {
                         __Identifier4,
                         __Identifier5,
                         __Identifier6,
+                        __Identifier7,
                         __Unknown,
                     }
                     #[doc(hidden)]
@@ -34326,6 +34554,7 @@ pub mod projects {
                                 4u64 => ::core::result::Result::Ok(__Identifier::__Identifier4),
                                 5u64 => ::core::result::Result::Ok(__Identifier::__Identifier5),
                                 6u64 => ::core::result::Result::Ok(__Identifier::__Identifier6),
+                                7u64 => ::core::result::Result::Ok(__Identifier::__Identifier7),
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
                         }
@@ -34344,17 +34573,18 @@ pub mod projects {
                                 "firstSeen" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier2)
                                 }
+                                "status" => ::core::result::Result::Ok(__Identifier::__Identifier3),
                                 "isConnected" => {
-                                    ::core::result::Result::Ok(__Identifier::__Identifier3)
-                                }
-                                "pendingCertificatesCount" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier4)
                                 }
-                                "lastConnectedAt" => {
+                                "pendingCertificatesCount" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier5)
                                 }
-                                "currentConnectionDurationSecs" => {
+                                "lastConnectedAt" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier6)
+                                }
+                                "currentConnectionDurationSecs" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier7)
                                 }
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
@@ -34374,17 +34604,20 @@ pub mod projects {
                                 b"firstSeen" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier2)
                                 }
-                                b"isConnected" => {
+                                b"status" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier3)
                                 }
-                                b"pendingCertificatesCount" => {
+                                b"isConnected" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier4)
                                 }
-                                b"lastConnectedAt" => {
+                                b"pendingCertificatesCount" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier5)
                                 }
-                                b"currentConnectionDurationSecs" => {
+                                b"lastConnectedAt" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier6)
+                                }
+                                b"currentConnectionDurationSecs" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier7)
                                 }
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
@@ -34411,12 +34644,14 @@ pub mod projects {
                     > = ::core::option::Option::None;
                     let mut __field2: ::core::option::Option<super::datetime::Timestamp> =
                         ::core::option::Option::None;
-                    let mut __field3: ::core::option::Option<bool> = ::core::option::Option::None;
-                    let mut __field4: ::core::option::Option<u32> = ::core::option::Option::None;
-                    let mut __field5: ::core::option::Option<
+                    let mut __field3: ::core::option::Option<super::devices::DeviceStatus> =
+                        ::core::option::Option::None;
+                    let mut __field4: ::core::option::Option<bool> = ::core::option::Option::None;
+                    let mut __field5: ::core::option::Option<u32> = ::core::option::Option::None;
+                    let mut __field6: ::core::option::Option<
                         ::std::option::Option<super::datetime::Timestamp>,
                     > = ::core::option::Option::None;
-                    let mut __field6: ::core::option::Option<::std::option::Option<u32>> =
+                    let mut __field7: ::core::option::Option<::std::option::Option<u32>> =
                         ::core::option::Option::None;
                     while let ::core::option::Option::Some(__key) =
                         __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
@@ -34466,49 +34701,63 @@ pub mod projects {
                                 if ::core::option::Option::is_some(&__field3) {
                                     return ::core::result::Result::Err(
                                         <__A::Error as __serde::de::Error>::duplicate_field(
-                                            "isConnected",
+                                            "status",
                                         ),
                                     );
                                 }
                                 __field3 = ::core::option::Option::Some(
-                                    __serde::de::MapAccess::next_value::<bool>(&mut __map)?,
+                                    __serde::de::MapAccess::next_value::<
+                                        super::devices::DeviceStatus,
+                                    >(&mut __map)?,
                                 );
                             }
                             __Identifier::__Identifier4 => {
                                 if ::core::option::Option::is_some(&__field4) {
                                     return ::core::result::Result::Err(
                                         <__A::Error as __serde::de::Error>::duplicate_field(
-                                            "pendingCertificatesCount",
+                                            "isConnected",
                                         ),
                                     );
                                 }
                                 __field4 = ::core::option::Option::Some(
-                                    __serde::de::MapAccess::next_value::<u32>(&mut __map)?,
+                                    __serde::de::MapAccess::next_value::<bool>(&mut __map)?,
                                 );
                             }
                             __Identifier::__Identifier5 => {
                                 if ::core::option::Option::is_some(&__field5) {
                                     return ::core::result::Result::Err(
                                         <__A::Error as __serde::de::Error>::duplicate_field(
-                                            "lastConnectedAt",
+                                            "pendingCertificatesCount",
                                         ),
                                     );
                                 }
                                 __field5 = ::core::option::Option::Some(
-                                    __serde::de::MapAccess::next_value::<
-                                        ::std::option::Option<super::datetime::Timestamp>,
-                                    >(&mut __map)?,
+                                    __serde::de::MapAccess::next_value::<u32>(&mut __map)?,
                                 );
                             }
                             __Identifier::__Identifier6 => {
                                 if ::core::option::Option::is_some(&__field6) {
                                     return ::core::result::Result::Err(
                                         <__A::Error as __serde::de::Error>::duplicate_field(
-                                            "currentConnectionDurationSecs",
+                                            "lastConnectedAt",
                                         ),
                                     );
                                 }
                                 __field6 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<
+                                        ::std::option::Option<super::datetime::Timestamp>,
+                                    >(&mut __map)?,
+                                );
+                            }
+                            __Identifier::__Identifier7 => {
+                                if ::core::option::Option::is_some(&__field7) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "currentConnectionDurationSecs",
+                                        ),
+                                    );
+                                }
+                                __field7 = ::core::option::Option::Some(
                                     __serde::de::MapAccess::next_value::<::std::option::Option<u32>>(
                                         &mut __map,
                                     )?,
@@ -34545,11 +34794,19 @@ pub mod projects {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                <__A::Error as __serde::de::Error>::missing_field("isConnected"),
+                                <__A::Error as __serde::de::Error>::missing_field("status"),
                             );
                         }
                     };
                     let __field4 = match __field4 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                <__A::Error as __serde::de::Error>::missing_field("isConnected"),
+                            );
+                        }
+                    };
+                    let __field5 = match __field5 {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
@@ -34559,11 +34816,11 @@ pub mod projects {
                             );
                         }
                     };
-                    let __field5 = match __field5 {
+                    let __field6 = match __field6 {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => ::core::option::Option::None,
                     };
-                    let __field6 = match __field6 {
+                    let __field7 = match __field7 {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => ::core::option::Option::None,
                     };
@@ -34571,10 +34828,11 @@ pub mod projects {
                         device_id: __field0,
                         name: __field1,
                         first_seen: __field2,
-                        is_connected: __field3,
-                        pending_certificates_count: __field4,
-                        last_connected_at: __field5,
-                        current_connection_duration_secs: __field6,
+                        status: __field3,
+                        is_connected: __field4,
+                        pending_certificates_count: __field5,
+                        last_connected_at: __field6,
+                        current_connection_duration_secs: __field7,
                     })
                 }
             }
@@ -34583,6 +34841,7 @@ pub mod projects {
                 "deviceId",
                 "name",
                 "firstSeen",
+                "status",
                 "isConnected",
                 "pendingCertificatesCount",
                 "lastConnectedAt",

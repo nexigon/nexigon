@@ -3,6 +3,7 @@
 import audit::AuditLogEvent
 import datetime::Timestamp
 import devices::DeviceId
+import devices::DeviceStatus
 import organizations::OrganizationId
 import repositories::RepositoryId
 import users::UserId
@@ -109,6 +110,8 @@ record QueryProjectDevicesItem {
     name?: string,
     /// Timestamp when the device was first seen.
     first_seen: Timestamp,
+    /// Combined device status (connection + health).
+    status: DeviceStatus,
     /// Indicates whether the device is online.
     is_connected: bool,
     /// Pending device certificates.
