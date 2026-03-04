@@ -233,3 +233,34 @@ record RemoveProjectRepositoryAction {
     /// ID of the repository.
     repository_id: RepositoryId,
 }
+
+/// OTLP event forwarding configuration for a project.
+record ProjectOtlpConfig {
+    /// Whether OTLP forwarding is enabled.
+    enabled: bool,
+    /// OTLP endpoint URL (e.g., https://otel-collector.example.com/v1/logs).
+    endpoint?: string,
+    /// HTTP headers to include with OTLP requests (e.g., for authentication).
+    /// Values are masked when read back.
+    headers: [string: string],
+}
+
+/// Get the OTLP event forwarding configuration for a project.
+record GetProjectOtlpConfigAction {
+    /// ID of the project.
+    project_id: ProjectId,
+}
+
+/// Output of getting the OTLP configuration for a project.
+record GetProjectOtlpConfigOutput {
+    /// OTLP configuration.
+    config: ProjectOtlpConfig,
+}
+
+/// Set the OTLP event forwarding configuration for a project.
+record SetProjectOtlpConfigAction {
+    /// ID of the project.
+    project_id: ProjectId,
+    /// OTLP configuration.
+    config: ProjectOtlpConfig,
+}

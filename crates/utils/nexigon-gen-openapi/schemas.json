@@ -2394,11 +2394,60 @@
     ],
     "unevaluatedProperties": false
   },
+  "nexigon_api.projects.GetProjectOtlpConfigAction": {
+    "type": "object",
+    "description": "Get the OTLP event forwarding configuration for a project.",
+    "properties": {
+      "projectId": {
+        "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+      }
+    },
+    "required": [
+      "projectId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.projects.GetProjectOtlpConfigOutput": {
+    "type": "object",
+    "description": "Output of getting the OTLP configuration for a project.",
+    "properties": {
+      "config": {
+        "$ref": "#/components/schemas/nexigon_api.projects.ProjectOtlpConfig"
+      }
+    },
+    "required": [
+      "config"
+    ],
+    "unevaluatedProperties": false
+  },
   "nexigon_api.projects.ProjectId": {
     "type": [
       "string"
     ],
     "description": "Unique ID of a project."
+  },
+  "nexigon_api.projects.ProjectOtlpConfig": {
+    "type": "object",
+    "description": "OTLP event forwarding configuration for a project.",
+    "properties": {
+      "enabled": {
+        "type": "boolean"
+      },
+      "endpoint": {
+        "type": "string"
+      },
+      "headers": {
+        "type": "object",
+        "additionalProperties": {
+          "type": "string"
+        }
+      }
+    },
+    "required": [
+      "enabled",
+      "headers"
+    ],
+    "unevaluatedProperties": false
   },
   "nexigon_api.projects.QueryAuditLogEventsAction": {
     "type": "object",
@@ -2688,6 +2737,23 @@
     "required": [
       "projectId",
       "name"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.projects.SetProjectOtlpConfigAction": {
+    "type": "object",
+    "description": "Set the OTLP event forwarding configuration for a project.",
+    "properties": {
+      "projectId": {
+        "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+      },
+      "config": {
+        "$ref": "#/components/schemas/nexigon_api.projects.ProjectOtlpConfig"
+      }
+    },
+    "required": [
+      "projectId",
+      "config"
     ],
     "unevaluatedProperties": false
   },

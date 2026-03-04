@@ -91,6 +91,9 @@ macro_rules! with_actions {
             // ## Repositories
             ("projects_LinkRepository", AddProjectRepository, projects::AddProjectRepositoryAction, outputs::Empty),
             ("projects_UnlinkRepository", RemoveProjectRepository, projects::RemoveProjectRepositoryAction, outputs::Empty),
+            // ## OTLP Config
+            ("projects_GetOtlpConfig", GetProjectOtlpConfig, projects::GetProjectOtlpConfigAction, projects::GetProjectOtlpConfigOutput),
+            ("projects_SetOtlpConfig", SetProjectOtlpConfig, projects::SetProjectOtlpConfigAction, outputs::Empty),
 
             // # Devices
             ("devices_Query", QueryDevices, devices::QueryDevicesAction, devices::QueryDevicesOutput),

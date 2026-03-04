@@ -1618,6 +1618,68 @@
         }
       }
     },
+    "/api/v1/actions/invoke/projects_GetOtlpConfig": {
+      "post": {
+        "tags": [
+          "projects"
+        ],
+        "summary": "GetOtlpConfig",
+        "description": "Get the OTLP event forwarding configuration for a project.",
+        "operationId": "projects_GetOtlpConfig",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/nexigon_api.projects.GetProjectOtlpConfigAction"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/nexigon_api.projects.GetProjectOtlpConfigOutput"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/actions/invoke/projects_SetOtlpConfig": {
+      "post": {
+        "tags": [
+          "projects"
+        ],
+        "summary": "SetOtlpConfig",
+        "description": "Set the OTLP event forwarding configuration for a project.",
+        "operationId": "projects_SetOtlpConfig",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/nexigon_api.projects.SetProjectOtlpConfigAction"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/nexigon_api.outputs.Empty"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/actions/invoke/devices_Query": {
       "post": {
         "tags": [
@@ -6035,9 +6097,57 @@
         ],
         "unevaluatedProperties": false
       },
+      "nexigon_api.projects.GetProjectOtlpConfigAction": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+          }
+        },
+        "required": [
+          "projectId"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.projects.GetProjectOtlpConfigOutput": {
+        "type": "object",
+        "description": "Output of getting the OTLP configuration for a project.",
+        "properties": {
+          "config": {
+            "$ref": "#/components/schemas/nexigon_api.projects.ProjectOtlpConfig"
+          }
+        },
+        "required": [
+          "config"
+        ],
+        "unevaluatedProperties": false
+      },
       "nexigon_api.projects.ProjectId": {
         "type": "string",
         "description": "Unique ID of a project."
+      },
+      "nexigon_api.projects.ProjectOtlpConfig": {
+        "type": "object",
+        "description": "OTLP event forwarding configuration for a project.",
+        "properties": {
+          "enabled": {
+            "type": "boolean"
+          },
+          "endpoint": {
+            "type": "string"
+          },
+          "headers": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "enabled",
+          "headers"
+        ],
+        "unevaluatedProperties": false
       },
       "nexigon_api.projects.QueryAuditLogEventsAction": {
         "type": "object",
@@ -6319,6 +6429,22 @@
         "required": [
           "projectId",
           "name"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.projects.SetProjectOtlpConfigAction": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+          },
+          "config": {
+            "$ref": "#/components/schemas/nexigon_api.projects.ProjectOtlpConfig"
+          }
+        },
+        "required": [
+          "projectId",
+          "config"
         ],
         "unevaluatedProperties": false
       },
