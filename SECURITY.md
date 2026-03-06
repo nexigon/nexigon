@@ -18,7 +18,7 @@ Only the latest minor version branch receives security updates.
 
 ## Responsible Disclosure
 
-If you have found a potential vulnerability in Nexigon or any related tooling and dependencies, please send an email to **security@silitics.com** OR use [GitHub's responsible disclosure functionality](https://github.com/silitics/nexigon/security/advisories/new).
+If you have found a potential vulnerability in Nexigon or any related tooling and dependencies, please send an email to **security@silitics.com** OR use [GitHub's responsible disclosure functionality](https://github.com/nexigon/nexigon/security/advisories/new).
 Please include a detailed technical description in your report, such that we can validate and assess the potential vulnerability.
 
 ### What to Expect
