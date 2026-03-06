@@ -1,0 +1,20 @@
+# spellchecker:ignore Taplo
+
+name: Upload Installer
+
+on:
+  workflow_dispatch:
+
+jobs:
+  upload_installer:
+    name: Upload Installer
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy
+        uses: silitics/actions/deploy-site@main
+        with:
+          domain: install.nexigon.dev
+          source-dir: installer
+          s3-access-key: ${{ vars.SILITICS_SITES_ACCESS_KEY }}
+          s3-secret-key: ${{ secrets.SILITICS_SITES_SECRET_KEY }}
