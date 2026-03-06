@@ -5,7 +5,7 @@
     Fleet Management for Connected Devices
 </h4>
 <p align="center">
-  <a href="https://github.com/silitics/nexigon/actions"><img alt="Pipeline Status Badge" src="https://img.shields.io/github/actions/workflow/status/silitics/nexigon/pipeline.yml"></a>
+  <a href="https://github.com/nexigon/nexigon/actions"><img alt="Pipeline Status Badge" src="https://img.shields.io/github/actions/workflow/status/nexigon/nexigon/pipeline.yml"></a>
 </p>
 
 [Nexigon](https://nexigon.dev) is a fleet management platform for connected devices. This repository contains its open-source components:
