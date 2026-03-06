@@ -140,6 +140,10 @@ hub-url = "$HUB_URL"
 token = "$TOKEN"
 
 fingerprint-script = "/usr/libexec/nexigon/nexigon-device-fingerprint"
+
+# Enable remote terminal support.
+[terminal]
+enabled = true
 EOF
 
     echo "=> Configuration:"
