@@ -522,6 +522,8 @@ record DeviceProperty {
     value: JsonValue,
     /// Indicates whether the property is protected.
     protected: bool,
+    /// Incremental version number, incremented on each update.
+    version: u64,
     /// Last time the property was updated.
     last_updated: Timestamp,
 }

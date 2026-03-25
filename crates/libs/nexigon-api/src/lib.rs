@@ -126,6 +126,14 @@ macro_rules! with_actions {
             // ## Audit Log
             ("devices_QueryAuditLog", QueryDeviceAuditLog, devices::QueryDeviceAuditLogAction, devices::QueryDeviceAuditLogOutput),
 
+            // # Fleet Properties
+            ("fleet_SetProperty", SetFleetProperty, fleet::SetFleetPropertyAction, outputs::Empty),
+            ("fleet_GetProperty", GetFleetProperty, fleet::GetFleetPropertyAction, fleet::GetFleetPropertyOutput),
+            ("fleet_RemoveProperty", RemoveFleetProperty, fleet::RemoveFleetPropertyAction, fleet::RemoveFleetPropertyOutput),
+            ("fleet_QueryProperties", QueryFleetProperties, fleet::QueryFleetPropertiesAction, fleet::QueryFleetPropertiesOutput),
+            ("fleet_DefineComputedProperty", DefineComputedFleetProperty, fleet::DefineComputedFleetPropertyAction, outputs::Empty),
+            ("fleet_QueryComputedPropertyDefinitions", QueryComputedFleetPropertyDefinitions, fleet::QueryComputedFleetPropertyDefinitionsAction, fleet::QueryComputedFleetPropertyDefinitionsOutput),
+
             // # Repositories
             ("repositories_ResolveName", ResolveRepositoryName, repositories::ResolveRepositoryNameAction, repositories::ResolveRepositoryNameOutput),
             ("repositories_GetDetails", GetRepositoryDetails, repositories::GetRepositoryDetailsAction, repositories::GetRepositoryDetailsOutput),

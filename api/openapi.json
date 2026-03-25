@@ -2393,6 +2393,192 @@
         }
       }
     },
+    "/api/v1/actions/invoke/fleet_SetProperty": {
+      "post": {
+        "tags": [
+          "fleet"
+        ],
+        "summary": "SetProperty",
+        "description": "Set a fleet property manually.",
+        "operationId": "fleet_SetProperty",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/nexigon_api.fleet.SetFleetPropertyAction"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/nexigon_api.outputs.Empty"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/actions/invoke/fleet_GetProperty": {
+      "post": {
+        "tags": [
+          "fleet"
+        ],
+        "summary": "GetProperty",
+        "description": "Get a fleet property by name.",
+        "operationId": "fleet_GetProperty",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/nexigon_api.fleet.GetFleetPropertyAction"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/nexigon_api.fleet.GetFleetPropertyOutput"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/actions/invoke/fleet_RemoveProperty": {
+      "post": {
+        "tags": [
+          "fleet"
+        ],
+        "summary": "RemoveProperty",
+        "description": "Remove a fleet property.\n\nHandles both manual and computed properties. For computed properties, the\nassociated definition is removed as well.",
+        "operationId": "fleet_RemoveProperty",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/nexigon_api.fleet.RemoveFleetPropertyAction"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/nexigon_api.fleet.RemoveFleetPropertyOutput"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/actions/invoke/fleet_QueryProperties": {
+      "post": {
+        "tags": [
+          "fleet"
+        ],
+        "summary": "QueryProperties",
+        "description": "Query all fleet properties of a project.",
+        "operationId": "fleet_QueryProperties",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/nexigon_api.fleet.QueryFleetPropertiesAction"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/nexigon_api.fleet.QueryFleetPropertiesOutput"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/actions/invoke/fleet_DefineComputedProperty": {
+      "post": {
+        "tags": [
+          "fleet"
+        ],
+        "summary": "DefineComputedProperty",
+        "description": "Define a computed fleet property.",
+        "operationId": "fleet_DefineComputedProperty",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/nexigon_api.fleet.DefineComputedFleetPropertyAction"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/nexigon_api.outputs.Empty"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/actions/invoke/fleet_QueryComputedPropertyDefinitions": {
+      "post": {
+        "tags": [
+          "fleet"
+        ],
+        "summary": "QueryComputedPropertyDefinitions",
+        "description": "Query computed fleet property definitions for a project.",
+        "operationId": "fleet_QueryComputedPropertyDefinitions",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/nexigon_api.fleet.QueryComputedFleetPropertyDefinitionsAction"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/nexigon_api.fleet.QueryComputedFleetPropertyDefinitionsOutput"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/actions/invoke/repositories_ResolveName": {
       "post": {
         "tags": [
@@ -4607,6 +4793,10 @@
           "protected": {
             "type": "boolean"
           },
+          "version": {
+            "type": "integer",
+            "format": "uint64"
+          },
           "lastUpdated": {
             "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
           }
@@ -4615,6 +4805,7 @@
           "name",
           "value",
           "protected",
+          "version",
           "lastUpdated"
         ],
         "unevaluatedProperties": false
@@ -4727,6 +4918,10 @@
               "protected": {
                 "type": "boolean"
               },
+              "version": {
+                "type": "integer",
+                "format": "uint64"
+              },
               "lastUpdated": {
                 "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
               }
@@ -4736,6 +4931,7 @@
               "name",
               "value",
               "protected",
+              "version",
               "lastUpdated"
             ]
           }
@@ -5338,6 +5534,285 @@
             ]
           }
         ]
+      },
+      "nexigon_api.fleet.ComputedFleetPropertyDefinition": {
+        "type": "object",
+        "description": "A computed fleet property definition.",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "inputProperties": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "strategy": {
+            "type": "string"
+          },
+          "config": {
+            "$ref": "#/components/schemas/nexigon_api.json.JsonValue"
+          },
+          "createdAt": {
+            "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
+          }
+        },
+        "required": [
+          "name",
+          "inputProperties",
+          "strategy",
+          "config",
+          "createdAt"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.fleet.DefineComputedFleetPropertyAction": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+          },
+          "name": {
+            "type": "string"
+          },
+          "inputProperties": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "strategy": {
+            "type": "string"
+          },
+          "config": {
+            "$ref": "#/components/schemas/nexigon_api.json.JsonValue"
+          }
+        },
+        "required": [
+          "projectId",
+          "name",
+          "inputProperties",
+          "strategy"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.fleet.FleetProperty": {
+        "type": "object",
+        "description": "A fleet property.",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "value": {
+            "$ref": "#/components/schemas/nexigon_api.json.JsonValue"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/nexigon_api.fleet.FleetPropertyKind"
+          },
+          "version": {
+            "type": "integer",
+            "format": "uint64"
+          },
+          "error": {
+            "type": "string"
+          },
+          "lastUpdated": {
+            "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
+          }
+        },
+        "required": [
+          "name",
+          "value",
+          "kind",
+          "version",
+          "lastUpdated"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.fleet.FleetPropertyKind": {
+        "enum": [
+          {
+            "kind": "Manual"
+          },
+          {
+            "kind": "Computed"
+          },
+          {
+            "kind": "Builtin"
+          }
+        ],
+        "description": "How a fleet property is managed."
+      },
+      "nexigon_api.fleet.GetFleetPropertyAction": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "projectId",
+          "name"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.fleet.GetFleetPropertyOutput": {
+        "description": "Output of getting a fleet property.",
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "result": {
+                "const": "NotFound"
+              }
+            },
+            "required": [
+              "result"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "result": {
+                "const": "Found"
+              },
+              "name": {
+                "type": "string"
+              },
+              "value": {
+                "$ref": "#/components/schemas/nexigon_api.json.JsonValue"
+              },
+              "kind": {
+                "$ref": "#/components/schemas/nexigon_api.fleet.FleetPropertyKind"
+              },
+              "version": {
+                "type": "integer",
+                "format": "uint64"
+              },
+              "error": {
+                "type": "string"
+              },
+              "lastUpdated": {
+                "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
+              }
+            },
+            "required": [
+              "result",
+              "name",
+              "value",
+              "kind",
+              "version",
+              "lastUpdated"
+            ]
+          }
+        ]
+      },
+      "nexigon_api.fleet.QueryComputedFleetPropertyDefinitionsAction": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+          }
+        },
+        "required": [
+          "projectId"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.fleet.QueryComputedFleetPropertyDefinitionsOutput": {
+        "type": "object",
+        "description": "Output of querying computed fleet property definitions.",
+        "properties": {
+          "definitions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/nexigon_api.fleet.ComputedFleetPropertyDefinition"
+            }
+          }
+        },
+        "required": [
+          "definitions"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.fleet.QueryFleetPropertiesAction": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+          }
+        },
+        "required": [
+          "projectId"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.fleet.QueryFleetPropertiesOutput": {
+        "type": "object",
+        "description": "Output of querying fleet properties.",
+        "properties": {
+          "properties": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/nexigon_api.fleet.FleetProperty"
+            }
+          }
+        },
+        "required": [
+          "properties"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.fleet.RemoveFleetPropertyAction": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "projectId",
+          "name"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.fleet.RemoveFleetPropertyOutput": {
+        "enum": [
+          {
+            "result": "NotFound"
+          },
+          {
+            "result": "Removed"
+          }
+        ],
+        "description": "Output of removing a fleet property."
+      },
+      "nexigon_api.fleet.SetFleetPropertyAction": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+          },
+          "name": {
+            "type": "string"
+          },
+          "value": {
+            "$ref": "#/components/schemas/nexigon_api.json.JsonValue"
+          }
+        },
+        "required": [
+          "projectId",
+          "name",
+          "value"
+        ],
+        "unevaluatedProperties": false
       },
       "nexigon_api.instance.GetInstanceSettingsRawAction": {
         "type": "object",

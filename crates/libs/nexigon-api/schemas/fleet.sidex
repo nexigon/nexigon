@@ -1,0 +1,131 @@
+//! Fleet-level actions and types.
+
+import datetime::Timestamp
+import json::JsonValue
+import projects::ProjectId
+
+/// Set a fleet property manually.
+record SetFleetPropertyAction {
+    /// ID of the project.
+    project_id: ProjectId,
+    /// Name of the property.
+    name: string,
+    /// Value of the property.
+    value: JsonValue,
+}
+
+/// Get a fleet property by name.
+record GetFleetPropertyAction {
+    /// ID of the project.
+    project_id: ProjectId,
+    /// Name of the property.
+    name: string,
+}
+
+/// Output of getting a fleet property.
+#[json(tag = "result")]
+variant GetFleetPropertyOutput {
+    /// The property was not found.
+    NotFound,
+    /// The property was found.
+    Found: FleetProperty,
+}
+
+/// Remove a fleet property.
+///
+/// Handles both manual and computed properties. For computed properties, the
+/// associated definition is removed as well.
+record RemoveFleetPropertyAction {
+    /// ID of the project.
+    project_id: ProjectId,
+    /// Name of the property.
+    name: string,
+}
+
+/// Output of removing a fleet property.
+#[json(tag = "result")]
+variant RemoveFleetPropertyOutput {
+    /// The property was not found.
+    NotFound,
+    /// The property was removed.
+    Removed,
+}
+
+/// Query all fleet properties of a project.
+record QueryFleetPropertiesAction {
+    /// ID of the project.
+    project_id: ProjectId,
+}
+
+/// Output of querying fleet properties.
+record QueryFleetPropertiesOutput {
+    /// Properties keyed by name.
+    properties: [string: FleetProperty],
+}
+
+/// How a fleet property is managed.
+#[json(tag = "kind")]
+variant FleetPropertyKind {
+    /// Set manually via the API.
+    Manual,
+    /// Computed from device properties via a user-defined strategy.
+    Computed,
+    /// Computed from device properties via a built-in strategy.
+    Builtin,
+}
+
+/// A fleet property.
+record FleetProperty {
+    /// Name of the property.
+    name: string,
+    /// Current value.
+    value: JsonValue,
+    /// How this property is managed.
+    kind: FleetPropertyKind,
+    /// Incremental version number, bumped on each update.
+    version: u64,
+    /// Error from the last computation attempt, if any.
+    error?: string,
+    /// When the value was last updated.
+    last_updated: Timestamp,
+}
+
+/// Define a computed fleet property.
+record DefineComputedFleetPropertyAction {
+    /// ID of the project.
+    project_id: ProjectId,
+    /// Name of the property.
+    name: string,
+    /// Device property names fed into the strategy's map function.
+    input_properties: [string],
+    /// Name of the computation strategy.
+    strategy: string,
+    /// Strategy-specific configuration.
+    config?: JsonValue,
+}
+
+/// Query computed fleet property definitions for a project.
+record QueryComputedFleetPropertyDefinitionsAction {
+    /// ID of the project.
+    project_id: ProjectId,
+}
+
+/// Output of querying computed fleet property definitions.
+record QueryComputedFleetPropertyDefinitionsOutput {
+    /// List of definitions.
+    definitions: [ComputedFleetPropertyDefinition],
+}
+
+/// A computed fleet property definition.
+record ComputedFleetPropertyDefinition {
+    /// Name of the property.
+    name: string,
+    /// Device property names fed into the strategy's map function.
+    input_properties: [string],
+    /// Name of the computation strategy.
+    strategy: string,
+    /// Strategy-specific configuration.
+    config: JsonValue,
+    /// When the definition was created.
+    created_at: Timestamp,
+}
