@@ -75,6 +75,9 @@ impl std::fmt::Display for Actor {
             Actor::User(user) => write!(f, "{}", user.user_id),
             Actor::UserToken(user) => write!(f, "{}:{}", user.user_id, user.token_id),
             Actor::ClusterNode(node) => write!(f, "{}", node.node_id),
+            Actor::OrganizationApiToken(token) => {
+                write!(f, "{}:{}", token.organization_id, token.token_id)
+            }
         }
     }
 }

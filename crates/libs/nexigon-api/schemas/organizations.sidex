@@ -15,6 +15,11 @@ opaque OrganizationId
 #[json(type = "string")]
 opaque OrganizationInvitationId
 
+/// Unique ID of an organization API token.
+#[rust(type = "nexigon_ids::ids::OrganizationApiTokenId")]
+#[json(type = "string")]
+opaque OrganizationApiTokenId
+
 /// Query the organizations of the instance.
 record QueryOrganizationsAction {}
 

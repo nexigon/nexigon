@@ -489,6 +489,14 @@ define_types! {
     OrganizationId => (FlatRawId, "org", 22, secret = false),
     /// Organization invitation id (globally unique).
     OrganizationInvitationId => (FlatRawId, "org_invite", 22, secret = false),
+    /// Organization API token (globally unique).
+    ///
+    /// Used for programmatic access scoped to an organization with a fine-grained policy.
+    OrganizationApiToken => (FlatRawId, "org_sk", 66, secret = true),
+    /// Organization API token id (globally unique).
+    ///
+    /// The first 22 characters of the respective organization API token secret.
+    OrganizationApiTokenId => (FlatRawId, "org_pk", 22, secret = false),
 
     /// Subscription ID (globally unique).
     SubscriptionId => (FlatRawId, "subscription", 22, secret = false),
@@ -542,6 +550,15 @@ impl ids::UserSessionToken {
     pub fn token_id(&self) -> ids::UserSessionId {
         ids::UserSessionId::from_raw_unchecked(RawId::new(
             &self.raw().as_str()[..Tag::UserSessionId.raw_size()],
+        ))
+    }
+}
+
+impl ids::OrganizationApiToken {
+    /// Id of the token.
+    pub fn token_id(&self) -> ids::OrganizationApiTokenId {
+        ids::OrganizationApiTokenId::from_raw_unchecked(RawId::new(
+            &self.raw().as_str()[..Tag::OrganizationApiTokenId.raw_size()],
         ))
     }
 }

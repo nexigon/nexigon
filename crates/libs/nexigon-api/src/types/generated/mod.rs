@@ -21,6 +21,8 @@ pub mod actor {
         UserToken(UserTokenActor),
         #[doc = "A cluster node.\n"]
         ClusterNode(ClusterNodeActor),
+        #[doc = "An organization API token.\n"]
+        OrganizationApiToken(OrganizationApiTokenActor),
     }
     #[automatically_derived]
     impl __serde::Serialize for Actor {
@@ -48,6 +50,12 @@ pub mod actor {
                 Self::ClusterNode(__value) => {
                     __serializer.serialize_internally_tagged("actor", "ClusterNode", 5u32, __value)
                 }
+                Self::OrganizationApiToken(__value) => __serializer.serialize_internally_tagged(
+                    "actor",
+                    "OrganizationApiToken",
+                    6u32,
+                    __value,
+                ),
             }
         }
     }
@@ -64,9 +72,10 @@ pub mod actor {
                 "User",
                 "UserToken",
                 "ClusterNode",
+                "OrganizationApiToken",
             ];
             #[doc(hidden)]
-            const __EXPECTING_IDENTIFIERS: &'static str = "an identifier in [\"Anonymous\", \"System\", \"Device\", \"User\", \"UserToken\", \"ClusterNode\"]";
+            const __EXPECTING_IDENTIFIERS: &'static str = "an identifier in [\"Anonymous\", \"System\", \"Device\", \"User\", \"UserToken\", \"ClusterNode\", \"OrganizationApiToken\"]";
             #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
             #[doc(hidden)]
             enum __Identifier {
@@ -76,6 +85,7 @@ pub mod actor {
                 __Identifier3,
                 __Identifier4,
                 __Identifier5,
+                __Identifier6,
             }
             #[doc(hidden)]
             struct __IdentifierVisitor;
@@ -98,6 +108,7 @@ pub mod actor {
                         3u64 => ::core::result::Result::Ok(__Identifier::__Identifier3),
                         4u64 => ::core::result::Result::Ok(__Identifier::__Identifier4),
                         5u64 => ::core::result::Result::Ok(__Identifier::__Identifier5),
+                        6u64 => ::core::result::Result::Ok(__Identifier::__Identifier6),
                         __variant => {
                             ::core::result::Result::Err(__serde::de::Error::invalid_value(
                                 __serde::de::Unexpected::Unsigned(__variant),
@@ -117,6 +128,9 @@ pub mod actor {
                         "User" => ::core::result::Result::Ok(__Identifier::__Identifier3),
                         "UserToken" => ::core::result::Result::Ok(__Identifier::__Identifier4),
                         "ClusterNode" => ::core::result::Result::Ok(__Identifier::__Identifier5),
+                        "OrganizationApiToken" => {
+                            ::core::result::Result::Ok(__Identifier::__Identifier6)
+                        }
                         __variant => ::core::result::Result::Err(
                             __serde::de::Error::unknown_variant(__variant, __IDENTIFIERS),
                         ),
@@ -136,6 +150,9 @@ pub mod actor {
                         b"User" => ::core::result::Result::Ok(__Identifier::__Identifier3),
                         b"UserToken" => ::core::result::Result::Ok(__Identifier::__Identifier4),
                         b"ClusterNode" => ::core::result::Result::Ok(__Identifier::__Identifier5),
+                        b"OrganizationApiToken" => {
+                            ::core::result::Result::Ok(__Identifier::__Identifier6)
+                        }
                         __variant => {
                             ::core::result::Result::Err(__serde::de::Error::invalid_value(
                                 __serde::de::Unexpected::Bytes(__variant),
@@ -165,32 +182,14 @@ pub mod actor {
                 "User",
                 "UserToken",
                 "ClusterNode",
+                "OrganizationApiToken",
             ];
             if __serde::Deserializer::is_human_readable(&__deserializer) {
                 let __tagged = __sidex_serde::de::tagged::deserialize_tagged_variant::<
                     __Identifier,
                     __D,
                 >(__deserializer, "actor")?;
-                match __tagged.tag {
-                    __Identifier::__Identifier0 => ::core::result::Result::Ok(Actor::Anonymous(
-                        __tagged.deserialize_internally_tagged::<AnonymousActor, __D::Error>()?,
-                    )),
-                    __Identifier::__Identifier1 => ::core::result::Result::Ok(Actor::System(
-                        __tagged.deserialize_internally_tagged::<SystemActor, __D::Error>()?,
-                    )),
-                    __Identifier::__Identifier2 => ::core::result::Result::Ok(Actor::Device(
-                        __tagged.deserialize_internally_tagged::<DeviceActor, __D::Error>()?,
-                    )),
-                    __Identifier::__Identifier3 => ::core::result::Result::Ok(Actor::User(
-                        __tagged.deserialize_internally_tagged::<UserActor, __D::Error>()?,
-                    )),
-                    __Identifier::__Identifier4 => ::core::result::Result::Ok(Actor::UserToken(
-                        __tagged.deserialize_internally_tagged::<UserTokenActor, __D::Error>()?,
-                    )),
-                    __Identifier::__Identifier5 => ::core::result::Result::Ok(Actor::ClusterNode(
-                        __tagged.deserialize_internally_tagged::<ClusterNodeActor, __D::Error>()?,
-                    )),
-                }
+                match __tagged . tag { __Identifier :: __Identifier0 => { :: core :: result :: Result :: Ok (Actor :: Anonymous (__tagged . deserialize_internally_tagged :: < AnonymousActor < > , __D :: Error > () ?)) } , __Identifier :: __Identifier1 => { :: core :: result :: Result :: Ok (Actor :: System (__tagged . deserialize_internally_tagged :: < SystemActor < > , __D :: Error > () ?)) } , __Identifier :: __Identifier2 => { :: core :: result :: Result :: Ok (Actor :: Device (__tagged . deserialize_internally_tagged :: < DeviceActor < > , __D :: Error > () ?)) } , __Identifier :: __Identifier3 => { :: core :: result :: Result :: Ok (Actor :: User (__tagged . deserialize_internally_tagged :: < UserActor < > , __D :: Error > () ?)) } , __Identifier :: __Identifier4 => { :: core :: result :: Result :: Ok (Actor :: UserToken (__tagged . deserialize_internally_tagged :: < UserTokenActor < > , __D :: Error > () ?)) } , __Identifier :: __Identifier5 => { :: core :: result :: Result :: Ok (Actor :: ClusterNode (__tagged . deserialize_internally_tagged :: < ClusterNodeActor < > , __D :: Error > () ?)) } , __Identifier :: __Identifier6 => { :: core :: result :: Result :: Ok (Actor :: OrganizationApiToken (__tagged . deserialize_internally_tagged :: < OrganizationApiTokenActor < > , __D :: Error > () ?)) } , }
             } else {
                 #[doc(hidden)]
                 struct __Visitor {
@@ -265,6 +264,12 @@ pub mod actor {
                                     ClusterNodeActor,
                                 >(__variant)?;
                                 ::core::result::Result::Ok(Actor::ClusterNode(__value))
+                            }
+                            (__Identifier::__Identifier6, __variant) => {
+                                let __value = __serde::de::VariantAccess::newtype_variant::<
+                                    OrganizationApiTokenActor,
+                                >(__variant)?;
+                                ::core::result::Result::Ok(Actor::OrganizationApiToken(__value))
                             }
                         }
                     }
@@ -1526,6 +1531,299 @@ pub mod actor {
             __serde::Deserializer::deserialize_struct(
                 __deserializer,
                 "ClusterNodeActor",
+                __FIELDS,
+                __Visitor {
+                    __phantom_vars: ::core::marker::PhantomData,
+                },
+            )
+        }
+    }
+    #[doc = "Organization API token actor.\n"]
+    #[derive(Clone, Debug)]
+    pub struct OrganizationApiTokenActor {
+        #[doc = "ID of the organization.\n"]
+        pub organization_id: super::organizations::OrganizationId,
+        #[doc = "ID of the API token.\n"]
+        pub token_id: super::organizations::OrganizationApiTokenId,
+    }
+    impl OrganizationApiTokenActor {
+        #[doc = "Creates a new [`OrganizationApiTokenActor`]."]
+        pub fn new(
+            organization_id: super::organizations::OrganizationId,
+            token_id: super::organizations::OrganizationApiTokenId,
+        ) -> Self {
+            Self {
+                organization_id,
+                token_id,
+            }
+        }
+        #[doc = "Sets the value of `organization_id`."]
+        pub fn set_organization_id(
+            &mut self,
+            organization_id: super::organizations::OrganizationId,
+        ) -> &mut Self {
+            self.organization_id = organization_id;
+            self
+        }
+        #[doc = "Sets the value of `organization_id`."]
+        pub fn with_organization_id(
+            mut self,
+            organization_id: super::organizations::OrganizationId,
+        ) -> Self {
+            self.organization_id = organization_id;
+            self
+        }
+        #[doc = "Sets the value of `token_id`."]
+        pub fn set_token_id(
+            &mut self,
+            token_id: super::organizations::OrganizationApiTokenId,
+        ) -> &mut Self {
+            self.token_id = token_id;
+            self
+        }
+        #[doc = "Sets the value of `token_id`."]
+        pub fn with_token_id(
+            mut self,
+            token_id: super::organizations::OrganizationApiTokenId,
+        ) -> Self {
+            self.token_id = token_id;
+            self
+        }
+    }
+    #[automatically_derived]
+    impl __serde::Serialize for OrganizationApiTokenActor {
+        fn serialize<__S: __serde::Serializer>(
+            &self,
+            __serializer: __S,
+        ) -> ::std::result::Result<__S::Ok, __S::Error> {
+            let mut __record = __sidex_serde::ser::RecordSerializer::new(
+                __serializer,
+                "OrganizationApiTokenActor",
+                2usize,
+            )?;
+            __record.serialize_field("organizationId", &self.organization_id)?;
+            __record.serialize_field("tokenId", &self.token_id)?;
+            __record.end()
+        }
+    }
+    #[automatically_derived]
+    impl<'de> __serde::Deserialize<'de> for OrganizationApiTokenActor {
+        fn deserialize<__D: __serde::Deserializer<'de>>(
+            __deserializer: __D,
+        ) -> ::std::result::Result<Self, __D::Error> {
+            #[doc(hidden)]
+            struct __Visitor {
+                __phantom_vars: ::core::marker::PhantomData<fn(&())>,
+            }
+            impl<'de> __serde::de::Visitor<'de> for __Visitor {
+                type Value = OrganizationApiTokenActor;
+                fn expecting(
+                    &self,
+                    __formatter: &mut ::core::fmt::Formatter,
+                ) -> ::core::fmt::Result {
+                    ::core::fmt::Formatter::write_str(
+                        __formatter,
+                        "record OrganizationApiTokenActor",
+                    )
+                }
+                #[inline]
+                fn visit_seq<__A>(
+                    self,
+                    mut __seq: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::SeqAccess<'de>,
+                {
+                    let __field0 = match __serde::de::SeqAccess::next_element::<
+                        super::organizations::OrganizationId,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(0usize, &"record with 2 fields"),
+                            );
+                        }
+                    };
+                    let __field1 = match __serde::de::SeqAccess::next_element::<
+                        super::organizations::OrganizationApiTokenId,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(1usize, &"record with 2 fields"),
+                            );
+                        }
+                    };
+                    ::core::result::Result::Ok(OrganizationApiTokenActor {
+                        organization_id: __field0,
+                        token_id: __field1,
+                    })
+                }
+                #[inline]
+                fn visit_map<__A>(
+                    self,
+                    mut __map: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::MapAccess<'de>,
+                {
+                    #[doc(hidden)]
+                    const __IDENTIFIERS: &'static [&'static str] = &["organizationId", "tokenId"];
+                    #[doc(hidden)]
+                    const __EXPECTING_IDENTIFIERS: &'static str =
+                        "an identifier in [\"organizationId\", \"tokenId\"]";
+                    #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
+                    #[doc(hidden)]
+                    enum __Identifier {
+                        __Identifier0,
+                        __Identifier1,
+                        __Unknown,
+                    }
+                    #[doc(hidden)]
+                    struct __IdentifierVisitor;
+                    impl<'de> __serde::de::Visitor<'de> for __IdentifierVisitor {
+                        type Value = __Identifier;
+                        fn expecting(
+                            &self,
+                            __formatter: &mut ::core::fmt::Formatter,
+                        ) -> ::core::fmt::Result {
+                            ::core::fmt::Formatter::write_str(__formatter, __EXPECTING_IDENTIFIERS)
+                        }
+                        fn visit_u64<__E>(
+                            self,
+                            __value: u64,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                0u64 => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                                1u64 => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_str<__E>(
+                            self,
+                            __value: &str,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                "organizationId" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
+                                }
+                                "tokenId" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier1)
+                                }
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_bytes<__E>(
+                            self,
+                            __value: &[u8],
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                b"organizationId" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
+                                }
+                                b"tokenId" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier1)
+                                }
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                    }
+                    impl<'de> __serde::Deserialize<'de> for __Identifier {
+                        #[inline]
+                        fn deserialize<__D>(
+                            __deserializer: __D,
+                        ) -> ::core::result::Result<Self, __D::Error>
+                        where
+                            __D: __serde::Deserializer<'de>,
+                        {
+                            __serde::Deserializer::deserialize_identifier(
+                                __deserializer,
+                                __IdentifierVisitor,
+                            )
+                        }
+                    }
+                    let mut __field0: ::core::option::Option<super::organizations::OrganizationId> =
+                        ::core::option::Option::None;
+                    let mut __field1: ::core::option::Option<
+                        super::organizations::OrganizationApiTokenId,
+                    > = ::core::option::Option::None;
+                    while let ::core::option::Option::Some(__key) =
+                        __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
+                    {
+                        match __key {
+                            __Identifier::__Identifier0 => {
+                                if ::core::option::Option::is_some(&__field0) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "organizationId",
+                                        ),
+                                    );
+                                }
+                                __field0 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<
+                                        super::organizations::OrganizationId,
+                                    >(&mut __map)?,
+                                );
+                            }
+                            __Identifier::__Identifier1 => {
+                                if ::core::option::Option::is_some(&__field1) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "tokenId",
+                                        ),
+                                    );
+                                }
+                                __field1 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<
+                                        super::organizations::OrganizationApiTokenId,
+                                    >(&mut __map)?,
+                                );
+                            }
+                            _ => {
+                                __serde::de::MapAccess::next_value::<__serde::de::IgnoredAny>(
+                                    &mut __map,
+                                )?;
+                            }
+                        }
+                    }
+                    let __field0 = match __field0 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                <__A::Error as __serde::de::Error>::missing_field("organizationId"),
+                            );
+                        }
+                    };
+                    let __field1 = match __field1 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                <__A::Error as __serde::de::Error>::missing_field("tokenId"),
+                            );
+                        }
+                    };
+                    ::core::result::Result::Ok(OrganizationApiTokenActor {
+                        organization_id: __field0,
+                        token_id: __field1,
+                    })
+                }
+            }
+            #[doc(hidden)]
+            const __FIELDS: &'static [&'static str] = &["organizationId", "tokenId"];
+            __serde::Deserializer::deserialize_struct(
+                __deserializer,
+                "OrganizationApiTokenActor",
                 __FIELDS,
                 __Visitor {
                     __phantom_vars: ::core::marker::PhantomData,
@@ -28513,6 +28811,8 @@ pub mod organizations {
     pub type OrganizationId = nexigon_ids::ids::OrganizationId;
     #[doc = "Unique ID of an invitation to an organization.\n"]
     pub type OrganizationInvitationId = nexigon_ids::ids::OrganizationInvitationId;
+    #[doc = "Unique ID of an organization API token.\n"]
+    pub type OrganizationApiTokenId = nexigon_ids::ids::OrganizationApiTokenId;
     #[doc = "Query the organizations of the instance.\n"]
     #[derive(Clone, Debug)]
     pub struct QueryOrganizationsAction {}

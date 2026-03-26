@@ -2,6 +2,7 @@
 
 import cluster::ClusterNodeId
 import devices::DeviceId
+import organizations::{OrganizationId, OrganizationApiTokenId}
 import projects::DeploymentTokenId
 import users::{UserId, UserSessionId, UserTokenId}
 
@@ -20,6 +21,8 @@ variant Actor {
     UserToken: UserTokenActor,
     /// A cluster node.
     ClusterNode: ClusterNodeActor,
+    /// An organization API token.
+    OrganizationApiToken: OrganizationApiTokenActor,
 }
 
 /// Anonymous actor, typically used for unauthenticated actions.
@@ -54,6 +57,14 @@ record UserTokenActor {
 record ClusterNodeActor {
     /// ID of the cluster node.
     node_id: ClusterNodeId,
+}
+
+/// Organization API token actor.
+record OrganizationApiTokenActor {
+    /// ID of the organization.
+    organization_id: OrganizationId,
+    /// ID of the API token.
+    token_id: OrganizationApiTokenId,
 }
 
 /// Get the actor.

@@ -91,6 +91,25 @@
           "actor",
           "nodeId"
         ]
+      },
+      {
+        "type": "object",
+        "properties": {
+          "actor": {
+            "const": "OrganizationApiToken"
+          },
+          "organizationId": {
+            "$ref": "#/components/schemas/nexigon_api.organizations.OrganizationId"
+          },
+          "tokenId": {
+            "$ref": "#/components/schemas/nexigon_api.organizations.OrganizationApiTokenId"
+          }
+        },
+        "required": [
+          "actor",
+          "organizationId",
+          "tokenId"
+        ]
       }
     ]
   },
@@ -148,6 +167,23 @@
     },
     "required": [
       "actor"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.actor.OrganizationApiTokenActor": {
+    "type": "object",
+    "description": "Organization API token actor.",
+    "properties": {
+      "organizationId": {
+        "$ref": "#/components/schemas/nexigon_api.organizations.OrganizationId"
+      },
+      "tokenId": {
+        "$ref": "#/components/schemas/nexigon_api.organizations.OrganizationApiTokenId"
+      }
+    },
+    "required": [
+      "organizationId",
+      "tokenId"
     ],
     "unevaluatedProperties": false
   },
@@ -2177,6 +2213,12 @@
       "invitationId"
     ],
     "unevaluatedProperties": false
+  },
+  "nexigon_api.organizations.OrganizationApiTokenId": {
+    "type": [
+      "string"
+    ],
+    "description": "Unique ID of an organization API token."
   },
   "nexigon_api.organizations.OrganizationId": {
     "type": [
