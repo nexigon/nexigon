@@ -50,6 +50,7 @@ build TARGET=DEFAULT_TARGET CROSS="false":
     #!/usr/bin/env bash
     TARGET="{{ TARGET }}"
     CROSS="{{ CROSS }}"
+    export NEXIGON_GIT_VERSION="${NEXIGON_GIT_VERSION:-$(git describe --tags --always 2>/dev/null || echo unknown)}"
     if [ "$CROSS" == "true" ]; then
         cross build --locked --release --bins --target "$TARGET"
     else

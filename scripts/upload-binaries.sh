@@ -11,12 +11,11 @@ GIT_VERSION="git-$GIT_COMMIT"
 
 BUILD_VERSION=${BUILD_VERSION:-"build-$TIMESTAMP-$GIT_COMMIT"}
 
-CARGO_METADATA=$(cargo metadata --no-deps --format-version 1)
+DESCRIBED_VERSION=$(git describe --tags --always)
 
 
 function upload_binaries() {
-    local build_version_info version_id filename target asset_info asset_id \
-        crate_version crate_version_minor crate_version_major
+    local build_version_info version_id filename target asset_info asset_id
 
     local crate=$1
     # Check whether the build version already exists. Otherwise, create it.
@@ -29,12 +28,8 @@ function upload_binaries() {
         version_id=$($NEXIGON_CLI repositories versions create "nexigon-downloads/$crate" --tag "$BUILD_VERSION,locked" | jq -r '.versionId')
     fi
 
-    crate_version=$(echo "$CARGO_METADATA" | jq -r ".packages[] | select(.name == \"$crate\") | .version")
-    crate_version_major="${crate_version%%.*}"
-    crate_version_minor="${crate_version%.*}"
-
     echo "VERSION_ID=$version_id"
-    echo "CRATE_VERSION=$crate_version"
+    echo "DESCRIBED_VERSION=$DESCRIBED_VERSION"
 
     for archive in build/binaries/*.tar.gz; do
         filename=$(basename "$archive")
@@ -52,11 +47,18 @@ function upload_binaries() {
         fi
     done
 
-    $NEXIGON_CLI repositories versions tag "$version_id" \
-        --tag "$GIT_VERSION,reassign" \
-        --tag "v$crate_version,reassign" \
-        --tag "v$crate_version_major,reassign" \
-        --tag "v$crate_version_minor,reassign"
+    local tag_args=(
+        --tag "$GIT_VERSION,reassign"
+        --tag "$DESCRIBED_VERSION,reassign"
+    )
+
+    # For proper releases (e.g., v0.5.0), also reassign v$major and v$major.$minor tags.
+    if [[ "$DESCRIBED_VERSION" =~ ^v([0-9]+)\.([0-9]+)\.[0-9]+$ ]]; then
+        tag_args+=(--tag "v${BASH_REMATCH[1]},reassign")
+        tag_args+=(--tag "v${BASH_REMATCH[1]}.${BASH_REMATCH[2]},reassign")
+    fi
+
+    $NEXIGON_CLI repositories versions tag "$version_id" "${tag_args[@]}"
 }
 
 upload_binaries "nexigon-agent"

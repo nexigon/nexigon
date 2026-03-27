@@ -97,6 +97,8 @@ jobs:
       - name: Install Cross
         if: ${{ matrix.cross }}
         run: curl -s -L "$CROSS_URL" | tar xvzf - -C /usr/local/bin
+      - name: Determine Version
+        run: echo "NEXIGON_GIT_VERSION=$(git describe --tags --always)" >> "$GITHUB_ENV"
       - name: Run Build
         run: just build ${{ matrix.target }} ${{ matrix.cross }}
       - name: Upload Binaries

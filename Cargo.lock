@@ -1009,6 +1009,7 @@ dependencies = [
  "nexigon-common",
  "nexigon-ids",
  "nexigon-multiplex",
+ "nexigon-version",
  "nix",
  "reportify",
  "serde",
@@ -1057,6 +1058,7 @@ dependencies = [
  "nexigon-common",
  "nexigon-ids",
  "nexigon-multiplex",
+ "nexigon-version",
  "reqwest",
  "serde",
  "serde_json",
@@ -1159,6 +1161,10 @@ dependencies = [
  "tokio",
  "tracing",
 ]
+
+[[package]]
+name = "nexigon-version"
+version = "0.1.0"
 
 [[package]]
 name = "nix"

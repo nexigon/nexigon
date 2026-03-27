@@ -209,7 +209,7 @@ async fn main() -> anyhow::Result<()> {
 
 /// CLI arguments.
 #[derive(Debug, Parser)]
-#[clap(version)]
+#[clap(version = nexigon_version::NEXIGON_GIT_VERSION)]
 pub struct Args {
     /// Logging arguments.
     #[clap(flatten)]
