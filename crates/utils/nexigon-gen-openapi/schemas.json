@@ -3546,6 +3546,48 @@
     ],
     "unevaluatedProperties": false
   },
+  "nexigon_api.repositories.AssetRelation": {
+    "type": "object",
+    "description": "An asset relation linking two assets with a typed relationship.",
+    "properties": {
+      "relationId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.AssetRelationId"
+      },
+      "sourceAssetId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryAssetId"
+      },
+      "targetAssetId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryAssetId"
+      },
+      "relationType": {
+        "type": "string"
+      },
+      "properties": {
+        "type": "object",
+        "additionalProperties": {
+          "$ref": "#/components/schemas/nexigon_api.json.JsonValue"
+        }
+      },
+      "createdAt": {
+        "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
+      }
+    },
+    "required": [
+      "relationId",
+      "sourceAssetId",
+      "targetAssetId",
+      "relationType",
+      "properties",
+      "createdAt"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.repositories.AssetRelationId": {
+    "type": [
+      "string"
+    ],
+    "description": "Unique ID of an asset relation."
+  },
   "nexigon_api.repositories.CreateAssetAction": {
     "type": "object",
     "description": "Create an asset.",
@@ -3594,6 +3636,77 @@
         }
       }
     ]
+  },
+  "nexigon_api.repositories.CreateAssetRelationAction": {
+    "type": "object",
+    "description": "Create a relation between two assets.",
+    "properties": {
+      "sourceAssetId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryAssetId"
+      },
+      "targetAssetId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryAssetId"
+      },
+      "relationType": {
+        "type": "string"
+      },
+      "properties": {
+        "type": "object",
+        "additionalProperties": {
+          "$ref": "#/components/schemas/nexigon_api.json.JsonValue"
+        }
+      }
+    },
+    "required": [
+      "sourceAssetId",
+      "targetAssetId",
+      "relationType"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.repositories.CreateAssetRelationOutput": {
+    "description": "Output of creating an asset relation.",
+    "oneOf": [
+      {
+        "type": "object",
+        "properties": {
+          "result": {
+            "const": "AlreadyExists"
+          }
+        },
+        "required": [
+          "result"
+        ]
+      },
+      {
+        "type": "object",
+        "properties": {
+          "result": {
+            "const": "Created"
+          },
+          "relationId": {
+            "$ref": "#/components/schemas/nexigon_api.repositories.AssetRelationId"
+          }
+        },
+        "required": [
+          "result",
+          "relationId"
+        ]
+      }
+    ]
+  },
+  "nexigon_api.repositories.CreateAssetRelationSuccess": {
+    "type": "object",
+    "description": "Successfully created an asset relation.",
+    "properties": {
+      "relationId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.AssetRelationId"
+      }
+    },
+    "required": [
+      "relationId"
+    ],
+    "unevaluatedProperties": false
   },
   "nexigon_api.repositories.CreatePackageAction": {
     "type": "object",
@@ -3785,6 +3898,19 @@
     },
     "required": [
       "assetId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.repositories.DeleteAssetRelationAction": {
+    "type": "object",
+    "description": "Delete an asset relation.",
+    "properties": {
+      "relationId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.AssetRelationId"
+      }
+    },
+    "required": [
+      "relationId"
     ],
     "unevaluatedProperties": false
   },
@@ -4141,6 +4267,42 @@
     "required": [
       "tag",
       "locked"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.repositories.QueryAssetRelationsAction": {
+    "type": "object",
+    "description": "Query relations for an asset.",
+    "properties": {
+      "assetId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryAssetId"
+      }
+    },
+    "required": [
+      "assetId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.repositories.QueryAssetRelationsOutput": {
+    "type": "object",
+    "description": "Output of querying asset relations.",
+    "properties": {
+      "outgoing": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.repositories.AssetRelation"
+        }
+      },
+      "incoming": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.repositories.AssetRelation"
+        }
+      }
+    },
+    "required": [
+      "outgoing",
+      "incoming"
     ],
     "unevaluatedProperties": false
   },

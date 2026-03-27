@@ -166,6 +166,10 @@ macro_rules! with_actions {
             // ## S3 Config
             ("repositories_SetS3Config", SetRepositoryS3Credentials, repositories::SetRepositoryS3ConfigAction, outputs::Empty),
             ("repositories_GetS3Config", GetRepositoryS3Credentials, repositories::GetRepositoryS3ConfigAction, repositories::GetRepositoryS3ConfigOutput),
+            // ## Asset Relations
+            ("repositories_CreateAssetRelation", CreateAssetRelation, repositories::CreateAssetRelationAction, repositories::CreateAssetRelationOutput),
+            ("repositories_DeleteAssetRelation", DeleteAssetRelation, repositories::DeleteAssetRelationAction, outputs::Empty),
+            ("repositories_QueryAssetRelations", QueryAssetRelations, repositories::QueryAssetRelationsAction, repositories::QueryAssetRelationsOutput),
             // ## Assets
             ("repositories_GetAssetDetails", GetAssetDetails, repositories::GetAssetDetailsAction, repositories::GetAssetDetailsOutput),
             ("repositories_CreateAsset", CreateAsset, repositories::CreateAssetAction, repositories::CreateAssetOutput),

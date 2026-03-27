@@ -3,6 +3,7 @@
 import audit::AuditLogEvent
 import datetime::Timestamp
 import digest::Digest
+import json::JsonValue
 import organizations::OrganizationId
 import projects::ProjectId
 import users::UserId
@@ -26,6 +27,11 @@ opaque PackageId
 #[rust(type = "nexigon_ids::ids::PackageVersionId")]
 #[json(type = "string")]
 opaque PackageVersionId
+
+/// Unique ID of an asset relation.
+#[rust(type = "nexigon_ids::ids::AssetRelationId")]
+#[json(type = "string")]
+opaque AssetRelationId
 
 /// Asset status.
 #[json(tagged = externally)]
@@ -61,6 +67,69 @@ record RepositoryS3Config {
     access_key_id: string,
     /// S3 secret access key (sensitive, will be stored encrypted).
     secret_access_key?: string,
+}
+
+/// An asset relation linking two assets with a typed relationship.
+record AssetRelation {
+    /// ID of the relation.
+    relation_id: AssetRelationId,
+    /// ID of the source asset (e.g., the VDR or SBOM).
+    source_asset_id: RepositoryAssetId,
+    /// ID of the target asset (e.g., the firmware image).
+    target_asset_id: RepositoryAssetId,
+    /// Free-form relation type (e.g., "sbom_for", "vdr_for", "signature_of").
+    relation_type: string,
+    /// Properties of the relation.
+    properties: [string: JsonValue],
+    /// Timestamp when the relation was created.
+    created_at: Timestamp,
+}
+
+/// Create a relation between two assets.
+record CreateAssetRelationAction {
+    /// ID of the source asset.
+    source_asset_id: RepositoryAssetId,
+    /// ID of the target asset.
+    target_asset_id: RepositoryAssetId,
+    /// Free-form relation type (e.g., "sbom_for", "vdr_for", "signature_of").
+    relation_type: string,
+    /// Optional properties to set on the relation.
+    properties?: [string: JsonValue],
+}
+
+/// Output of creating an asset relation.
+#[json(tag = "result")]
+variant CreateAssetRelationOutput {
+    /// The relation already exists.
+    AlreadyExists,
+    /// The relation has been created.
+    Created: CreateAssetRelationSuccess,
+}
+
+/// Successfully created an asset relation.
+record CreateAssetRelationSuccess {
+    /// ID of the relation.
+    relation_id: AssetRelationId,
+}
+
+/// Delete an asset relation.
+record DeleteAssetRelationAction {
+    /// ID of the relation.
+    relation_id: AssetRelationId,
+}
+
+/// Query relations for an asset.
+record QueryAssetRelationsAction {
+    /// ID of the asset to query relations for.
+    asset_id: RepositoryAssetId,
+}
+
+/// Output of querying asset relations.
+record QueryAssetRelationsOutput {
+    /// Relations where this asset is the source (outgoing).
+    outgoing: [AssetRelation],
+    /// Relations where this asset is the target (incoming).
+    incoming: [AssetRelation],
 }
 
 /// Resolve a repository by its name.
