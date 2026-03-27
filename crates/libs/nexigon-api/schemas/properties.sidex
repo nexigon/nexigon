@@ -1,4 +1,6 @@
 //! Types related to device properties.
+ 
+import json::JsonValue
 
 /// System information.
 record SystemInfo {
@@ -193,4 +195,24 @@ record RugixBakeryReleaseInfo {
 record YoctoSystemInfo {
     /// Build information key-value pairs read from `/etc/buildinfo`.
     build_info: [string: string],
+}
+
+/// Command manifest (`dev.nexigon.commands` property).
+record DeviceCommandManifest {
+    /// Available commands.
+    commands: [DeviceCommandDescriptor],
+}
+
+/// Descriptor for an on-demand command.
+record DeviceCommandDescriptor {
+    /// Command name.
+    name: string,
+    /// Description of what the command does.
+    description?: string,
+    /// Category for grouping in the UI.
+    category?: string,
+    /// JSON Schema for the command input.
+    input?: JsonValue,
+    /// JSON Schema for the command output.
+    output?: JsonValue,
 }

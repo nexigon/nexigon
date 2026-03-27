@@ -737,6 +737,171 @@
     ],
     "description": "Status of a device certificate."
   },
+  "nexigon_api.devices.DeviceCommandDeviceFrame": {
+    "description": "Device-to-hub frame.",
+    "oneOf": [
+      {
+        "type": "object",
+        "properties": {
+          "type": {
+            "const": "Log"
+          },
+          "lines": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "type",
+          "lines"
+        ]
+      },
+      {
+        "type": "object",
+        "properties": {
+          "type": {
+            "const": "Done"
+          },
+          "status": {
+            "$ref": "#/components/schemas/nexigon_api.devices.DeviceCommandStatus"
+          },
+          "output": {
+            "$ref": "#/components/schemas/nexigon_api.json.JsonValue"
+          },
+          "error": {
+            "type": "string"
+          },
+          "logTail": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "durationMs": {
+            "type": "integer",
+            "format": "uint64"
+          }
+        },
+        "required": [
+          "type",
+          "status",
+          "logTail",
+          "durationMs"
+        ]
+      }
+    ]
+  },
+  "nexigon_api.devices.DeviceCommandDoneData": {
+    "type": "object",
+    "description": "Command completion.",
+    "properties": {
+      "status": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceCommandStatus"
+      },
+      "output": {
+        "$ref": "#/components/schemas/nexigon_api.json.JsonValue"
+      },
+      "error": {
+        "type": "string"
+      },
+      "logTail": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "durationMs": {
+        "type": "integer",
+        "format": "uint64"
+      }
+    },
+    "required": [
+      "status",
+      "logTail",
+      "durationMs"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.devices.DeviceCommandHubFrame": {
+    "description": "Hub-to-device frame.",
+    "oneOf": [
+      {
+        "type": "object",
+        "properties": {
+          "type": {
+            "const": "Invoke"
+          },
+          "command": {
+            "type": "string"
+          },
+          "input": {
+            "$ref": "#/components/schemas/nexigon_api.json.JsonValue"
+          },
+          "streamLog": {
+            "type": "boolean"
+          },
+          "timeoutSecs": {
+            "type": "integer",
+            "format": "uint32"
+          }
+        },
+        "required": [
+          "type",
+          "command",
+          "input"
+        ]
+      }
+    ]
+  },
+  "nexigon_api.devices.DeviceCommandInvokeData": {
+    "type": "object",
+    "description": "Command invocation parameters.",
+    "properties": {
+      "command": {
+        "type": "string"
+      },
+      "input": {
+        "$ref": "#/components/schemas/nexigon_api.json.JsonValue"
+      },
+      "streamLog": {
+        "type": "boolean"
+      },
+      "timeoutSecs": {
+        "type": "integer",
+        "format": "uint32"
+      }
+    },
+    "required": [
+      "command",
+      "input"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.devices.DeviceCommandLogData": {
+    "type": "object",
+    "description": "Log data.",
+    "properties": {
+      "lines": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      }
+    },
+    "required": [
+      "lines"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.devices.DeviceCommandStatus": {
+    "enum": [
+      "Ok",
+      "Error"
+    ],
+    "description": "Status of a device command invocation."
+  },
   "nexigon_api.devices.DeviceConnection": {
     "type": "object",
     "description": "Device connection.",
@@ -1153,6 +1318,32 @@
     },
     "required": [
       "events"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.devices.QueryDeviceCommandsAction": {
+    "type": "object",
+    "description": "Query the on-demand commands supported by a device.",
+    "properties": {
+      "deviceId": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceId"
+      }
+    },
+    "required": [
+      "deviceId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.devices.QueryDeviceCommandsOutput": {
+    "type": "object",
+    "description": "Output of querying device commands.",
+    "properties": {
+      "manifest": {
+        "$ref": "#/components/schemas/nexigon_api.properties.DeviceCommandManifest"
+      }
+    },
+    "required": [
+      "manifest"
     ],
     "unevaluatedProperties": false
   },
@@ -3092,6 +3283,47 @@
     "required": [
       "projectId",
       "config"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.properties.DeviceCommandDescriptor": {
+    "type": "object",
+    "description": "Descriptor for an on-demand command.",
+    "properties": {
+      "name": {
+        "type": "string"
+      },
+      "description": {
+        "type": "string"
+      },
+      "category": {
+        "type": "string"
+      },
+      "input": {
+        "$ref": "#/components/schemas/nexigon_api.json.JsonValue"
+      },
+      "output": {
+        "$ref": "#/components/schemas/nexigon_api.json.JsonValue"
+      }
+    },
+    "required": [
+      "name"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.properties.DeviceCommandManifest": {
+    "type": "object",
+    "description": "Command manifest (`dev.nexigon.commands` property).",
+    "properties": {
+      "commands": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.properties.DeviceCommandDescriptor"
+        }
+      }
+    },
+    "required": [
+      "commands"
     ],
     "unevaluatedProperties": false
   },

@@ -35,9 +35,11 @@ use nexigon_ids::ids::DeviceFingerprint;
 use nexigon_multiplex::ConnectionEvent;
 
 use crate::config::Config;
+use crate::handlers::CommandRegistry;
 use crate::system_info::get_system_info;
 
 pub mod config;
+pub mod handlers;
 pub mod system_info;
 #[cfg(target_os = "linux")]
 pub mod terminal;
@@ -120,10 +122,31 @@ async fn main() -> anyhow::Result<()> {
     .connect()
     .await
     .context("cannot connect to Nexigon Hub")?;
+    // Load command registry if commands are enabled.
+    let commands_enabled = config
+        .commands
+        .as_ref()
+        .and_then(|h| h.enabled)
+        .unwrap_or(false);
+    let command_registry = if commands_enabled {
+        let commands_dir = config
+            .commands
+            .as_ref()
+            .and_then(|h| h.directory.as_deref())
+            .unwrap_or(Path::new("/etc/nexigon/agent/commands"));
+        let registry =
+            CommandRegistry::load(commands_dir).context("failed to load command definitions")?;
+        Some(Arc::new(registry))
+    } else {
+        None
+    };
+
     let mut connection_ref = connection.make_ref();
     let connection_config = config.clone();
+    let connection_registry = command_registry.clone();
     let connection_handle = tokio::spawn(async move {
         let config = connection_config;
+        let command_registry = connection_registry;
         while let Some(event) = connection.next().await {
             match event {
                 Ok(ConnectionEvent::RequestChannel(request)) => {
@@ -181,6 +204,23 @@ async fn main() -> anyhow::Result<()> {
                         {
                             request.reject(b"terminal not supported on this platform");
                         }
+                    } else if endpoint == "handler" {
+                        let Some(registry) = command_registry.as_ref() else {
+                            request.reject(b"commands not enabled");
+                            continue;
+                        };
+                        let config = config.clone();
+                        let registry = registry.clone();
+                        request.accept(move |channel| {
+                            tokio::spawn(async move {
+                                if let Err(e) =
+                                    handlers::handle_handler_channel(channel, &config, &registry)
+                                        .await
+                                {
+                                    warn!("handler channel error: {e:?}");
+                                }
+                            });
+                        });
                     } else {
                         warn!(endpoint, "unknown endpoint requested");
                         request.reject(b"unknown endpoint");
@@ -219,12 +259,14 @@ async fn main() -> anyhow::Result<()> {
         Cmd::Run => {
             if !config.disable_system_info.unwrap_or(false) {
                 let sysinfo_config = config.clone();
+                let sysinfo_device_id = device_id.clone();
+                let mut sysinfo_executor = connect_executor(&mut connection_ref).await.unwrap();
                 tokio::spawn(async move {
                     loop {
                         let system_info = get_system_info(&sysinfo_config);
-                        executor
+                        sysinfo_executor
                             .execute(SetDevicePropertyAction::new(
-                                device_id.clone(),
+                                sysinfo_device_id.clone(),
                                 "dev.nexigon.system.info".to_owned(),
                                 serde_json::to_value(system_info).unwrap(),
                             ))
@@ -233,6 +275,18 @@ async fn main() -> anyhow::Result<()> {
                         tokio::time::sleep(Duration::from_secs(30 * 60)).await;
                     }
                 });
+            }
+            // Publish command capability manifest as a device property.
+            if let Some(registry) = &command_registry {
+                let manifest = registry.manifest();
+                executor
+                    .execute(SetDevicePropertyAction::new(
+                        device_id.clone(),
+                        "dev.nexigon.commands".to_owned(),
+                        serde_json::to_value(manifest).unwrap(),
+                    ))
+                    .await
+                    .ok();
             }
             connection_handle.await??;
         }

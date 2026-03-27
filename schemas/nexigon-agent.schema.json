@@ -33,6 +33,9 @@
     },
     "terminal": {
       "$ref": "#/$defs/nexigon_agent.config.TerminalConfig"
+    },
+    "commands": {
+      "$ref": "#/$defs/nexigon_agent.config.CommandsConfig"
     }
   },
   "required": [
@@ -42,6 +45,139 @@
   ],
   "unevaluatedProperties": false,
   "$defs": {
+    "nexigon_agent.commands.CommandOutputLine": {
+      "$id": "nexigon_agent.commands.CommandOutputLine",
+      "type": "object",
+      "description": "Command output line payload.",
+      "properties": {
+        "data": {
+          "$ref": "#/$defs/nexigon_agent.commands.JsonValue"
+        }
+      },
+      "required": [
+        "data"
+      ],
+      "unevaluatedProperties": false
+    },
+    "nexigon_agent.commands.CommandStdoutLine": {
+      "$id": "nexigon_agent.commands.CommandStdoutLine",
+      "description": "Line written by a command to stdout.",
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "const": "Output"
+            },
+            "data": {
+              "$ref": "#/$defs/nexigon_agent.commands.JsonValue"
+            }
+          },
+          "required": [
+            "type",
+            "data"
+          ]
+        }
+      ]
+    },
+    "nexigon_agent.commands.JsonValue": {
+      "$id": "nexigon_agent.commands.JsonValue",
+      "description": "JSON value."
+    },
+    "nexigon_agent.config.CommandDefinition": {
+      "$id": "nexigon_agent.config.CommandDefinition",
+      "type": "object",
+      "description": "Command definition file.",
+      "properties": {
+        "command": {
+          "$ref": "#/$defs/nexigon_agent.config.CommandMeta"
+        },
+        "input": {
+          "$ref": "#/$defs/nexigon_agent.config.CommandSchemaBlock"
+        },
+        "output": {
+          "$ref": "#/$defs/nexigon_agent.config.CommandSchemaBlock"
+        },
+        "exec": {
+          "$ref": "#/$defs/nexigon_agent.config.CommandExec"
+        }
+      },
+      "required": [
+        "command",
+        "exec"
+      ],
+      "unevaluatedProperties": false
+    },
+    "nexigon_agent.config.CommandExec": {
+      "$id": "nexigon_agent.config.CommandExec",
+      "type": "object",
+      "description": "Command execution configuration.",
+      "properties": {
+        "handler": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "timeout": {
+          "type": "integer",
+          "format": "uint64"
+        }
+      },
+      "required": [
+        "handler"
+      ],
+      "unevaluatedProperties": false
+    },
+    "nexigon_agent.config.CommandMeta": {
+      "$id": "nexigon_agent.config.CommandMeta",
+      "type": "object",
+      "description": "Command metadata.",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "category": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "unevaluatedProperties": false
+    },
+    "nexigon_agent.config.CommandSchemaBlock": {
+      "$id": "nexigon_agent.config.CommandSchemaBlock",
+      "type": "object",
+      "description": "JSON Schema block.",
+      "properties": {
+        "schema": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "schema"
+      ],
+      "unevaluatedProperties": false
+    },
+    "nexigon_agent.config.CommandsConfig": {
+      "$id": "nexigon_agent.config.CommandsConfig",
+      "type": "object",
+      "description": "On-demand command configuration.",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "directory": {
+          "$ref": "#/$defs/nexigon_agent.config.PathBuf"
+        }
+      },
+      "required": [],
+      "unevaluatedProperties": false
+    },
     "nexigon_agent.config.DeploymentToken": {
       "$id": "nexigon_agent.config.DeploymentToken",
       "type": [

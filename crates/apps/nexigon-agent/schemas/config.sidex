@@ -30,6 +30,8 @@ record Config {
     exports?: [ExportConfig],
     /// Remote terminal configuration.
     terminal?: TerminalConfig,
+    /// On-demand command configuration.
+    commands?: CommandsConfig,
 }
 
 /// Service export configuration.
@@ -62,3 +64,49 @@ record TerminalConfig {
     /// Allowed users for terminal sessions. If not set, any user is allowed.
     allowed_users?: [string],
 }
+
+/// On-demand command configuration.
+#[json(rename_all = "kebab-case")]
+record CommandsConfig {
+    /// Whether on-demand commands are enabled (defaults to false).
+    enabled?: bool,
+    /// Directory containing command definition files (defaults to /etc/nexigon/agent/commands).
+    directory?: PathBuf,
+}
+
+/// Command definition file.
+record CommandDefinition {
+    /// Command metadata.
+    command: CommandMeta,
+    /// JSON Schema for the command input.
+    input?: CommandSchemaBlock,
+    /// JSON Schema for the command output.
+    output?: CommandSchemaBlock,
+    /// Execution configuration.
+    exec: CommandExec,
+}
+
+/// Command metadata.
+record CommandMeta {
+    /// Command name.
+    name: string,
+    /// Description of what the command does.
+    description?: string,
+    /// Category for grouping in the UI.
+    category?: string,
+}
+
+/// JSON Schema block.
+record CommandSchemaBlock {
+    /// JSON Schema as a string.
+    schema: string,
+}
+
+/// Command execution configuration.
+record CommandExec {
+    /// Executable and arguments to run.
+    handler: [string],
+    /// Timeout in seconds (defaults to 30).
+    timeout?: u64,
+}
+

@@ -1,0 +1,21 @@
+//! Protocol types for the command stdout line format.
+//!
+//! Commands write enveloped NDJSON lines to stdout. Each line is a JSON object
+//! with a `type` field. Unknown types are ignored for forward compatibility.
+
+/// JSON value.
+#[rust(type = "serde_json::Value")]
+opaque JsonValue
+
+/// Line written by a command to stdout.
+#[json(tag = "type")]
+variant CommandStdoutLine {
+    /// Command output value.
+    Output: CommandOutputLine,
+}
+
+/// Command output line payload.
+record CommandOutputLine {
+    /// The output data.
+    data: JsonValue,
+}

@@ -125,6 +125,8 @@ macro_rules! with_actions {
             ("devices_QueryProperties", QueryDeviceProperties, devices::QueryDevicePropertiesAction, devices::QueryDevicePropertiesOutput),
             // ## Audit Log
             ("devices_QueryAuditLog", QueryDeviceAuditLog, devices::QueryDeviceAuditLogAction, devices::QueryDeviceAuditLogOutput),
+            // ## On-Demand Commands
+            ("devices_QueryCommands", QueryDeviceCommands, devices::QueryDeviceCommandsAction, devices::QueryDeviceCommandsOutput),
 
             // # Fleet Properties
             ("fleet_SetProperty", SetFleetProperty, fleet::SetFleetPropertyAction, outputs::Empty),

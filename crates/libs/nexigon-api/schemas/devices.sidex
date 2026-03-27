@@ -9,6 +9,8 @@ import jwt::Jwt
 import projects::DeploymentToken
 import projects::DeploymentTokenId
 import projects::ProjectId
+import properties::DeviceCommandDescriptor
+import properties::DeviceCommandManifest
 
 /// Unique ID of a device.
 #[rust(type = "nexigon_ids::ids::DeviceId")]
@@ -538,4 +540,73 @@ record QueryDeviceAuditLogAction {
 record QueryDeviceAuditLogOutput {
     /// List of audit log events.
     events: [AuditLogEvent],
+}
+
+/// Query the on-demand commands supported by a device.
+record QueryDeviceCommandsAction {
+    /// ID of the device.
+    device_id: DeviceId,
+}
+
+/// Output of querying device commands.
+record QueryDeviceCommandsOutput {
+    /// Command manifest.
+    manifest: DeviceCommandManifest,
+}
+
+/// Status of a device command invocation.
+#[json(tagged = externally)]
+variant DeviceCommandStatus {
+    /// Command completed successfully.
+    Ok,
+    /// Command failed.
+    Error,
+}
+
+/// Hub-to-device frame.
+#[json(tag = "type")]
+variant DeviceCommandHubFrame {
+    /// Invoke a command.
+    Invoke: DeviceCommandInvokeData,
+}
+
+/// Command invocation parameters.
+record DeviceCommandInvokeData {
+    /// Command name.
+    command: string,
+    /// Command input.
+    input: JsonValue,
+    /// Stream log output back to the hub during execution (defaults to false).
+    stream_log?: bool,
+    /// Timeout in seconds.
+    timeout_secs?: u32,
+}
+
+/// Device-to-hub frame.
+#[json(tag = "type")]
+variant DeviceCommandDeviceFrame {
+    /// Diagnostic log lines from the command.
+    Log: DeviceCommandLogData,
+    /// Command finished executing.
+    Done: DeviceCommandDoneData,
+}
+
+/// Log data.
+record DeviceCommandLogData {
+    /// Lines of diagnostic output from the command.
+    lines: [string],
+}
+
+/// Command completion.
+record DeviceCommandDoneData {
+    /// Completion status.
+    status: DeviceCommandStatus,
+    /// Command output.
+    output?: JsonValue,
+    /// Error message (present on failure).
+    error?: string,
+    /// Last lines of the command's diagnostic log output.
+    log_tail: [string],
+    /// Execution duration in milliseconds.
+    duration_ms: u64,
 }
