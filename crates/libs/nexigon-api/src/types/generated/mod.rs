@@ -21916,6 +21916,8 @@ pub mod errors {
         Forbidden,
         #[doc = "Internal server error.\n"]
         Internal,
+        #[doc = "Rate limit exceeded.\n"]
+        RateLimited,
     }
     #[automatically_derived]
     impl __serde::Serialize for ActionErrorKind {
@@ -21929,6 +21931,7 @@ pub mod errors {
                 Self::Invalid => __serializer.serialize_tag("Invalid", 0u32),
                 Self::Forbidden => __serializer.serialize_tag("Forbidden", 1u32),
                 Self::Internal => __serializer.serialize_tag("Internal", 2u32),
+                Self::RateLimited => __serializer.serialize_tag("RateLimited", 3u32),
             }
         }
     }
@@ -21938,16 +21941,18 @@ pub mod errors {
             __deserializer: __D,
         ) -> ::std::result::Result<Self, __D::Error> {
             #[doc(hidden)]
-            const __IDENTIFIERS: &'static [&'static str] = &["Invalid", "Forbidden", "Internal"];
+            const __IDENTIFIERS: &'static [&'static str] =
+                &["Invalid", "Forbidden", "Internal", "RateLimited"];
             #[doc(hidden)]
             const __EXPECTING_IDENTIFIERS: &'static str =
-                "an identifier in [\"Invalid\", \"Forbidden\", \"Internal\"]";
+                "an identifier in [\"Invalid\", \"Forbidden\", \"Internal\", \"RateLimited\"]";
             #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
             #[doc(hidden)]
             enum __Identifier {
                 __Identifier0,
                 __Identifier1,
                 __Identifier2,
+                __Identifier3,
             }
             #[doc(hidden)]
             struct __IdentifierVisitor;
@@ -21967,6 +21972,7 @@ pub mod errors {
                         0u64 => ::core::result::Result::Ok(__Identifier::__Identifier0),
                         1u64 => ::core::result::Result::Ok(__Identifier::__Identifier1),
                         2u64 => ::core::result::Result::Ok(__Identifier::__Identifier2),
+                        3u64 => ::core::result::Result::Ok(__Identifier::__Identifier3),
                         __variant => {
                             ::core::result::Result::Err(__serde::de::Error::invalid_value(
                                 __serde::de::Unexpected::Unsigned(__variant),
@@ -21983,6 +21989,7 @@ pub mod errors {
                         "Invalid" => ::core::result::Result::Ok(__Identifier::__Identifier0),
                         "Forbidden" => ::core::result::Result::Ok(__Identifier::__Identifier1),
                         "Internal" => ::core::result::Result::Ok(__Identifier::__Identifier2),
+                        "RateLimited" => ::core::result::Result::Ok(__Identifier::__Identifier3),
                         __variant => ::core::result::Result::Err(
                             __serde::de::Error::unknown_variant(__variant, __IDENTIFIERS),
                         ),
@@ -21999,6 +22006,7 @@ pub mod errors {
                         b"Invalid" => ::core::result::Result::Ok(__Identifier::__Identifier0),
                         b"Forbidden" => ::core::result::Result::Ok(__Identifier::__Identifier1),
                         b"Internal" => ::core::result::Result::Ok(__Identifier::__Identifier2),
+                        b"RateLimited" => ::core::result::Result::Ok(__Identifier::__Identifier3),
                         __variant => {
                             ::core::result::Result::Err(__serde::de::Error::invalid_value(
                                 __serde::de::Unexpected::Bytes(__variant),
@@ -22021,7 +22029,8 @@ pub mod errors {
                 }
             }
             #[doc(hidden)]
-            const __VARIANTS: &'static [&'static str] = &["Invalid", "Forbidden", "Internal"];
+            const __VARIANTS: &'static [&'static str] =
+                &["Invalid", "Forbidden", "Internal", "RateLimited"];
             #[doc(hidden)]
             struct __Visitor {
                 __phantom_vars: ::core::marker::PhantomData<fn(&())>,
@@ -22051,6 +22060,9 @@ pub mod errors {
                         __Identifier::__Identifier2 => {
                             ::core::result::Result::Ok(ActionErrorKind::Internal)
                         }
+                        __Identifier::__Identifier3 => {
+                            ::core::result::Result::Ok(ActionErrorKind::RateLimited)
+                        }
                         _ => Err(__E::invalid_value(
                             __serde::de::Unexpected::Str(__value),
                             &self,
@@ -22077,6 +22089,10 @@ pub mod errors {
                         (__Identifier::__Identifier2, __variant) => {
                             __serde::de::VariantAccess::unit_variant(__variant)?;
                             ::core::result::Result::Ok(ActionErrorKind::Internal)
+                        }
+                        (__Identifier::__Identifier3, __variant) => {
+                            __serde::de::VariantAccess::unit_variant(__variant)?;
+                            ::core::result::Result::Ok(ActionErrorKind::RateLimited)
                         }
                     }
                 }

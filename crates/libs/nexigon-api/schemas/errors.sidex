@@ -10,6 +10,8 @@ variant ActionErrorKind {
     Forbidden,
     /// Internal server error.
     Internal,
+    /// Rate limit exceeded.
+    RateLimited,
 }
 
 /// Action error.

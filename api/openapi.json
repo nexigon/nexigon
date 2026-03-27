@@ -5627,7 +5627,8 @@
         "enum": [
           "Invalid",
           "Forbidden",
-          "Internal"
+          "Internal",
+          "RateLimited"
         ],
         "description": "Kind of an action error."
       },
