@@ -72,6 +72,24 @@ record CommandsConfig {
     enabled?: bool,
     /// Directory containing command definition files (defaults to /etc/nexigon/agent/commands).
     directory?: PathBuf,
+    /// Built-in command configuration.
+    builtins?: BuiltinCommandsConfig,
+}
+
+/// Built-in command configuration.
+#[json(rename_all = "kebab-case")]
+record BuiltinCommandsConfig {
+    /// System power commands (reboot, shutdown).
+    system?: BuiltinCommandGroupConfig,
+    /// Systemd service management commands.
+    systemd?: BuiltinCommandGroupConfig,
+}
+
+/// Configuration for a group of built-in commands.
+#[json(rename_all = "kebab-case")]
+record BuiltinCommandGroupConfig {
+    /// Whether this group of built-in commands is enabled (defaults to false).
+    enabled?: bool,
 }
 
 /// Command definition file.

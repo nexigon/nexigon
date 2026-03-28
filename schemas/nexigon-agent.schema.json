@@ -84,6 +84,33 @@
       "$id": "nexigon_agent.commands.JsonValue",
       "description": "JSON value."
     },
+    "nexigon_agent.config.BuiltinCommandGroupConfig": {
+      "$id": "nexigon_agent.config.BuiltinCommandGroupConfig",
+      "type": "object",
+      "description": "Configuration for a group of built-in commands.",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        }
+      },
+      "required": [],
+      "unevaluatedProperties": false
+    },
+    "nexigon_agent.config.BuiltinCommandsConfig": {
+      "$id": "nexigon_agent.config.BuiltinCommandsConfig",
+      "type": "object",
+      "description": "Built-in command configuration.",
+      "properties": {
+        "system": {
+          "$ref": "#/$defs/nexigon_agent.config.BuiltinCommandGroupConfig"
+        },
+        "systemd": {
+          "$ref": "#/$defs/nexigon_agent.config.BuiltinCommandGroupConfig"
+        }
+      },
+      "required": [],
+      "unevaluatedProperties": false
+    },
     "nexigon_agent.config.CommandDefinition": {
       "$id": "nexigon_agent.config.CommandDefinition",
       "type": "object",
@@ -173,6 +200,9 @@
         },
         "directory": {
           "$ref": "#/$defs/nexigon_agent.config.PathBuf"
+        },
+        "builtins": {
+          "$ref": "#/$defs/nexigon_agent.config.BuiltinCommandsConfig"
         }
       },
       "required": [],

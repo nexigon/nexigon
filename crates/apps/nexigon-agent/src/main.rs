@@ -38,6 +38,7 @@ use crate::config::Config;
 use crate::handlers::CommandRegistry;
 use crate::system_info::get_system_info;
 
+pub mod builtins;
 pub mod config;
 pub mod handlers;
 pub mod system_info;
@@ -134,8 +135,12 @@ async fn main() -> anyhow::Result<()> {
             .as_ref()
             .and_then(|h| h.directory.as_deref())
             .unwrap_or(Path::new("/etc/nexigon/agent/commands"));
-        let registry =
-            CommandRegistry::load(commands_dir).context("failed to load command definitions")?;
+        let mut registry = CommandRegistry::load_external(commands_dir)
+            .context("failed to load command definitions")?;
+        if let Some(builtins_config) = config.commands.as_ref().and_then(|c| c.builtins.as_ref()) {
+            let builtins = builtins::collect_builtins(builtins_config);
+            registry.add_builtins(builtins);
+        }
         Some(Arc::new(registry))
     } else {
         None

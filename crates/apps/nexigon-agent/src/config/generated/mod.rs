@@ -2088,6 +2088,8 @@ pub mod config {
         pub enabled: ::std::option::Option<bool>,
         #[doc = "Directory containing command definition files (defaults to /etc/nexigon/agent/commands).\n"]
         pub directory: ::std::option::Option<PathBuf>,
+        #[doc = "Built-in command configuration.\n"]
+        pub builtins: ::std::option::Option<BuiltinCommandsConfig>,
     }
     impl CommandsConfig {
         #[doc = "Creates a new [`CommandsConfig`]."]
@@ -2095,6 +2097,7 @@ pub mod config {
             Self {
                 enabled: ::std::default::Default::default(),
                 directory: ::std::default::Default::default(),
+                builtins: ::std::default::Default::default(),
             }
         }
         #[doc = "Sets the value of `enabled`."]
@@ -2117,6 +2120,22 @@ pub mod config {
             self.directory = directory;
             self
         }
+        #[doc = "Sets the value of `builtins`."]
+        pub fn set_builtins(
+            &mut self,
+            builtins: ::std::option::Option<BuiltinCommandsConfig>,
+        ) -> &mut Self {
+            self.builtins = builtins;
+            self
+        }
+        #[doc = "Sets the value of `builtins`."]
+        pub fn with_builtins(
+            mut self,
+            builtins: ::std::option::Option<BuiltinCommandsConfig>,
+        ) -> Self {
+            self.builtins = builtins;
+            self
+        }
     }
     impl ::std::default::Default for CommandsConfig {
         fn default() -> Self {
@@ -2130,7 +2149,7 @@ pub mod config {
             __serializer: __S,
         ) -> ::std::result::Result<__S::Ok, __S::Error> {
             let mut __record =
-                __sidex_serde::ser::RecordSerializer::new(__serializer, "CommandsConfig", 2usize)?;
+                __sidex_serde::ser::RecordSerializer::new(__serializer, "CommandsConfig", 3usize)?;
             __record.serialize_optional_field(
                 "enabled",
                 ::core::option::Option::as_ref(&self.enabled),
@@ -2138,6 +2157,10 @@ pub mod config {
             __record.serialize_optional_field(
                 "directory",
                 ::core::option::Option::as_ref(&self.directory),
+            )?;
+            __record.serialize_optional_field(
+                "builtins",
+                ::core::option::Option::as_ref(&self.builtins),
             )?;
             __record.end()
         }
@@ -2174,7 +2197,7 @@ pub mod config {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(0usize, &"record with 2 fields"),
+                                __serde::de::Error::invalid_length(0usize, &"record with 3 fields"),
                             );
                         }
                     };
@@ -2185,13 +2208,25 @@ pub mod config {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(1usize, &"record with 2 fields"),
+                                __serde::de::Error::invalid_length(1usize, &"record with 3 fields"),
+                            );
+                        }
+                    };
+                    let __field2 = match __serde::de::SeqAccess::next_element::<
+                        ::std::option::Option<BuiltinCommandsConfig>,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(2usize, &"record with 3 fields"),
                             );
                         }
                     };
                     ::core::result::Result::Ok(CommandsConfig {
                         enabled: __field0,
                         directory: __field1,
+                        builtins: __field2,
                     })
                 }
                 #[inline]
@@ -2203,10 +2238,328 @@ pub mod config {
                     __A: __serde::de::MapAccess<'de>,
                 {
                     #[doc(hidden)]
-                    const __IDENTIFIERS: &'static [&'static str] = &["enabled", "directory"];
+                    const __IDENTIFIERS: &'static [&'static str] =
+                        &["enabled", "directory", "builtins"];
                     #[doc(hidden)]
                     const __EXPECTING_IDENTIFIERS: &'static str =
-                        "an identifier in [\"enabled\", \"directory\"]";
+                        "an identifier in [\"enabled\", \"directory\", \"builtins\"]";
+                    #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
+                    #[doc(hidden)]
+                    enum __Identifier {
+                        __Identifier0,
+                        __Identifier1,
+                        __Identifier2,
+                        __Unknown,
+                    }
+                    #[doc(hidden)]
+                    struct __IdentifierVisitor;
+                    impl<'de> __serde::de::Visitor<'de> for __IdentifierVisitor {
+                        type Value = __Identifier;
+                        fn expecting(
+                            &self,
+                            __formatter: &mut ::core::fmt::Formatter,
+                        ) -> ::core::fmt::Result {
+                            ::core::fmt::Formatter::write_str(__formatter, __EXPECTING_IDENTIFIERS)
+                        }
+                        fn visit_u64<__E>(
+                            self,
+                            __value: u64,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                0u64 => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                                1u64 => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                                2u64 => ::core::result::Result::Ok(__Identifier::__Identifier2),
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_str<__E>(
+                            self,
+                            __value: &str,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                "enabled" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
+                                }
+                                "directory" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier1)
+                                }
+                                "builtins" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier2)
+                                }
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_bytes<__E>(
+                            self,
+                            __value: &[u8],
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                b"enabled" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
+                                }
+                                b"directory" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier1)
+                                }
+                                b"builtins" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier2)
+                                }
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                    }
+                    impl<'de> __serde::Deserialize<'de> for __Identifier {
+                        #[inline]
+                        fn deserialize<__D>(
+                            __deserializer: __D,
+                        ) -> ::core::result::Result<Self, __D::Error>
+                        where
+                            __D: __serde::Deserializer<'de>,
+                        {
+                            __serde::Deserializer::deserialize_identifier(
+                                __deserializer,
+                                __IdentifierVisitor,
+                            )
+                        }
+                    }
+                    let mut __field0: ::core::option::Option<::std::option::Option<bool>> =
+                        ::core::option::Option::None;
+                    let mut __field1: ::core::option::Option<::std::option::Option<PathBuf>> =
+                        ::core::option::Option::None;
+                    let mut __field2: ::core::option::Option<
+                        ::std::option::Option<BuiltinCommandsConfig>,
+                    > = ::core::option::Option::None;
+                    while let ::core::option::Option::Some(__key) =
+                        __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
+                    {
+                        match __key {
+                            __Identifier::__Identifier0 => {
+                                if ::core::option::Option::is_some(&__field0) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "enabled",
+                                        ),
+                                    );
+                                }
+                                __field0 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<
+                                        ::std::option::Option<bool>,
+                                    >(&mut __map)?,
+                                );
+                            }
+                            __Identifier::__Identifier1 => {
+                                if ::core::option::Option::is_some(&__field1) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "directory",
+                                        ),
+                                    );
+                                }
+                                __field1 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<
+                                        ::std::option::Option<PathBuf>,
+                                    >(&mut __map)?,
+                                );
+                            }
+                            __Identifier::__Identifier2 => {
+                                if ::core::option::Option::is_some(&__field2) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "builtins",
+                                        ),
+                                    );
+                                }
+                                __field2 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<
+                                        ::std::option::Option<BuiltinCommandsConfig>,
+                                    >(&mut __map)?,
+                                );
+                            }
+                            _ => {
+                                __serde::de::MapAccess::next_value::<__serde::de::IgnoredAny>(
+                                    &mut __map,
+                                )?;
+                            }
+                        }
+                    }
+                    let __field0 = match __field0 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => ::core::option::Option::None,
+                    };
+                    let __field1 = match __field1 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => ::core::option::Option::None,
+                    };
+                    let __field2 = match __field2 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => ::core::option::Option::None,
+                    };
+                    ::core::result::Result::Ok(CommandsConfig {
+                        enabled: __field0,
+                        directory: __field1,
+                        builtins: __field2,
+                    })
+                }
+            }
+            #[doc(hidden)]
+            const __FIELDS: &'static [&'static str] = &["enabled", "directory", "builtins"];
+            __serde::Deserializer::deserialize_struct(
+                __deserializer,
+                "CommandsConfig",
+                __FIELDS,
+                __Visitor {
+                    __phantom_vars: ::core::marker::PhantomData,
+                },
+            )
+        }
+    }
+    #[doc = "Built-in command configuration.\n"]
+    #[derive(Clone, Debug)]
+    pub struct BuiltinCommandsConfig {
+        #[doc = "System power commands (reboot, shutdown).\n"]
+        pub system: ::std::option::Option<BuiltinCommandGroupConfig>,
+        #[doc = "Systemd service management commands.\n"]
+        pub systemd: ::std::option::Option<BuiltinCommandGroupConfig>,
+    }
+    impl BuiltinCommandsConfig {
+        #[doc = "Creates a new [`BuiltinCommandsConfig`]."]
+        pub fn new() -> Self {
+            Self {
+                system: ::std::default::Default::default(),
+                systemd: ::std::default::Default::default(),
+            }
+        }
+        #[doc = "Sets the value of `system`."]
+        pub fn set_system(
+            &mut self,
+            system: ::std::option::Option<BuiltinCommandGroupConfig>,
+        ) -> &mut Self {
+            self.system = system;
+            self
+        }
+        #[doc = "Sets the value of `system`."]
+        pub fn with_system(
+            mut self,
+            system: ::std::option::Option<BuiltinCommandGroupConfig>,
+        ) -> Self {
+            self.system = system;
+            self
+        }
+        #[doc = "Sets the value of `systemd`."]
+        pub fn set_systemd(
+            &mut self,
+            systemd: ::std::option::Option<BuiltinCommandGroupConfig>,
+        ) -> &mut Self {
+            self.systemd = systemd;
+            self
+        }
+        #[doc = "Sets the value of `systemd`."]
+        pub fn with_systemd(
+            mut self,
+            systemd: ::std::option::Option<BuiltinCommandGroupConfig>,
+        ) -> Self {
+            self.systemd = systemd;
+            self
+        }
+    }
+    impl ::std::default::Default for BuiltinCommandsConfig {
+        fn default() -> Self {
+            Self::new()
+        }
+    }
+    #[automatically_derived]
+    impl __serde::Serialize for BuiltinCommandsConfig {
+        fn serialize<__S: __serde::Serializer>(
+            &self,
+            __serializer: __S,
+        ) -> ::std::result::Result<__S::Ok, __S::Error> {
+            let mut __record = __sidex_serde::ser::RecordSerializer::new(
+                __serializer,
+                "BuiltinCommandsConfig",
+                2usize,
+            )?;
+            __record
+                .serialize_optional_field("system", ::core::option::Option::as_ref(&self.system))?;
+            __record.serialize_optional_field(
+                "systemd",
+                ::core::option::Option::as_ref(&self.systemd),
+            )?;
+            __record.end()
+        }
+    }
+    #[automatically_derived]
+    impl<'de> __serde::Deserialize<'de> for BuiltinCommandsConfig {
+        fn deserialize<__D: __serde::Deserializer<'de>>(
+            __deserializer: __D,
+        ) -> ::std::result::Result<Self, __D::Error> {
+            #[doc(hidden)]
+            struct __Visitor {
+                __phantom_vars: ::core::marker::PhantomData<fn(&())>,
+            }
+            impl<'de> __serde::de::Visitor<'de> for __Visitor {
+                type Value = BuiltinCommandsConfig;
+                fn expecting(
+                    &self,
+                    __formatter: &mut ::core::fmt::Formatter,
+                ) -> ::core::fmt::Result {
+                    ::core::fmt::Formatter::write_str(__formatter, "record BuiltinCommandsConfig")
+                }
+                #[inline]
+                fn visit_seq<__A>(
+                    self,
+                    mut __seq: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::SeqAccess<'de>,
+                {
+                    let __field0 = match __serde::de::SeqAccess::next_element::<
+                        ::std::option::Option<BuiltinCommandGroupConfig>,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(0usize, &"record with 2 fields"),
+                            );
+                        }
+                    };
+                    let __field1 = match __serde::de::SeqAccess::next_element::<
+                        ::std::option::Option<BuiltinCommandGroupConfig>,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(1usize, &"record with 2 fields"),
+                            );
+                        }
+                    };
+                    ::core::result::Result::Ok(BuiltinCommandsConfig {
+                        system: __field0,
+                        systemd: __field1,
+                    })
+                }
+                #[inline]
+                fn visit_map<__A>(
+                    self,
+                    mut __map: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::MapAccess<'de>,
+                {
+                    #[doc(hidden)]
+                    const __IDENTIFIERS: &'static [&'static str] = &["system", "systemd"];
+                    #[doc(hidden)]
+                    const __EXPECTING_IDENTIFIERS: &'static str =
+                        "an identifier in [\"system\", \"systemd\"]";
                     #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
                     #[doc(hidden)]
                     enum __Identifier {
@@ -2245,11 +2598,254 @@ pub mod config {
                             __E: __serde::de::Error,
                         {
                             match __value {
-                                "enabled" => {
+                                "system" => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                                "systemd" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier1)
+                                }
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_bytes<__E>(
+                            self,
+                            __value: &[u8],
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                b"system" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier0)
                                 }
-                                "directory" => {
+                                b"systemd" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier1)
+                                }
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                    }
+                    impl<'de> __serde::Deserialize<'de> for __Identifier {
+                        #[inline]
+                        fn deserialize<__D>(
+                            __deserializer: __D,
+                        ) -> ::core::result::Result<Self, __D::Error>
+                        where
+                            __D: __serde::Deserializer<'de>,
+                        {
+                            __serde::Deserializer::deserialize_identifier(
+                                __deserializer,
+                                __IdentifierVisitor,
+                            )
+                        }
+                    }
+                    let mut __field0: ::core::option::Option<
+                        ::std::option::Option<BuiltinCommandGroupConfig>,
+                    > = ::core::option::Option::None;
+                    let mut __field1: ::core::option::Option<
+                        ::std::option::Option<BuiltinCommandGroupConfig>,
+                    > = ::core::option::Option::None;
+                    while let ::core::option::Option::Some(__key) =
+                        __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
+                    {
+                        match __key {
+                            __Identifier::__Identifier0 => {
+                                if ::core::option::Option::is_some(&__field0) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "system",
+                                        ),
+                                    );
+                                }
+                                __field0 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<
+                                        ::std::option::Option<BuiltinCommandGroupConfig>,
+                                    >(&mut __map)?,
+                                );
+                            }
+                            __Identifier::__Identifier1 => {
+                                if ::core::option::Option::is_some(&__field1) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "systemd",
+                                        ),
+                                    );
+                                }
+                                __field1 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<
+                                        ::std::option::Option<BuiltinCommandGroupConfig>,
+                                    >(&mut __map)?,
+                                );
+                            }
+                            _ => {
+                                __serde::de::MapAccess::next_value::<__serde::de::IgnoredAny>(
+                                    &mut __map,
+                                )?;
+                            }
+                        }
+                    }
+                    let __field0 = match __field0 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => ::core::option::Option::None,
+                    };
+                    let __field1 = match __field1 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => ::core::option::Option::None,
+                    };
+                    ::core::result::Result::Ok(BuiltinCommandsConfig {
+                        system: __field0,
+                        systemd: __field1,
+                    })
+                }
+            }
+            #[doc(hidden)]
+            const __FIELDS: &'static [&'static str] = &["system", "systemd"];
+            __serde::Deserializer::deserialize_struct(
+                __deserializer,
+                "BuiltinCommandsConfig",
+                __FIELDS,
+                __Visitor {
+                    __phantom_vars: ::core::marker::PhantomData,
+                },
+            )
+        }
+    }
+    #[doc = "Configuration for a group of built-in commands.\n"]
+    #[derive(Clone, Debug)]
+    pub struct BuiltinCommandGroupConfig {
+        #[doc = "Whether this group of built-in commands is enabled (defaults to false).\n"]
+        pub enabled: ::std::option::Option<bool>,
+    }
+    impl BuiltinCommandGroupConfig {
+        #[doc = "Creates a new [`BuiltinCommandGroupConfig`]."]
+        pub fn new() -> Self {
+            Self {
+                enabled: ::std::default::Default::default(),
+            }
+        }
+        #[doc = "Sets the value of `enabled`."]
+        pub fn set_enabled(&mut self, enabled: ::std::option::Option<bool>) -> &mut Self {
+            self.enabled = enabled;
+            self
+        }
+        #[doc = "Sets the value of `enabled`."]
+        pub fn with_enabled(mut self, enabled: ::std::option::Option<bool>) -> Self {
+            self.enabled = enabled;
+            self
+        }
+    }
+    impl ::std::default::Default for BuiltinCommandGroupConfig {
+        fn default() -> Self {
+            Self::new()
+        }
+    }
+    #[automatically_derived]
+    impl __serde::Serialize for BuiltinCommandGroupConfig {
+        fn serialize<__S: __serde::Serializer>(
+            &self,
+            __serializer: __S,
+        ) -> ::std::result::Result<__S::Ok, __S::Error> {
+            let mut __record = __sidex_serde::ser::RecordSerializer::new(
+                __serializer,
+                "BuiltinCommandGroupConfig",
+                1usize,
+            )?;
+            __record.serialize_optional_field(
+                "enabled",
+                ::core::option::Option::as_ref(&self.enabled),
+            )?;
+            __record.end()
+        }
+    }
+    #[automatically_derived]
+    impl<'de> __serde::Deserialize<'de> for BuiltinCommandGroupConfig {
+        fn deserialize<__D: __serde::Deserializer<'de>>(
+            __deserializer: __D,
+        ) -> ::std::result::Result<Self, __D::Error> {
+            #[doc(hidden)]
+            struct __Visitor {
+                __phantom_vars: ::core::marker::PhantomData<fn(&())>,
+            }
+            impl<'de> __serde::de::Visitor<'de> for __Visitor {
+                type Value = BuiltinCommandGroupConfig;
+                fn expecting(
+                    &self,
+                    __formatter: &mut ::core::fmt::Formatter,
+                ) -> ::core::fmt::Result {
+                    ::core::fmt::Formatter::write_str(
+                        __formatter,
+                        "record BuiltinCommandGroupConfig",
+                    )
+                }
+                #[inline]
+                fn visit_seq<__A>(
+                    self,
+                    mut __seq: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::SeqAccess<'de>,
+                {
+                    let __field0 = match __serde::de::SeqAccess::next_element::<
+                        ::std::option::Option<bool>,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(0usize, &"record with 1 fields"),
+                            );
+                        }
+                    };
+                    ::core::result::Result::Ok(BuiltinCommandGroupConfig { enabled: __field0 })
+                }
+                #[inline]
+                fn visit_map<__A>(
+                    self,
+                    mut __map: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::MapAccess<'de>,
+                {
+                    #[doc(hidden)]
+                    const __IDENTIFIERS: &'static [&'static str] = &["enabled"];
+                    #[doc(hidden)]
+                    const __EXPECTING_IDENTIFIERS: &'static str = "an identifier in [\"enabled\"]";
+                    #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
+                    #[doc(hidden)]
+                    enum __Identifier {
+                        __Identifier0,
+                        __Unknown,
+                    }
+                    #[doc(hidden)]
+                    struct __IdentifierVisitor;
+                    impl<'de> __serde::de::Visitor<'de> for __IdentifierVisitor {
+                        type Value = __Identifier;
+                        fn expecting(
+                            &self,
+                            __formatter: &mut ::core::fmt::Formatter,
+                        ) -> ::core::fmt::Result {
+                            ::core::fmt::Formatter::write_str(__formatter, __EXPECTING_IDENTIFIERS)
+                        }
+                        fn visit_u64<__E>(
+                            self,
+                            __value: u64,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                0u64 => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_str<__E>(
+                            self,
+                            __value: &str,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                "enabled" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
                                 }
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
@@ -2264,9 +2860,6 @@ pub mod config {
                             match __value {
                                 b"enabled" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier0)
-                                }
-                                b"directory" => {
-                                    ::core::result::Result::Ok(__Identifier::__Identifier1)
                                 }
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
@@ -2288,8 +2881,6 @@ pub mod config {
                     }
                     let mut __field0: ::core::option::Option<::std::option::Option<bool>> =
                         ::core::option::Option::None;
-                    let mut __field1: ::core::option::Option<::std::option::Option<PathBuf>> =
-                        ::core::option::Option::None;
                     while let ::core::option::Option::Some(__key) =
                         __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
                     {
@@ -2308,20 +2899,6 @@ pub mod config {
                                     >(&mut __map)?,
                                 );
                             }
-                            __Identifier::__Identifier1 => {
-                                if ::core::option::Option::is_some(&__field1) {
-                                    return ::core::result::Result::Err(
-                                        <__A::Error as __serde::de::Error>::duplicate_field(
-                                            "directory",
-                                        ),
-                                    );
-                                }
-                                __field1 = ::core::option::Option::Some(
-                                    __serde::de::MapAccess::next_value::<
-                                        ::std::option::Option<PathBuf>,
-                                    >(&mut __map)?,
-                                );
-                            }
                             _ => {
                                 __serde::de::MapAccess::next_value::<__serde::de::IgnoredAny>(
                                     &mut __map,
@@ -2333,21 +2910,14 @@ pub mod config {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => ::core::option::Option::None,
                     };
-                    let __field1 = match __field1 {
-                        ::core::option::Option::Some(__value) => __value,
-                        ::core::option::Option::None => ::core::option::Option::None,
-                    };
-                    ::core::result::Result::Ok(CommandsConfig {
-                        enabled: __field0,
-                        directory: __field1,
-                    })
+                    ::core::result::Result::Ok(BuiltinCommandGroupConfig { enabled: __field0 })
                 }
             }
             #[doc(hidden)]
-            const __FIELDS: &'static [&'static str] = &["enabled", "directory"];
+            const __FIELDS: &'static [&'static str] = &["enabled"];
             __serde::Deserializer::deserialize_struct(
                 __deserializer,
-                "CommandsConfig",
+                "BuiltinCommandGroupConfig",
                 __FIELDS,
                 __Visitor {
                     __phantom_vars: ::core::marker::PhantomData,
