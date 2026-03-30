@@ -2428,6 +2428,8 @@ pub mod config {
         pub system: ::std::option::Option<BuiltinCommandGroupConfig>,
         #[doc = "Systemd service management commands.\n"]
         pub systemd: ::std::option::Option<BuiltinCommandGroupConfig>,
+        #[doc = "Rugix Apps lifecycle management commands.\n"]
+        pub rugix_apps: ::std::option::Option<BuiltinCommandGroupConfig>,
     }
     impl BuiltinCommandsConfig {
         #[doc = "Creates a new [`BuiltinCommandsConfig`]."]
@@ -2435,6 +2437,7 @@ pub mod config {
             Self {
                 system: ::std::default::Default::default(),
                 systemd: ::std::default::Default::default(),
+                rugix_apps: ::std::default::Default::default(),
             }
         }
         #[doc = "Sets the value of `system`."]
@@ -2469,6 +2472,22 @@ pub mod config {
             self.systemd = systemd;
             self
         }
+        #[doc = "Sets the value of `rugix_apps`."]
+        pub fn set_rugix_apps(
+            &mut self,
+            rugix_apps: ::std::option::Option<BuiltinCommandGroupConfig>,
+        ) -> &mut Self {
+            self.rugix_apps = rugix_apps;
+            self
+        }
+        #[doc = "Sets the value of `rugix_apps`."]
+        pub fn with_rugix_apps(
+            mut self,
+            rugix_apps: ::std::option::Option<BuiltinCommandGroupConfig>,
+        ) -> Self {
+            self.rugix_apps = rugix_apps;
+            self
+        }
     }
     impl ::std::default::Default for BuiltinCommandsConfig {
         fn default() -> Self {
@@ -2484,13 +2503,17 @@ pub mod config {
             let mut __record = __sidex_serde::ser::RecordSerializer::new(
                 __serializer,
                 "BuiltinCommandsConfig",
-                2usize,
+                3usize,
             )?;
             __record
                 .serialize_optional_field("system", ::core::option::Option::as_ref(&self.system))?;
             __record.serialize_optional_field(
                 "systemd",
                 ::core::option::Option::as_ref(&self.systemd),
+            )?;
+            __record.serialize_optional_field(
+                "rugix-apps",
+                ::core::option::Option::as_ref(&self.rugix_apps),
             )?;
             __record.end()
         }
@@ -2527,7 +2550,7 @@ pub mod config {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(0usize, &"record with 2 fields"),
+                                __serde::de::Error::invalid_length(0usize, &"record with 3 fields"),
                             );
                         }
                     };
@@ -2538,13 +2561,25 @@ pub mod config {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(1usize, &"record with 2 fields"),
+                                __serde::de::Error::invalid_length(1usize, &"record with 3 fields"),
+                            );
+                        }
+                    };
+                    let __field2 = match __serde::de::SeqAccess::next_element::<
+                        ::std::option::Option<BuiltinCommandGroupConfig>,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(2usize, &"record with 3 fields"),
                             );
                         }
                     };
                     ::core::result::Result::Ok(BuiltinCommandsConfig {
                         system: __field0,
                         systemd: __field1,
+                        rugix_apps: __field2,
                     })
                 }
                 #[inline]
@@ -2556,15 +2591,17 @@ pub mod config {
                     __A: __serde::de::MapAccess<'de>,
                 {
                     #[doc(hidden)]
-                    const __IDENTIFIERS: &'static [&'static str] = &["system", "systemd"];
+                    const __IDENTIFIERS: &'static [&'static str] =
+                        &["system", "systemd", "rugix-apps"];
                     #[doc(hidden)]
                     const __EXPECTING_IDENTIFIERS: &'static str =
-                        "an identifier in [\"system\", \"systemd\"]";
+                        "an identifier in [\"system\", \"systemd\", \"rugix-apps\"]";
                     #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
                     #[doc(hidden)]
                     enum __Identifier {
                         __Identifier0,
                         __Identifier1,
+                        __Identifier2,
                         __Unknown,
                     }
                     #[doc(hidden)]
@@ -2587,6 +2624,7 @@ pub mod config {
                             match __value {
                                 0u64 => ::core::result::Result::Ok(__Identifier::__Identifier0),
                                 1u64 => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                                2u64 => ::core::result::Result::Ok(__Identifier::__Identifier2),
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
                         }
@@ -2601,6 +2639,9 @@ pub mod config {
                                 "system" => ::core::result::Result::Ok(__Identifier::__Identifier0),
                                 "systemd" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier1)
+                                }
+                                "rugix-apps" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier2)
                                 }
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
@@ -2618,6 +2659,9 @@ pub mod config {
                                 }
                                 b"systemd" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier1)
+                                }
+                                b"rugix-apps" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier2)
                                 }
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
@@ -2641,6 +2685,9 @@ pub mod config {
                         ::std::option::Option<BuiltinCommandGroupConfig>,
                     > = ::core::option::Option::None;
                     let mut __field1: ::core::option::Option<
+                        ::std::option::Option<BuiltinCommandGroupConfig>,
+                    > = ::core::option::Option::None;
+                    let mut __field2: ::core::option::Option<
                         ::std::option::Option<BuiltinCommandGroupConfig>,
                     > = ::core::option::Option::None;
                     while let ::core::option::Option::Some(__key) =
@@ -2675,6 +2722,20 @@ pub mod config {
                                     >(&mut __map)?,
                                 );
                             }
+                            __Identifier::__Identifier2 => {
+                                if ::core::option::Option::is_some(&__field2) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "rugix-apps",
+                                        ),
+                                    );
+                                }
+                                __field2 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<
+                                        ::std::option::Option<BuiltinCommandGroupConfig>,
+                                    >(&mut __map)?,
+                                );
+                            }
                             _ => {
                                 __serde::de::MapAccess::next_value::<__serde::de::IgnoredAny>(
                                     &mut __map,
@@ -2690,14 +2751,19 @@ pub mod config {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => ::core::option::Option::None,
                     };
+                    let __field2 = match __field2 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => ::core::option::Option::None,
+                    };
                     ::core::result::Result::Ok(BuiltinCommandsConfig {
                         system: __field0,
                         systemd: __field1,
+                        rugix_apps: __field2,
                     })
                 }
             }
             #[doc(hidden)]
-            const __FIELDS: &'static [&'static str] = &["system", "systemd"];
+            const __FIELDS: &'static [&'static str] = &["system", "systemd", "rugix-apps"];
             __serde::Deserializer::deserialize_struct(
                 __deserializer,
                 "BuiltinCommandsConfig",

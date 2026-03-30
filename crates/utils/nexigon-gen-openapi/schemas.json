@@ -3950,6 +3950,9 @@
       },
       "name": {
         "type": "string"
+      },
+      "kind": {
+        "type": "string"
       }
     },
     "required": [
@@ -4251,6 +4254,9 @@
         "$ref": "#/components/schemas/nexigon_api.repositories.PackageId"
       },
       "name": {
+        "type": "string"
+      },
+      "kind": {
         "type": "string"
       },
       "versionCount": {
@@ -4698,6 +4704,9 @@
       "name": {
         "type": "string"
       },
+      "kind": {
+        "type": "string"
+      },
       "createdAt": {
         "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
       }
@@ -5140,6 +5149,22 @@
         ]
       }
     ]
+  },
+  "nexigon_api.repositories.SetPackageKindAction": {
+    "type": "object",
+    "description": "Set the kind of a package.",
+    "properties": {
+      "packageId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.PackageId"
+      },
+      "kind": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "packageId"
+    ],
+    "unevaluatedProperties": false
   },
   "nexigon_api.repositories.SetPackageNameAction": {
     "type": "object",

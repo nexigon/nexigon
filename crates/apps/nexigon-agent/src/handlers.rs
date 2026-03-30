@@ -22,6 +22,8 @@ use tracing::error;
 use tracing::info;
 use tracing::warn;
 
+use nexigon_multiplex::ConnectionRef;
+
 use crate::builtins::BuiltinCommand;
 use crate::builtins::InvocationCtx;
 use crate::config::CommandDefinition;
@@ -161,6 +163,7 @@ pub async fn handle_handler_channel(
     channel: nexigon_multiplex::Channel,
     _config: &Arc<Config>,
     registry: &Arc<CommandRegistry>,
+    connection_ref: ConnectionRef,
 ) -> anyhow::Result<()> {
     let (mut chan_writer, mut chan_reader) = channel.split();
 
@@ -193,6 +196,7 @@ pub async fn handle_handler_channel(
             let timeout_secs: Option<u64> = request.timeout_secs.map(|t| t.into());
             let ctx = InvocationCtx {
                 input: request.input.clone(),
+                connection_ref: Some(connection_ref),
             };
             let started = std::time::Instant::now();
             let done = if let Some(timeout_secs) = timeout_secs {

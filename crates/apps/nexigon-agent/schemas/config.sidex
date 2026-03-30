@@ -83,6 +83,8 @@ record BuiltinCommandsConfig {
     system?: BuiltinCommandGroupConfig,
     /// Systemd service management commands.
     systemd?: BuiltinCommandGroupConfig,
+    /// Rugix Apps lifecycle management commands.
+    rugix_apps?: BuiltinCommandGroupConfig,
 }
 
 /// Configuration for a group of built-in commands.

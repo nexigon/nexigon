@@ -6,8 +6,12 @@ use std::pin::Pin;
 use nexigon_api::types::devices::DeviceCommandDoneData;
 use nexigon_api::types::properties::DeviceCommandDescriptor;
 
+use nexigon_multiplex::ConnectionRef;
+
 use crate::config::BuiltinCommandsConfig;
 
+#[cfg(target_os = "linux")]
+mod rugix_apps;
 #[cfg(target_os = "linux")]
 mod system;
 #[cfg(target_os = "linux")]
@@ -16,6 +20,8 @@ mod systemd;
 /// Context passed to built-in command invocations.
 pub struct InvocationCtx {
     pub input: serde_json::Value,
+    /// Reference to the hub connection for issuing API calls.
+    pub connection_ref: Option<ConnectionRef>,
 }
 
 /// A built-in command that executes natively in the agent process.
@@ -51,6 +57,14 @@ pub fn collect_builtins(config: &BuiltinCommandsConfig) -> Vec<Box<dyn BuiltinCo
             .unwrap_or(false)
         {
             builtins.extend(systemd::commands());
+        }
+        if config
+            .rugix_apps
+            .as_ref()
+            .and_then(|g| g.enabled)
+            .unwrap_or(false)
+        {
+            builtins.extend(rugix_apps::commands());
         }
     }
 

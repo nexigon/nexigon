@@ -3075,6 +3075,37 @@
         }
       }
     },
+    "/api/v1/actions/invoke/repositories_SetPackageKind": {
+      "post": {
+        "tags": [
+          "repositories"
+        ],
+        "summary": "SetPackageKind",
+        "description": "Set the kind of a package.",
+        "operationId": "repositories_SetPackageKind",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/nexigon_api.repositories.SetPackageKindAction"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/nexigon_api.outputs.Empty"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/actions/invoke/repositories_QueryPackageVersions": {
       "post": {
         "tags": [
@@ -7936,6 +7967,9 @@
           },
           "name": {
             "type": "string"
+          },
+          "kind": {
+            "type": "string"
           }
         },
         "required": [
@@ -8228,6 +8262,9 @@
             "$ref": "#/components/schemas/nexigon_api.repositories.PackageId"
           },
           "name": {
+            "type": "string"
+          },
+          "kind": {
             "type": "string"
           },
           "versionCount": {
@@ -8659,6 +8696,9 @@
             "$ref": "#/components/schemas/nexigon_api.repositories.PackageId"
           },
           "name": {
+            "type": "string"
+          },
+          "kind": {
             "type": "string"
           },
           "createdAt": {
@@ -9093,6 +9133,21 @@
             ]
           }
         ]
+      },
+      "nexigon_api.repositories.SetPackageKindAction": {
+        "type": "object",
+        "properties": {
+          "packageId": {
+            "$ref": "#/components/schemas/nexigon_api.repositories.PackageId"
+          },
+          "kind": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "packageId"
+        ],
+        "unevaluatedProperties": false
       },
       "nexigon_api.repositories.SetPackageNameAction": {
         "type": "object",

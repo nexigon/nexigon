@@ -59004,6 +59004,8 @@ pub mod repositories {
         pub package_id: PackageId,
         #[doc = "Name of the package.\n"]
         pub name: ::std::string::String,
+        #[doc = "Free-form kind of the package (e.g., \"rugix-app\").\n"]
+        pub kind: ::std::option::Option<::std::string::String>,
         #[doc = "Timestamp when the package was created.\n"]
         pub created_at: super::datetime::Timestamp,
     }
@@ -59018,6 +59020,7 @@ pub mod repositories {
                 package_id,
                 name,
                 created_at,
+                kind: ::std::default::Default::default(),
             }
         }
         #[doc = "Sets the value of `package_id`."]
@@ -59040,6 +59043,19 @@ pub mod repositories {
             self.name = name;
             self
         }
+        #[doc = "Sets the value of `kind`."]
+        pub fn set_kind(
+            &mut self,
+            kind: ::std::option::Option<::std::string::String>,
+        ) -> &mut Self {
+            self.kind = kind;
+            self
+        }
+        #[doc = "Sets the value of `kind`."]
+        pub fn with_kind(mut self, kind: ::std::option::Option<::std::string::String>) -> Self {
+            self.kind = kind;
+            self
+        }
         #[doc = "Sets the value of `created_at`."]
         pub fn set_created_at(&mut self, created_at: super::datetime::Timestamp) -> &mut Self {
             self.created_at = created_at;
@@ -59060,10 +59076,12 @@ pub mod repositories {
             let mut __record = __sidex_serde::ser::RecordSerializer::new(
                 __serializer,
                 "QueryRepositoryPackagesItem",
-                3usize,
+                4usize,
             )?;
             __record.serialize_field("packageId", &self.package_id)?;
             __record.serialize_field("name", &self.name)?;
+            __record
+                .serialize_optional_field("kind", ::core::option::Option::as_ref(&self.kind))?;
             __record.serialize_field("createdAt", &self.created_at)?;
             __record.end()
         }
@@ -59103,7 +59121,7 @@ pub mod repositories {
                                 return ::core::result::Result::Err(
                                     __serde::de::Error::invalid_length(
                                         0usize,
-                                        &"record with 3 fields",
+                                        &"record with 4 fields",
                                     ),
                                 );
                             }
@@ -59115,25 +59133,37 @@ pub mod repositories {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(1usize, &"record with 3 fields"),
+                                __serde::de::Error::invalid_length(1usize, &"record with 4 fields"),
                             );
                         }
                     };
                     let __field2 = match __serde::de::SeqAccess::next_element::<
+                        ::std::option::Option<::std::string::String>,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(2usize, &"record with 4 fields"),
+                            );
+                        }
+                    };
+                    let __field3 = match __serde::de::SeqAccess::next_element::<
                         super::datetime::Timestamp,
                     >(&mut __seq)?
                     {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(2usize, &"record with 3 fields"),
+                                __serde::de::Error::invalid_length(3usize, &"record with 4 fields"),
                             );
                         }
                     };
                     ::core::result::Result::Ok(QueryRepositoryPackagesItem {
                         package_id: __field0,
                         name: __field1,
-                        created_at: __field2,
+                        kind: __field2,
+                        created_at: __field3,
                     })
                 }
                 #[inline]
@@ -59146,16 +59176,17 @@ pub mod repositories {
                 {
                     #[doc(hidden)]
                     const __IDENTIFIERS: &'static [&'static str] =
-                        &["packageId", "name", "createdAt"];
+                        &["packageId", "name", "kind", "createdAt"];
                     #[doc(hidden)]
                     const __EXPECTING_IDENTIFIERS: &'static str =
-                        "an identifier in [\"packageId\", \"name\", \"createdAt\"]";
+                        "an identifier in [\"packageId\", \"name\", \"kind\", \"createdAt\"]";
                     #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
                     #[doc(hidden)]
                     enum __Identifier {
                         __Identifier0,
                         __Identifier1,
                         __Identifier2,
+                        __Identifier3,
                         __Unknown,
                     }
                     #[doc(hidden)]
@@ -59179,6 +59210,7 @@ pub mod repositories {
                                 0u64 => ::core::result::Result::Ok(__Identifier::__Identifier0),
                                 1u64 => ::core::result::Result::Ok(__Identifier::__Identifier1),
                                 2u64 => ::core::result::Result::Ok(__Identifier::__Identifier2),
+                                3u64 => ::core::result::Result::Ok(__Identifier::__Identifier3),
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
                         }
@@ -59194,8 +59226,9 @@ pub mod repositories {
                                     ::core::result::Result::Ok(__Identifier::__Identifier0)
                                 }
                                 "name" => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                                "kind" => ::core::result::Result::Ok(__Identifier::__Identifier2),
                                 "createdAt" => {
-                                    ::core::result::Result::Ok(__Identifier::__Identifier2)
+                                    ::core::result::Result::Ok(__Identifier::__Identifier3)
                                 }
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
@@ -59212,8 +59245,9 @@ pub mod repositories {
                                     ::core::result::Result::Ok(__Identifier::__Identifier0)
                                 }
                                 b"name" => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                                b"kind" => ::core::result::Result::Ok(__Identifier::__Identifier2),
                                 b"createdAt" => {
-                                    ::core::result::Result::Ok(__Identifier::__Identifier2)
+                                    ::core::result::Result::Ok(__Identifier::__Identifier3)
                                 }
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
@@ -59237,7 +59271,10 @@ pub mod repositories {
                         ::core::option::Option::None;
                     let mut __field1: ::core::option::Option<::std::string::String> =
                         ::core::option::Option::None;
-                    let mut __field2: ::core::option::Option<super::datetime::Timestamp> =
+                    let mut __field2: ::core::option::Option<
+                        ::std::option::Option<::std::string::String>,
+                    > = ::core::option::Option::None;
+                    let mut __field3: ::core::option::Option<super::datetime::Timestamp> =
                         ::core::option::Option::None;
                     while let ::core::option::Option::Some(__key) =
                         __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
@@ -59270,12 +59307,24 @@ pub mod repositories {
                             __Identifier::__Identifier2 => {
                                 if ::core::option::Option::is_some(&__field2) {
                                     return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field("kind"),
+                                    );
+                                }
+                                __field2 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<
+                                        ::std::option::Option<::std::string::String>,
+                                    >(&mut __map)?,
+                                );
+                            }
+                            __Identifier::__Identifier3 => {
+                                if ::core::option::Option::is_some(&__field3) {
+                                    return ::core::result::Result::Err(
                                         <__A::Error as __serde::de::Error>::duplicate_field(
                                             "createdAt",
                                         ),
                                     );
                                 }
-                                __field2 = ::core::option::Option::Some(
+                                __field3 = ::core::option::Option::Some(
                                     __serde::de::MapAccess::next_value::<super::datetime::Timestamp>(
                                         &mut __map,
                                     )?,
@@ -59306,6 +59355,10 @@ pub mod repositories {
                     };
                     let __field2 = match __field2 {
                         ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => ::core::option::Option::None,
+                    };
+                    let __field3 = match __field3 {
+                        ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
                                 <__A::Error as __serde::de::Error>::missing_field("createdAt"),
@@ -59315,12 +59368,13 @@ pub mod repositories {
                     ::core::result::Result::Ok(QueryRepositoryPackagesItem {
                         package_id: __field0,
                         name: __field1,
-                        created_at: __field2,
+                        kind: __field2,
+                        created_at: __field3,
                     })
                 }
             }
             #[doc(hidden)]
-            const __FIELDS: &'static [&'static str] = &["packageId", "name", "createdAt"];
+            const __FIELDS: &'static [&'static str] = &["packageId", "name", "kind", "createdAt"];
             __serde::Deserializer::deserialize_struct(
                 __deserializer,
                 "QueryRepositoryPackagesItem",
@@ -61741,6 +61795,8 @@ pub mod repositories {
         pub package_id: PackageId,
         #[doc = "Name of the package.\n"]
         pub name: ::std::string::String,
+        #[doc = "Free-form kind of the package (e.g., \"rugix-app\").\n"]
+        pub kind: ::std::option::Option<::std::string::String>,
         #[doc = "Number of versions of the package.\n"]
         pub version_count: u64,
     }
@@ -61751,6 +61807,7 @@ pub mod repositories {
                 package_id,
                 name,
                 version_count,
+                kind: ::std::default::Default::default(),
             }
         }
         #[doc = "Sets the value of `package_id`."]
@@ -61773,6 +61830,19 @@ pub mod repositories {
             self.name = name;
             self
         }
+        #[doc = "Sets the value of `kind`."]
+        pub fn set_kind(
+            &mut self,
+            kind: ::std::option::Option<::std::string::String>,
+        ) -> &mut Self {
+            self.kind = kind;
+            self
+        }
+        #[doc = "Sets the value of `kind`."]
+        pub fn with_kind(mut self, kind: ::std::option::Option<::std::string::String>) -> Self {
+            self.kind = kind;
+            self
+        }
         #[doc = "Sets the value of `version_count`."]
         pub fn set_version_count(&mut self, version_count: u64) -> &mut Self {
             self.version_count = version_count;
@@ -61793,10 +61863,12 @@ pub mod repositories {
             let mut __record = __sidex_serde::ser::RecordSerializer::new(
                 __serializer,
                 "GetPackageDetailsOutput",
-                3usize,
+                4usize,
             )?;
             __record.serialize_field("packageId", &self.package_id)?;
             __record.serialize_field("name", &self.name)?;
+            __record
+                .serialize_optional_field("kind", ::core::option::Option::as_ref(&self.kind))?;
             __record.serialize_field("versionCount", &self.version_count)?;
             __record.end()
         }
@@ -61833,6 +61905,368 @@ pub mod repositories {
                                 return ::core::result::Result::Err(
                                     __serde::de::Error::invalid_length(
                                         0usize,
+                                        &"record with 4 fields",
+                                    ),
+                                );
+                            }
+                        };
+                    let __field1 = match __serde::de::SeqAccess::next_element::<
+                        ::std::string::String,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(1usize, &"record with 4 fields"),
+                            );
+                        }
+                    };
+                    let __field2 = match __serde::de::SeqAccess::next_element::<
+                        ::std::option::Option<::std::string::String>,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(2usize, &"record with 4 fields"),
+                            );
+                        }
+                    };
+                    let __field3 = match __serde::de::SeqAccess::next_element::<u64>(&mut __seq)? {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(3usize, &"record with 4 fields"),
+                            );
+                        }
+                    };
+                    ::core::result::Result::Ok(GetPackageDetailsOutput {
+                        package_id: __field0,
+                        name: __field1,
+                        kind: __field2,
+                        version_count: __field3,
+                    })
+                }
+                #[inline]
+                fn visit_map<__A>(
+                    self,
+                    mut __map: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::MapAccess<'de>,
+                {
+                    #[doc(hidden)]
+                    const __IDENTIFIERS: &'static [&'static str] =
+                        &["packageId", "name", "kind", "versionCount"];
+                    #[doc(hidden)]
+                    const __EXPECTING_IDENTIFIERS: &'static str =
+                        "an identifier in [\"packageId\", \"name\", \"kind\", \"versionCount\"]";
+                    #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
+                    #[doc(hidden)]
+                    enum __Identifier {
+                        __Identifier0,
+                        __Identifier1,
+                        __Identifier2,
+                        __Identifier3,
+                        __Unknown,
+                    }
+                    #[doc(hidden)]
+                    struct __IdentifierVisitor;
+                    impl<'de> __serde::de::Visitor<'de> for __IdentifierVisitor {
+                        type Value = __Identifier;
+                        fn expecting(
+                            &self,
+                            __formatter: &mut ::core::fmt::Formatter,
+                        ) -> ::core::fmt::Result {
+                            ::core::fmt::Formatter::write_str(__formatter, __EXPECTING_IDENTIFIERS)
+                        }
+                        fn visit_u64<__E>(
+                            self,
+                            __value: u64,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                0u64 => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                                1u64 => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                                2u64 => ::core::result::Result::Ok(__Identifier::__Identifier2),
+                                3u64 => ::core::result::Result::Ok(__Identifier::__Identifier3),
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_str<__E>(
+                            self,
+                            __value: &str,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                "packageId" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
+                                }
+                                "name" => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                                "kind" => ::core::result::Result::Ok(__Identifier::__Identifier2),
+                                "versionCount" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier3)
+                                }
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_bytes<__E>(
+                            self,
+                            __value: &[u8],
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                b"packageId" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
+                                }
+                                b"name" => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                                b"kind" => ::core::result::Result::Ok(__Identifier::__Identifier2),
+                                b"versionCount" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier3)
+                                }
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                    }
+                    impl<'de> __serde::Deserialize<'de> for __Identifier {
+                        #[inline]
+                        fn deserialize<__D>(
+                            __deserializer: __D,
+                        ) -> ::core::result::Result<Self, __D::Error>
+                        where
+                            __D: __serde::Deserializer<'de>,
+                        {
+                            __serde::Deserializer::deserialize_identifier(
+                                __deserializer,
+                                __IdentifierVisitor,
+                            )
+                        }
+                    }
+                    let mut __field0: ::core::option::Option<PackageId> =
+                        ::core::option::Option::None;
+                    let mut __field1: ::core::option::Option<::std::string::String> =
+                        ::core::option::Option::None;
+                    let mut __field2: ::core::option::Option<
+                        ::std::option::Option<::std::string::String>,
+                    > = ::core::option::Option::None;
+                    let mut __field3: ::core::option::Option<u64> = ::core::option::Option::None;
+                    while let ::core::option::Option::Some(__key) =
+                        __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
+                    {
+                        match __key {
+                            __Identifier::__Identifier0 => {
+                                if ::core::option::Option::is_some(&__field0) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "packageId",
+                                        ),
+                                    );
+                                }
+                                __field0 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<PackageId>(&mut __map)?,
+                                );
+                            }
+                            __Identifier::__Identifier1 => {
+                                if ::core::option::Option::is_some(&__field1) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field("name"),
+                                    );
+                                }
+                                __field1 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<::std::string::String>(
+                                        &mut __map,
+                                    )?,
+                                );
+                            }
+                            __Identifier::__Identifier2 => {
+                                if ::core::option::Option::is_some(&__field2) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field("kind"),
+                                    );
+                                }
+                                __field2 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<
+                                        ::std::option::Option<::std::string::String>,
+                                    >(&mut __map)?,
+                                );
+                            }
+                            __Identifier::__Identifier3 => {
+                                if ::core::option::Option::is_some(&__field3) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "versionCount",
+                                        ),
+                                    );
+                                }
+                                __field3 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<u64>(&mut __map)?,
+                                );
+                            }
+                            _ => {
+                                __serde::de::MapAccess::next_value::<__serde::de::IgnoredAny>(
+                                    &mut __map,
+                                )?;
+                            }
+                        }
+                    }
+                    let __field0 = match __field0 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                <__A::Error as __serde::de::Error>::missing_field("packageId"),
+                            );
+                        }
+                    };
+                    let __field1 = match __field1 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                <__A::Error as __serde::de::Error>::missing_field("name"),
+                            );
+                        }
+                    };
+                    let __field2 = match __field2 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => ::core::option::Option::None,
+                    };
+                    let __field3 = match __field3 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                <__A::Error as __serde::de::Error>::missing_field("versionCount"),
+                            );
+                        }
+                    };
+                    ::core::result::Result::Ok(GetPackageDetailsOutput {
+                        package_id: __field0,
+                        name: __field1,
+                        kind: __field2,
+                        version_count: __field3,
+                    })
+                }
+            }
+            #[doc(hidden)]
+            const __FIELDS: &'static [&'static str] =
+                &["packageId", "name", "kind", "versionCount"];
+            __serde::Deserializer::deserialize_struct(
+                __deserializer,
+                "GetPackageDetailsOutput",
+                __FIELDS,
+                __Visitor {
+                    __phantom_vars: ::core::marker::PhantomData,
+                },
+            )
+        }
+    }
+    #[doc = "Create a new package.\n"]
+    #[derive(Clone, Debug)]
+    pub struct CreatePackageAction {
+        #[doc = "ID of the repository.\n"]
+        pub repository_id: RepositoryId,
+        #[doc = "Name of the package.\n"]
+        pub name: ::std::string::String,
+        #[doc = "Free-form kind of the package (e.g., \"rugix-app\").\n"]
+        pub kind: ::std::option::Option<::std::string::String>,
+    }
+    impl CreatePackageAction {
+        #[doc = "Creates a new [`CreatePackageAction`]."]
+        pub fn new(repository_id: RepositoryId, name: ::std::string::String) -> Self {
+            Self {
+                repository_id,
+                name,
+                kind: ::std::default::Default::default(),
+            }
+        }
+        #[doc = "Sets the value of `repository_id`."]
+        pub fn set_repository_id(&mut self, repository_id: RepositoryId) -> &mut Self {
+            self.repository_id = repository_id;
+            self
+        }
+        #[doc = "Sets the value of `repository_id`."]
+        pub fn with_repository_id(mut self, repository_id: RepositoryId) -> Self {
+            self.repository_id = repository_id;
+            self
+        }
+        #[doc = "Sets the value of `name`."]
+        pub fn set_name(&mut self, name: ::std::string::String) -> &mut Self {
+            self.name = name;
+            self
+        }
+        #[doc = "Sets the value of `name`."]
+        pub fn with_name(mut self, name: ::std::string::String) -> Self {
+            self.name = name;
+            self
+        }
+        #[doc = "Sets the value of `kind`."]
+        pub fn set_kind(
+            &mut self,
+            kind: ::std::option::Option<::std::string::String>,
+        ) -> &mut Self {
+            self.kind = kind;
+            self
+        }
+        #[doc = "Sets the value of `kind`."]
+        pub fn with_kind(mut self, kind: ::std::option::Option<::std::string::String>) -> Self {
+            self.kind = kind;
+            self
+        }
+    }
+    #[automatically_derived]
+    impl __serde::Serialize for CreatePackageAction {
+        fn serialize<__S: __serde::Serializer>(
+            &self,
+            __serializer: __S,
+        ) -> ::std::result::Result<__S::Ok, __S::Error> {
+            let mut __record = __sidex_serde::ser::RecordSerializer::new(
+                __serializer,
+                "CreatePackageAction",
+                3usize,
+            )?;
+            __record.serialize_field("repositoryId", &self.repository_id)?;
+            __record.serialize_field("name", &self.name)?;
+            __record
+                .serialize_optional_field("kind", ::core::option::Option::as_ref(&self.kind))?;
+            __record.end()
+        }
+    }
+    #[automatically_derived]
+    impl<'de> __serde::Deserialize<'de> for CreatePackageAction {
+        fn deserialize<__D: __serde::Deserializer<'de>>(
+            __deserializer: __D,
+        ) -> ::std::result::Result<Self, __D::Error> {
+            #[doc(hidden)]
+            struct __Visitor {
+                __phantom_vars: ::core::marker::PhantomData<fn(&())>,
+            }
+            impl<'de> __serde::de::Visitor<'de> for __Visitor {
+                type Value = CreatePackageAction;
+                fn expecting(
+                    &self,
+                    __formatter: &mut ::core::fmt::Formatter,
+                ) -> ::core::fmt::Result {
+                    ::core::fmt::Formatter::write_str(__formatter, "record CreatePackageAction")
+                }
+                #[inline]
+                fn visit_seq<__A>(
+                    self,
+                    mut __seq: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::SeqAccess<'de>,
+                {
+                    let __field0 =
+                        match __serde::de::SeqAccess::next_element::<RepositoryId>(&mut __seq)? {
+                            ::core::option::Option::Some(__value) => __value,
+                            ::core::option::Option::None => {
+                                return ::core::result::Result::Err(
+                                    __serde::de::Error::invalid_length(
+                                        0usize,
                                         &"record with 3 fields",
                                     ),
                                 );
@@ -61849,7 +62283,10 @@ pub mod repositories {
                             );
                         }
                     };
-                    let __field2 = match __serde::de::SeqAccess::next_element::<u64>(&mut __seq)? {
+                    let __field2 = match __serde::de::SeqAccess::next_element::<
+                        ::std::option::Option<::std::string::String>,
+                    >(&mut __seq)?
+                    {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
@@ -61857,10 +62294,10 @@ pub mod repositories {
                             );
                         }
                     };
-                    ::core::result::Result::Ok(GetPackageDetailsOutput {
-                        package_id: __field0,
+                    ::core::result::Result::Ok(CreatePackageAction {
+                        repository_id: __field0,
                         name: __field1,
-                        version_count: __field2,
+                        kind: __field2,
                     })
                 }
                 #[inline]
@@ -61873,10 +62310,10 @@ pub mod repositories {
                 {
                     #[doc(hidden)]
                     const __IDENTIFIERS: &'static [&'static str] =
-                        &["packageId", "name", "versionCount"];
+                        &["repositoryId", "name", "kind"];
                     #[doc(hidden)]
                     const __EXPECTING_IDENTIFIERS: &'static str =
-                        "an identifier in [\"packageId\", \"name\", \"versionCount\"]";
+                        "an identifier in [\"repositoryId\", \"name\", \"kind\"]";
                     #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
                     #[doc(hidden)]
                     enum __Identifier {
@@ -61917,305 +62354,11 @@ pub mod repositories {
                             __E: __serde::de::Error,
                         {
                             match __value {
-                                "packageId" => {
-                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
-                                }
-                                "name" => ::core::result::Result::Ok(__Identifier::__Identifier1),
-                                "versionCount" => {
-                                    ::core::result::Result::Ok(__Identifier::__Identifier2)
-                                }
-                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
-                            }
-                        }
-                        fn visit_bytes<__E>(
-                            self,
-                            __value: &[u8],
-                        ) -> ::core::result::Result<Self::Value, __E>
-                        where
-                            __E: __serde::de::Error,
-                        {
-                            match __value {
-                                b"packageId" => {
-                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
-                                }
-                                b"name" => ::core::result::Result::Ok(__Identifier::__Identifier1),
-                                b"versionCount" => {
-                                    ::core::result::Result::Ok(__Identifier::__Identifier2)
-                                }
-                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
-                            }
-                        }
-                    }
-                    impl<'de> __serde::Deserialize<'de> for __Identifier {
-                        #[inline]
-                        fn deserialize<__D>(
-                            __deserializer: __D,
-                        ) -> ::core::result::Result<Self, __D::Error>
-                        where
-                            __D: __serde::Deserializer<'de>,
-                        {
-                            __serde::Deserializer::deserialize_identifier(
-                                __deserializer,
-                                __IdentifierVisitor,
-                            )
-                        }
-                    }
-                    let mut __field0: ::core::option::Option<PackageId> =
-                        ::core::option::Option::None;
-                    let mut __field1: ::core::option::Option<::std::string::String> =
-                        ::core::option::Option::None;
-                    let mut __field2: ::core::option::Option<u64> = ::core::option::Option::None;
-                    while let ::core::option::Option::Some(__key) =
-                        __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
-                    {
-                        match __key {
-                            __Identifier::__Identifier0 => {
-                                if ::core::option::Option::is_some(&__field0) {
-                                    return ::core::result::Result::Err(
-                                        <__A::Error as __serde::de::Error>::duplicate_field(
-                                            "packageId",
-                                        ),
-                                    );
-                                }
-                                __field0 = ::core::option::Option::Some(
-                                    __serde::de::MapAccess::next_value::<PackageId>(&mut __map)?,
-                                );
-                            }
-                            __Identifier::__Identifier1 => {
-                                if ::core::option::Option::is_some(&__field1) {
-                                    return ::core::result::Result::Err(
-                                        <__A::Error as __serde::de::Error>::duplicate_field("name"),
-                                    );
-                                }
-                                __field1 = ::core::option::Option::Some(
-                                    __serde::de::MapAccess::next_value::<::std::string::String>(
-                                        &mut __map,
-                                    )?,
-                                );
-                            }
-                            __Identifier::__Identifier2 => {
-                                if ::core::option::Option::is_some(&__field2) {
-                                    return ::core::result::Result::Err(
-                                        <__A::Error as __serde::de::Error>::duplicate_field(
-                                            "versionCount",
-                                        ),
-                                    );
-                                }
-                                __field2 = ::core::option::Option::Some(
-                                    __serde::de::MapAccess::next_value::<u64>(&mut __map)?,
-                                );
-                            }
-                            _ => {
-                                __serde::de::MapAccess::next_value::<__serde::de::IgnoredAny>(
-                                    &mut __map,
-                                )?;
-                            }
-                        }
-                    }
-                    let __field0 = match __field0 {
-                        ::core::option::Option::Some(__value) => __value,
-                        ::core::option::Option::None => {
-                            return ::core::result::Result::Err(
-                                <__A::Error as __serde::de::Error>::missing_field("packageId"),
-                            );
-                        }
-                    };
-                    let __field1 = match __field1 {
-                        ::core::option::Option::Some(__value) => __value,
-                        ::core::option::Option::None => {
-                            return ::core::result::Result::Err(
-                                <__A::Error as __serde::de::Error>::missing_field("name"),
-                            );
-                        }
-                    };
-                    let __field2 = match __field2 {
-                        ::core::option::Option::Some(__value) => __value,
-                        ::core::option::Option::None => {
-                            return ::core::result::Result::Err(
-                                <__A::Error as __serde::de::Error>::missing_field("versionCount"),
-                            );
-                        }
-                    };
-                    ::core::result::Result::Ok(GetPackageDetailsOutput {
-                        package_id: __field0,
-                        name: __field1,
-                        version_count: __field2,
-                    })
-                }
-            }
-            #[doc(hidden)]
-            const __FIELDS: &'static [&'static str] = &["packageId", "name", "versionCount"];
-            __serde::Deserializer::deserialize_struct(
-                __deserializer,
-                "GetPackageDetailsOutput",
-                __FIELDS,
-                __Visitor {
-                    __phantom_vars: ::core::marker::PhantomData,
-                },
-            )
-        }
-    }
-    #[doc = "Create a new package.\n"]
-    #[derive(Clone, Debug)]
-    pub struct CreatePackageAction {
-        #[doc = "ID of the repository.\n"]
-        pub repository_id: RepositoryId,
-        #[doc = "Name of the package.\n"]
-        pub name: ::std::string::String,
-    }
-    impl CreatePackageAction {
-        #[doc = "Creates a new [`CreatePackageAction`]."]
-        pub fn new(repository_id: RepositoryId, name: ::std::string::String) -> Self {
-            Self {
-                repository_id,
-                name,
-            }
-        }
-        #[doc = "Sets the value of `repository_id`."]
-        pub fn set_repository_id(&mut self, repository_id: RepositoryId) -> &mut Self {
-            self.repository_id = repository_id;
-            self
-        }
-        #[doc = "Sets the value of `repository_id`."]
-        pub fn with_repository_id(mut self, repository_id: RepositoryId) -> Self {
-            self.repository_id = repository_id;
-            self
-        }
-        #[doc = "Sets the value of `name`."]
-        pub fn set_name(&mut self, name: ::std::string::String) -> &mut Self {
-            self.name = name;
-            self
-        }
-        #[doc = "Sets the value of `name`."]
-        pub fn with_name(mut self, name: ::std::string::String) -> Self {
-            self.name = name;
-            self
-        }
-    }
-    #[automatically_derived]
-    impl __serde::Serialize for CreatePackageAction {
-        fn serialize<__S: __serde::Serializer>(
-            &self,
-            __serializer: __S,
-        ) -> ::std::result::Result<__S::Ok, __S::Error> {
-            let mut __record = __sidex_serde::ser::RecordSerializer::new(
-                __serializer,
-                "CreatePackageAction",
-                2usize,
-            )?;
-            __record.serialize_field("repositoryId", &self.repository_id)?;
-            __record.serialize_field("name", &self.name)?;
-            __record.end()
-        }
-    }
-    #[automatically_derived]
-    impl<'de> __serde::Deserialize<'de> for CreatePackageAction {
-        fn deserialize<__D: __serde::Deserializer<'de>>(
-            __deserializer: __D,
-        ) -> ::std::result::Result<Self, __D::Error> {
-            #[doc(hidden)]
-            struct __Visitor {
-                __phantom_vars: ::core::marker::PhantomData<fn(&())>,
-            }
-            impl<'de> __serde::de::Visitor<'de> for __Visitor {
-                type Value = CreatePackageAction;
-                fn expecting(
-                    &self,
-                    __formatter: &mut ::core::fmt::Formatter,
-                ) -> ::core::fmt::Result {
-                    ::core::fmt::Formatter::write_str(__formatter, "record CreatePackageAction")
-                }
-                #[inline]
-                fn visit_seq<__A>(
-                    self,
-                    mut __seq: __A,
-                ) -> ::core::result::Result<Self::Value, __A::Error>
-                where
-                    __A: __serde::de::SeqAccess<'de>,
-                {
-                    let __field0 =
-                        match __serde::de::SeqAccess::next_element::<RepositoryId>(&mut __seq)? {
-                            ::core::option::Option::Some(__value) => __value,
-                            ::core::option::Option::None => {
-                                return ::core::result::Result::Err(
-                                    __serde::de::Error::invalid_length(
-                                        0usize,
-                                        &"record with 2 fields",
-                                    ),
-                                );
-                            }
-                        };
-                    let __field1 = match __serde::de::SeqAccess::next_element::<
-                        ::std::string::String,
-                    >(&mut __seq)?
-                    {
-                        ::core::option::Option::Some(__value) => __value,
-                        ::core::option::Option::None => {
-                            return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(1usize, &"record with 2 fields"),
-                            );
-                        }
-                    };
-                    ::core::result::Result::Ok(CreatePackageAction {
-                        repository_id: __field0,
-                        name: __field1,
-                    })
-                }
-                #[inline]
-                fn visit_map<__A>(
-                    self,
-                    mut __map: __A,
-                ) -> ::core::result::Result<Self::Value, __A::Error>
-                where
-                    __A: __serde::de::MapAccess<'de>,
-                {
-                    #[doc(hidden)]
-                    const __IDENTIFIERS: &'static [&'static str] = &["repositoryId", "name"];
-                    #[doc(hidden)]
-                    const __EXPECTING_IDENTIFIERS: &'static str =
-                        "an identifier in [\"repositoryId\", \"name\"]";
-                    #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
-                    #[doc(hidden)]
-                    enum __Identifier {
-                        __Identifier0,
-                        __Identifier1,
-                        __Unknown,
-                    }
-                    #[doc(hidden)]
-                    struct __IdentifierVisitor;
-                    impl<'de> __serde::de::Visitor<'de> for __IdentifierVisitor {
-                        type Value = __Identifier;
-                        fn expecting(
-                            &self,
-                            __formatter: &mut ::core::fmt::Formatter,
-                        ) -> ::core::fmt::Result {
-                            ::core::fmt::Formatter::write_str(__formatter, __EXPECTING_IDENTIFIERS)
-                        }
-                        fn visit_u64<__E>(
-                            self,
-                            __value: u64,
-                        ) -> ::core::result::Result<Self::Value, __E>
-                        where
-                            __E: __serde::de::Error,
-                        {
-                            match __value {
-                                0u64 => ::core::result::Result::Ok(__Identifier::__Identifier0),
-                                1u64 => ::core::result::Result::Ok(__Identifier::__Identifier1),
-                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
-                            }
-                        }
-                        fn visit_str<__E>(
-                            self,
-                            __value: &str,
-                        ) -> ::core::result::Result<Self::Value, __E>
-                        where
-                            __E: __serde::de::Error,
-                        {
-                            match __value {
                                 "repositoryId" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier0)
                                 }
                                 "name" => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                                "kind" => ::core::result::Result::Ok(__Identifier::__Identifier2),
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
                         }
@@ -62231,6 +62374,7 @@ pub mod repositories {
                                     ::core::result::Result::Ok(__Identifier::__Identifier0)
                                 }
                                 b"name" => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                                b"kind" => ::core::result::Result::Ok(__Identifier::__Identifier2),
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
                         }
@@ -62253,6 +62397,9 @@ pub mod repositories {
                         ::core::option::Option::None;
                     let mut __field1: ::core::option::Option<::std::string::String> =
                         ::core::option::Option::None;
+                    let mut __field2: ::core::option::Option<
+                        ::std::option::Option<::std::string::String>,
+                    > = ::core::option::Option::None;
                     while let ::core::option::Option::Some(__key) =
                         __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
                     {
@@ -62281,6 +62428,18 @@ pub mod repositories {
                                     )?,
                                 );
                             }
+                            __Identifier::__Identifier2 => {
+                                if ::core::option::Option::is_some(&__field2) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field("kind"),
+                                    );
+                                }
+                                __field2 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<
+                                        ::std::option::Option<::std::string::String>,
+                                    >(&mut __map)?,
+                                );
+                            }
                             _ => {
                                 __serde::de::MapAccess::next_value::<__serde::de::IgnoredAny>(
                                     &mut __map,
@@ -62304,14 +62463,19 @@ pub mod repositories {
                             );
                         }
                     };
+                    let __field2 = match __field2 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => ::core::option::Option::None,
+                    };
                     ::core::result::Result::Ok(CreatePackageAction {
                         repository_id: __field0,
                         name: __field1,
+                        kind: __field2,
                     })
                 }
             }
             #[doc(hidden)]
-            const __FIELDS: &'static [&'static str] = &["repositoryId", "name"];
+            const __FIELDS: &'static [&'static str] = &["repositoryId", "name", "kind"];
             __serde::Deserializer::deserialize_struct(
                 __deserializer,
                 "CreatePackageAction",
@@ -62938,6 +63102,274 @@ pub mod repositories {
             __serde::Deserializer::deserialize_struct(
                 __deserializer,
                 "DeletePackageAction",
+                __FIELDS,
+                __Visitor {
+                    __phantom_vars: ::core::marker::PhantomData,
+                },
+            )
+        }
+    }
+    #[doc = "Set the kind of a package.\n"]
+    #[derive(Clone, Debug)]
+    pub struct SetPackageKindAction {
+        #[doc = "ID of the package.\n"]
+        pub package_id: PackageId,
+        #[doc = "New kind of the package (e.g., \"rugix-app\"), or null to clear.\n"]
+        pub kind: ::std::option::Option<::std::string::String>,
+    }
+    impl SetPackageKindAction {
+        #[doc = "Creates a new [`SetPackageKindAction`]."]
+        pub fn new(package_id: PackageId) -> Self {
+            Self {
+                package_id,
+                kind: ::std::default::Default::default(),
+            }
+        }
+        #[doc = "Sets the value of `package_id`."]
+        pub fn set_package_id(&mut self, package_id: PackageId) -> &mut Self {
+            self.package_id = package_id;
+            self
+        }
+        #[doc = "Sets the value of `package_id`."]
+        pub fn with_package_id(mut self, package_id: PackageId) -> Self {
+            self.package_id = package_id;
+            self
+        }
+        #[doc = "Sets the value of `kind`."]
+        pub fn set_kind(
+            &mut self,
+            kind: ::std::option::Option<::std::string::String>,
+        ) -> &mut Self {
+            self.kind = kind;
+            self
+        }
+        #[doc = "Sets the value of `kind`."]
+        pub fn with_kind(mut self, kind: ::std::option::Option<::std::string::String>) -> Self {
+            self.kind = kind;
+            self
+        }
+    }
+    #[automatically_derived]
+    impl __serde::Serialize for SetPackageKindAction {
+        fn serialize<__S: __serde::Serializer>(
+            &self,
+            __serializer: __S,
+        ) -> ::std::result::Result<__S::Ok, __S::Error> {
+            let mut __record = __sidex_serde::ser::RecordSerializer::new(
+                __serializer,
+                "SetPackageKindAction",
+                2usize,
+            )?;
+            __record.serialize_field("packageId", &self.package_id)?;
+            __record
+                .serialize_optional_field("kind", ::core::option::Option::as_ref(&self.kind))?;
+            __record.end()
+        }
+    }
+    #[automatically_derived]
+    impl<'de> __serde::Deserialize<'de> for SetPackageKindAction {
+        fn deserialize<__D: __serde::Deserializer<'de>>(
+            __deserializer: __D,
+        ) -> ::std::result::Result<Self, __D::Error> {
+            #[doc(hidden)]
+            struct __Visitor {
+                __phantom_vars: ::core::marker::PhantomData<fn(&())>,
+            }
+            impl<'de> __serde::de::Visitor<'de> for __Visitor {
+                type Value = SetPackageKindAction;
+                fn expecting(
+                    &self,
+                    __formatter: &mut ::core::fmt::Formatter,
+                ) -> ::core::fmt::Result {
+                    ::core::fmt::Formatter::write_str(__formatter, "record SetPackageKindAction")
+                }
+                #[inline]
+                fn visit_seq<__A>(
+                    self,
+                    mut __seq: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::SeqAccess<'de>,
+                {
+                    let __field0 =
+                        match __serde::de::SeqAccess::next_element::<PackageId>(&mut __seq)? {
+                            ::core::option::Option::Some(__value) => __value,
+                            ::core::option::Option::None => {
+                                return ::core::result::Result::Err(
+                                    __serde::de::Error::invalid_length(
+                                        0usize,
+                                        &"record with 2 fields",
+                                    ),
+                                );
+                            }
+                        };
+                    let __field1 = match __serde::de::SeqAccess::next_element::<
+                        ::std::option::Option<::std::string::String>,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(1usize, &"record with 2 fields"),
+                            );
+                        }
+                    };
+                    ::core::result::Result::Ok(SetPackageKindAction {
+                        package_id: __field0,
+                        kind: __field1,
+                    })
+                }
+                #[inline]
+                fn visit_map<__A>(
+                    self,
+                    mut __map: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::MapAccess<'de>,
+                {
+                    #[doc(hidden)]
+                    const __IDENTIFIERS: &'static [&'static str] = &["packageId", "kind"];
+                    #[doc(hidden)]
+                    const __EXPECTING_IDENTIFIERS: &'static str =
+                        "an identifier in [\"packageId\", \"kind\"]";
+                    #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
+                    #[doc(hidden)]
+                    enum __Identifier {
+                        __Identifier0,
+                        __Identifier1,
+                        __Unknown,
+                    }
+                    #[doc(hidden)]
+                    struct __IdentifierVisitor;
+                    impl<'de> __serde::de::Visitor<'de> for __IdentifierVisitor {
+                        type Value = __Identifier;
+                        fn expecting(
+                            &self,
+                            __formatter: &mut ::core::fmt::Formatter,
+                        ) -> ::core::fmt::Result {
+                            ::core::fmt::Formatter::write_str(__formatter, __EXPECTING_IDENTIFIERS)
+                        }
+                        fn visit_u64<__E>(
+                            self,
+                            __value: u64,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                0u64 => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                                1u64 => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_str<__E>(
+                            self,
+                            __value: &str,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                "packageId" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
+                                }
+                                "kind" => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_bytes<__E>(
+                            self,
+                            __value: &[u8],
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                b"packageId" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
+                                }
+                                b"kind" => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                    }
+                    impl<'de> __serde::Deserialize<'de> for __Identifier {
+                        #[inline]
+                        fn deserialize<__D>(
+                            __deserializer: __D,
+                        ) -> ::core::result::Result<Self, __D::Error>
+                        where
+                            __D: __serde::Deserializer<'de>,
+                        {
+                            __serde::Deserializer::deserialize_identifier(
+                                __deserializer,
+                                __IdentifierVisitor,
+                            )
+                        }
+                    }
+                    let mut __field0: ::core::option::Option<PackageId> =
+                        ::core::option::Option::None;
+                    let mut __field1: ::core::option::Option<
+                        ::std::option::Option<::std::string::String>,
+                    > = ::core::option::Option::None;
+                    while let ::core::option::Option::Some(__key) =
+                        __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
+                    {
+                        match __key {
+                            __Identifier::__Identifier0 => {
+                                if ::core::option::Option::is_some(&__field0) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "packageId",
+                                        ),
+                                    );
+                                }
+                                __field0 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<PackageId>(&mut __map)?,
+                                );
+                            }
+                            __Identifier::__Identifier1 => {
+                                if ::core::option::Option::is_some(&__field1) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field("kind"),
+                                    );
+                                }
+                                __field1 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<
+                                        ::std::option::Option<::std::string::String>,
+                                    >(&mut __map)?,
+                                );
+                            }
+                            _ => {
+                                __serde::de::MapAccess::next_value::<__serde::de::IgnoredAny>(
+                                    &mut __map,
+                                )?;
+                            }
+                        }
+                    }
+                    let __field0 = match __field0 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                <__A::Error as __serde::de::Error>::missing_field("packageId"),
+                            );
+                        }
+                    };
+                    let __field1 = match __field1 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => ::core::option::Option::None,
+                    };
+                    ::core::result::Result::Ok(SetPackageKindAction {
+                        package_id: __field0,
+                        kind: __field1,
+                    })
+                }
+            }
+            #[doc(hidden)]
+            const __FIELDS: &'static [&'static str] = &["packageId", "kind"];
+            __serde::Deserializer::deserialize_struct(
+                __deserializer,
+                "SetPackageKindAction",
                 __FIELDS,
                 __Visitor {
                     __phantom_vars: ::core::marker::PhantomData,

@@ -153,6 +153,7 @@ macro_rules! with_actions {
             ("repositories_CreatePackage", CreatePackage, repositories::CreatePackageAction, repositories::CreatePackageOutput),
             ("repositories_DeletePackage", DeletePackage, repositories::DeletePackageAction, outputs::Empty),
             ("repositories_SetPackageName", SetPackageName, repositories::SetPackageNameAction, repositories::SetPackageNameOutput),
+            ("repositories_SetPackageKind", SetPackageKind, repositories::SetPackageKindAction, outputs::Empty),
             ("repositories_QueryPackageVersions", QueryPackageVersions, repositories::QueryPackageVersionsAction, repositories::QueryPackageVersionsOutput),
             // ## Package Versions
             ("repositories_ResolveVersionByPath", ResolvePackageVersionByPath, repositories::ResolvePackageVersionByPathAction, repositories::ResolvePackageVersionByPathOutput),

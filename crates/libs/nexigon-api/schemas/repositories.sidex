@@ -258,6 +258,8 @@ record QueryRepositoryPackagesItem {
     package_id: PackageId,
     /// Name of the package.
     name: string,
+    /// Free-form kind of the package (e.g., "rugix-app").
+    kind?: string,
     /// Timestamp when the package was created.
     created_at: Timestamp,
 }
@@ -341,6 +343,8 @@ record GetPackageDetailsOutput {
     package_id: PackageId,
     /// Name of the package.
     name: string,
+    /// Free-form kind of the package (e.g., "rugix-app").
+    kind?: string,
     /// Number of versions of the package.
     version_count: u64,
 }
@@ -351,6 +355,8 @@ record CreatePackageAction {
     repository_id: RepositoryId,
     /// Name of the package.
     name: string,
+    /// Free-form kind of the package (e.g., "rugix-app").
+    kind?: string,
 }
 
 /// Output of creating a package.
@@ -372,6 +378,14 @@ record CreatePackageSuccess {
 record DeletePackageAction {
     /// ID of the package.
     package_id: PackageId,
+}
+
+/// Set the kind of a package.
+record SetPackageKindAction {
+    /// ID of the package.
+    package_id: PackageId,
+    /// New kind of the package (e.g., "rugix-app"), or null to clear.
+    kind?: string,
 }
 
 /// Set the name of a package.

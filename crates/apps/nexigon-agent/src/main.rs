@@ -147,11 +147,13 @@ async fn main() -> anyhow::Result<()> {
     };
 
     let mut connection_ref = connection.make_ref();
+    let handler_connection_ref = connection.make_ref();
     let connection_config = config.clone();
     let connection_registry = command_registry.clone();
     let connection_handle = tokio::spawn(async move {
         let config = connection_config;
         let command_registry = connection_registry;
+        let handler_connection_ref = handler_connection_ref;
         while let Some(event) = connection.next().await {
             match event {
                 Ok(ConnectionEvent::RequestChannel(request)) => {
@@ -216,11 +218,13 @@ async fn main() -> anyhow::Result<()> {
                         };
                         let config = config.clone();
                         let registry = registry.clone();
+                        let conn_ref = handler_connection_ref.clone();
                         request.accept(move |channel| {
                             tokio::spawn(async move {
-                                if let Err(e) =
-                                    handlers::handle_handler_channel(channel, &config, &registry)
-                                        .await
+                                if let Err(e) = handlers::handle_handler_channel(
+                                    channel, &config, &registry, conn_ref,
+                                )
+                                .await
                                 {
                                     warn!("handler channel error: {e:?}");
                                 }
