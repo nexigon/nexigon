@@ -10,8 +10,8 @@ use nexigon_api::types::repositories::IssueAssetDownloadUrlAction;
 use nexigon_client::connect_executor;
 use nexigon_ids::ids::PackageVersionId;
 
-use super::BuiltinCommand;
-use super::InvocationCtx;
+use crate::builtins::BuiltinCommand;
+use crate::builtins::InvocationCtx;
 
 pub fn commands() -> Vec<Box<dyn BuiltinCommand>> {
     vec![

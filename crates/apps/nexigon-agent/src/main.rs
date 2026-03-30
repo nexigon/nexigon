@@ -41,6 +41,7 @@ use crate::system_info::get_system_info;
 pub mod builtins;
 pub mod config;
 pub mod handlers;
+pub mod integrations;
 pub mod system_info;
 #[cfg(target_os = "linux")]
 pub mod terminal;
@@ -140,6 +141,10 @@ async fn main() -> anyhow::Result<()> {
         if let Some(builtins_config) = config.commands.as_ref().and_then(|c| c.builtins.as_ref()) {
             let builtins = builtins::collect_builtins(builtins_config);
             registry.add_builtins(builtins);
+        }
+        if let Some(integrations_config) = config.integrations.as_ref() {
+            let integration_commands = integrations::collect_commands(integrations_config);
+            registry.add_builtins(integration_commands);
         }
         Some(Arc::new(registry))
     } else {

@@ -36,6 +36,9 @@
     },
     "commands": {
       "$ref": "#/$defs/nexigon_agent.config.CommandsConfig"
+    },
+    "integrations": {
+      "$ref": "#/$defs/nexigon_agent.config.IntegrationsConfig"
     }
   },
   "required": [
@@ -105,9 +108,6 @@
           "$ref": "#/$defs/nexigon_agent.config.BuiltinCommandGroupConfig"
         },
         "systemd": {
-          "$ref": "#/$defs/nexigon_agent.config.BuiltinCommandGroupConfig"
-        },
-        "rugix-apps": {
           "$ref": "#/$defs/nexigon_agent.config.BuiltinCommandGroupConfig"
         }
       },
@@ -263,12 +263,36 @@
       ],
       "unevaluatedProperties": false
     },
+    "nexigon_agent.config.IntegrationsConfig": {
+      "$id": "nexigon_agent.config.IntegrationsConfig",
+      "type": "object",
+      "description": "Integration configuration.",
+      "properties": {
+        "rugix-apps": {
+          "$ref": "#/$defs/nexigon_agent.config.RugixAppsConfig"
+        }
+      },
+      "required": [],
+      "unevaluatedProperties": false
+    },
     "nexigon_agent.config.PathBuf": {
       "$id": "nexigon_agent.config.PathBuf",
       "type": [
         "string"
       ],
       "description": "Filesystem path."
+    },
+    "nexigon_agent.config.RugixAppsConfig": {
+      "$id": "nexigon_agent.config.RugixAppsConfig",
+      "type": "object",
+      "description": "Rugix Apps integration configuration.",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        }
+      },
+      "required": [],
+      "unevaluatedProperties": false
     },
     "nexigon_agent.config.TerminalConfig": {
       "$id": "nexigon_agent.config.TerminalConfig",
