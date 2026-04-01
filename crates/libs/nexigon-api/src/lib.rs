@@ -154,6 +154,7 @@ macro_rules! with_actions {
             ("repositories_DeletePackage", DeletePackage, repositories::DeletePackageAction, outputs::Empty),
             ("repositories_SetPackageName", SetPackageName, repositories::SetPackageNameAction, repositories::SetPackageNameOutput),
             ("repositories_SetPackageKind", SetPackageKind, repositories::SetPackageKindAction, outputs::Empty),
+            ("repositories_SetPackageMetadata", SetPackageMetadata, repositories::SetPackageMetadataAction, outputs::Empty),
             ("repositories_QueryPackageVersions", QueryPackageVersions, repositories::QueryPackageVersionsAction, repositories::QueryPackageVersionsOutput),
             // ## Package Versions
             ("repositories_ResolveVersionByPath", ResolvePackageVersionByPath, repositories::ResolvePackageVersionByPathAction, repositories::ResolvePackageVersionByPathOutput),
@@ -161,18 +162,16 @@ macro_rules! with_actions {
             ("repositories_CreateVersion", CreatePackageVersion, repositories::CreatePackageVersionAction, repositories::CreatePackageVersionOutput),
             ("repositories_DeleteVersion", DeletePackageVersion, repositories::DeletePackageVersionAction, outputs::Empty),
             ("repositories_SetVersionName", SetPackageVersionName, repositories::SetPackageVersionNameAction, outputs::Empty),
+            ("repositories_SetVersionMetadata", SetPackageVersionMetadata, repositories::SetPackageVersionMetadataAction, outputs::Empty),
             ("repositories_AddVersionAsset", AddPackageVersionAsset, repositories::AddPackageVersionAssetAction, repositories::AddPackageVersionAssetOutput),
             ("repositories_RemoveVersionAsset", RemovePackageVersionAsset, repositories::RemovePackageVersionAssetAction, outputs::Empty),
+            ("repositories_SetVersionAssetMetadata", SetPackageVersionAssetMetadata, repositories::SetPackageVersionAssetMetadataAction, outputs::Empty),
             ("repositories_TagVersion", TagPackageVersion, repositories::TagPackageVersionAction, outputs::Empty),
             ("repositories_UntagVersion", UntagPackageVersion, repositories::UntagPackageVersionAction, outputs::Empty),
             ("repositories_ResolveVersionAssetByPath", ResolvePackageVersionAssetByPath, repositories::ResolvePackageVersionAssetByPathAction, repositories::ResolvePackageVersionAssetByPathOutput),
             // ## S3 Config
             ("repositories_SetS3Config", SetRepositoryS3Credentials, repositories::SetRepositoryS3ConfigAction, outputs::Empty),
             ("repositories_GetS3Config", GetRepositoryS3Credentials, repositories::GetRepositoryS3ConfigAction, repositories::GetRepositoryS3ConfigOutput),
-            // ## Asset Relations
-            ("repositories_CreateAssetRelation", CreateAssetRelation, repositories::CreateAssetRelationAction, repositories::CreateAssetRelationOutput),
-            ("repositories_DeleteAssetRelation", DeleteAssetRelation, repositories::DeleteAssetRelationAction, outputs::Empty),
-            ("repositories_QueryAssetRelations", QueryAssetRelations, repositories::QueryAssetRelationsAction, repositories::QueryAssetRelationsOutput),
             // ## Assets
             ("repositories_GetAssetDetails", GetAssetDetails, repositories::GetAssetDetailsAction, repositories::GetAssetDetailsOutput),
             ("repositories_CreateAsset", CreateAsset, repositories::CreateAssetAction, repositories::CreateAssetOutput),

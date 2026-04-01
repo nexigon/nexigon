@@ -3106,6 +3106,37 @@
         }
       }
     },
+    "/api/v1/actions/invoke/repositories_SetPackageMetadata": {
+      "post": {
+        "tags": [
+          "repositories"
+        ],
+        "summary": "SetPackageMetadata",
+        "description": "Set metadata on a package.",
+        "operationId": "repositories_SetPackageMetadata",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/nexigon_api.repositories.SetPackageMetadataAction"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/nexigon_api.outputs.Empty"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/actions/invoke/repositories_QueryPackageVersions": {
       "post": {
         "tags": [
@@ -3292,13 +3323,44 @@
         }
       }
     },
+    "/api/v1/actions/invoke/repositories_SetVersionMetadata": {
+      "post": {
+        "tags": [
+          "repositories"
+        ],
+        "summary": "SetVersionMetadata",
+        "description": "Set metadata on a package version.",
+        "operationId": "repositories_SetVersionMetadata",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/nexigon_api.repositories.SetPackageVersionMetadataAction"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/nexigon_api.outputs.Empty"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/actions/invoke/repositories_AddVersionAsset": {
       "post": {
         "tags": [
           "repositories"
         ],
         "summary": "AddVersionAsset",
-        "description": "Add an assert to a package version.",
+        "description": "Add an asset to a package version.",
         "operationId": "repositories_AddVersionAsset",
         "requestBody": {
           "content": {
@@ -3336,6 +3398,37 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/nexigon_api.repositories.RemovePackageVersionAssetAction"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/nexigon_api.outputs.Empty"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/actions/invoke/repositories_SetVersionAssetMetadata": {
+      "post": {
+        "tags": [
+          "repositories"
+        ],
+        "summary": "SetVersionAssetMetadata",
+        "description": "Set metadata on a package version asset.",
+        "operationId": "repositories_SetVersionAssetMetadata",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/nexigon_api.repositories.SetPackageVersionAssetMetadataAction"
               }
             }
           }
@@ -3502,99 +3595,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/nexigon_api.repositories.GetRepositoryS3ConfigOutput"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v1/actions/invoke/repositories_CreateAssetRelation": {
-      "post": {
-        "tags": [
-          "repositories"
-        ],
-        "summary": "CreateAssetRelation",
-        "description": "Create a relation between two assets.",
-        "operationId": "repositories_CreateAssetRelation",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/nexigon_api.repositories.CreateAssetRelationAction"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/nexigon_api.repositories.CreateAssetRelationOutput"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v1/actions/invoke/repositories_DeleteAssetRelation": {
-      "post": {
-        "tags": [
-          "repositories"
-        ],
-        "summary": "DeleteAssetRelation",
-        "description": "Delete an asset relation.",
-        "operationId": "repositories_DeleteAssetRelation",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/nexigon_api.repositories.DeleteAssetRelationAction"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/nexigon_api.outputs.Empty"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v1/actions/invoke/repositories_QueryAssetRelations": {
-      "post": {
-        "tags": [
-          "repositories"
-        ],
-        "summary": "QueryAssetRelations",
-        "description": "Query relations for an asset.",
-        "operationId": "repositories_QueryAssetRelations",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/nexigon_api.repositories.QueryAssetRelationsAction"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/nexigon_api.repositories.QueryAssetRelationsOutput"
                 }
               }
             }
@@ -7762,6 +7762,12 @@
           },
           "filename": {
             "type": "string"
+          },
+          "metadata": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/nexigon_api.json.JsonValue"
+            }
           }
         },
         "required": [
@@ -7800,46 +7806,6 @@
           "tag"
         ],
         "unevaluatedProperties": false
-      },
-      "nexigon_api.repositories.AssetRelation": {
-        "type": "object",
-        "description": "An asset relation linking two assets with a typed relationship.",
-        "properties": {
-          "relationId": {
-            "$ref": "#/components/schemas/nexigon_api.repositories.AssetRelationId"
-          },
-          "sourceAssetId": {
-            "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryAssetId"
-          },
-          "targetAssetId": {
-            "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryAssetId"
-          },
-          "relationType": {
-            "type": "string"
-          },
-          "properties": {
-            "type": "object",
-            "additionalProperties": {
-              "$ref": "#/components/schemas/nexigon_api.json.JsonValue"
-            }
-          },
-          "createdAt": {
-            "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
-          }
-        },
-        "required": [
-          "relationId",
-          "sourceAssetId",
-          "targetAssetId",
-          "relationType",
-          "properties",
-          "createdAt"
-        ],
-        "unevaluatedProperties": false
-      },
-      "nexigon_api.repositories.AssetRelationId": {
-        "type": "string",
-        "description": "Unique ID of an asset relation."
       },
       "nexigon_api.repositories.CreateAssetAction": {
         "type": "object",
@@ -7889,76 +7855,6 @@
           }
         ]
       },
-      "nexigon_api.repositories.CreateAssetRelationAction": {
-        "type": "object",
-        "properties": {
-          "sourceAssetId": {
-            "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryAssetId"
-          },
-          "targetAssetId": {
-            "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryAssetId"
-          },
-          "relationType": {
-            "type": "string"
-          },
-          "properties": {
-            "type": "object",
-            "additionalProperties": {
-              "$ref": "#/components/schemas/nexigon_api.json.JsonValue"
-            }
-          }
-        },
-        "required": [
-          "sourceAssetId",
-          "targetAssetId",
-          "relationType"
-        ],
-        "unevaluatedProperties": false
-      },
-      "nexigon_api.repositories.CreateAssetRelationOutput": {
-        "description": "Output of creating an asset relation.",
-        "oneOf": [
-          {
-            "type": "object",
-            "properties": {
-              "result": {
-                "const": "AlreadyExists"
-              }
-            },
-            "required": [
-              "result"
-            ]
-          },
-          {
-            "type": "object",
-            "properties": {
-              "result": {
-                "const": "Created"
-              },
-              "relationId": {
-                "$ref": "#/components/schemas/nexigon_api.repositories.AssetRelationId"
-              }
-            },
-            "required": [
-              "result",
-              "relationId"
-            ]
-          }
-        ]
-      },
-      "nexigon_api.repositories.CreateAssetRelationSuccess": {
-        "type": "object",
-        "description": "Successfully created an asset relation.",
-        "properties": {
-          "relationId": {
-            "$ref": "#/components/schemas/nexigon_api.repositories.AssetRelationId"
-          }
-        },
-        "required": [
-          "relationId"
-        ],
-        "unevaluatedProperties": false
-      },
       "nexigon_api.repositories.CreatePackageAction": {
         "type": "object",
         "properties": {
@@ -7970,6 +7866,12 @@
           },
           "kind": {
             "type": "string"
+          },
+          "metadata": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/nexigon_api.json.JsonValue"
+            }
           }
         },
         "required": [
@@ -8035,6 +7937,12 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/nexigon_api.repositories.AddTagItem"
+            }
+          },
+          "metadata": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/nexigon_api.json.JsonValue"
             }
           }
         },
@@ -8151,18 +8059,6 @@
         ],
         "unevaluatedProperties": false
       },
-      "nexigon_api.repositories.DeleteAssetRelationAction": {
-        "type": "object",
-        "properties": {
-          "relationId": {
-            "$ref": "#/components/schemas/nexigon_api.repositories.AssetRelationId"
-          }
-        },
-        "required": [
-          "relationId"
-        ],
-        "unevaluatedProperties": false
-      },
       "nexigon_api.repositories.DeletePackageAction": {
         "type": "object",
         "properties": {
@@ -8270,12 +8166,19 @@
           "versionCount": {
             "type": "integer",
             "format": "uint64"
+          },
+          "metadata": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/nexigon_api.json.JsonValue"
+            }
           }
         },
         "required": [
           "packageId",
           "name",
-          "versionCount"
+          "versionCount",
+          "metadata"
         ],
         "unevaluatedProperties": false
       },
@@ -8318,6 +8221,12 @@
             "items": {
               "$ref": "#/components/schemas/nexigon_api.repositories.PackageVersionTag"
             }
+          },
+          "metadata": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/nexigon_api.json.JsonValue"
+            }
           }
         },
         "required": [
@@ -8325,7 +8234,8 @@
           "repositoryId",
           "packageId",
           "assets",
-          "tags"
+          "tags",
+          "metadata"
         ],
         "unevaluatedProperties": false
       },
@@ -8476,6 +8386,12 @@
           },
           "status": {
             "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryAssetStatus"
+          },
+          "metadata": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/nexigon_api.json.JsonValue"
+            }
           }
         },
         "required": [
@@ -8483,7 +8399,8 @@
           "assetId",
           "size",
           "digest",
-          "status"
+          "status",
+          "metadata"
         ],
         "unevaluatedProperties": false
       },
@@ -8505,41 +8422,6 @@
         "required": [
           "tag",
           "locked"
-        ],
-        "unevaluatedProperties": false
-      },
-      "nexigon_api.repositories.QueryAssetRelationsAction": {
-        "type": "object",
-        "properties": {
-          "assetId": {
-            "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryAssetId"
-          }
-        },
-        "required": [
-          "assetId"
-        ],
-        "unevaluatedProperties": false
-      },
-      "nexigon_api.repositories.QueryAssetRelationsOutput": {
-        "type": "object",
-        "description": "Output of querying asset relations.",
-        "properties": {
-          "outgoing": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/nexigon_api.repositories.AssetRelation"
-            }
-          },
-          "incoming": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/nexigon_api.repositories.AssetRelation"
-            }
-          }
-        },
-        "required": [
-          "outgoing",
-          "incoming"
         ],
         "unevaluatedProperties": false
       },
@@ -9149,6 +9031,25 @@
         ],
         "unevaluatedProperties": false
       },
+      "nexigon_api.repositories.SetPackageMetadataAction": {
+        "type": "object",
+        "properties": {
+          "packageId": {
+            "$ref": "#/components/schemas/nexigon_api.repositories.PackageId"
+          },
+          "metadata": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/nexigon_api.json.JsonValue"
+            }
+          }
+        },
+        "required": [
+          "packageId",
+          "metadata"
+        ],
+        "unevaluatedProperties": false
+      },
       "nexigon_api.repositories.SetPackageNameAction": {
         "type": "object",
         "properties": {
@@ -9175,6 +9076,48 @@
           }
         ],
         "description": "Output of setting the name of a package."
+      },
+      "nexigon_api.repositories.SetPackageVersionAssetMetadataAction": {
+        "type": "object",
+        "properties": {
+          "versionId": {
+            "$ref": "#/components/schemas/nexigon_api.repositories.PackageVersionId"
+          },
+          "filename": {
+            "type": "string"
+          },
+          "metadata": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/nexigon_api.json.JsonValue"
+            }
+          }
+        },
+        "required": [
+          "versionId",
+          "filename",
+          "metadata"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.repositories.SetPackageVersionMetadataAction": {
+        "type": "object",
+        "properties": {
+          "versionId": {
+            "$ref": "#/components/schemas/nexigon_api.repositories.PackageVersionId"
+          },
+          "metadata": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/nexigon_api.json.JsonValue"
+            }
+          }
+        },
+        "required": [
+          "versionId",
+          "metadata"
+        ],
+        "unevaluatedProperties": false
       },
       "nexigon_api.repositories.SetPackageVersionNameAction": {
         "type": "object",

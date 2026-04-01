@@ -471,9 +471,6 @@ define_types! {
     RepositoryId => (FlatRawId, "repo", 22, secret = false),
     /// Repository asset id (globally unique).
     RepositoryAssetId => (FlatRawId, "repo_a", 22, secret = false),
-    /// Asset relation id (globally unique).
-    AssetRelationId => (FlatRawId, "repo_a_rel", 22, secret = false),
-
     /// Package id (globally unique).
     PackageId => (FlatRawId, "pkg", 22, secret = false),
     /// Package version id (globally unique).

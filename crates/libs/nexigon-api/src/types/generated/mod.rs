@@ -52451,8 +52451,6 @@ pub mod repositories {
     pub type PackageId = nexigon_ids::ids::PackageId;
     #[doc = "Unique ID of a package version.\n"]
     pub type PackageVersionId = nexigon_ids::ids::PackageVersionId;
-    #[doc = "Unique ID of an asset relation.\n"]
-    pub type AssetRelationId = nexigon_ids::ids::AssetRelationId;
     #[doc = "Asset status.\n"]
     #[derive(Clone, Debug)]
     pub enum RepositoryAssetStatus {
@@ -53329,2081 +53327,6 @@ pub mod repositories {
             __serde::Deserializer::deserialize_struct(
                 __deserializer,
                 "RepositoryS3Config",
-                __FIELDS,
-                __Visitor {
-                    __phantom_vars: ::core::marker::PhantomData,
-                },
-            )
-        }
-    }
-    #[doc = "An asset relation linking two assets with a typed relationship.\n"]
-    #[derive(Clone, Debug)]
-    pub struct AssetRelation {
-        #[doc = "ID of the relation.\n"]
-        pub relation_id: AssetRelationId,
-        #[doc = "ID of the source asset (e.g., the VDR or SBOM).\n"]
-        pub source_asset_id: RepositoryAssetId,
-        #[doc = "ID of the target asset (e.g., the firmware image).\n"]
-        pub target_asset_id: RepositoryAssetId,
-        #[doc = "Free-form relation type (e.g., \"sbom_for\", \"vdr_for\", \"signature_of\").\n"]
-        pub relation_type: ::std::string::String,
-        #[doc = "Properties of the relation.\n"]
-        pub properties: ::std::collections::HashMap<::std::string::String, super::json::JsonValue>,
-        #[doc = "Timestamp when the relation was created.\n"]
-        pub created_at: super::datetime::Timestamp,
-    }
-    impl AssetRelation {
-        #[doc = "Creates a new [`AssetRelation`]."]
-        pub fn new(
-            relation_id: AssetRelationId,
-            source_asset_id: RepositoryAssetId,
-            target_asset_id: RepositoryAssetId,
-            relation_type: ::std::string::String,
-            properties: ::std::collections::HashMap<::std::string::String, super::json::JsonValue>,
-            created_at: super::datetime::Timestamp,
-        ) -> Self {
-            Self {
-                relation_id,
-                source_asset_id,
-                target_asset_id,
-                relation_type,
-                properties,
-                created_at,
-            }
-        }
-        #[doc = "Sets the value of `relation_id`."]
-        pub fn set_relation_id(&mut self, relation_id: AssetRelationId) -> &mut Self {
-            self.relation_id = relation_id;
-            self
-        }
-        #[doc = "Sets the value of `relation_id`."]
-        pub fn with_relation_id(mut self, relation_id: AssetRelationId) -> Self {
-            self.relation_id = relation_id;
-            self
-        }
-        #[doc = "Sets the value of `source_asset_id`."]
-        pub fn set_source_asset_id(&mut self, source_asset_id: RepositoryAssetId) -> &mut Self {
-            self.source_asset_id = source_asset_id;
-            self
-        }
-        #[doc = "Sets the value of `source_asset_id`."]
-        pub fn with_source_asset_id(mut self, source_asset_id: RepositoryAssetId) -> Self {
-            self.source_asset_id = source_asset_id;
-            self
-        }
-        #[doc = "Sets the value of `target_asset_id`."]
-        pub fn set_target_asset_id(&mut self, target_asset_id: RepositoryAssetId) -> &mut Self {
-            self.target_asset_id = target_asset_id;
-            self
-        }
-        #[doc = "Sets the value of `target_asset_id`."]
-        pub fn with_target_asset_id(mut self, target_asset_id: RepositoryAssetId) -> Self {
-            self.target_asset_id = target_asset_id;
-            self
-        }
-        #[doc = "Sets the value of `relation_type`."]
-        pub fn set_relation_type(&mut self, relation_type: ::std::string::String) -> &mut Self {
-            self.relation_type = relation_type;
-            self
-        }
-        #[doc = "Sets the value of `relation_type`."]
-        pub fn with_relation_type(mut self, relation_type: ::std::string::String) -> Self {
-            self.relation_type = relation_type;
-            self
-        }
-        #[doc = "Sets the value of `properties`."]
-        pub fn set_properties(
-            &mut self,
-            properties: ::std::collections::HashMap<::std::string::String, super::json::JsonValue>,
-        ) -> &mut Self {
-            self.properties = properties;
-            self
-        }
-        #[doc = "Sets the value of `properties`."]
-        pub fn with_properties(
-            mut self,
-            properties: ::std::collections::HashMap<::std::string::String, super::json::JsonValue>,
-        ) -> Self {
-            self.properties = properties;
-            self
-        }
-        #[doc = "Sets the value of `created_at`."]
-        pub fn set_created_at(&mut self, created_at: super::datetime::Timestamp) -> &mut Self {
-            self.created_at = created_at;
-            self
-        }
-        #[doc = "Sets the value of `created_at`."]
-        pub fn with_created_at(mut self, created_at: super::datetime::Timestamp) -> Self {
-            self.created_at = created_at;
-            self
-        }
-    }
-    #[automatically_derived]
-    impl __serde::Serialize for AssetRelation {
-        fn serialize<__S: __serde::Serializer>(
-            &self,
-            __serializer: __S,
-        ) -> ::std::result::Result<__S::Ok, __S::Error> {
-            let mut __record =
-                __sidex_serde::ser::RecordSerializer::new(__serializer, "AssetRelation", 6usize)?;
-            __record.serialize_field("relationId", &self.relation_id)?;
-            __record.serialize_field("sourceAssetId", &self.source_asset_id)?;
-            __record.serialize_field("targetAssetId", &self.target_asset_id)?;
-            __record.serialize_field("relationType", &self.relation_type)?;
-            __record.serialize_field("properties", &self.properties)?;
-            __record.serialize_field("createdAt", &self.created_at)?;
-            __record.end()
-        }
-    }
-    #[automatically_derived]
-    impl<'de> __serde::Deserialize<'de> for AssetRelation {
-        fn deserialize<__D: __serde::Deserializer<'de>>(
-            __deserializer: __D,
-        ) -> ::std::result::Result<Self, __D::Error> {
-            #[doc(hidden)]
-            struct __Visitor {
-                __phantom_vars: ::core::marker::PhantomData<fn(&())>,
-            }
-            impl<'de> __serde::de::Visitor<'de> for __Visitor {
-                type Value = AssetRelation;
-                fn expecting(
-                    &self,
-                    __formatter: &mut ::core::fmt::Formatter,
-                ) -> ::core::fmt::Result {
-                    ::core::fmt::Formatter::write_str(__formatter, "record AssetRelation")
-                }
-                #[inline]
-                fn visit_seq<__A>(
-                    self,
-                    mut __seq: __A,
-                ) -> ::core::result::Result<Self::Value, __A::Error>
-                where
-                    __A: __serde::de::SeqAccess<'de>,
-                {
-                    let __field0 = match __serde::de::SeqAccess::next_element::<AssetRelationId>(
-                        &mut __seq,
-                    )? {
-                        ::core::option::Option::Some(__value) => __value,
-                        ::core::option::Option::None => {
-                            return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(0usize, &"record with 6 fields"),
-                            );
-                        }
-                    };
-                    let __field1 = match __serde::de::SeqAccess::next_element::<RepositoryAssetId>(
-                        &mut __seq,
-                    )? {
-                        ::core::option::Option::Some(__value) => __value,
-                        ::core::option::Option::None => {
-                            return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(1usize, &"record with 6 fields"),
-                            );
-                        }
-                    };
-                    let __field2 = match __serde::de::SeqAccess::next_element::<RepositoryAssetId>(
-                        &mut __seq,
-                    )? {
-                        ::core::option::Option::Some(__value) => __value,
-                        ::core::option::Option::None => {
-                            return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(2usize, &"record with 6 fields"),
-                            );
-                        }
-                    };
-                    let __field3 = match __serde::de::SeqAccess::next_element::<
-                        ::std::string::String,
-                    >(&mut __seq)?
-                    {
-                        ::core::option::Option::Some(__value) => __value,
-                        ::core::option::Option::None => {
-                            return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(3usize, &"record with 6 fields"),
-                            );
-                        }
-                    };
-                    let __field4 = match __serde::de::SeqAccess::next_element::<
-                        ::std::collections::HashMap<::std::string::String, super::json::JsonValue>,
-                    >(&mut __seq)?
-                    {
-                        ::core::option::Option::Some(__value) => __value,
-                        ::core::option::Option::None => {
-                            return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(4usize, &"record with 6 fields"),
-                            );
-                        }
-                    };
-                    let __field5 = match __serde::de::SeqAccess::next_element::<
-                        super::datetime::Timestamp,
-                    >(&mut __seq)?
-                    {
-                        ::core::option::Option::Some(__value) => __value,
-                        ::core::option::Option::None => {
-                            return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(5usize, &"record with 6 fields"),
-                            );
-                        }
-                    };
-                    ::core::result::Result::Ok(AssetRelation {
-                        relation_id: __field0,
-                        source_asset_id: __field1,
-                        target_asset_id: __field2,
-                        relation_type: __field3,
-                        properties: __field4,
-                        created_at: __field5,
-                    })
-                }
-                #[inline]
-                fn visit_map<__A>(
-                    self,
-                    mut __map: __A,
-                ) -> ::core::result::Result<Self::Value, __A::Error>
-                where
-                    __A: __serde::de::MapAccess<'de>,
-                {
-                    #[doc(hidden)]
-                    const __IDENTIFIERS: &'static [&'static str] = &[
-                        "relationId",
-                        "sourceAssetId",
-                        "targetAssetId",
-                        "relationType",
-                        "properties",
-                        "createdAt",
-                    ];
-                    #[doc(hidden)]
-                    const __EXPECTING_IDENTIFIERS: &'static str = "an identifier in [\"relationId\", \"sourceAssetId\", \"targetAssetId\", \"relationType\", \"properties\", \"createdAt\"]";
-                    #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
-                    #[doc(hidden)]
-                    enum __Identifier {
-                        __Identifier0,
-                        __Identifier1,
-                        __Identifier2,
-                        __Identifier3,
-                        __Identifier4,
-                        __Identifier5,
-                        __Unknown,
-                    }
-                    #[doc(hidden)]
-                    struct __IdentifierVisitor;
-                    impl<'de> __serde::de::Visitor<'de> for __IdentifierVisitor {
-                        type Value = __Identifier;
-                        fn expecting(
-                            &self,
-                            __formatter: &mut ::core::fmt::Formatter,
-                        ) -> ::core::fmt::Result {
-                            ::core::fmt::Formatter::write_str(__formatter, __EXPECTING_IDENTIFIERS)
-                        }
-                        fn visit_u64<__E>(
-                            self,
-                            __value: u64,
-                        ) -> ::core::result::Result<Self::Value, __E>
-                        where
-                            __E: __serde::de::Error,
-                        {
-                            match __value {
-                                0u64 => ::core::result::Result::Ok(__Identifier::__Identifier0),
-                                1u64 => ::core::result::Result::Ok(__Identifier::__Identifier1),
-                                2u64 => ::core::result::Result::Ok(__Identifier::__Identifier2),
-                                3u64 => ::core::result::Result::Ok(__Identifier::__Identifier3),
-                                4u64 => ::core::result::Result::Ok(__Identifier::__Identifier4),
-                                5u64 => ::core::result::Result::Ok(__Identifier::__Identifier5),
-                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
-                            }
-                        }
-                        fn visit_str<__E>(
-                            self,
-                            __value: &str,
-                        ) -> ::core::result::Result<Self::Value, __E>
-                        where
-                            __E: __serde::de::Error,
-                        {
-                            match __value {
-                                "relationId" => {
-                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
-                                }
-                                "sourceAssetId" => {
-                                    ::core::result::Result::Ok(__Identifier::__Identifier1)
-                                }
-                                "targetAssetId" => {
-                                    ::core::result::Result::Ok(__Identifier::__Identifier2)
-                                }
-                                "relationType" => {
-                                    ::core::result::Result::Ok(__Identifier::__Identifier3)
-                                }
-                                "properties" => {
-                                    ::core::result::Result::Ok(__Identifier::__Identifier4)
-                                }
-                                "createdAt" => {
-                                    ::core::result::Result::Ok(__Identifier::__Identifier5)
-                                }
-                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
-                            }
-                        }
-                        fn visit_bytes<__E>(
-                            self,
-                            __value: &[u8],
-                        ) -> ::core::result::Result<Self::Value, __E>
-                        where
-                            __E: __serde::de::Error,
-                        {
-                            match __value {
-                                b"relationId" => {
-                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
-                                }
-                                b"sourceAssetId" => {
-                                    ::core::result::Result::Ok(__Identifier::__Identifier1)
-                                }
-                                b"targetAssetId" => {
-                                    ::core::result::Result::Ok(__Identifier::__Identifier2)
-                                }
-                                b"relationType" => {
-                                    ::core::result::Result::Ok(__Identifier::__Identifier3)
-                                }
-                                b"properties" => {
-                                    ::core::result::Result::Ok(__Identifier::__Identifier4)
-                                }
-                                b"createdAt" => {
-                                    ::core::result::Result::Ok(__Identifier::__Identifier5)
-                                }
-                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
-                            }
-                        }
-                    }
-                    impl<'de> __serde::Deserialize<'de> for __Identifier {
-                        #[inline]
-                        fn deserialize<__D>(
-                            __deserializer: __D,
-                        ) -> ::core::result::Result<Self, __D::Error>
-                        where
-                            __D: __serde::Deserializer<'de>,
-                        {
-                            __serde::Deserializer::deserialize_identifier(
-                                __deserializer,
-                                __IdentifierVisitor,
-                            )
-                        }
-                    }
-                    let mut __field0: ::core::option::Option<AssetRelationId> =
-                        ::core::option::Option::None;
-                    let mut __field1: ::core::option::Option<RepositoryAssetId> =
-                        ::core::option::Option::None;
-                    let mut __field2: ::core::option::Option<RepositoryAssetId> =
-                        ::core::option::Option::None;
-                    let mut __field3: ::core::option::Option<::std::string::String> =
-                        ::core::option::Option::None;
-                    let mut __field4: ::core::option::Option<
-                        ::std::collections::HashMap<::std::string::String, super::json::JsonValue>,
-                    > = ::core::option::Option::None;
-                    let mut __field5: ::core::option::Option<super::datetime::Timestamp> =
-                        ::core::option::Option::None;
-                    while let ::core::option::Option::Some(__key) =
-                        __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
-                    {
-                        match __key {
-                            __Identifier::__Identifier0 => {
-                                if ::core::option::Option::is_some(&__field0) {
-                                    return ::core::result::Result::Err(
-                                        <__A::Error as __serde::de::Error>::duplicate_field(
-                                            "relationId",
-                                        ),
-                                    );
-                                }
-                                __field0 = ::core::option::Option::Some(
-                                    __serde::de::MapAccess::next_value::<AssetRelationId>(
-                                        &mut __map,
-                                    )?,
-                                );
-                            }
-                            __Identifier::__Identifier1 => {
-                                if ::core::option::Option::is_some(&__field1) {
-                                    return ::core::result::Result::Err(
-                                        <__A::Error as __serde::de::Error>::duplicate_field(
-                                            "sourceAssetId",
-                                        ),
-                                    );
-                                }
-                                __field1 = ::core::option::Option::Some(
-                                    __serde::de::MapAccess::next_value::<RepositoryAssetId>(
-                                        &mut __map,
-                                    )?,
-                                );
-                            }
-                            __Identifier::__Identifier2 => {
-                                if ::core::option::Option::is_some(&__field2) {
-                                    return ::core::result::Result::Err(
-                                        <__A::Error as __serde::de::Error>::duplicate_field(
-                                            "targetAssetId",
-                                        ),
-                                    );
-                                }
-                                __field2 = ::core::option::Option::Some(
-                                    __serde::de::MapAccess::next_value::<RepositoryAssetId>(
-                                        &mut __map,
-                                    )?,
-                                );
-                            }
-                            __Identifier::__Identifier3 => {
-                                if ::core::option::Option::is_some(&__field3) {
-                                    return ::core::result::Result::Err(
-                                        <__A::Error as __serde::de::Error>::duplicate_field(
-                                            "relationType",
-                                        ),
-                                    );
-                                }
-                                __field3 = ::core::option::Option::Some(
-                                    __serde::de::MapAccess::next_value::<::std::string::String>(
-                                        &mut __map,
-                                    )?,
-                                );
-                            }
-                            __Identifier::__Identifier4 => {
-                                if ::core::option::Option::is_some(&__field4) {
-                                    return ::core::result::Result::Err(
-                                        <__A::Error as __serde::de::Error>::duplicate_field(
-                                            "properties",
-                                        ),
-                                    );
-                                }
-                                __field4 = ::core::option::Option::Some(
-                                    __serde::de::MapAccess::next_value::<
-                                        ::std::collections::HashMap<
-                                            ::std::string::String,
-                                            super::json::JsonValue,
-                                        >,
-                                    >(&mut __map)?,
-                                );
-                            }
-                            __Identifier::__Identifier5 => {
-                                if ::core::option::Option::is_some(&__field5) {
-                                    return ::core::result::Result::Err(
-                                        <__A::Error as __serde::de::Error>::duplicate_field(
-                                            "createdAt",
-                                        ),
-                                    );
-                                }
-                                __field5 = ::core::option::Option::Some(
-                                    __serde::de::MapAccess::next_value::<super::datetime::Timestamp>(
-                                        &mut __map,
-                                    )?,
-                                );
-                            }
-                            _ => {
-                                __serde::de::MapAccess::next_value::<__serde::de::IgnoredAny>(
-                                    &mut __map,
-                                )?;
-                            }
-                        }
-                    }
-                    let __field0 = match __field0 {
-                        ::core::option::Option::Some(__value) => __value,
-                        ::core::option::Option::None => {
-                            return ::core::result::Result::Err(
-                                <__A::Error as __serde::de::Error>::missing_field("relationId"),
-                            );
-                        }
-                    };
-                    let __field1 = match __field1 {
-                        ::core::option::Option::Some(__value) => __value,
-                        ::core::option::Option::None => {
-                            return ::core::result::Result::Err(
-                                <__A::Error as __serde::de::Error>::missing_field("sourceAssetId"),
-                            );
-                        }
-                    };
-                    let __field2 = match __field2 {
-                        ::core::option::Option::Some(__value) => __value,
-                        ::core::option::Option::None => {
-                            return ::core::result::Result::Err(
-                                <__A::Error as __serde::de::Error>::missing_field("targetAssetId"),
-                            );
-                        }
-                    };
-                    let __field3 = match __field3 {
-                        ::core::option::Option::Some(__value) => __value,
-                        ::core::option::Option::None => {
-                            return ::core::result::Result::Err(
-                                <__A::Error as __serde::de::Error>::missing_field("relationType"),
-                            );
-                        }
-                    };
-                    let __field4 = match __field4 {
-                        ::core::option::Option::Some(__value) => __value,
-                        ::core::option::Option::None => {
-                            return ::core::result::Result::Err(
-                                <__A::Error as __serde::de::Error>::missing_field("properties"),
-                            );
-                        }
-                    };
-                    let __field5 = match __field5 {
-                        ::core::option::Option::Some(__value) => __value,
-                        ::core::option::Option::None => {
-                            return ::core::result::Result::Err(
-                                <__A::Error as __serde::de::Error>::missing_field("createdAt"),
-                            );
-                        }
-                    };
-                    ::core::result::Result::Ok(AssetRelation {
-                        relation_id: __field0,
-                        source_asset_id: __field1,
-                        target_asset_id: __field2,
-                        relation_type: __field3,
-                        properties: __field4,
-                        created_at: __field5,
-                    })
-                }
-            }
-            #[doc(hidden)]
-            const __FIELDS: &'static [&'static str] = &[
-                "relationId",
-                "sourceAssetId",
-                "targetAssetId",
-                "relationType",
-                "properties",
-                "createdAt",
-            ];
-            __serde::Deserializer::deserialize_struct(
-                __deserializer,
-                "AssetRelation",
-                __FIELDS,
-                __Visitor {
-                    __phantom_vars: ::core::marker::PhantomData,
-                },
-            )
-        }
-    }
-    #[doc = "Create a relation between two assets.\n"]
-    #[derive(Clone, Debug)]
-    pub struct CreateAssetRelationAction {
-        #[doc = "ID of the source asset.\n"]
-        pub source_asset_id: RepositoryAssetId,
-        #[doc = "ID of the target asset.\n"]
-        pub target_asset_id: RepositoryAssetId,
-        #[doc = "Free-form relation type (e.g., \"sbom_for\", \"vdr_for\", \"signature_of\").\n"]
-        pub relation_type: ::std::string::String,
-        #[doc = "Optional properties to set on the relation.\n"]
-        pub properties: ::std::option::Option<
-            ::std::collections::HashMap<::std::string::String, super::json::JsonValue>,
-        >,
-    }
-    impl CreateAssetRelationAction {
-        #[doc = "Creates a new [`CreateAssetRelationAction`]."]
-        pub fn new(
-            source_asset_id: RepositoryAssetId,
-            target_asset_id: RepositoryAssetId,
-            relation_type: ::std::string::String,
-        ) -> Self {
-            Self {
-                source_asset_id,
-                target_asset_id,
-                relation_type,
-                properties: ::std::default::Default::default(),
-            }
-        }
-        #[doc = "Sets the value of `source_asset_id`."]
-        pub fn set_source_asset_id(&mut self, source_asset_id: RepositoryAssetId) -> &mut Self {
-            self.source_asset_id = source_asset_id;
-            self
-        }
-        #[doc = "Sets the value of `source_asset_id`."]
-        pub fn with_source_asset_id(mut self, source_asset_id: RepositoryAssetId) -> Self {
-            self.source_asset_id = source_asset_id;
-            self
-        }
-        #[doc = "Sets the value of `target_asset_id`."]
-        pub fn set_target_asset_id(&mut self, target_asset_id: RepositoryAssetId) -> &mut Self {
-            self.target_asset_id = target_asset_id;
-            self
-        }
-        #[doc = "Sets the value of `target_asset_id`."]
-        pub fn with_target_asset_id(mut self, target_asset_id: RepositoryAssetId) -> Self {
-            self.target_asset_id = target_asset_id;
-            self
-        }
-        #[doc = "Sets the value of `relation_type`."]
-        pub fn set_relation_type(&mut self, relation_type: ::std::string::String) -> &mut Self {
-            self.relation_type = relation_type;
-            self
-        }
-        #[doc = "Sets the value of `relation_type`."]
-        pub fn with_relation_type(mut self, relation_type: ::std::string::String) -> Self {
-            self.relation_type = relation_type;
-            self
-        }
-        #[doc = "Sets the value of `properties`."]
-        pub fn set_properties(
-            &mut self,
-            properties: ::std::option::Option<
-                ::std::collections::HashMap<::std::string::String, super::json::JsonValue>,
-            >,
-        ) -> &mut Self {
-            self.properties = properties;
-            self
-        }
-        #[doc = "Sets the value of `properties`."]
-        pub fn with_properties(
-            mut self,
-            properties: ::std::option::Option<
-                ::std::collections::HashMap<::std::string::String, super::json::JsonValue>,
-            >,
-        ) -> Self {
-            self.properties = properties;
-            self
-        }
-    }
-    #[automatically_derived]
-    impl __serde::Serialize for CreateAssetRelationAction {
-        fn serialize<__S: __serde::Serializer>(
-            &self,
-            __serializer: __S,
-        ) -> ::std::result::Result<__S::Ok, __S::Error> {
-            let mut __record = __sidex_serde::ser::RecordSerializer::new(
-                __serializer,
-                "CreateAssetRelationAction",
-                4usize,
-            )?;
-            __record.serialize_field("sourceAssetId", &self.source_asset_id)?;
-            __record.serialize_field("targetAssetId", &self.target_asset_id)?;
-            __record.serialize_field("relationType", &self.relation_type)?;
-            __record.serialize_optional_field(
-                "properties",
-                ::core::option::Option::as_ref(&self.properties),
-            )?;
-            __record.end()
-        }
-    }
-    #[automatically_derived]
-    impl<'de> __serde::Deserialize<'de> for CreateAssetRelationAction {
-        fn deserialize<__D: __serde::Deserializer<'de>>(
-            __deserializer: __D,
-        ) -> ::std::result::Result<Self, __D::Error> {
-            #[doc(hidden)]
-            struct __Visitor {
-                __phantom_vars: ::core::marker::PhantomData<fn(&())>,
-            }
-            impl<'de> __serde::de::Visitor<'de> for __Visitor {
-                type Value = CreateAssetRelationAction;
-                fn expecting(
-                    &self,
-                    __formatter: &mut ::core::fmt::Formatter,
-                ) -> ::core::fmt::Result {
-                    ::core::fmt::Formatter::write_str(
-                        __formatter,
-                        "record CreateAssetRelationAction",
-                    )
-                }
-                #[inline]
-                fn visit_seq<__A>(
-                    self,
-                    mut __seq: __A,
-                ) -> ::core::result::Result<Self::Value, __A::Error>
-                where
-                    __A: __serde::de::SeqAccess<'de>,
-                {
-                    let __field0 = match __serde::de::SeqAccess::next_element::<RepositoryAssetId>(
-                        &mut __seq,
-                    )? {
-                        ::core::option::Option::Some(__value) => __value,
-                        ::core::option::Option::None => {
-                            return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(0usize, &"record with 4 fields"),
-                            );
-                        }
-                    };
-                    let __field1 = match __serde::de::SeqAccess::next_element::<RepositoryAssetId>(
-                        &mut __seq,
-                    )? {
-                        ::core::option::Option::Some(__value) => __value,
-                        ::core::option::Option::None => {
-                            return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(1usize, &"record with 4 fields"),
-                            );
-                        }
-                    };
-                    let __field2 = match __serde::de::SeqAccess::next_element::<
-                        ::std::string::String,
-                    >(&mut __seq)?
-                    {
-                        ::core::option::Option::Some(__value) => __value,
-                        ::core::option::Option::None => {
-                            return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(2usize, &"record with 4 fields"),
-                            );
-                        }
-                    };
-                    let __field3 = match __serde::de::SeqAccess::next_element::<
-                        ::std::option::Option<
-                            ::std::collections::HashMap<
-                                ::std::string::String,
-                                super::json::JsonValue,
-                            >,
-                        >,
-                    >(&mut __seq)?
-                    {
-                        ::core::option::Option::Some(__value) => __value,
-                        ::core::option::Option::None => {
-                            return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(3usize, &"record with 4 fields"),
-                            );
-                        }
-                    };
-                    ::core::result::Result::Ok(CreateAssetRelationAction {
-                        source_asset_id: __field0,
-                        target_asset_id: __field1,
-                        relation_type: __field2,
-                        properties: __field3,
-                    })
-                }
-                #[inline]
-                fn visit_map<__A>(
-                    self,
-                    mut __map: __A,
-                ) -> ::core::result::Result<Self::Value, __A::Error>
-                where
-                    __A: __serde::de::MapAccess<'de>,
-                {
-                    #[doc(hidden)]
-                    const __IDENTIFIERS: &'static [&'static str] = &[
-                        "sourceAssetId",
-                        "targetAssetId",
-                        "relationType",
-                        "properties",
-                    ];
-                    #[doc(hidden)]
-                    const __EXPECTING_IDENTIFIERS: &'static str = "an identifier in [\"sourceAssetId\", \"targetAssetId\", \"relationType\", \"properties\"]";
-                    #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
-                    #[doc(hidden)]
-                    enum __Identifier {
-                        __Identifier0,
-                        __Identifier1,
-                        __Identifier2,
-                        __Identifier3,
-                        __Unknown,
-                    }
-                    #[doc(hidden)]
-                    struct __IdentifierVisitor;
-                    impl<'de> __serde::de::Visitor<'de> for __IdentifierVisitor {
-                        type Value = __Identifier;
-                        fn expecting(
-                            &self,
-                            __formatter: &mut ::core::fmt::Formatter,
-                        ) -> ::core::fmt::Result {
-                            ::core::fmt::Formatter::write_str(__formatter, __EXPECTING_IDENTIFIERS)
-                        }
-                        fn visit_u64<__E>(
-                            self,
-                            __value: u64,
-                        ) -> ::core::result::Result<Self::Value, __E>
-                        where
-                            __E: __serde::de::Error,
-                        {
-                            match __value {
-                                0u64 => ::core::result::Result::Ok(__Identifier::__Identifier0),
-                                1u64 => ::core::result::Result::Ok(__Identifier::__Identifier1),
-                                2u64 => ::core::result::Result::Ok(__Identifier::__Identifier2),
-                                3u64 => ::core::result::Result::Ok(__Identifier::__Identifier3),
-                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
-                            }
-                        }
-                        fn visit_str<__E>(
-                            self,
-                            __value: &str,
-                        ) -> ::core::result::Result<Self::Value, __E>
-                        where
-                            __E: __serde::de::Error,
-                        {
-                            match __value {
-                                "sourceAssetId" => {
-                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
-                                }
-                                "targetAssetId" => {
-                                    ::core::result::Result::Ok(__Identifier::__Identifier1)
-                                }
-                                "relationType" => {
-                                    ::core::result::Result::Ok(__Identifier::__Identifier2)
-                                }
-                                "properties" => {
-                                    ::core::result::Result::Ok(__Identifier::__Identifier3)
-                                }
-                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
-                            }
-                        }
-                        fn visit_bytes<__E>(
-                            self,
-                            __value: &[u8],
-                        ) -> ::core::result::Result<Self::Value, __E>
-                        where
-                            __E: __serde::de::Error,
-                        {
-                            match __value {
-                                b"sourceAssetId" => {
-                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
-                                }
-                                b"targetAssetId" => {
-                                    ::core::result::Result::Ok(__Identifier::__Identifier1)
-                                }
-                                b"relationType" => {
-                                    ::core::result::Result::Ok(__Identifier::__Identifier2)
-                                }
-                                b"properties" => {
-                                    ::core::result::Result::Ok(__Identifier::__Identifier3)
-                                }
-                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
-                            }
-                        }
-                    }
-                    impl<'de> __serde::Deserialize<'de> for __Identifier {
-                        #[inline]
-                        fn deserialize<__D>(
-                            __deserializer: __D,
-                        ) -> ::core::result::Result<Self, __D::Error>
-                        where
-                            __D: __serde::Deserializer<'de>,
-                        {
-                            __serde::Deserializer::deserialize_identifier(
-                                __deserializer,
-                                __IdentifierVisitor,
-                            )
-                        }
-                    }
-                    let mut __field0: ::core::option::Option<RepositoryAssetId> =
-                        ::core::option::Option::None;
-                    let mut __field1: ::core::option::Option<RepositoryAssetId> =
-                        ::core::option::Option::None;
-                    let mut __field2: ::core::option::Option<::std::string::String> =
-                        ::core::option::Option::None;
-                    let mut __field3: ::core::option::Option<
-                        ::std::option::Option<
-                            ::std::collections::HashMap<
-                                ::std::string::String,
-                                super::json::JsonValue,
-                            >,
-                        >,
-                    > = ::core::option::Option::None;
-                    while let ::core::option::Option::Some(__key) =
-                        __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
-                    {
-                        match __key {
-                            __Identifier::__Identifier0 => {
-                                if ::core::option::Option::is_some(&__field0) {
-                                    return ::core::result::Result::Err(
-                                        <__A::Error as __serde::de::Error>::duplicate_field(
-                                            "sourceAssetId",
-                                        ),
-                                    );
-                                }
-                                __field0 = ::core::option::Option::Some(
-                                    __serde::de::MapAccess::next_value::<RepositoryAssetId>(
-                                        &mut __map,
-                                    )?,
-                                );
-                            }
-                            __Identifier::__Identifier1 => {
-                                if ::core::option::Option::is_some(&__field1) {
-                                    return ::core::result::Result::Err(
-                                        <__A::Error as __serde::de::Error>::duplicate_field(
-                                            "targetAssetId",
-                                        ),
-                                    );
-                                }
-                                __field1 = ::core::option::Option::Some(
-                                    __serde::de::MapAccess::next_value::<RepositoryAssetId>(
-                                        &mut __map,
-                                    )?,
-                                );
-                            }
-                            __Identifier::__Identifier2 => {
-                                if ::core::option::Option::is_some(&__field2) {
-                                    return ::core::result::Result::Err(
-                                        <__A::Error as __serde::de::Error>::duplicate_field(
-                                            "relationType",
-                                        ),
-                                    );
-                                }
-                                __field2 = ::core::option::Option::Some(
-                                    __serde::de::MapAccess::next_value::<::std::string::String>(
-                                        &mut __map,
-                                    )?,
-                                );
-                            }
-                            __Identifier::__Identifier3 => {
-                                if ::core::option::Option::is_some(&__field3) {
-                                    return ::core::result::Result::Err(
-                                        <__A::Error as __serde::de::Error>::duplicate_field(
-                                            "properties",
-                                        ),
-                                    );
-                                }
-                                __field3 = ::core::option::Option::Some(
-                                    __serde::de::MapAccess::next_value::<
-                                        ::std::option::Option<
-                                            ::std::collections::HashMap<
-                                                ::std::string::String,
-                                                super::json::JsonValue,
-                                            >,
-                                        >,
-                                    >(&mut __map)?,
-                                );
-                            }
-                            _ => {
-                                __serde::de::MapAccess::next_value::<__serde::de::IgnoredAny>(
-                                    &mut __map,
-                                )?;
-                            }
-                        }
-                    }
-                    let __field0 = match __field0 {
-                        ::core::option::Option::Some(__value) => __value,
-                        ::core::option::Option::None => {
-                            return ::core::result::Result::Err(
-                                <__A::Error as __serde::de::Error>::missing_field("sourceAssetId"),
-                            );
-                        }
-                    };
-                    let __field1 = match __field1 {
-                        ::core::option::Option::Some(__value) => __value,
-                        ::core::option::Option::None => {
-                            return ::core::result::Result::Err(
-                                <__A::Error as __serde::de::Error>::missing_field("targetAssetId"),
-                            );
-                        }
-                    };
-                    let __field2 = match __field2 {
-                        ::core::option::Option::Some(__value) => __value,
-                        ::core::option::Option::None => {
-                            return ::core::result::Result::Err(
-                                <__A::Error as __serde::de::Error>::missing_field("relationType"),
-                            );
-                        }
-                    };
-                    let __field3 = match __field3 {
-                        ::core::option::Option::Some(__value) => __value,
-                        ::core::option::Option::None => ::core::option::Option::None,
-                    };
-                    ::core::result::Result::Ok(CreateAssetRelationAction {
-                        source_asset_id: __field0,
-                        target_asset_id: __field1,
-                        relation_type: __field2,
-                        properties: __field3,
-                    })
-                }
-            }
-            #[doc(hidden)]
-            const __FIELDS: &'static [&'static str] = &[
-                "sourceAssetId",
-                "targetAssetId",
-                "relationType",
-                "properties",
-            ];
-            __serde::Deserializer::deserialize_struct(
-                __deserializer,
-                "CreateAssetRelationAction",
-                __FIELDS,
-                __Visitor {
-                    __phantom_vars: ::core::marker::PhantomData,
-                },
-            )
-        }
-    }
-    #[doc = "Output of creating an asset relation.\n"]
-    #[derive(Clone, Debug)]
-    pub enum CreateAssetRelationOutput {
-        #[doc = "The relation already exists.\n"]
-        AlreadyExists,
-        #[doc = "The relation has been created.\n"]
-        Created(CreateAssetRelationSuccess),
-    }
-    #[automatically_derived]
-    impl __serde::Serialize for CreateAssetRelationOutput {
-        fn serialize<__S: __serde::Serializer>(
-            &self,
-            __serializer: __S,
-        ) -> ::std::result::Result<__S::Ok, __S::Error> {
-            let __serializer = __sidex_serde::ser::VariantSerializer::new(
-                __serializer,
-                "CreateAssetRelationOutput",
-            );
-            match self {
-                Self::AlreadyExists => {
-                    __serializer.serialize_internal_tag("result", "AlreadyExists", 0u32)
-                }
-                Self::Created(__value) => {
-                    __serializer.serialize_internally_tagged("result", "Created", 1u32, __value)
-                }
-            }
-        }
-    }
-    #[automatically_derived]
-    impl<'de> __serde::Deserialize<'de> for CreateAssetRelationOutput {
-        fn deserialize<__D: __serde::Deserializer<'de>>(
-            __deserializer: __D,
-        ) -> ::std::result::Result<Self, __D::Error> {
-            #[doc(hidden)]
-            const __IDENTIFIERS: &'static [&'static str] = &["AlreadyExists", "Created"];
-            #[doc(hidden)]
-            const __EXPECTING_IDENTIFIERS: &'static str =
-                "an identifier in [\"AlreadyExists\", \"Created\"]";
-            #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
-            #[doc(hidden)]
-            enum __Identifier {
-                __Identifier0,
-                __Identifier1,
-            }
-            #[doc(hidden)]
-            struct __IdentifierVisitor;
-            impl<'de> __serde::de::Visitor<'de> for __IdentifierVisitor {
-                type Value = __Identifier;
-                fn expecting(
-                    &self,
-                    __formatter: &mut ::core::fmt::Formatter,
-                ) -> ::core::fmt::Result {
-                    ::core::fmt::Formatter::write_str(__formatter, __EXPECTING_IDENTIFIERS)
-                }
-                fn visit_u64<__E>(self, __value: u64) -> ::core::result::Result<Self::Value, __E>
-                where
-                    __E: __serde::de::Error,
-                {
-                    match __value {
-                        0u64 => ::core::result::Result::Ok(__Identifier::__Identifier0),
-                        1u64 => ::core::result::Result::Ok(__Identifier::__Identifier1),
-                        __variant => {
-                            ::core::result::Result::Err(__serde::de::Error::invalid_value(
-                                __serde::de::Unexpected::Unsigned(__variant),
-                                &__EXPECTING_IDENTIFIERS,
-                            ))
-                        }
-                    }
-                }
-                fn visit_str<__E>(self, __value: &str) -> ::core::result::Result<Self::Value, __E>
-                where
-                    __E: __serde::de::Error,
-                {
-                    match __value {
-                        "AlreadyExists" => ::core::result::Result::Ok(__Identifier::__Identifier0),
-                        "Created" => ::core::result::Result::Ok(__Identifier::__Identifier1),
-                        __variant => ::core::result::Result::Err(
-                            __serde::de::Error::unknown_variant(__variant, __IDENTIFIERS),
-                        ),
-                    }
-                }
-                fn visit_bytes<__E>(
-                    self,
-                    __value: &[u8],
-                ) -> ::core::result::Result<Self::Value, __E>
-                where
-                    __E: __serde::de::Error,
-                {
-                    match __value {
-                        b"AlreadyExists" => ::core::result::Result::Ok(__Identifier::__Identifier0),
-                        b"Created" => ::core::result::Result::Ok(__Identifier::__Identifier1),
-                        __variant => {
-                            ::core::result::Result::Err(__serde::de::Error::invalid_value(
-                                __serde::de::Unexpected::Bytes(__variant),
-                                &__EXPECTING_IDENTIFIERS,
-                            ))
-                        }
-                    }
-                }
-            }
-            impl<'de> __serde::Deserialize<'de> for __Identifier {
-                #[inline]
-                fn deserialize<__D>(__deserializer: __D) -> ::core::result::Result<Self, __D::Error>
-                where
-                    __D: __serde::Deserializer<'de>,
-                {
-                    __serde::Deserializer::deserialize_identifier(
-                        __deserializer,
-                        __IdentifierVisitor,
-                    )
-                }
-            }
-            #[doc(hidden)]
-            const __VARIANTS: &'static [&'static str] = &["AlreadyExists", "Created"];
-            if __serde::Deserializer::is_human_readable(&__deserializer) {
-                let __tagged = __sidex_serde::de::tagged::deserialize_tagged_variant::<
-                    __Identifier,
-                    __D,
-                >(__deserializer, "result")?;
-                match __tagged . tag { __Identifier :: __Identifier0 => { :: core :: result :: Result :: Ok (CreateAssetRelationOutput :: AlreadyExists) } , __Identifier :: __Identifier1 => { :: core :: result :: Result :: Ok (CreateAssetRelationOutput :: Created (__tagged . deserialize_internally_tagged :: < CreateAssetRelationSuccess < > , __D :: Error > () ?)) } , }
-            } else {
-                #[doc(hidden)]
-                struct __Visitor {
-                    __phantom_vars: ::core::marker::PhantomData<fn(&())>,
-                }
-                impl<'de> __serde::de::Visitor<'de> for __Visitor {
-                    type Value = CreateAssetRelationOutput;
-                    fn expecting(
-                        &self,
-                        __formatter: &mut ::core::fmt::Formatter,
-                    ) -> ::core::fmt::Result {
-                        ::core::fmt::Formatter::write_str(
-                            __formatter,
-                            "enum CreateAssetRelationOutput",
-                        )
-                    }
-                    #[inline]
-                    fn visit_str<__E>(
-                        self,
-                        __value: &str,
-                    ) -> ::core::result::Result<Self::Value, __E>
-                    where
-                        __E: __serde::de::Error,
-                    {
-                        let __identifier = __IdentifierVisitor.visit_str(__value)?;
-                        #[allow(unreachable_patterns)]
-                        match __identifier {
-                            __Identifier::__Identifier0 => {
-                                ::core::result::Result::Ok(CreateAssetRelationOutput::AlreadyExists)
-                            }
-                            _ => Err(__E::invalid_value(
-                                __serde::de::Unexpected::Str(__value),
-                                &self,
-                            )),
-                        }
-                    }
-                    #[inline]
-                    fn visit_enum<__A>(
-                        self,
-                        __data: __A,
-                    ) -> ::core::result::Result<Self::Value, __A::Error>
-                    where
-                        __A: __serde::de::EnumAccess<'de>,
-                    {
-                        match __serde::de::EnumAccess::variant::<__Identifier>(__data)? {
-                            (__Identifier::__Identifier0, __variant) => {
-                                __serde::de::VariantAccess::unit_variant(__variant)?;
-                                ::core::result::Result::Ok(CreateAssetRelationOutput::AlreadyExists)
-                            }
-                            (__Identifier::__Identifier1, __variant) => {
-                                let __value = __serde::de::VariantAccess::newtype_variant::<
-                                    CreateAssetRelationSuccess,
-                                >(__variant)?;
-                                ::core::result::Result::Ok(CreateAssetRelationOutput::Created(
-                                    __value,
-                                ))
-                            }
-                        }
-                    }
-                }
-                __serde::Deserializer::deserialize_enum(
-                    __deserializer,
-                    "CreateAssetRelationOutput",
-                    __VARIANTS,
-                    __Visitor {
-                        __phantom_vars: ::core::marker::PhantomData,
-                    },
-                )
-            }
-        }
-    }
-    #[doc = "Successfully created an asset relation.\n"]
-    #[derive(Clone, Debug)]
-    pub struct CreateAssetRelationSuccess {
-        #[doc = "ID of the relation.\n"]
-        pub relation_id: AssetRelationId,
-    }
-    impl CreateAssetRelationSuccess {
-        #[doc = "Creates a new [`CreateAssetRelationSuccess`]."]
-        pub fn new(relation_id: AssetRelationId) -> Self {
-            Self { relation_id }
-        }
-        #[doc = "Sets the value of `relation_id`."]
-        pub fn set_relation_id(&mut self, relation_id: AssetRelationId) -> &mut Self {
-            self.relation_id = relation_id;
-            self
-        }
-        #[doc = "Sets the value of `relation_id`."]
-        pub fn with_relation_id(mut self, relation_id: AssetRelationId) -> Self {
-            self.relation_id = relation_id;
-            self
-        }
-    }
-    #[automatically_derived]
-    impl __serde::Serialize for CreateAssetRelationSuccess {
-        fn serialize<__S: __serde::Serializer>(
-            &self,
-            __serializer: __S,
-        ) -> ::std::result::Result<__S::Ok, __S::Error> {
-            let mut __record = __sidex_serde::ser::RecordSerializer::new(
-                __serializer,
-                "CreateAssetRelationSuccess",
-                1usize,
-            )?;
-            __record.serialize_field("relationId", &self.relation_id)?;
-            __record.end()
-        }
-    }
-    #[automatically_derived]
-    impl<'de> __serde::Deserialize<'de> for CreateAssetRelationSuccess {
-        fn deserialize<__D: __serde::Deserializer<'de>>(
-            __deserializer: __D,
-        ) -> ::std::result::Result<Self, __D::Error> {
-            #[doc(hidden)]
-            struct __Visitor {
-                __phantom_vars: ::core::marker::PhantomData<fn(&())>,
-            }
-            impl<'de> __serde::de::Visitor<'de> for __Visitor {
-                type Value = CreateAssetRelationSuccess;
-                fn expecting(
-                    &self,
-                    __formatter: &mut ::core::fmt::Formatter,
-                ) -> ::core::fmt::Result {
-                    ::core::fmt::Formatter::write_str(
-                        __formatter,
-                        "record CreateAssetRelationSuccess",
-                    )
-                }
-                #[inline]
-                fn visit_seq<__A>(
-                    self,
-                    mut __seq: __A,
-                ) -> ::core::result::Result<Self::Value, __A::Error>
-                where
-                    __A: __serde::de::SeqAccess<'de>,
-                {
-                    let __field0 = match __serde::de::SeqAccess::next_element::<AssetRelationId>(
-                        &mut __seq,
-                    )? {
-                        ::core::option::Option::Some(__value) => __value,
-                        ::core::option::Option::None => {
-                            return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(0usize, &"record with 1 fields"),
-                            );
-                        }
-                    };
-                    ::core::result::Result::Ok(CreateAssetRelationSuccess {
-                        relation_id: __field0,
-                    })
-                }
-                #[inline]
-                fn visit_map<__A>(
-                    self,
-                    mut __map: __A,
-                ) -> ::core::result::Result<Self::Value, __A::Error>
-                where
-                    __A: __serde::de::MapAccess<'de>,
-                {
-                    #[doc(hidden)]
-                    const __IDENTIFIERS: &'static [&'static str] = &["relationId"];
-                    #[doc(hidden)]
-                    const __EXPECTING_IDENTIFIERS: &'static str =
-                        "an identifier in [\"relationId\"]";
-                    #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
-                    #[doc(hidden)]
-                    enum __Identifier {
-                        __Identifier0,
-                        __Unknown,
-                    }
-                    #[doc(hidden)]
-                    struct __IdentifierVisitor;
-                    impl<'de> __serde::de::Visitor<'de> for __IdentifierVisitor {
-                        type Value = __Identifier;
-                        fn expecting(
-                            &self,
-                            __formatter: &mut ::core::fmt::Formatter,
-                        ) -> ::core::fmt::Result {
-                            ::core::fmt::Formatter::write_str(__formatter, __EXPECTING_IDENTIFIERS)
-                        }
-                        fn visit_u64<__E>(
-                            self,
-                            __value: u64,
-                        ) -> ::core::result::Result<Self::Value, __E>
-                        where
-                            __E: __serde::de::Error,
-                        {
-                            match __value {
-                                0u64 => ::core::result::Result::Ok(__Identifier::__Identifier0),
-                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
-                            }
-                        }
-                        fn visit_str<__E>(
-                            self,
-                            __value: &str,
-                        ) -> ::core::result::Result<Self::Value, __E>
-                        where
-                            __E: __serde::de::Error,
-                        {
-                            match __value {
-                                "relationId" => {
-                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
-                                }
-                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
-                            }
-                        }
-                        fn visit_bytes<__E>(
-                            self,
-                            __value: &[u8],
-                        ) -> ::core::result::Result<Self::Value, __E>
-                        where
-                            __E: __serde::de::Error,
-                        {
-                            match __value {
-                                b"relationId" => {
-                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
-                                }
-                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
-                            }
-                        }
-                    }
-                    impl<'de> __serde::Deserialize<'de> for __Identifier {
-                        #[inline]
-                        fn deserialize<__D>(
-                            __deserializer: __D,
-                        ) -> ::core::result::Result<Self, __D::Error>
-                        where
-                            __D: __serde::Deserializer<'de>,
-                        {
-                            __serde::Deserializer::deserialize_identifier(
-                                __deserializer,
-                                __IdentifierVisitor,
-                            )
-                        }
-                    }
-                    let mut __field0: ::core::option::Option<AssetRelationId> =
-                        ::core::option::Option::None;
-                    while let ::core::option::Option::Some(__key) =
-                        __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
-                    {
-                        match __key {
-                            __Identifier::__Identifier0 => {
-                                if ::core::option::Option::is_some(&__field0) {
-                                    return ::core::result::Result::Err(
-                                        <__A::Error as __serde::de::Error>::duplicate_field(
-                                            "relationId",
-                                        ),
-                                    );
-                                }
-                                __field0 = ::core::option::Option::Some(
-                                    __serde::de::MapAccess::next_value::<AssetRelationId>(
-                                        &mut __map,
-                                    )?,
-                                );
-                            }
-                            _ => {
-                                __serde::de::MapAccess::next_value::<__serde::de::IgnoredAny>(
-                                    &mut __map,
-                                )?;
-                            }
-                        }
-                    }
-                    let __field0 = match __field0 {
-                        ::core::option::Option::Some(__value) => __value,
-                        ::core::option::Option::None => {
-                            return ::core::result::Result::Err(
-                                <__A::Error as __serde::de::Error>::missing_field("relationId"),
-                            );
-                        }
-                    };
-                    ::core::result::Result::Ok(CreateAssetRelationSuccess {
-                        relation_id: __field0,
-                    })
-                }
-            }
-            #[doc(hidden)]
-            const __FIELDS: &'static [&'static str] = &["relationId"];
-            __serde::Deserializer::deserialize_struct(
-                __deserializer,
-                "CreateAssetRelationSuccess",
-                __FIELDS,
-                __Visitor {
-                    __phantom_vars: ::core::marker::PhantomData,
-                },
-            )
-        }
-    }
-    #[doc = "Delete an asset relation.\n"]
-    #[derive(Clone, Debug)]
-    pub struct DeleteAssetRelationAction {
-        #[doc = "ID of the relation.\n"]
-        pub relation_id: AssetRelationId,
-    }
-    impl DeleteAssetRelationAction {
-        #[doc = "Creates a new [`DeleteAssetRelationAction`]."]
-        pub fn new(relation_id: AssetRelationId) -> Self {
-            Self { relation_id }
-        }
-        #[doc = "Sets the value of `relation_id`."]
-        pub fn set_relation_id(&mut self, relation_id: AssetRelationId) -> &mut Self {
-            self.relation_id = relation_id;
-            self
-        }
-        #[doc = "Sets the value of `relation_id`."]
-        pub fn with_relation_id(mut self, relation_id: AssetRelationId) -> Self {
-            self.relation_id = relation_id;
-            self
-        }
-    }
-    #[automatically_derived]
-    impl __serde::Serialize for DeleteAssetRelationAction {
-        fn serialize<__S: __serde::Serializer>(
-            &self,
-            __serializer: __S,
-        ) -> ::std::result::Result<__S::Ok, __S::Error> {
-            let mut __record = __sidex_serde::ser::RecordSerializer::new(
-                __serializer,
-                "DeleteAssetRelationAction",
-                1usize,
-            )?;
-            __record.serialize_field("relationId", &self.relation_id)?;
-            __record.end()
-        }
-    }
-    #[automatically_derived]
-    impl<'de> __serde::Deserialize<'de> for DeleteAssetRelationAction {
-        fn deserialize<__D: __serde::Deserializer<'de>>(
-            __deserializer: __D,
-        ) -> ::std::result::Result<Self, __D::Error> {
-            #[doc(hidden)]
-            struct __Visitor {
-                __phantom_vars: ::core::marker::PhantomData<fn(&())>,
-            }
-            impl<'de> __serde::de::Visitor<'de> for __Visitor {
-                type Value = DeleteAssetRelationAction;
-                fn expecting(
-                    &self,
-                    __formatter: &mut ::core::fmt::Formatter,
-                ) -> ::core::fmt::Result {
-                    ::core::fmt::Formatter::write_str(
-                        __formatter,
-                        "record DeleteAssetRelationAction",
-                    )
-                }
-                #[inline]
-                fn visit_seq<__A>(
-                    self,
-                    mut __seq: __A,
-                ) -> ::core::result::Result<Self::Value, __A::Error>
-                where
-                    __A: __serde::de::SeqAccess<'de>,
-                {
-                    let __field0 = match __serde::de::SeqAccess::next_element::<AssetRelationId>(
-                        &mut __seq,
-                    )? {
-                        ::core::option::Option::Some(__value) => __value,
-                        ::core::option::Option::None => {
-                            return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(0usize, &"record with 1 fields"),
-                            );
-                        }
-                    };
-                    ::core::result::Result::Ok(DeleteAssetRelationAction {
-                        relation_id: __field0,
-                    })
-                }
-                #[inline]
-                fn visit_map<__A>(
-                    self,
-                    mut __map: __A,
-                ) -> ::core::result::Result<Self::Value, __A::Error>
-                where
-                    __A: __serde::de::MapAccess<'de>,
-                {
-                    #[doc(hidden)]
-                    const __IDENTIFIERS: &'static [&'static str] = &["relationId"];
-                    #[doc(hidden)]
-                    const __EXPECTING_IDENTIFIERS: &'static str =
-                        "an identifier in [\"relationId\"]";
-                    #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
-                    #[doc(hidden)]
-                    enum __Identifier {
-                        __Identifier0,
-                        __Unknown,
-                    }
-                    #[doc(hidden)]
-                    struct __IdentifierVisitor;
-                    impl<'de> __serde::de::Visitor<'de> for __IdentifierVisitor {
-                        type Value = __Identifier;
-                        fn expecting(
-                            &self,
-                            __formatter: &mut ::core::fmt::Formatter,
-                        ) -> ::core::fmt::Result {
-                            ::core::fmt::Formatter::write_str(__formatter, __EXPECTING_IDENTIFIERS)
-                        }
-                        fn visit_u64<__E>(
-                            self,
-                            __value: u64,
-                        ) -> ::core::result::Result<Self::Value, __E>
-                        where
-                            __E: __serde::de::Error,
-                        {
-                            match __value {
-                                0u64 => ::core::result::Result::Ok(__Identifier::__Identifier0),
-                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
-                            }
-                        }
-                        fn visit_str<__E>(
-                            self,
-                            __value: &str,
-                        ) -> ::core::result::Result<Self::Value, __E>
-                        where
-                            __E: __serde::de::Error,
-                        {
-                            match __value {
-                                "relationId" => {
-                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
-                                }
-                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
-                            }
-                        }
-                        fn visit_bytes<__E>(
-                            self,
-                            __value: &[u8],
-                        ) -> ::core::result::Result<Self::Value, __E>
-                        where
-                            __E: __serde::de::Error,
-                        {
-                            match __value {
-                                b"relationId" => {
-                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
-                                }
-                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
-                            }
-                        }
-                    }
-                    impl<'de> __serde::Deserialize<'de> for __Identifier {
-                        #[inline]
-                        fn deserialize<__D>(
-                            __deserializer: __D,
-                        ) -> ::core::result::Result<Self, __D::Error>
-                        where
-                            __D: __serde::Deserializer<'de>,
-                        {
-                            __serde::Deserializer::deserialize_identifier(
-                                __deserializer,
-                                __IdentifierVisitor,
-                            )
-                        }
-                    }
-                    let mut __field0: ::core::option::Option<AssetRelationId> =
-                        ::core::option::Option::None;
-                    while let ::core::option::Option::Some(__key) =
-                        __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
-                    {
-                        match __key {
-                            __Identifier::__Identifier0 => {
-                                if ::core::option::Option::is_some(&__field0) {
-                                    return ::core::result::Result::Err(
-                                        <__A::Error as __serde::de::Error>::duplicate_field(
-                                            "relationId",
-                                        ),
-                                    );
-                                }
-                                __field0 = ::core::option::Option::Some(
-                                    __serde::de::MapAccess::next_value::<AssetRelationId>(
-                                        &mut __map,
-                                    )?,
-                                );
-                            }
-                            _ => {
-                                __serde::de::MapAccess::next_value::<__serde::de::IgnoredAny>(
-                                    &mut __map,
-                                )?;
-                            }
-                        }
-                    }
-                    let __field0 = match __field0 {
-                        ::core::option::Option::Some(__value) => __value,
-                        ::core::option::Option::None => {
-                            return ::core::result::Result::Err(
-                                <__A::Error as __serde::de::Error>::missing_field("relationId"),
-                            );
-                        }
-                    };
-                    ::core::result::Result::Ok(DeleteAssetRelationAction {
-                        relation_id: __field0,
-                    })
-                }
-            }
-            #[doc(hidden)]
-            const __FIELDS: &'static [&'static str] = &["relationId"];
-            __serde::Deserializer::deserialize_struct(
-                __deserializer,
-                "DeleteAssetRelationAction",
-                __FIELDS,
-                __Visitor {
-                    __phantom_vars: ::core::marker::PhantomData,
-                },
-            )
-        }
-    }
-    #[doc = "Query relations for an asset.\n"]
-    #[derive(Clone, Debug)]
-    pub struct QueryAssetRelationsAction {
-        #[doc = "ID of the asset to query relations for.\n"]
-        pub asset_id: RepositoryAssetId,
-    }
-    impl QueryAssetRelationsAction {
-        #[doc = "Creates a new [`QueryAssetRelationsAction`]."]
-        pub fn new(asset_id: RepositoryAssetId) -> Self {
-            Self { asset_id }
-        }
-        #[doc = "Sets the value of `asset_id`."]
-        pub fn set_asset_id(&mut self, asset_id: RepositoryAssetId) -> &mut Self {
-            self.asset_id = asset_id;
-            self
-        }
-        #[doc = "Sets the value of `asset_id`."]
-        pub fn with_asset_id(mut self, asset_id: RepositoryAssetId) -> Self {
-            self.asset_id = asset_id;
-            self
-        }
-    }
-    #[automatically_derived]
-    impl __serde::Serialize for QueryAssetRelationsAction {
-        fn serialize<__S: __serde::Serializer>(
-            &self,
-            __serializer: __S,
-        ) -> ::std::result::Result<__S::Ok, __S::Error> {
-            let mut __record = __sidex_serde::ser::RecordSerializer::new(
-                __serializer,
-                "QueryAssetRelationsAction",
-                1usize,
-            )?;
-            __record.serialize_field("assetId", &self.asset_id)?;
-            __record.end()
-        }
-    }
-    #[automatically_derived]
-    impl<'de> __serde::Deserialize<'de> for QueryAssetRelationsAction {
-        fn deserialize<__D: __serde::Deserializer<'de>>(
-            __deserializer: __D,
-        ) -> ::std::result::Result<Self, __D::Error> {
-            #[doc(hidden)]
-            struct __Visitor {
-                __phantom_vars: ::core::marker::PhantomData<fn(&())>,
-            }
-            impl<'de> __serde::de::Visitor<'de> for __Visitor {
-                type Value = QueryAssetRelationsAction;
-                fn expecting(
-                    &self,
-                    __formatter: &mut ::core::fmt::Formatter,
-                ) -> ::core::fmt::Result {
-                    ::core::fmt::Formatter::write_str(
-                        __formatter,
-                        "record QueryAssetRelationsAction",
-                    )
-                }
-                #[inline]
-                fn visit_seq<__A>(
-                    self,
-                    mut __seq: __A,
-                ) -> ::core::result::Result<Self::Value, __A::Error>
-                where
-                    __A: __serde::de::SeqAccess<'de>,
-                {
-                    let __field0 = match __serde::de::SeqAccess::next_element::<RepositoryAssetId>(
-                        &mut __seq,
-                    )? {
-                        ::core::option::Option::Some(__value) => __value,
-                        ::core::option::Option::None => {
-                            return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(0usize, &"record with 1 fields"),
-                            );
-                        }
-                    };
-                    ::core::result::Result::Ok(QueryAssetRelationsAction { asset_id: __field0 })
-                }
-                #[inline]
-                fn visit_map<__A>(
-                    self,
-                    mut __map: __A,
-                ) -> ::core::result::Result<Self::Value, __A::Error>
-                where
-                    __A: __serde::de::MapAccess<'de>,
-                {
-                    #[doc(hidden)]
-                    const __IDENTIFIERS: &'static [&'static str] = &["assetId"];
-                    #[doc(hidden)]
-                    const __EXPECTING_IDENTIFIERS: &'static str = "an identifier in [\"assetId\"]";
-                    #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
-                    #[doc(hidden)]
-                    enum __Identifier {
-                        __Identifier0,
-                        __Unknown,
-                    }
-                    #[doc(hidden)]
-                    struct __IdentifierVisitor;
-                    impl<'de> __serde::de::Visitor<'de> for __IdentifierVisitor {
-                        type Value = __Identifier;
-                        fn expecting(
-                            &self,
-                            __formatter: &mut ::core::fmt::Formatter,
-                        ) -> ::core::fmt::Result {
-                            ::core::fmt::Formatter::write_str(__formatter, __EXPECTING_IDENTIFIERS)
-                        }
-                        fn visit_u64<__E>(
-                            self,
-                            __value: u64,
-                        ) -> ::core::result::Result<Self::Value, __E>
-                        where
-                            __E: __serde::de::Error,
-                        {
-                            match __value {
-                                0u64 => ::core::result::Result::Ok(__Identifier::__Identifier0),
-                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
-                            }
-                        }
-                        fn visit_str<__E>(
-                            self,
-                            __value: &str,
-                        ) -> ::core::result::Result<Self::Value, __E>
-                        where
-                            __E: __serde::de::Error,
-                        {
-                            match __value {
-                                "assetId" => {
-                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
-                                }
-                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
-                            }
-                        }
-                        fn visit_bytes<__E>(
-                            self,
-                            __value: &[u8],
-                        ) -> ::core::result::Result<Self::Value, __E>
-                        where
-                            __E: __serde::de::Error,
-                        {
-                            match __value {
-                                b"assetId" => {
-                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
-                                }
-                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
-                            }
-                        }
-                    }
-                    impl<'de> __serde::Deserialize<'de> for __Identifier {
-                        #[inline]
-                        fn deserialize<__D>(
-                            __deserializer: __D,
-                        ) -> ::core::result::Result<Self, __D::Error>
-                        where
-                            __D: __serde::Deserializer<'de>,
-                        {
-                            __serde::Deserializer::deserialize_identifier(
-                                __deserializer,
-                                __IdentifierVisitor,
-                            )
-                        }
-                    }
-                    let mut __field0: ::core::option::Option<RepositoryAssetId> =
-                        ::core::option::Option::None;
-                    while let ::core::option::Option::Some(__key) =
-                        __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
-                    {
-                        match __key {
-                            __Identifier::__Identifier0 => {
-                                if ::core::option::Option::is_some(&__field0) {
-                                    return ::core::result::Result::Err(
-                                        <__A::Error as __serde::de::Error>::duplicate_field(
-                                            "assetId",
-                                        ),
-                                    );
-                                }
-                                __field0 = ::core::option::Option::Some(
-                                    __serde::de::MapAccess::next_value::<RepositoryAssetId>(
-                                        &mut __map,
-                                    )?,
-                                );
-                            }
-                            _ => {
-                                __serde::de::MapAccess::next_value::<__serde::de::IgnoredAny>(
-                                    &mut __map,
-                                )?;
-                            }
-                        }
-                    }
-                    let __field0 = match __field0 {
-                        ::core::option::Option::Some(__value) => __value,
-                        ::core::option::Option::None => {
-                            return ::core::result::Result::Err(
-                                <__A::Error as __serde::de::Error>::missing_field("assetId"),
-                            );
-                        }
-                    };
-                    ::core::result::Result::Ok(QueryAssetRelationsAction { asset_id: __field0 })
-                }
-            }
-            #[doc(hidden)]
-            const __FIELDS: &'static [&'static str] = &["assetId"];
-            __serde::Deserializer::deserialize_struct(
-                __deserializer,
-                "QueryAssetRelationsAction",
-                __FIELDS,
-                __Visitor {
-                    __phantom_vars: ::core::marker::PhantomData,
-                },
-            )
-        }
-    }
-    #[doc = "Output of querying asset relations.\n"]
-    #[derive(Clone, Debug)]
-    pub struct QueryAssetRelationsOutput {
-        #[doc = "Relations where this asset is the source (outgoing).\n"]
-        pub outgoing: ::std::vec::Vec<AssetRelation>,
-        #[doc = "Relations where this asset is the target (incoming).\n"]
-        pub incoming: ::std::vec::Vec<AssetRelation>,
-    }
-    impl QueryAssetRelationsOutput {
-        #[doc = "Creates a new [`QueryAssetRelationsOutput`]."]
-        pub fn new(
-            outgoing: ::std::vec::Vec<AssetRelation>,
-            incoming: ::std::vec::Vec<AssetRelation>,
-        ) -> Self {
-            Self { outgoing, incoming }
-        }
-        #[doc = "Sets the value of `outgoing`."]
-        pub fn set_outgoing(&mut self, outgoing: ::std::vec::Vec<AssetRelation>) -> &mut Self {
-            self.outgoing = outgoing;
-            self
-        }
-        #[doc = "Sets the value of `outgoing`."]
-        pub fn with_outgoing(mut self, outgoing: ::std::vec::Vec<AssetRelation>) -> Self {
-            self.outgoing = outgoing;
-            self
-        }
-        #[doc = "Sets the value of `incoming`."]
-        pub fn set_incoming(&mut self, incoming: ::std::vec::Vec<AssetRelation>) -> &mut Self {
-            self.incoming = incoming;
-            self
-        }
-        #[doc = "Sets the value of `incoming`."]
-        pub fn with_incoming(mut self, incoming: ::std::vec::Vec<AssetRelation>) -> Self {
-            self.incoming = incoming;
-            self
-        }
-    }
-    #[automatically_derived]
-    impl __serde::Serialize for QueryAssetRelationsOutput {
-        fn serialize<__S: __serde::Serializer>(
-            &self,
-            __serializer: __S,
-        ) -> ::std::result::Result<__S::Ok, __S::Error> {
-            let mut __record = __sidex_serde::ser::RecordSerializer::new(
-                __serializer,
-                "QueryAssetRelationsOutput",
-                2usize,
-            )?;
-            __record.serialize_field("outgoing", &self.outgoing)?;
-            __record.serialize_field("incoming", &self.incoming)?;
-            __record.end()
-        }
-    }
-    #[automatically_derived]
-    impl<'de> __serde::Deserialize<'de> for QueryAssetRelationsOutput {
-        fn deserialize<__D: __serde::Deserializer<'de>>(
-            __deserializer: __D,
-        ) -> ::std::result::Result<Self, __D::Error> {
-            #[doc(hidden)]
-            struct __Visitor {
-                __phantom_vars: ::core::marker::PhantomData<fn(&())>,
-            }
-            impl<'de> __serde::de::Visitor<'de> for __Visitor {
-                type Value = QueryAssetRelationsOutput;
-                fn expecting(
-                    &self,
-                    __formatter: &mut ::core::fmt::Formatter,
-                ) -> ::core::fmt::Result {
-                    ::core::fmt::Formatter::write_str(
-                        __formatter,
-                        "record QueryAssetRelationsOutput",
-                    )
-                }
-                #[inline]
-                fn visit_seq<__A>(
-                    self,
-                    mut __seq: __A,
-                ) -> ::core::result::Result<Self::Value, __A::Error>
-                where
-                    __A: __serde::de::SeqAccess<'de>,
-                {
-                    let __field0 = match __serde::de::SeqAccess::next_element::<
-                        ::std::vec::Vec<AssetRelation>,
-                    >(&mut __seq)?
-                    {
-                        ::core::option::Option::Some(__value) => __value,
-                        ::core::option::Option::None => {
-                            return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(0usize, &"record with 2 fields"),
-                            );
-                        }
-                    };
-                    let __field1 = match __serde::de::SeqAccess::next_element::<
-                        ::std::vec::Vec<AssetRelation>,
-                    >(&mut __seq)?
-                    {
-                        ::core::option::Option::Some(__value) => __value,
-                        ::core::option::Option::None => {
-                            return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(1usize, &"record with 2 fields"),
-                            );
-                        }
-                    };
-                    ::core::result::Result::Ok(QueryAssetRelationsOutput {
-                        outgoing: __field0,
-                        incoming: __field1,
-                    })
-                }
-                #[inline]
-                fn visit_map<__A>(
-                    self,
-                    mut __map: __A,
-                ) -> ::core::result::Result<Self::Value, __A::Error>
-                where
-                    __A: __serde::de::MapAccess<'de>,
-                {
-                    #[doc(hidden)]
-                    const __IDENTIFIERS: &'static [&'static str] = &["outgoing", "incoming"];
-                    #[doc(hidden)]
-                    const __EXPECTING_IDENTIFIERS: &'static str =
-                        "an identifier in [\"outgoing\", \"incoming\"]";
-                    #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
-                    #[doc(hidden)]
-                    enum __Identifier {
-                        __Identifier0,
-                        __Identifier1,
-                        __Unknown,
-                    }
-                    #[doc(hidden)]
-                    struct __IdentifierVisitor;
-                    impl<'de> __serde::de::Visitor<'de> for __IdentifierVisitor {
-                        type Value = __Identifier;
-                        fn expecting(
-                            &self,
-                            __formatter: &mut ::core::fmt::Formatter,
-                        ) -> ::core::fmt::Result {
-                            ::core::fmt::Formatter::write_str(__formatter, __EXPECTING_IDENTIFIERS)
-                        }
-                        fn visit_u64<__E>(
-                            self,
-                            __value: u64,
-                        ) -> ::core::result::Result<Self::Value, __E>
-                        where
-                            __E: __serde::de::Error,
-                        {
-                            match __value {
-                                0u64 => ::core::result::Result::Ok(__Identifier::__Identifier0),
-                                1u64 => ::core::result::Result::Ok(__Identifier::__Identifier1),
-                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
-                            }
-                        }
-                        fn visit_str<__E>(
-                            self,
-                            __value: &str,
-                        ) -> ::core::result::Result<Self::Value, __E>
-                        where
-                            __E: __serde::de::Error,
-                        {
-                            match __value {
-                                "outgoing" => {
-                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
-                                }
-                                "incoming" => {
-                                    ::core::result::Result::Ok(__Identifier::__Identifier1)
-                                }
-                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
-                            }
-                        }
-                        fn visit_bytes<__E>(
-                            self,
-                            __value: &[u8],
-                        ) -> ::core::result::Result<Self::Value, __E>
-                        where
-                            __E: __serde::de::Error,
-                        {
-                            match __value {
-                                b"outgoing" => {
-                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
-                                }
-                                b"incoming" => {
-                                    ::core::result::Result::Ok(__Identifier::__Identifier1)
-                                }
-                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
-                            }
-                        }
-                    }
-                    impl<'de> __serde::Deserialize<'de> for __Identifier {
-                        #[inline]
-                        fn deserialize<__D>(
-                            __deserializer: __D,
-                        ) -> ::core::result::Result<Self, __D::Error>
-                        where
-                            __D: __serde::Deserializer<'de>,
-                        {
-                            __serde::Deserializer::deserialize_identifier(
-                                __deserializer,
-                                __IdentifierVisitor,
-                            )
-                        }
-                    }
-                    let mut __field0: ::core::option::Option<::std::vec::Vec<AssetRelation>> =
-                        ::core::option::Option::None;
-                    let mut __field1: ::core::option::Option<::std::vec::Vec<AssetRelation>> =
-                        ::core::option::Option::None;
-                    while let ::core::option::Option::Some(__key) =
-                        __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
-                    {
-                        match __key {
-                            __Identifier::__Identifier0 => {
-                                if ::core::option::Option::is_some(&__field0) {
-                                    return ::core::result::Result::Err(
-                                        <__A::Error as __serde::de::Error>::duplicate_field(
-                                            "outgoing",
-                                        ),
-                                    );
-                                }
-                                __field0 = ::core::option::Option::Some(
-                                    __serde::de::MapAccess::next_value::<
-                                        ::std::vec::Vec<AssetRelation>,
-                                    >(&mut __map)?,
-                                );
-                            }
-                            __Identifier::__Identifier1 => {
-                                if ::core::option::Option::is_some(&__field1) {
-                                    return ::core::result::Result::Err(
-                                        <__A::Error as __serde::de::Error>::duplicate_field(
-                                            "incoming",
-                                        ),
-                                    );
-                                }
-                                __field1 = ::core::option::Option::Some(
-                                    __serde::de::MapAccess::next_value::<
-                                        ::std::vec::Vec<AssetRelation>,
-                                    >(&mut __map)?,
-                                );
-                            }
-                            _ => {
-                                __serde::de::MapAccess::next_value::<__serde::de::IgnoredAny>(
-                                    &mut __map,
-                                )?;
-                            }
-                        }
-                    }
-                    let __field0 = match __field0 {
-                        ::core::option::Option::Some(__value) => __value,
-                        ::core::option::Option::None => {
-                            return ::core::result::Result::Err(
-                                <__A::Error as __serde::de::Error>::missing_field("outgoing"),
-                            );
-                        }
-                    };
-                    let __field1 = match __field1 {
-                        ::core::option::Option::Some(__value) => __value,
-                        ::core::option::Option::None => {
-                            return ::core::result::Result::Err(
-                                <__A::Error as __serde::de::Error>::missing_field("incoming"),
-                            );
-                        }
-                    };
-                    ::core::result::Result::Ok(QueryAssetRelationsOutput {
-                        outgoing: __field0,
-                        incoming: __field1,
-                    })
-                }
-            }
-            #[doc(hidden)]
-            const __FIELDS: &'static [&'static str] = &["outgoing", "incoming"];
-            __serde::Deserializer::deserialize_struct(
-                __deserializer,
-                "QueryAssetRelationsOutput",
                 __FIELDS,
                 __Visitor {
                     __phantom_vars: ::core::marker::PhantomData,
@@ -61799,14 +59722,22 @@ pub mod repositories {
         pub kind: ::std::option::Option<::std::string::String>,
         #[doc = "Number of versions of the package.\n"]
         pub version_count: u64,
+        #[doc = "Package-level metadata.\n"]
+        pub metadata: ::std::collections::HashMap<::std::string::String, super::json::JsonValue>,
     }
     impl GetPackageDetailsOutput {
         #[doc = "Creates a new [`GetPackageDetailsOutput`]."]
-        pub fn new(package_id: PackageId, name: ::std::string::String, version_count: u64) -> Self {
+        pub fn new(
+            package_id: PackageId,
+            name: ::std::string::String,
+            version_count: u64,
+            metadata: ::std::collections::HashMap<::std::string::String, super::json::JsonValue>,
+        ) -> Self {
             Self {
                 package_id,
                 name,
                 version_count,
+                metadata,
                 kind: ::std::default::Default::default(),
             }
         }
@@ -61853,6 +59784,22 @@ pub mod repositories {
             self.version_count = version_count;
             self
         }
+        #[doc = "Sets the value of `metadata`."]
+        pub fn set_metadata(
+            &mut self,
+            metadata: ::std::collections::HashMap<::std::string::String, super::json::JsonValue>,
+        ) -> &mut Self {
+            self.metadata = metadata;
+            self
+        }
+        #[doc = "Sets the value of `metadata`."]
+        pub fn with_metadata(
+            mut self,
+            metadata: ::std::collections::HashMap<::std::string::String, super::json::JsonValue>,
+        ) -> Self {
+            self.metadata = metadata;
+            self
+        }
     }
     #[automatically_derived]
     impl __serde::Serialize for GetPackageDetailsOutput {
@@ -61863,13 +59810,14 @@ pub mod repositories {
             let mut __record = __sidex_serde::ser::RecordSerializer::new(
                 __serializer,
                 "GetPackageDetailsOutput",
-                4usize,
+                5usize,
             )?;
             __record.serialize_field("packageId", &self.package_id)?;
             __record.serialize_field("name", &self.name)?;
             __record
                 .serialize_optional_field("kind", ::core::option::Option::as_ref(&self.kind))?;
             __record.serialize_field("versionCount", &self.version_count)?;
+            __record.serialize_field("metadata", &self.metadata)?;
             __record.end()
         }
     }
@@ -61905,7 +59853,7 @@ pub mod repositories {
                                 return ::core::result::Result::Err(
                                     __serde::de::Error::invalid_length(
                                         0usize,
-                                        &"record with 4 fields",
+                                        &"record with 5 fields",
                                     ),
                                 );
                             }
@@ -61917,7 +59865,7 @@ pub mod repositories {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(1usize, &"record with 4 fields"),
+                                __serde::de::Error::invalid_length(1usize, &"record with 5 fields"),
                             );
                         }
                     };
@@ -61928,7 +59876,7 @@ pub mod repositories {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(2usize, &"record with 4 fields"),
+                                __serde::de::Error::invalid_length(2usize, &"record with 5 fields"),
                             );
                         }
                     };
@@ -61936,7 +59884,18 @@ pub mod repositories {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(3usize, &"record with 4 fields"),
+                                __serde::de::Error::invalid_length(3usize, &"record with 5 fields"),
+                            );
+                        }
+                    };
+                    let __field4 = match __serde::de::SeqAccess::next_element::<
+                        ::std::collections::HashMap<::std::string::String, super::json::JsonValue>,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(4usize, &"record with 5 fields"),
                             );
                         }
                     };
@@ -61945,6 +59904,7 @@ pub mod repositories {
                         name: __field1,
                         kind: __field2,
                         version_count: __field3,
+                        metadata: __field4,
                     })
                 }
                 #[inline]
@@ -61957,10 +59917,9 @@ pub mod repositories {
                 {
                     #[doc(hidden)]
                     const __IDENTIFIERS: &'static [&'static str] =
-                        &["packageId", "name", "kind", "versionCount"];
+                        &["packageId", "name", "kind", "versionCount", "metadata"];
                     #[doc(hidden)]
-                    const __EXPECTING_IDENTIFIERS: &'static str =
-                        "an identifier in [\"packageId\", \"name\", \"kind\", \"versionCount\"]";
+                    const __EXPECTING_IDENTIFIERS: &'static str = "an identifier in [\"packageId\", \"name\", \"kind\", \"versionCount\", \"metadata\"]";
                     #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
                     #[doc(hidden)]
                     enum __Identifier {
@@ -61968,6 +59927,7 @@ pub mod repositories {
                         __Identifier1,
                         __Identifier2,
                         __Identifier3,
+                        __Identifier4,
                         __Unknown,
                     }
                     #[doc(hidden)]
@@ -61992,6 +59952,7 @@ pub mod repositories {
                                 1u64 => ::core::result::Result::Ok(__Identifier::__Identifier1),
                                 2u64 => ::core::result::Result::Ok(__Identifier::__Identifier2),
                                 3u64 => ::core::result::Result::Ok(__Identifier::__Identifier3),
+                                4u64 => ::core::result::Result::Ok(__Identifier::__Identifier4),
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
                         }
@@ -62011,6 +59972,9 @@ pub mod repositories {
                                 "versionCount" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier3)
                                 }
+                                "metadata" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier4)
+                                }
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
                         }
@@ -62029,6 +59993,9 @@ pub mod repositories {
                                 b"kind" => ::core::result::Result::Ok(__Identifier::__Identifier2),
                                 b"versionCount" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier3)
+                                }
+                                b"metadata" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier4)
                                 }
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
@@ -62056,6 +60023,9 @@ pub mod repositories {
                         ::std::option::Option<::std::string::String>,
                     > = ::core::option::Option::None;
                     let mut __field3: ::core::option::Option<u64> = ::core::option::Option::None;
+                    let mut __field4: ::core::option::Option<
+                        ::std::collections::HashMap<::std::string::String, super::json::JsonValue>,
+                    > = ::core::option::Option::None;
                     while let ::core::option::Option::Some(__key) =
                         __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
                     {
@@ -62108,6 +60078,23 @@ pub mod repositories {
                                     __serde::de::MapAccess::next_value::<u64>(&mut __map)?,
                                 );
                             }
+                            __Identifier::__Identifier4 => {
+                                if ::core::option::Option::is_some(&__field4) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "metadata",
+                                        ),
+                                    );
+                                }
+                                __field4 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<
+                                        ::std::collections::HashMap<
+                                            ::std::string::String,
+                                            super::json::JsonValue,
+                                        >,
+                                    >(&mut __map)?,
+                                );
+                            }
                             _ => {
                                 __serde::de::MapAccess::next_value::<__serde::de::IgnoredAny>(
                                     &mut __map,
@@ -62143,17 +60130,26 @@ pub mod repositories {
                             );
                         }
                     };
+                    let __field4 = match __field4 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                <__A::Error as __serde::de::Error>::missing_field("metadata"),
+                            );
+                        }
+                    };
                     ::core::result::Result::Ok(GetPackageDetailsOutput {
                         package_id: __field0,
                         name: __field1,
                         kind: __field2,
                         version_count: __field3,
+                        metadata: __field4,
                     })
                 }
             }
             #[doc(hidden)]
             const __FIELDS: &'static [&'static str] =
-                &["packageId", "name", "kind", "versionCount"];
+                &["packageId", "name", "kind", "versionCount", "metadata"];
             __serde::Deserializer::deserialize_struct(
                 __deserializer,
                 "GetPackageDetailsOutput",
@@ -62173,6 +60169,10 @@ pub mod repositories {
         pub name: ::std::string::String,
         #[doc = "Free-form kind of the package (e.g., \"rugix-app\").\n"]
         pub kind: ::std::option::Option<::std::string::String>,
+        #[doc = "Optional initial metadata.\n"]
+        pub metadata: ::std::option::Option<
+            ::std::collections::HashMap<::std::string::String, super::json::JsonValue>,
+        >,
     }
     impl CreatePackageAction {
         #[doc = "Creates a new [`CreatePackageAction`]."]
@@ -62181,6 +60181,7 @@ pub mod repositories {
                 repository_id,
                 name,
                 kind: ::std::default::Default::default(),
+                metadata: ::std::default::Default::default(),
             }
         }
         #[doc = "Sets the value of `repository_id`."]
@@ -62216,6 +60217,26 @@ pub mod repositories {
             self.kind = kind;
             self
         }
+        #[doc = "Sets the value of `metadata`."]
+        pub fn set_metadata(
+            &mut self,
+            metadata: ::std::option::Option<
+                ::std::collections::HashMap<::std::string::String, super::json::JsonValue>,
+            >,
+        ) -> &mut Self {
+            self.metadata = metadata;
+            self
+        }
+        #[doc = "Sets the value of `metadata`."]
+        pub fn with_metadata(
+            mut self,
+            metadata: ::std::option::Option<
+                ::std::collections::HashMap<::std::string::String, super::json::JsonValue>,
+            >,
+        ) -> Self {
+            self.metadata = metadata;
+            self
+        }
     }
     #[automatically_derived]
     impl __serde::Serialize for CreatePackageAction {
@@ -62226,12 +60247,16 @@ pub mod repositories {
             let mut __record = __sidex_serde::ser::RecordSerializer::new(
                 __serializer,
                 "CreatePackageAction",
-                3usize,
+                4usize,
             )?;
             __record.serialize_field("repositoryId", &self.repository_id)?;
             __record.serialize_field("name", &self.name)?;
             __record
                 .serialize_optional_field("kind", ::core::option::Option::as_ref(&self.kind))?;
+            __record.serialize_optional_field(
+                "metadata",
+                ::core::option::Option::as_ref(&self.metadata),
+            )?;
             __record.end()
         }
     }
@@ -62267,7 +60292,7 @@ pub mod repositories {
                                 return ::core::result::Result::Err(
                                     __serde::de::Error::invalid_length(
                                         0usize,
-                                        &"record with 3 fields",
+                                        &"record with 4 fields",
                                     ),
                                 );
                             }
@@ -62279,7 +60304,7 @@ pub mod repositories {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(1usize, &"record with 3 fields"),
+                                __serde::de::Error::invalid_length(1usize, &"record with 4 fields"),
                             );
                         }
                     };
@@ -62290,7 +60315,23 @@ pub mod repositories {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(2usize, &"record with 3 fields"),
+                                __serde::de::Error::invalid_length(2usize, &"record with 4 fields"),
+                            );
+                        }
+                    };
+                    let __field3 = match __serde::de::SeqAccess::next_element::<
+                        ::std::option::Option<
+                            ::std::collections::HashMap<
+                                ::std::string::String,
+                                super::json::JsonValue,
+                            >,
+                        >,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(3usize, &"record with 4 fields"),
                             );
                         }
                     };
@@ -62298,6 +60339,7 @@ pub mod repositories {
                         repository_id: __field0,
                         name: __field1,
                         kind: __field2,
+                        metadata: __field3,
                     })
                 }
                 #[inline]
@@ -62310,16 +60352,17 @@ pub mod repositories {
                 {
                     #[doc(hidden)]
                     const __IDENTIFIERS: &'static [&'static str] =
-                        &["repositoryId", "name", "kind"];
+                        &["repositoryId", "name", "kind", "metadata"];
                     #[doc(hidden)]
                     const __EXPECTING_IDENTIFIERS: &'static str =
-                        "an identifier in [\"repositoryId\", \"name\", \"kind\"]";
+                        "an identifier in [\"repositoryId\", \"name\", \"kind\", \"metadata\"]";
                     #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
                     #[doc(hidden)]
                     enum __Identifier {
                         __Identifier0,
                         __Identifier1,
                         __Identifier2,
+                        __Identifier3,
                         __Unknown,
                     }
                     #[doc(hidden)]
@@ -62343,6 +60386,7 @@ pub mod repositories {
                                 0u64 => ::core::result::Result::Ok(__Identifier::__Identifier0),
                                 1u64 => ::core::result::Result::Ok(__Identifier::__Identifier1),
                                 2u64 => ::core::result::Result::Ok(__Identifier::__Identifier2),
+                                3u64 => ::core::result::Result::Ok(__Identifier::__Identifier3),
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
                         }
@@ -62359,6 +60403,9 @@ pub mod repositories {
                                 }
                                 "name" => ::core::result::Result::Ok(__Identifier::__Identifier1),
                                 "kind" => ::core::result::Result::Ok(__Identifier::__Identifier2),
+                                "metadata" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier3)
+                                }
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
                         }
@@ -62375,6 +60422,9 @@ pub mod repositories {
                                 }
                                 b"name" => ::core::result::Result::Ok(__Identifier::__Identifier1),
                                 b"kind" => ::core::result::Result::Ok(__Identifier::__Identifier2),
+                                b"metadata" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier3)
+                                }
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
                         }
@@ -62399,6 +60449,14 @@ pub mod repositories {
                         ::core::option::Option::None;
                     let mut __field2: ::core::option::Option<
                         ::std::option::Option<::std::string::String>,
+                    > = ::core::option::Option::None;
+                    let mut __field3: ::core::option::Option<
+                        ::std::option::Option<
+                            ::std::collections::HashMap<
+                                ::std::string::String,
+                                super::json::JsonValue,
+                            >,
+                        >,
                     > = ::core::option::Option::None;
                     while let ::core::option::Option::Some(__key) =
                         __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
@@ -62440,6 +60498,25 @@ pub mod repositories {
                                     >(&mut __map)?,
                                 );
                             }
+                            __Identifier::__Identifier3 => {
+                                if ::core::option::Option::is_some(&__field3) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "metadata",
+                                        ),
+                                    );
+                                }
+                                __field3 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<
+                                        ::std::option::Option<
+                                            ::std::collections::HashMap<
+                                                ::std::string::String,
+                                                super::json::JsonValue,
+                                            >,
+                                        >,
+                                    >(&mut __map)?,
+                                );
+                            }
                             _ => {
                                 __serde::de::MapAccess::next_value::<__serde::de::IgnoredAny>(
                                     &mut __map,
@@ -62467,15 +60544,20 @@ pub mod repositories {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => ::core::option::Option::None,
                     };
+                    let __field3 = match __field3 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => ::core::option::Option::None,
+                    };
                     ::core::result::Result::Ok(CreatePackageAction {
                         repository_id: __field0,
                         name: __field1,
                         kind: __field2,
+                        metadata: __field3,
                     })
                 }
             }
             #[doc(hidden)]
-            const __FIELDS: &'static [&'static str] = &["repositoryId", "name", "kind"];
+            const __FIELDS: &'static [&'static str] = &["repositoryId", "name", "kind", "metadata"];
             __serde::Deserializer::deserialize_struct(
                 __deserializer,
                 "CreatePackageAction",
@@ -63102,6 +61184,295 @@ pub mod repositories {
             __serde::Deserializer::deserialize_struct(
                 __deserializer,
                 "DeletePackageAction",
+                __FIELDS,
+                __Visitor {
+                    __phantom_vars: ::core::marker::PhantomData,
+                },
+            )
+        }
+    }
+    #[doc = "Set metadata on a package.\n"]
+    #[derive(Clone, Debug)]
+    pub struct SetPackageMetadataAction {
+        #[doc = "ID of the package.\n"]
+        pub package_id: PackageId,
+        #[doc = "Metadata to set (replaces existing metadata).\n"]
+        pub metadata: ::std::collections::HashMap<::std::string::String, super::json::JsonValue>,
+    }
+    impl SetPackageMetadataAction {
+        #[doc = "Creates a new [`SetPackageMetadataAction`]."]
+        pub fn new(
+            package_id: PackageId,
+            metadata: ::std::collections::HashMap<::std::string::String, super::json::JsonValue>,
+        ) -> Self {
+            Self {
+                package_id,
+                metadata,
+            }
+        }
+        #[doc = "Sets the value of `package_id`."]
+        pub fn set_package_id(&mut self, package_id: PackageId) -> &mut Self {
+            self.package_id = package_id;
+            self
+        }
+        #[doc = "Sets the value of `package_id`."]
+        pub fn with_package_id(mut self, package_id: PackageId) -> Self {
+            self.package_id = package_id;
+            self
+        }
+        #[doc = "Sets the value of `metadata`."]
+        pub fn set_metadata(
+            &mut self,
+            metadata: ::std::collections::HashMap<::std::string::String, super::json::JsonValue>,
+        ) -> &mut Self {
+            self.metadata = metadata;
+            self
+        }
+        #[doc = "Sets the value of `metadata`."]
+        pub fn with_metadata(
+            mut self,
+            metadata: ::std::collections::HashMap<::std::string::String, super::json::JsonValue>,
+        ) -> Self {
+            self.metadata = metadata;
+            self
+        }
+    }
+    #[automatically_derived]
+    impl __serde::Serialize for SetPackageMetadataAction {
+        fn serialize<__S: __serde::Serializer>(
+            &self,
+            __serializer: __S,
+        ) -> ::std::result::Result<__S::Ok, __S::Error> {
+            let mut __record = __sidex_serde::ser::RecordSerializer::new(
+                __serializer,
+                "SetPackageMetadataAction",
+                2usize,
+            )?;
+            __record.serialize_field("packageId", &self.package_id)?;
+            __record.serialize_field("metadata", &self.metadata)?;
+            __record.end()
+        }
+    }
+    #[automatically_derived]
+    impl<'de> __serde::Deserialize<'de> for SetPackageMetadataAction {
+        fn deserialize<__D: __serde::Deserializer<'de>>(
+            __deserializer: __D,
+        ) -> ::std::result::Result<Self, __D::Error> {
+            #[doc(hidden)]
+            struct __Visitor {
+                __phantom_vars: ::core::marker::PhantomData<fn(&())>,
+            }
+            impl<'de> __serde::de::Visitor<'de> for __Visitor {
+                type Value = SetPackageMetadataAction;
+                fn expecting(
+                    &self,
+                    __formatter: &mut ::core::fmt::Formatter,
+                ) -> ::core::fmt::Result {
+                    ::core::fmt::Formatter::write_str(
+                        __formatter,
+                        "record SetPackageMetadataAction",
+                    )
+                }
+                #[inline]
+                fn visit_seq<__A>(
+                    self,
+                    mut __seq: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::SeqAccess<'de>,
+                {
+                    let __field0 =
+                        match __serde::de::SeqAccess::next_element::<PackageId>(&mut __seq)? {
+                            ::core::option::Option::Some(__value) => __value,
+                            ::core::option::Option::None => {
+                                return ::core::result::Result::Err(
+                                    __serde::de::Error::invalid_length(
+                                        0usize,
+                                        &"record with 2 fields",
+                                    ),
+                                );
+                            }
+                        };
+                    let __field1 = match __serde::de::SeqAccess::next_element::<
+                        ::std::collections::HashMap<::std::string::String, super::json::JsonValue>,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(1usize, &"record with 2 fields"),
+                            );
+                        }
+                    };
+                    ::core::result::Result::Ok(SetPackageMetadataAction {
+                        package_id: __field0,
+                        metadata: __field1,
+                    })
+                }
+                #[inline]
+                fn visit_map<__A>(
+                    self,
+                    mut __map: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::MapAccess<'de>,
+                {
+                    #[doc(hidden)]
+                    const __IDENTIFIERS: &'static [&'static str] = &["packageId", "metadata"];
+                    #[doc(hidden)]
+                    const __EXPECTING_IDENTIFIERS: &'static str =
+                        "an identifier in [\"packageId\", \"metadata\"]";
+                    #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
+                    #[doc(hidden)]
+                    enum __Identifier {
+                        __Identifier0,
+                        __Identifier1,
+                        __Unknown,
+                    }
+                    #[doc(hidden)]
+                    struct __IdentifierVisitor;
+                    impl<'de> __serde::de::Visitor<'de> for __IdentifierVisitor {
+                        type Value = __Identifier;
+                        fn expecting(
+                            &self,
+                            __formatter: &mut ::core::fmt::Formatter,
+                        ) -> ::core::fmt::Result {
+                            ::core::fmt::Formatter::write_str(__formatter, __EXPECTING_IDENTIFIERS)
+                        }
+                        fn visit_u64<__E>(
+                            self,
+                            __value: u64,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                0u64 => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                                1u64 => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_str<__E>(
+                            self,
+                            __value: &str,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                "packageId" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
+                                }
+                                "metadata" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier1)
+                                }
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_bytes<__E>(
+                            self,
+                            __value: &[u8],
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                b"packageId" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
+                                }
+                                b"metadata" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier1)
+                                }
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                    }
+                    impl<'de> __serde::Deserialize<'de> for __Identifier {
+                        #[inline]
+                        fn deserialize<__D>(
+                            __deserializer: __D,
+                        ) -> ::core::result::Result<Self, __D::Error>
+                        where
+                            __D: __serde::Deserializer<'de>,
+                        {
+                            __serde::Deserializer::deserialize_identifier(
+                                __deserializer,
+                                __IdentifierVisitor,
+                            )
+                        }
+                    }
+                    let mut __field0: ::core::option::Option<PackageId> =
+                        ::core::option::Option::None;
+                    let mut __field1: ::core::option::Option<
+                        ::std::collections::HashMap<::std::string::String, super::json::JsonValue>,
+                    > = ::core::option::Option::None;
+                    while let ::core::option::Option::Some(__key) =
+                        __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
+                    {
+                        match __key {
+                            __Identifier::__Identifier0 => {
+                                if ::core::option::Option::is_some(&__field0) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "packageId",
+                                        ),
+                                    );
+                                }
+                                __field0 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<PackageId>(&mut __map)?,
+                                );
+                            }
+                            __Identifier::__Identifier1 => {
+                                if ::core::option::Option::is_some(&__field1) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "metadata",
+                                        ),
+                                    );
+                                }
+                                __field1 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<
+                                        ::std::collections::HashMap<
+                                            ::std::string::String,
+                                            super::json::JsonValue,
+                                        >,
+                                    >(&mut __map)?,
+                                );
+                            }
+                            _ => {
+                                __serde::de::MapAccess::next_value::<__serde::de::IgnoredAny>(
+                                    &mut __map,
+                                )?;
+                            }
+                        }
+                    }
+                    let __field0 = match __field0 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                <__A::Error as __serde::de::Error>::missing_field("packageId"),
+                            );
+                        }
+                    };
+                    let __field1 = match __field1 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                <__A::Error as __serde::de::Error>::missing_field("metadata"),
+                            );
+                        }
+                    };
+                    ::core::result::Result::Ok(SetPackageMetadataAction {
+                        package_id: __field0,
+                        metadata: __field1,
+                    })
+                }
+            }
+            #[doc(hidden)]
+            const __FIELDS: &'static [&'static str] = &["packageId", "metadata"];
+            __serde::Deserializer::deserialize_struct(
+                __deserializer,
+                "SetPackageMetadataAction",
                 __FIELDS,
                 __Visitor {
                     __phantom_vars: ::core::marker::PhantomData,
@@ -65446,6 +63817,8 @@ pub mod repositories {
         pub digest: super::digest::Digest,
         #[doc = "Status of the asset.\n"]
         pub status: RepositoryAssetStatus,
+        #[doc = "Arbitrary metadata associated with this asset in the version.\n"]
+        pub metadata: ::std::collections::HashMap<::std::string::String, super::json::JsonValue>,
     }
     impl PackageVersionAsset {
         #[doc = "Creates a new [`PackageVersionAsset`]."]
@@ -65455,6 +63828,7 @@ pub mod repositories {
             size: u64,
             digest: super::digest::Digest,
             status: RepositoryAssetStatus,
+            metadata: ::std::collections::HashMap<::std::string::String, super::json::JsonValue>,
         ) -> Self {
             Self {
                 filename,
@@ -65462,6 +63836,7 @@ pub mod repositories {
                 size,
                 digest,
                 status,
+                metadata,
             }
         }
         #[doc = "Sets the value of `filename`."]
@@ -65514,6 +63889,22 @@ pub mod repositories {
             self.status = status;
             self
         }
+        #[doc = "Sets the value of `metadata`."]
+        pub fn set_metadata(
+            &mut self,
+            metadata: ::std::collections::HashMap<::std::string::String, super::json::JsonValue>,
+        ) -> &mut Self {
+            self.metadata = metadata;
+            self
+        }
+        #[doc = "Sets the value of `metadata`."]
+        pub fn with_metadata(
+            mut self,
+            metadata: ::std::collections::HashMap<::std::string::String, super::json::JsonValue>,
+        ) -> Self {
+            self.metadata = metadata;
+            self
+        }
     }
     #[automatically_derived]
     impl __serde::Serialize for PackageVersionAsset {
@@ -65524,13 +63915,14 @@ pub mod repositories {
             let mut __record = __sidex_serde::ser::RecordSerializer::new(
                 __serializer,
                 "PackageVersionAsset",
-                5usize,
+                6usize,
             )?;
             __record.serialize_field("filename", &self.filename)?;
             __record.serialize_field("assetId", &self.asset_id)?;
             __record.serialize_field("size", &self.size)?;
             __record.serialize_field("digest", &self.digest)?;
             __record.serialize_field("status", &self.status)?;
+            __record.serialize_field("metadata", &self.metadata)?;
             __record.end()
         }
     }
@@ -65566,7 +63958,7 @@ pub mod repositories {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(0usize, &"record with 5 fields"),
+                                __serde::de::Error::invalid_length(0usize, &"record with 6 fields"),
                             );
                         }
                     };
@@ -65576,7 +63968,7 @@ pub mod repositories {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(1usize, &"record with 5 fields"),
+                                __serde::de::Error::invalid_length(1usize, &"record with 6 fields"),
                             );
                         }
                     };
@@ -65584,7 +63976,7 @@ pub mod repositories {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(2usize, &"record with 5 fields"),
+                                __serde::de::Error::invalid_length(2usize, &"record with 6 fields"),
                             );
                         }
                     };
@@ -65595,7 +63987,7 @@ pub mod repositories {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(3usize, &"record with 5 fields"),
+                                __serde::de::Error::invalid_length(3usize, &"record with 6 fields"),
                             );
                         }
                     };
@@ -65606,7 +63998,18 @@ pub mod repositories {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(4usize, &"record with 5 fields"),
+                                __serde::de::Error::invalid_length(4usize, &"record with 6 fields"),
+                            );
+                        }
+                    };
+                    let __field5 = match __serde::de::SeqAccess::next_element::<
+                        ::std::collections::HashMap<::std::string::String, super::json::JsonValue>,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(5usize, &"record with 6 fields"),
                             );
                         }
                     };
@@ -65616,6 +64019,7 @@ pub mod repositories {
                         size: __field2,
                         digest: __field3,
                         status: __field4,
+                        metadata: __field5,
                     })
                 }
                 #[inline]
@@ -65627,10 +64031,11 @@ pub mod repositories {
                     __A: __serde::de::MapAccess<'de>,
                 {
                     #[doc(hidden)]
-                    const __IDENTIFIERS: &'static [&'static str] =
-                        &["filename", "assetId", "size", "digest", "status"];
+                    const __IDENTIFIERS: &'static [&'static str] = &[
+                        "filename", "assetId", "size", "digest", "status", "metadata",
+                    ];
                     #[doc(hidden)]
-                    const __EXPECTING_IDENTIFIERS: &'static str = "an identifier in [\"filename\", \"assetId\", \"size\", \"digest\", \"status\"]";
+                    const __EXPECTING_IDENTIFIERS: &'static str = "an identifier in [\"filename\", \"assetId\", \"size\", \"digest\", \"status\", \"metadata\"]";
                     #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
                     #[doc(hidden)]
                     enum __Identifier {
@@ -65639,6 +64044,7 @@ pub mod repositories {
                         __Identifier2,
                         __Identifier3,
                         __Identifier4,
+                        __Identifier5,
                         __Unknown,
                     }
                     #[doc(hidden)]
@@ -65664,6 +64070,7 @@ pub mod repositories {
                                 2u64 => ::core::result::Result::Ok(__Identifier::__Identifier2),
                                 3u64 => ::core::result::Result::Ok(__Identifier::__Identifier3),
                                 4u64 => ::core::result::Result::Ok(__Identifier::__Identifier4),
+                                5u64 => ::core::result::Result::Ok(__Identifier::__Identifier5),
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
                         }
@@ -65684,6 +64091,9 @@ pub mod repositories {
                                 "size" => ::core::result::Result::Ok(__Identifier::__Identifier2),
                                 "digest" => ::core::result::Result::Ok(__Identifier::__Identifier3),
                                 "status" => ::core::result::Result::Ok(__Identifier::__Identifier4),
+                                "metadata" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier5)
+                                }
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
                         }
@@ -65707,6 +64117,9 @@ pub mod repositories {
                                 }
                                 b"status" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier4)
+                                }
+                                b"metadata" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier5)
                                 }
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
@@ -65735,6 +64148,9 @@ pub mod repositories {
                         ::core::option::Option::None;
                     let mut __field4: ::core::option::Option<RepositoryAssetStatus> =
                         ::core::option::Option::None;
+                    let mut __field5: ::core::option::Option<
+                        ::std::collections::HashMap<::std::string::String, super::json::JsonValue>,
+                    > = ::core::option::Option::None;
                     while let ::core::option::Option::Some(__key) =
                         __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
                     {
@@ -65805,6 +64221,23 @@ pub mod repositories {
                                     )?,
                                 );
                             }
+                            __Identifier::__Identifier5 => {
+                                if ::core::option::Option::is_some(&__field5) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "metadata",
+                                        ),
+                                    );
+                                }
+                                __field5 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<
+                                        ::std::collections::HashMap<
+                                            ::std::string::String,
+                                            super::json::JsonValue,
+                                        >,
+                                    >(&mut __map)?,
+                                );
+                            }
                             _ => {
                                 __serde::de::MapAccess::next_value::<__serde::de::IgnoredAny>(
                                     &mut __map,
@@ -65852,18 +64285,28 @@ pub mod repositories {
                             );
                         }
                     };
+                    let __field5 = match __field5 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                <__A::Error as __serde::de::Error>::missing_field("metadata"),
+                            );
+                        }
+                    };
                     ::core::result::Result::Ok(PackageVersionAsset {
                         filename: __field0,
                         asset_id: __field1,
                         size: __field2,
                         digest: __field3,
                         status: __field4,
+                        metadata: __field5,
                     })
                 }
             }
             #[doc(hidden)]
-            const __FIELDS: &'static [&'static str] =
-                &["filename", "assetId", "size", "digest", "status"];
+            const __FIELDS: &'static [&'static str] = &[
+                "filename", "assetId", "size", "digest", "status", "metadata",
+            ];
             __serde::Deserializer::deserialize_struct(
                 __deserializer,
                 "PackageVersionAsset",
@@ -66974,6 +65417,8 @@ pub mod repositories {
         pub assets: ::std::vec::Vec<PackageVersionAsset>,
         #[doc = "Tags of the version.\n"]
         pub tags: ::std::vec::Vec<PackageVersionTag>,
+        #[doc = "Version-level metadata.\n"]
+        pub metadata: ::std::collections::HashMap<::std::string::String, super::json::JsonValue>,
     }
     impl GetPackageVersionDetailsOutput {
         #[doc = "Creates a new [`GetPackageVersionDetailsOutput`]."]
@@ -66983,6 +65428,7 @@ pub mod repositories {
             package_id: PackageId,
             assets: ::std::vec::Vec<PackageVersionAsset>,
             tags: ::std::vec::Vec<PackageVersionTag>,
+            metadata: ::std::collections::HashMap<::std::string::String, super::json::JsonValue>,
         ) -> Self {
             Self {
                 version_id,
@@ -66990,6 +65436,7 @@ pub mod repositories {
                 package_id,
                 assets,
                 tags,
+                metadata,
                 name: ::std::default::Default::default(),
             }
         }
@@ -67056,6 +65503,22 @@ pub mod repositories {
             self.tags = tags;
             self
         }
+        #[doc = "Sets the value of `metadata`."]
+        pub fn set_metadata(
+            &mut self,
+            metadata: ::std::collections::HashMap<::std::string::String, super::json::JsonValue>,
+        ) -> &mut Self {
+            self.metadata = metadata;
+            self
+        }
+        #[doc = "Sets the value of `metadata`."]
+        pub fn with_metadata(
+            mut self,
+            metadata: ::std::collections::HashMap<::std::string::String, super::json::JsonValue>,
+        ) -> Self {
+            self.metadata = metadata;
+            self
+        }
     }
     #[automatically_derived]
     impl __serde::Serialize for GetPackageVersionDetailsOutput {
@@ -67066,7 +65529,7 @@ pub mod repositories {
             let mut __record = __sidex_serde::ser::RecordSerializer::new(
                 __serializer,
                 "GetPackageVersionDetailsOutput",
-                6usize,
+                7usize,
             )?;
             __record.serialize_field("versionId", &self.version_id)?;
             __record.serialize_field("repositoryId", &self.repository_id)?;
@@ -67075,6 +65538,7 @@ pub mod repositories {
                 .serialize_optional_field("name", ::core::option::Option::as_ref(&self.name))?;
             __record.serialize_field("assets", &self.assets)?;
             __record.serialize_field("tags", &self.tags)?;
+            __record.serialize_field("metadata", &self.metadata)?;
             __record.end()
         }
     }
@@ -67114,7 +65578,7 @@ pub mod repositories {
                                 return ::core::result::Result::Err(
                                     __serde::de::Error::invalid_length(
                                         0usize,
-                                        &"record with 6 fields",
+                                        &"record with 7 fields",
                                     ),
                                 );
                             }
@@ -67126,7 +65590,7 @@ pub mod repositories {
                                 return ::core::result::Result::Err(
                                     __serde::de::Error::invalid_length(
                                         1usize,
-                                        &"record with 6 fields",
+                                        &"record with 7 fields",
                                     ),
                                 );
                             }
@@ -67138,7 +65602,7 @@ pub mod repositories {
                                 return ::core::result::Result::Err(
                                     __serde::de::Error::invalid_length(
                                         2usize,
-                                        &"record with 6 fields",
+                                        &"record with 7 fields",
                                     ),
                                 );
                             }
@@ -67150,7 +65614,7 @@ pub mod repositories {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(3usize, &"record with 6 fields"),
+                                __serde::de::Error::invalid_length(3usize, &"record with 7 fields"),
                             );
                         }
                     };
@@ -67161,7 +65625,7 @@ pub mod repositories {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(4usize, &"record with 6 fields"),
+                                __serde::de::Error::invalid_length(4usize, &"record with 7 fields"),
                             );
                         }
                     };
@@ -67172,7 +65636,18 @@ pub mod repositories {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(5usize, &"record with 6 fields"),
+                                __serde::de::Error::invalid_length(5usize, &"record with 7 fields"),
+                            );
+                        }
+                    };
+                    let __field6 = match __serde::de::SeqAccess::next_element::<
+                        ::std::collections::HashMap<::std::string::String, super::json::JsonValue>,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(6usize, &"record with 7 fields"),
                             );
                         }
                     };
@@ -67183,6 +65658,7 @@ pub mod repositories {
                         name: __field3,
                         assets: __field4,
                         tags: __field5,
+                        metadata: __field6,
                     })
                 }
                 #[inline]
@@ -67201,9 +65677,10 @@ pub mod repositories {
                         "name",
                         "assets",
                         "tags",
+                        "metadata",
                     ];
                     #[doc(hidden)]
-                    const __EXPECTING_IDENTIFIERS: &'static str = "an identifier in [\"versionId\", \"repositoryId\", \"packageId\", \"name\", \"assets\", \"tags\"]";
+                    const __EXPECTING_IDENTIFIERS: &'static str = "an identifier in [\"versionId\", \"repositoryId\", \"packageId\", \"name\", \"assets\", \"tags\", \"metadata\"]";
                     #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
                     #[doc(hidden)]
                     enum __Identifier {
@@ -67213,6 +65690,7 @@ pub mod repositories {
                         __Identifier3,
                         __Identifier4,
                         __Identifier5,
+                        __Identifier6,
                         __Unknown,
                     }
                     #[doc(hidden)]
@@ -67239,6 +65717,7 @@ pub mod repositories {
                                 3u64 => ::core::result::Result::Ok(__Identifier::__Identifier3),
                                 4u64 => ::core::result::Result::Ok(__Identifier::__Identifier4),
                                 5u64 => ::core::result::Result::Ok(__Identifier::__Identifier5),
+                                6u64 => ::core::result::Result::Ok(__Identifier::__Identifier6),
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
                         }
@@ -67262,6 +65741,9 @@ pub mod repositories {
                                 "name" => ::core::result::Result::Ok(__Identifier::__Identifier3),
                                 "assets" => ::core::result::Result::Ok(__Identifier::__Identifier4),
                                 "tags" => ::core::result::Result::Ok(__Identifier::__Identifier5),
+                                "metadata" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier6)
+                                }
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
                         }
@@ -67287,6 +65769,9 @@ pub mod repositories {
                                     ::core::result::Result::Ok(__Identifier::__Identifier4)
                                 }
                                 b"tags" => ::core::result::Result::Ok(__Identifier::__Identifier5),
+                                b"metadata" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier6)
+                                }
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
                         }
@@ -67318,6 +65803,9 @@ pub mod repositories {
                         ::core::option::Option::None;
                     let mut __field5: ::core::option::Option<::std::vec::Vec<PackageVersionTag>> =
                         ::core::option::Option::None;
+                    let mut __field6: ::core::option::Option<
+                        ::std::collections::HashMap<::std::string::String, super::json::JsonValue>,
+                    > = ::core::option::Option::None;
                     while let ::core::option::Option::Some(__key) =
                         __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
                     {
@@ -67398,6 +65886,23 @@ pub mod repositories {
                                     >(&mut __map)?,
                                 );
                             }
+                            __Identifier::__Identifier6 => {
+                                if ::core::option::Option::is_some(&__field6) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "metadata",
+                                        ),
+                                    );
+                                }
+                                __field6 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<
+                                        ::std::collections::HashMap<
+                                            ::std::string::String,
+                                            super::json::JsonValue,
+                                        >,
+                                    >(&mut __map)?,
+                                );
+                            }
                             _ => {
                                 __serde::de::MapAccess::next_value::<__serde::de::IgnoredAny>(
                                     &mut __map,
@@ -67449,6 +65954,14 @@ pub mod repositories {
                             );
                         }
                     };
+                    let __field6 = match __field6 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                <__A::Error as __serde::de::Error>::missing_field("metadata"),
+                            );
+                        }
+                    };
                     ::core::result::Result::Ok(GetPackageVersionDetailsOutput {
                         version_id: __field0,
                         repository_id: __field1,
@@ -67456,6 +65969,7 @@ pub mod repositories {
                         name: __field3,
                         assets: __field4,
                         tags: __field5,
+                        metadata: __field6,
                     })
                 }
             }
@@ -67467,6 +65981,7 @@ pub mod repositories {
                 "name",
                 "assets",
                 "tags",
+                "metadata",
             ];
             __serde::Deserializer::deserialize_struct(
                 __deserializer,
@@ -67487,6 +66002,10 @@ pub mod repositories {
         pub name: ::std::option::Option<::std::string::String>,
         #[doc = "Tags to add to the package version.\n"]
         pub tags: ::std::option::Option<::std::vec::Vec<AddTagItem>>,
+        #[doc = "Optional initial metadata.\n"]
+        pub metadata: ::std::option::Option<
+            ::std::collections::HashMap<::std::string::String, super::json::JsonValue>,
+        >,
     }
     impl CreatePackageVersionAction {
         #[doc = "Creates a new [`CreatePackageVersionAction`]."]
@@ -67495,6 +66014,7 @@ pub mod repositories {
                 package_id,
                 name: ::std::default::Default::default(),
                 tags: ::std::default::Default::default(),
+                metadata: ::std::default::Default::default(),
             }
         }
         #[doc = "Sets the value of `package_id`."]
@@ -67536,6 +66056,26 @@ pub mod repositories {
             self.tags = tags;
             self
         }
+        #[doc = "Sets the value of `metadata`."]
+        pub fn set_metadata(
+            &mut self,
+            metadata: ::std::option::Option<
+                ::std::collections::HashMap<::std::string::String, super::json::JsonValue>,
+            >,
+        ) -> &mut Self {
+            self.metadata = metadata;
+            self
+        }
+        #[doc = "Sets the value of `metadata`."]
+        pub fn with_metadata(
+            mut self,
+            metadata: ::std::option::Option<
+                ::std::collections::HashMap<::std::string::String, super::json::JsonValue>,
+            >,
+        ) -> Self {
+            self.metadata = metadata;
+            self
+        }
     }
     #[automatically_derived]
     impl __serde::Serialize for CreatePackageVersionAction {
@@ -67546,13 +66086,17 @@ pub mod repositories {
             let mut __record = __sidex_serde::ser::RecordSerializer::new(
                 __serializer,
                 "CreatePackageVersionAction",
-                3usize,
+                4usize,
             )?;
             __record.serialize_field("packageId", &self.package_id)?;
             __record
                 .serialize_optional_field("name", ::core::option::Option::as_ref(&self.name))?;
             __record
                 .serialize_optional_field("tags", ::core::option::Option::as_ref(&self.tags))?;
+            __record.serialize_optional_field(
+                "metadata",
+                ::core::option::Option::as_ref(&self.metadata),
+            )?;
             __record.end()
         }
     }
@@ -67591,7 +66135,7 @@ pub mod repositories {
                                 return ::core::result::Result::Err(
                                     __serde::de::Error::invalid_length(
                                         0usize,
-                                        &"record with 3 fields",
+                                        &"record with 4 fields",
                                     ),
                                 );
                             }
@@ -67603,7 +66147,7 @@ pub mod repositories {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(1usize, &"record with 3 fields"),
+                                __serde::de::Error::invalid_length(1usize, &"record with 4 fields"),
                             );
                         }
                     };
@@ -67614,7 +66158,23 @@ pub mod repositories {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(2usize, &"record with 3 fields"),
+                                __serde::de::Error::invalid_length(2usize, &"record with 4 fields"),
+                            );
+                        }
+                    };
+                    let __field3 = match __serde::de::SeqAccess::next_element::<
+                        ::std::option::Option<
+                            ::std::collections::HashMap<
+                                ::std::string::String,
+                                super::json::JsonValue,
+                            >,
+                        >,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(3usize, &"record with 4 fields"),
                             );
                         }
                     };
@@ -67622,6 +66182,7 @@ pub mod repositories {
                         package_id: __field0,
                         name: __field1,
                         tags: __field2,
+                        metadata: __field3,
                     })
                 }
                 #[inline]
@@ -67633,16 +66194,18 @@ pub mod repositories {
                     __A: __serde::de::MapAccess<'de>,
                 {
                     #[doc(hidden)]
-                    const __IDENTIFIERS: &'static [&'static str] = &["packageId", "name", "tags"];
+                    const __IDENTIFIERS: &'static [&'static str] =
+                        &["packageId", "name", "tags", "metadata"];
                     #[doc(hidden)]
                     const __EXPECTING_IDENTIFIERS: &'static str =
-                        "an identifier in [\"packageId\", \"name\", \"tags\"]";
+                        "an identifier in [\"packageId\", \"name\", \"tags\", \"metadata\"]";
                     #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
                     #[doc(hidden)]
                     enum __Identifier {
                         __Identifier0,
                         __Identifier1,
                         __Identifier2,
+                        __Identifier3,
                         __Unknown,
                     }
                     #[doc(hidden)]
@@ -67666,6 +66229,7 @@ pub mod repositories {
                                 0u64 => ::core::result::Result::Ok(__Identifier::__Identifier0),
                                 1u64 => ::core::result::Result::Ok(__Identifier::__Identifier1),
                                 2u64 => ::core::result::Result::Ok(__Identifier::__Identifier2),
+                                3u64 => ::core::result::Result::Ok(__Identifier::__Identifier3),
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
                         }
@@ -67682,6 +66246,9 @@ pub mod repositories {
                                 }
                                 "name" => ::core::result::Result::Ok(__Identifier::__Identifier1),
                                 "tags" => ::core::result::Result::Ok(__Identifier::__Identifier2),
+                                "metadata" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier3)
+                                }
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
                         }
@@ -67698,6 +66265,9 @@ pub mod repositories {
                                 }
                                 b"name" => ::core::result::Result::Ok(__Identifier::__Identifier1),
                                 b"tags" => ::core::result::Result::Ok(__Identifier::__Identifier2),
+                                b"metadata" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier3)
+                                }
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
                         }
@@ -67723,6 +66293,14 @@ pub mod repositories {
                     > = ::core::option::Option::None;
                     let mut __field2: ::core::option::Option<
                         ::std::option::Option<::std::vec::Vec<AddTagItem>>,
+                    > = ::core::option::Option::None;
+                    let mut __field3: ::core::option::Option<
+                        ::std::option::Option<
+                            ::std::collections::HashMap<
+                                ::std::string::String,
+                                super::json::JsonValue,
+                            >,
+                        >,
                     > = ::core::option::Option::None;
                     while let ::core::option::Option::Some(__key) =
                         __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
@@ -67764,6 +66342,25 @@ pub mod repositories {
                                     >(&mut __map)?,
                                 );
                             }
+                            __Identifier::__Identifier3 => {
+                                if ::core::option::Option::is_some(&__field3) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "metadata",
+                                        ),
+                                    );
+                                }
+                                __field3 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<
+                                        ::std::option::Option<
+                                            ::std::collections::HashMap<
+                                                ::std::string::String,
+                                                super::json::JsonValue,
+                                            >,
+                                        >,
+                                    >(&mut __map)?,
+                                );
+                            }
                             _ => {
                                 __serde::de::MapAccess::next_value::<__serde::de::IgnoredAny>(
                                     &mut __map,
@@ -67787,15 +66384,20 @@ pub mod repositories {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => ::core::option::Option::None,
                     };
+                    let __field3 = match __field3 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => ::core::option::Option::None,
+                    };
                     ::core::result::Result::Ok(CreatePackageVersionAction {
                         package_id: __field0,
                         name: __field1,
                         tags: __field2,
+                        metadata: __field3,
                     })
                 }
             }
             #[doc(hidden)]
-            const __FIELDS: &'static [&'static str] = &["packageId", "name", "tags"];
+            const __FIELDS: &'static [&'static str] = &["packageId", "name", "tags", "metadata"];
             __serde::Deserializer::deserialize_struct(
                 __deserializer,
                 "CreatePackageVersionAction",
@@ -68690,7 +67292,299 @@ pub mod repositories {
             )
         }
     }
-    #[doc = "Add an assert to a package version.\n"]
+    #[doc = "Set metadata on a package version.\n"]
+    #[derive(Clone, Debug)]
+    pub struct SetPackageVersionMetadataAction {
+        #[doc = "ID of the package version.\n"]
+        pub version_id: PackageVersionId,
+        #[doc = "Metadata to set (replaces existing metadata).\n"]
+        pub metadata: ::std::collections::HashMap<::std::string::String, super::json::JsonValue>,
+    }
+    impl SetPackageVersionMetadataAction {
+        #[doc = "Creates a new [`SetPackageVersionMetadataAction`]."]
+        pub fn new(
+            version_id: PackageVersionId,
+            metadata: ::std::collections::HashMap<::std::string::String, super::json::JsonValue>,
+        ) -> Self {
+            Self {
+                version_id,
+                metadata,
+            }
+        }
+        #[doc = "Sets the value of `version_id`."]
+        pub fn set_version_id(&mut self, version_id: PackageVersionId) -> &mut Self {
+            self.version_id = version_id;
+            self
+        }
+        #[doc = "Sets the value of `version_id`."]
+        pub fn with_version_id(mut self, version_id: PackageVersionId) -> Self {
+            self.version_id = version_id;
+            self
+        }
+        #[doc = "Sets the value of `metadata`."]
+        pub fn set_metadata(
+            &mut self,
+            metadata: ::std::collections::HashMap<::std::string::String, super::json::JsonValue>,
+        ) -> &mut Self {
+            self.metadata = metadata;
+            self
+        }
+        #[doc = "Sets the value of `metadata`."]
+        pub fn with_metadata(
+            mut self,
+            metadata: ::std::collections::HashMap<::std::string::String, super::json::JsonValue>,
+        ) -> Self {
+            self.metadata = metadata;
+            self
+        }
+    }
+    #[automatically_derived]
+    impl __serde::Serialize for SetPackageVersionMetadataAction {
+        fn serialize<__S: __serde::Serializer>(
+            &self,
+            __serializer: __S,
+        ) -> ::std::result::Result<__S::Ok, __S::Error> {
+            let mut __record = __sidex_serde::ser::RecordSerializer::new(
+                __serializer,
+                "SetPackageVersionMetadataAction",
+                2usize,
+            )?;
+            __record.serialize_field("versionId", &self.version_id)?;
+            __record.serialize_field("metadata", &self.metadata)?;
+            __record.end()
+        }
+    }
+    #[automatically_derived]
+    impl<'de> __serde::Deserialize<'de> for SetPackageVersionMetadataAction {
+        fn deserialize<__D: __serde::Deserializer<'de>>(
+            __deserializer: __D,
+        ) -> ::std::result::Result<Self, __D::Error> {
+            #[doc(hidden)]
+            struct __Visitor {
+                __phantom_vars: ::core::marker::PhantomData<fn(&())>,
+            }
+            impl<'de> __serde::de::Visitor<'de> for __Visitor {
+                type Value = SetPackageVersionMetadataAction;
+                fn expecting(
+                    &self,
+                    __formatter: &mut ::core::fmt::Formatter,
+                ) -> ::core::fmt::Result {
+                    ::core::fmt::Formatter::write_str(
+                        __formatter,
+                        "record SetPackageVersionMetadataAction",
+                    )
+                }
+                #[inline]
+                fn visit_seq<__A>(
+                    self,
+                    mut __seq: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::SeqAccess<'de>,
+                {
+                    let __field0 =
+                        match __serde::de::SeqAccess::next_element::<PackageVersionId>(&mut __seq)?
+                        {
+                            ::core::option::Option::Some(__value) => __value,
+                            ::core::option::Option::None => {
+                                return ::core::result::Result::Err(
+                                    __serde::de::Error::invalid_length(
+                                        0usize,
+                                        &"record with 2 fields",
+                                    ),
+                                );
+                            }
+                        };
+                    let __field1 = match __serde::de::SeqAccess::next_element::<
+                        ::std::collections::HashMap<::std::string::String, super::json::JsonValue>,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(1usize, &"record with 2 fields"),
+                            );
+                        }
+                    };
+                    ::core::result::Result::Ok(SetPackageVersionMetadataAction {
+                        version_id: __field0,
+                        metadata: __field1,
+                    })
+                }
+                #[inline]
+                fn visit_map<__A>(
+                    self,
+                    mut __map: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::MapAccess<'de>,
+                {
+                    #[doc(hidden)]
+                    const __IDENTIFIERS: &'static [&'static str] = &["versionId", "metadata"];
+                    #[doc(hidden)]
+                    const __EXPECTING_IDENTIFIERS: &'static str =
+                        "an identifier in [\"versionId\", \"metadata\"]";
+                    #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
+                    #[doc(hidden)]
+                    enum __Identifier {
+                        __Identifier0,
+                        __Identifier1,
+                        __Unknown,
+                    }
+                    #[doc(hidden)]
+                    struct __IdentifierVisitor;
+                    impl<'de> __serde::de::Visitor<'de> for __IdentifierVisitor {
+                        type Value = __Identifier;
+                        fn expecting(
+                            &self,
+                            __formatter: &mut ::core::fmt::Formatter,
+                        ) -> ::core::fmt::Result {
+                            ::core::fmt::Formatter::write_str(__formatter, __EXPECTING_IDENTIFIERS)
+                        }
+                        fn visit_u64<__E>(
+                            self,
+                            __value: u64,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                0u64 => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                                1u64 => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_str<__E>(
+                            self,
+                            __value: &str,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                "versionId" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
+                                }
+                                "metadata" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier1)
+                                }
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_bytes<__E>(
+                            self,
+                            __value: &[u8],
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                b"versionId" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
+                                }
+                                b"metadata" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier1)
+                                }
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                    }
+                    impl<'de> __serde::Deserialize<'de> for __Identifier {
+                        #[inline]
+                        fn deserialize<__D>(
+                            __deserializer: __D,
+                        ) -> ::core::result::Result<Self, __D::Error>
+                        where
+                            __D: __serde::Deserializer<'de>,
+                        {
+                            __serde::Deserializer::deserialize_identifier(
+                                __deserializer,
+                                __IdentifierVisitor,
+                            )
+                        }
+                    }
+                    let mut __field0: ::core::option::Option<PackageVersionId> =
+                        ::core::option::Option::None;
+                    let mut __field1: ::core::option::Option<
+                        ::std::collections::HashMap<::std::string::String, super::json::JsonValue>,
+                    > = ::core::option::Option::None;
+                    while let ::core::option::Option::Some(__key) =
+                        __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
+                    {
+                        match __key {
+                            __Identifier::__Identifier0 => {
+                                if ::core::option::Option::is_some(&__field0) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "versionId",
+                                        ),
+                                    );
+                                }
+                                __field0 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<PackageVersionId>(
+                                        &mut __map,
+                                    )?,
+                                );
+                            }
+                            __Identifier::__Identifier1 => {
+                                if ::core::option::Option::is_some(&__field1) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "metadata",
+                                        ),
+                                    );
+                                }
+                                __field1 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<
+                                        ::std::collections::HashMap<
+                                            ::std::string::String,
+                                            super::json::JsonValue,
+                                        >,
+                                    >(&mut __map)?,
+                                );
+                            }
+                            _ => {
+                                __serde::de::MapAccess::next_value::<__serde::de::IgnoredAny>(
+                                    &mut __map,
+                                )?;
+                            }
+                        }
+                    }
+                    let __field0 = match __field0 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                <__A::Error as __serde::de::Error>::missing_field("versionId"),
+                            );
+                        }
+                    };
+                    let __field1 = match __field1 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                <__A::Error as __serde::de::Error>::missing_field("metadata"),
+                            );
+                        }
+                    };
+                    ::core::result::Result::Ok(SetPackageVersionMetadataAction {
+                        version_id: __field0,
+                        metadata: __field1,
+                    })
+                }
+            }
+            #[doc(hidden)]
+            const __FIELDS: &'static [&'static str] = &["versionId", "metadata"];
+            __serde::Deserializer::deserialize_struct(
+                __deserializer,
+                "SetPackageVersionMetadataAction",
+                __FIELDS,
+                __Visitor {
+                    __phantom_vars: ::core::marker::PhantomData,
+                },
+            )
+        }
+    }
+    #[doc = "Add an asset to a package version.\n"]
     #[derive(Clone, Debug)]
     pub struct AddPackageVersionAssetAction {
         #[doc = "ID of the package version.\n"]
@@ -68699,6 +67593,10 @@ pub mod repositories {
         pub asset_id: RepositoryAssetId,
         #[doc = "Filename of the asset.\n"]
         pub filename: ::std::string::String,
+        #[doc = "Optional metadata to associate with this asset in the version.\n"]
+        pub metadata: ::std::option::Option<
+            ::std::collections::HashMap<::std::string::String, super::json::JsonValue>,
+        >,
     }
     impl AddPackageVersionAssetAction {
         #[doc = "Creates a new [`AddPackageVersionAssetAction`]."]
@@ -68711,6 +67609,7 @@ pub mod repositories {
                 version_id,
                 asset_id,
                 filename,
+                metadata: ::std::default::Default::default(),
             }
         }
         #[doc = "Sets the value of `version_id`."]
@@ -68743,6 +67642,26 @@ pub mod repositories {
             self.filename = filename;
             self
         }
+        #[doc = "Sets the value of `metadata`."]
+        pub fn set_metadata(
+            &mut self,
+            metadata: ::std::option::Option<
+                ::std::collections::HashMap<::std::string::String, super::json::JsonValue>,
+            >,
+        ) -> &mut Self {
+            self.metadata = metadata;
+            self
+        }
+        #[doc = "Sets the value of `metadata`."]
+        pub fn with_metadata(
+            mut self,
+            metadata: ::std::option::Option<
+                ::std::collections::HashMap<::std::string::String, super::json::JsonValue>,
+            >,
+        ) -> Self {
+            self.metadata = metadata;
+            self
+        }
     }
     #[automatically_derived]
     impl __serde::Serialize for AddPackageVersionAssetAction {
@@ -68753,11 +67672,15 @@ pub mod repositories {
             let mut __record = __sidex_serde::ser::RecordSerializer::new(
                 __serializer,
                 "AddPackageVersionAssetAction",
-                3usize,
+                4usize,
             )?;
             __record.serialize_field("versionId", &self.version_id)?;
             __record.serialize_field("assetId", &self.asset_id)?;
             __record.serialize_field("filename", &self.filename)?;
+            __record.serialize_optional_field(
+                "metadata",
+                ::core::option::Option::as_ref(&self.metadata),
+            )?;
             __record.end()
         }
     }
@@ -68797,7 +67720,7 @@ pub mod repositories {
                                 return ::core::result::Result::Err(
                                     __serde::de::Error::invalid_length(
                                         0usize,
-                                        &"record with 3 fields",
+                                        &"record with 4 fields",
                                     ),
                                 );
                             }
@@ -68808,7 +67731,7 @@ pub mod repositories {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(1usize, &"record with 3 fields"),
+                                __serde::de::Error::invalid_length(1usize, &"record with 4 fields"),
                             );
                         }
                     };
@@ -68819,7 +67742,23 @@ pub mod repositories {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(2usize, &"record with 3 fields"),
+                                __serde::de::Error::invalid_length(2usize, &"record with 4 fields"),
+                            );
+                        }
+                    };
+                    let __field3 = match __serde::de::SeqAccess::next_element::<
+                        ::std::option::Option<
+                            ::std::collections::HashMap<
+                                ::std::string::String,
+                                super::json::JsonValue,
+                            >,
+                        >,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(3usize, &"record with 4 fields"),
                             );
                         }
                     };
@@ -68827,6 +67766,7 @@ pub mod repositories {
                         version_id: __field0,
                         asset_id: __field1,
                         filename: __field2,
+                        metadata: __field3,
                     })
                 }
                 #[inline]
@@ -68839,16 +67779,17 @@ pub mod repositories {
                 {
                     #[doc(hidden)]
                     const __IDENTIFIERS: &'static [&'static str] =
-                        &["versionId", "assetId", "filename"];
+                        &["versionId", "assetId", "filename", "metadata"];
                     #[doc(hidden)]
                     const __EXPECTING_IDENTIFIERS: &'static str =
-                        "an identifier in [\"versionId\", \"assetId\", \"filename\"]";
+                        "an identifier in [\"versionId\", \"assetId\", \"filename\", \"metadata\"]";
                     #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
                     #[doc(hidden)]
                     enum __Identifier {
                         __Identifier0,
                         __Identifier1,
                         __Identifier2,
+                        __Identifier3,
                         __Unknown,
                     }
                     #[doc(hidden)]
@@ -68872,6 +67813,7 @@ pub mod repositories {
                                 0u64 => ::core::result::Result::Ok(__Identifier::__Identifier0),
                                 1u64 => ::core::result::Result::Ok(__Identifier::__Identifier1),
                                 2u64 => ::core::result::Result::Ok(__Identifier::__Identifier2),
+                                3u64 => ::core::result::Result::Ok(__Identifier::__Identifier3),
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
                         }
@@ -68892,6 +67834,9 @@ pub mod repositories {
                                 "filename" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier2)
                                 }
+                                "metadata" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier3)
+                                }
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
                         }
@@ -68911,6 +67856,9 @@ pub mod repositories {
                                 }
                                 b"filename" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier2)
+                                }
+                                b"metadata" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier3)
                                 }
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
@@ -68936,6 +67884,14 @@ pub mod repositories {
                         ::core::option::Option::None;
                     let mut __field2: ::core::option::Option<::std::string::String> =
                         ::core::option::Option::None;
+                    let mut __field3: ::core::option::Option<
+                        ::std::option::Option<
+                            ::std::collections::HashMap<
+                                ::std::string::String,
+                                super::json::JsonValue,
+                            >,
+                        >,
+                    > = ::core::option::Option::None;
                     while let ::core::option::Option::Some(__key) =
                         __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
                     {
@@ -68982,6 +67938,25 @@ pub mod repositories {
                                     )?,
                                 );
                             }
+                            __Identifier::__Identifier3 => {
+                                if ::core::option::Option::is_some(&__field3) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "metadata",
+                                        ),
+                                    );
+                                }
+                                __field3 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<
+                                        ::std::option::Option<
+                                            ::std::collections::HashMap<
+                                                ::std::string::String,
+                                                super::json::JsonValue,
+                                            >,
+                                        >,
+                                    >(&mut __map)?,
+                                );
+                            }
                             _ => {
                                 __serde::de::MapAccess::next_value::<__serde::de::IgnoredAny>(
                                     &mut __map,
@@ -69013,15 +67988,21 @@ pub mod repositories {
                             );
                         }
                     };
+                    let __field3 = match __field3 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => ::core::option::Option::None,
+                    };
                     ::core::result::Result::Ok(AddPackageVersionAssetAction {
                         version_id: __field0,
                         asset_id: __field1,
                         filename: __field2,
+                        metadata: __field3,
                     })
                 }
             }
             #[doc(hidden)]
-            const __FIELDS: &'static [&'static str] = &["versionId", "assetId", "filename"];
+            const __FIELDS: &'static [&'static str] =
+                &["versionId", "assetId", "filename", "metadata"];
             __serde::Deserializer::deserialize_struct(
                 __deserializer,
                 "AddPackageVersionAssetAction",
@@ -69505,6 +68486,359 @@ pub mod repositories {
             __serde::Deserializer::deserialize_struct(
                 __deserializer,
                 "RemovePackageVersionAssetAction",
+                __FIELDS,
+                __Visitor {
+                    __phantom_vars: ::core::marker::PhantomData,
+                },
+            )
+        }
+    }
+    #[doc = "Set metadata on a package version asset.\n"]
+    #[derive(Clone, Debug)]
+    pub struct SetPackageVersionAssetMetadataAction {
+        #[doc = "ID of the package version.\n"]
+        pub version_id: PackageVersionId,
+        #[doc = "Filename of the asset.\n"]
+        pub filename: ::std::string::String,
+        #[doc = "Metadata to set (replaces existing metadata).\n"]
+        pub metadata: ::std::collections::HashMap<::std::string::String, super::json::JsonValue>,
+    }
+    impl SetPackageVersionAssetMetadataAction {
+        #[doc = "Creates a new [`SetPackageVersionAssetMetadataAction`]."]
+        pub fn new(
+            version_id: PackageVersionId,
+            filename: ::std::string::String,
+            metadata: ::std::collections::HashMap<::std::string::String, super::json::JsonValue>,
+        ) -> Self {
+            Self {
+                version_id,
+                filename,
+                metadata,
+            }
+        }
+        #[doc = "Sets the value of `version_id`."]
+        pub fn set_version_id(&mut self, version_id: PackageVersionId) -> &mut Self {
+            self.version_id = version_id;
+            self
+        }
+        #[doc = "Sets the value of `version_id`."]
+        pub fn with_version_id(mut self, version_id: PackageVersionId) -> Self {
+            self.version_id = version_id;
+            self
+        }
+        #[doc = "Sets the value of `filename`."]
+        pub fn set_filename(&mut self, filename: ::std::string::String) -> &mut Self {
+            self.filename = filename;
+            self
+        }
+        #[doc = "Sets the value of `filename`."]
+        pub fn with_filename(mut self, filename: ::std::string::String) -> Self {
+            self.filename = filename;
+            self
+        }
+        #[doc = "Sets the value of `metadata`."]
+        pub fn set_metadata(
+            &mut self,
+            metadata: ::std::collections::HashMap<::std::string::String, super::json::JsonValue>,
+        ) -> &mut Self {
+            self.metadata = metadata;
+            self
+        }
+        #[doc = "Sets the value of `metadata`."]
+        pub fn with_metadata(
+            mut self,
+            metadata: ::std::collections::HashMap<::std::string::String, super::json::JsonValue>,
+        ) -> Self {
+            self.metadata = metadata;
+            self
+        }
+    }
+    #[automatically_derived]
+    impl __serde::Serialize for SetPackageVersionAssetMetadataAction {
+        fn serialize<__S: __serde::Serializer>(
+            &self,
+            __serializer: __S,
+        ) -> ::std::result::Result<__S::Ok, __S::Error> {
+            let mut __record = __sidex_serde::ser::RecordSerializer::new(
+                __serializer,
+                "SetPackageVersionAssetMetadataAction",
+                3usize,
+            )?;
+            __record.serialize_field("versionId", &self.version_id)?;
+            __record.serialize_field("filename", &self.filename)?;
+            __record.serialize_field("metadata", &self.metadata)?;
+            __record.end()
+        }
+    }
+    #[automatically_derived]
+    impl<'de> __serde::Deserialize<'de> for SetPackageVersionAssetMetadataAction {
+        fn deserialize<__D: __serde::Deserializer<'de>>(
+            __deserializer: __D,
+        ) -> ::std::result::Result<Self, __D::Error> {
+            #[doc(hidden)]
+            struct __Visitor {
+                __phantom_vars: ::core::marker::PhantomData<fn(&())>,
+            }
+            impl<'de> __serde::de::Visitor<'de> for __Visitor {
+                type Value = SetPackageVersionAssetMetadataAction;
+                fn expecting(
+                    &self,
+                    __formatter: &mut ::core::fmt::Formatter,
+                ) -> ::core::fmt::Result {
+                    ::core::fmt::Formatter::write_str(
+                        __formatter,
+                        "record SetPackageVersionAssetMetadataAction",
+                    )
+                }
+                #[inline]
+                fn visit_seq<__A>(
+                    self,
+                    mut __seq: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::SeqAccess<'de>,
+                {
+                    let __field0 =
+                        match __serde::de::SeqAccess::next_element::<PackageVersionId>(&mut __seq)?
+                        {
+                            ::core::option::Option::Some(__value) => __value,
+                            ::core::option::Option::None => {
+                                return ::core::result::Result::Err(
+                                    __serde::de::Error::invalid_length(
+                                        0usize,
+                                        &"record with 3 fields",
+                                    ),
+                                );
+                            }
+                        };
+                    let __field1 = match __serde::de::SeqAccess::next_element::<
+                        ::std::string::String,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(1usize, &"record with 3 fields"),
+                            );
+                        }
+                    };
+                    let __field2 = match __serde::de::SeqAccess::next_element::<
+                        ::std::collections::HashMap<::std::string::String, super::json::JsonValue>,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(2usize, &"record with 3 fields"),
+                            );
+                        }
+                    };
+                    ::core::result::Result::Ok(SetPackageVersionAssetMetadataAction {
+                        version_id: __field0,
+                        filename: __field1,
+                        metadata: __field2,
+                    })
+                }
+                #[inline]
+                fn visit_map<__A>(
+                    self,
+                    mut __map: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::MapAccess<'de>,
+                {
+                    #[doc(hidden)]
+                    const __IDENTIFIERS: &'static [&'static str] =
+                        &["versionId", "filename", "metadata"];
+                    #[doc(hidden)]
+                    const __EXPECTING_IDENTIFIERS: &'static str =
+                        "an identifier in [\"versionId\", \"filename\", \"metadata\"]";
+                    #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
+                    #[doc(hidden)]
+                    enum __Identifier {
+                        __Identifier0,
+                        __Identifier1,
+                        __Identifier2,
+                        __Unknown,
+                    }
+                    #[doc(hidden)]
+                    struct __IdentifierVisitor;
+                    impl<'de> __serde::de::Visitor<'de> for __IdentifierVisitor {
+                        type Value = __Identifier;
+                        fn expecting(
+                            &self,
+                            __formatter: &mut ::core::fmt::Formatter,
+                        ) -> ::core::fmt::Result {
+                            ::core::fmt::Formatter::write_str(__formatter, __EXPECTING_IDENTIFIERS)
+                        }
+                        fn visit_u64<__E>(
+                            self,
+                            __value: u64,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                0u64 => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                                1u64 => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                                2u64 => ::core::result::Result::Ok(__Identifier::__Identifier2),
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_str<__E>(
+                            self,
+                            __value: &str,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                "versionId" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
+                                }
+                                "filename" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier1)
+                                }
+                                "metadata" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier2)
+                                }
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_bytes<__E>(
+                            self,
+                            __value: &[u8],
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                b"versionId" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
+                                }
+                                b"filename" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier1)
+                                }
+                                b"metadata" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier2)
+                                }
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                    }
+                    impl<'de> __serde::Deserialize<'de> for __Identifier {
+                        #[inline]
+                        fn deserialize<__D>(
+                            __deserializer: __D,
+                        ) -> ::core::result::Result<Self, __D::Error>
+                        where
+                            __D: __serde::Deserializer<'de>,
+                        {
+                            __serde::Deserializer::deserialize_identifier(
+                                __deserializer,
+                                __IdentifierVisitor,
+                            )
+                        }
+                    }
+                    let mut __field0: ::core::option::Option<PackageVersionId> =
+                        ::core::option::Option::None;
+                    let mut __field1: ::core::option::Option<::std::string::String> =
+                        ::core::option::Option::None;
+                    let mut __field2: ::core::option::Option<
+                        ::std::collections::HashMap<::std::string::String, super::json::JsonValue>,
+                    > = ::core::option::Option::None;
+                    while let ::core::option::Option::Some(__key) =
+                        __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
+                    {
+                        match __key {
+                            __Identifier::__Identifier0 => {
+                                if ::core::option::Option::is_some(&__field0) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "versionId",
+                                        ),
+                                    );
+                                }
+                                __field0 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<PackageVersionId>(
+                                        &mut __map,
+                                    )?,
+                                );
+                            }
+                            __Identifier::__Identifier1 => {
+                                if ::core::option::Option::is_some(&__field1) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "filename",
+                                        ),
+                                    );
+                                }
+                                __field1 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<::std::string::String>(
+                                        &mut __map,
+                                    )?,
+                                );
+                            }
+                            __Identifier::__Identifier2 => {
+                                if ::core::option::Option::is_some(&__field2) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "metadata",
+                                        ),
+                                    );
+                                }
+                                __field2 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<
+                                        ::std::collections::HashMap<
+                                            ::std::string::String,
+                                            super::json::JsonValue,
+                                        >,
+                                    >(&mut __map)?,
+                                );
+                            }
+                            _ => {
+                                __serde::de::MapAccess::next_value::<__serde::de::IgnoredAny>(
+                                    &mut __map,
+                                )?;
+                            }
+                        }
+                    }
+                    let __field0 = match __field0 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                <__A::Error as __serde::de::Error>::missing_field("versionId"),
+                            );
+                        }
+                    };
+                    let __field1 = match __field1 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                <__A::Error as __serde::de::Error>::missing_field("filename"),
+                            );
+                        }
+                    };
+                    let __field2 = match __field2 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                <__A::Error as __serde::de::Error>::missing_field("metadata"),
+                            );
+                        }
+                    };
+                    ::core::result::Result::Ok(SetPackageVersionAssetMetadataAction {
+                        version_id: __field0,
+                        filename: __field1,
+                        metadata: __field2,
+                    })
+                }
+            }
+            #[doc(hidden)]
+            const __FIELDS: &'static [&'static str] = &["versionId", "filename", "metadata"];
+            __serde::Deserializer::deserialize_struct(
+                __deserializer,
+                "SetPackageVersionAssetMetadataAction",
                 __FIELDS,
                 __Visitor {
                     __phantom_vars: ::core::marker::PhantomData,

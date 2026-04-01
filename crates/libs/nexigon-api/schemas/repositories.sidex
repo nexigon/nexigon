@@ -28,11 +28,6 @@ opaque PackageId
 #[json(type = "string")]
 opaque PackageVersionId
 
-/// Unique ID of an asset relation.
-#[rust(type = "nexigon_ids::ids::AssetRelationId")]
-#[json(type = "string")]
-opaque AssetRelationId
-
 /// Asset status.
 #[json(tagged = externally)]
 variant RepositoryAssetStatus {
@@ -67,69 +62,6 @@ record RepositoryS3Config {
     access_key_id: string,
     /// S3 secret access key (sensitive, will be stored encrypted).
     secret_access_key?: string,
-}
-
-/// An asset relation linking two assets with a typed relationship.
-record AssetRelation {
-    /// ID of the relation.
-    relation_id: AssetRelationId,
-    /// ID of the source asset (e.g., the VDR or SBOM).
-    source_asset_id: RepositoryAssetId,
-    /// ID of the target asset (e.g., the firmware image).
-    target_asset_id: RepositoryAssetId,
-    /// Free-form relation type (e.g., "sbom_for", "vdr_for", "signature_of").
-    relation_type: string,
-    /// Properties of the relation.
-    properties: [string: JsonValue],
-    /// Timestamp when the relation was created.
-    created_at: Timestamp,
-}
-
-/// Create a relation between two assets.
-record CreateAssetRelationAction {
-    /// ID of the source asset.
-    source_asset_id: RepositoryAssetId,
-    /// ID of the target asset.
-    target_asset_id: RepositoryAssetId,
-    /// Free-form relation type (e.g., "sbom_for", "vdr_for", "signature_of").
-    relation_type: string,
-    /// Optional properties to set on the relation.
-    properties?: [string: JsonValue],
-}
-
-/// Output of creating an asset relation.
-#[json(tag = "result")]
-variant CreateAssetRelationOutput {
-    /// The relation already exists.
-    AlreadyExists,
-    /// The relation has been created.
-    Created: CreateAssetRelationSuccess,
-}
-
-/// Successfully created an asset relation.
-record CreateAssetRelationSuccess {
-    /// ID of the relation.
-    relation_id: AssetRelationId,
-}
-
-/// Delete an asset relation.
-record DeleteAssetRelationAction {
-    /// ID of the relation.
-    relation_id: AssetRelationId,
-}
-
-/// Query relations for an asset.
-record QueryAssetRelationsAction {
-    /// ID of the asset to query relations for.
-    asset_id: RepositoryAssetId,
-}
-
-/// Output of querying asset relations.
-record QueryAssetRelationsOutput {
-    /// Relations where this asset is the source (outgoing).
-    outgoing: [AssetRelation],
-    /// Relations where this asset is the target (incoming).
-    incoming: [AssetRelation],
 }
 
 /// Resolve a repository by its name.
@@ -347,6 +279,8 @@ record GetPackageDetailsOutput {
     kind?: string,
     /// Number of versions of the package.
     version_count: u64,
+    /// Package-level metadata.
+    metadata: [string: JsonValue],
 }
 
 /// Create a new package.
@@ -357,6 +291,8 @@ record CreatePackageAction {
     name: string,
     /// Free-form kind of the package (e.g., "rugix-app").
     kind?: string,
+    /// Optional initial metadata.
+    metadata?: [string: JsonValue],
 }
 
 /// Output of creating a package.
@@ -378,6 +314,14 @@ record CreatePackageSuccess {
 record DeletePackageAction {
     /// ID of the package.
     package_id: PackageId,
+}
+
+/// Set metadata on a package.
+record SetPackageMetadataAction {
+    /// ID of the package.
+    package_id: PackageId,
+    /// Metadata to set (replaces existing metadata).
+    metadata: [string: JsonValue],
 }
 
 /// Set the kind of a package.
@@ -469,6 +413,8 @@ record PackageVersionAsset {
     digest: Digest,
     /// Status of the asset.
     status: RepositoryAssetStatus,
+    /// Arbitrary metadata associated with this asset in the version.
+    metadata: [string: JsonValue],
 }
 
 /// Resolve a package version by its path.
@@ -520,6 +466,8 @@ record GetPackageVersionDetailsOutput {
     assets: [PackageVersionAsset],
     /// Tags of the version.
     tags: [PackageVersionTag],
+    /// Version-level metadata.
+    metadata: [string: JsonValue],
 }
 
 /// Create a new package version.
@@ -530,6 +478,8 @@ record CreatePackageVersionAction {
     name?: string,
     /// Tags to add to the package version.
     tags?: [AddTagItem],
+    /// Optional initial metadata.
+    metadata?: [string: JsonValue],
 }
 
 /// Output of creating a package version.
@@ -559,7 +509,15 @@ record SetPackageVersionNameAction {
     name?: string,
 }
 
-/// Add an assert to a package version.
+/// Set metadata on a package version.
+record SetPackageVersionMetadataAction {
+    /// ID of the package version.
+    version_id: PackageVersionId,
+    /// Metadata to set (replaces existing metadata).
+    metadata: [string: JsonValue],
+}
+
+/// Add an asset to a package version.
 record AddPackageVersionAssetAction {
     /// ID of the package version.
     version_id: PackageVersionId,
@@ -567,6 +525,8 @@ record AddPackageVersionAssetAction {
     asset_id: RepositoryAssetId,
     /// Filename of the asset.
     filename: string,
+    /// Optional metadata to associate with this asset in the version.
+    metadata?: [string: JsonValue],
 }
 
 /// Output of adding an asset to a package version.
@@ -584,6 +544,16 @@ record RemovePackageVersionAssetAction {
     version_id: PackageVersionId,
     /// Filename of the asset.
     filename: string,
+}
+
+/// Set metadata on a package version asset.
+record SetPackageVersionAssetMetadataAction {
+    /// ID of the package version.
+    version_id: PackageVersionId,
+    /// Filename of the asset.
+    filename: string,
+    /// Metadata to set (replaces existing metadata).
+    metadata: [string: JsonValue],
 }
 
 /// Add tags to a version.

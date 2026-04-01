@@ -32,6 +32,28 @@ use nexigon_ids::ids::PackageId;
 use nexigon_ids::ids::PackageVersionId;
 use nexigon_ids::ids::RepositoryId;
 
+// ── Value parsing helpers ────────────────────────────────────────────
+
+fn parse_json_object(s: &str) -> Result<serde_json::Value, String> {
+    let value: serde_json::Value =
+        serde_json::from_str(s).map_err(|e| format!("invalid JSON: {e}"))?;
+    if !value.is_object() {
+        return Err("metadata must be a JSON object".to_owned());
+    }
+    Ok(value)
+}
+
+fn json_value_to_map(
+    value: &serde_json::Value,
+) -> std::collections::HashMap<String, serde_json::Value> {
+    value
+        .as_object()
+        .expect("metadata must be a JSON object")
+        .iter()
+        .map(|(k, v)| (k.clone(), v.clone()))
+        .collect()
+}
+
 // ── Path parsing ─────────────────────────────────────────────────────
 
 pub struct AssetPath {
@@ -265,6 +287,9 @@ pub enum PackagesCmd {
         repository: String,
         /// Package name.
         name: String,
+        /// Optional JSON metadata.
+        #[clap(long, value_parser = parse_json_object)]
+        metadata: Option<serde_json::Value>,
     },
     /// Delete a package.
     Delete {
@@ -293,6 +318,9 @@ pub enum VersionsCmd {
         /// Tags to add.
         #[clap(long = "tag")]
         tags: Vec<AddTagArg>,
+        /// Optional JSON metadata.
+        #[clap(long, value_parser = parse_json_object)]
+        metadata: Option<serde_json::Value>,
     },
     /// Delete a package version.
     Delete {
@@ -323,6 +351,9 @@ pub enum VersionAssetsCmd {
         asset_id: RepositoryAssetId,
         /// Asset filename.
         filename: String,
+        /// Optional JSON metadata.
+        #[clap(long, value_parser = parse_json_object)]
+        metadata: Option<serde_json::Value>,
     },
     /// Remove an asset from a package version.
     Remove {
@@ -360,13 +391,18 @@ pub async fn execute_repositories_cmd(
             println!("{}", serde_json::to_string(&output).unwrap());
         }
         RepositoriesCmd::Packages(cmd) => match cmd {
-            PackagesCmd::Create { repository, name } => {
+            PackagesCmd::Create {
+                repository,
+                name,
+                metadata,
+            } => {
                 let repository_id = resolve_repository(executor, repository).await?;
+                let metadata = metadata.as_ref().map(json_value_to_map);
                 let output = executor
-                    .execute(CreatePackageAction::new(
-                        repository_id.clone(),
-                        name.to_owned(),
-                    ))
+                    .execute(
+                        CreatePackageAction::new(repository_id.clone(), name.to_owned())
+                            .with_metadata(metadata),
+                    )
                     .await
                     .context("creating package")??;
                 serde_json::to_writer_pretty(std::io::stdout(), &output).unwrap();
@@ -463,12 +499,18 @@ pub async fn execute_versions_cmd(
             let output = get_version_details(executor, version_id).await?;
             serde_json::to_writer_pretty(std::io::stdout(), &output).unwrap();
         }
-        VersionsCmd::Create { package, tags } => {
+        VersionsCmd::Create {
+            package,
+            tags,
+            metadata,
+        } => {
             let package_id = resolve_package(executor, package).await?;
+            let metadata = metadata.as_ref().map(json_value_to_map);
             let output = executor
                 .execute(
                     CreatePackageVersionAction::new(package_id.clone())
-                        .with_tags(Some(tags.iter().map(|tag| tag.0.clone()).collect())),
+                        .with_tags(Some(tags.iter().map(|tag| tag.0.clone()).collect()))
+                        .with_metadata(metadata),
                 )
                 .await
                 .context("creating package version")??;
@@ -498,14 +540,19 @@ pub async fn execute_versions_cmd(
                 version,
                 asset_id,
                 filename,
+                metadata,
             } => {
                 let version_id = resolve_version(executor, version).await?;
+                let metadata = metadata.as_ref().map(json_value_to_map);
                 let output = executor
-                    .execute(AddPackageVersionAssetAction::new(
-                        version_id.clone(),
-                        asset_id.clone(),
-                        filename.to_owned(),
-                    ))
+                    .execute(
+                        AddPackageVersionAssetAction::new(
+                            version_id.clone(),
+                            asset_id.clone(),
+                            filename.to_owned(),
+                        )
+                        .with_metadata(metadata),
+                    )
                     .await??;
                 serde_json::to_writer_pretty(std::io::stdout(), &output).unwrap();
             }
