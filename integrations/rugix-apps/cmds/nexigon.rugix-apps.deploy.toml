@@ -1,0 +1,26 @@
+[command]
+name = "nexigon.rugix-apps.deploy"
+description = "Deploy a Rugix App from a package version"
+category = "applications"
+
+[input]
+schema = '''
+{
+  "type": "object",
+  "properties": {
+    "versionId": {
+      "type": "string",
+      "description": "Package version ID to deploy"
+    },
+    "assetFilename": {
+      "type": "string",
+      "description": "Asset filename (defaults to first .rugixb asset)"
+    }
+  },
+  "required": ["versionId"]
+}
+'''
+
+[exec]
+handler = ["/usr/libexec/nexigon/nexigon-rugix-apps-deploy"]
+timeout = 600

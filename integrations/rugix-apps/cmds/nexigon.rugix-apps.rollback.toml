@@ -1,0 +1,22 @@
+[command]
+name = "nexigon.rugix-apps.rollback"
+description = "Rollback a Rugix App to its previous generation"
+category = "applications"
+
+[input]
+schema = '''
+{
+  "type": "object",
+  "properties": {
+    "app": {
+      "type": "string",
+      "description": "Name of the application"
+    }
+  },
+  "required": ["app"]
+}
+'''
+
+[exec]
+handler = ["/usr/libexec/nexigon/nexigon-rugix-apps", "rollback"]
+timeout = 30

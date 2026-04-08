@@ -3521,30 +3521,52 @@
     ],
     "unevaluatedProperties": false
   },
+  "nexigon_api.properties.OtaUpdateConfig": {
+    "type": "object",
+    "description": "OTA update configuration identifying the update source.\n\nUsed as the shape of `/etc/nexigon-rugix-ota.json` and the\n`dev.nexigon.ota.config` device property. The device property is\nmerged on top of the file-based defaults.",
+    "properties": {
+      "path": {
+        "type": "string"
+      }
+    },
+    "required": [],
+    "unevaluatedProperties": false
+  },
   "nexigon_api.properties.OtaUpdateState": {
     "enum": [
+      "idle",
       "installing",
+      "rebooting",
+      "committing",
       "completed",
       "failed",
-      "rebooting"
+      "blocked",
+      "rollback"
     ],
-    "description": "OTA update state."
+    "description": "OTA update state.\n\nThe resting states are `idle`, `completed`, `failed`, and `blocked`.\nThe agent remains in one of these until the next check cycle begins\nor the blocking condition clears. `idle` means no update has been\nattempted yet; `completed` and `failed` retain the outcome of the\nlast cycle; `blocked` indicates an update is available but deferred."
   },
   "nexigon_api.properties.OtaUpdateStatus": {
     "type": "object",
-    "description": "OTA update status.",
+    "description": "OTA update status (`dev.nexigon.ota.status`).\n\nPublished by the device agent to report the effective OTA configuration\nand the current state of the update process.",
     "properties": {
-      "currentVersion": {
-        "type": "string"
+      "config": {
+        "$ref": "#/components/schemas/nexigon_api.properties.OtaUpdateConfig"
       },
-      "targetVersion": {
+      "currentVersion": {
         "type": "string"
       },
       "state": {
         "$ref": "#/components/schemas/nexigon_api.properties.OtaUpdateState"
       },
-      "active": {
-        "type": "boolean"
+      "targetVersion": {
+        "type": "string"
+      },
+      "failureCount": {
+        "type": "integer",
+        "format": "uint32"
+      },
+      "lastError": {
+        "type": "string"
       }
     },
     "required": [],

@@ -1,0 +1,8 @@
+[command]
+name = "nexigon.systemd.list-units"
+description = "List systemd units"
+category = "services"
+
+[exec]
+handler = ["/usr/libexec/nexigon/nexigon-systemd-list-units"]
+timeout = 15

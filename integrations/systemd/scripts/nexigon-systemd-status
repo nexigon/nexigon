@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+read -r input
+
+unit=$(echo "$input" | jq -r '.unit')
+output=$(systemctl show "$unit" | jq -Rs '
+    split("\n") | map(select(length > 0)) |
+    map(split("=") | {(.[0]): (.[1:] | join("="))}) |
+    add // {}
+')
+
+echo "{\"type\": \"Output\", \"data\": $output}"

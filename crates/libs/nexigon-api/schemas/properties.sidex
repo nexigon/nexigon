@@ -58,29 +58,62 @@ record DiskInfo {
     available_space: u64,
 }
 
-/// OTA update status.
+/// OTA update status (`dev.nexigon.ota.status`).
+///
+/// Published by the device agent to report the effective OTA configuration
+/// and the current state of the update process.
 record OtaUpdateStatus {
-    /// Current version.
+    /// Effective OTA configuration (TOML defaults merged with device overrides).
+    config?: OtaUpdateConfig,
+    /// Currently installed version (matches a repository version tag).
     current_version?: string,
-    /// Target version.
-    target_version?: string,
-    /// State of the update.
+    /// Current state of the update process.
     state?: OtaUpdateState,
-    /// Whether the device is currently performing an OTA update.
-    active?: bool,
+    /// Target version being installed, if an update is in progress.
+    target_version?: string,
+    /// Number of consecutive failed update attempts for the current target.
+    /// Reset to zero when the config changes or an update succeeds.
+    failure_count?: u32,
+    /// Error message from the last failed attempt, if any.
+    last_error?: string,
+}
+
+/// OTA update configuration identifying the update source.
+///
+/// Used as the shape of `/etc/nexigon-rugix-ota.json` and the
+/// `dev.nexigon.ota.config` device property. The device property is
+/// merged on top of the file-based defaults.
+record OtaUpdateConfig {
+    /// Repository path prefix for locating update artifacts.
+    path?: string,
 }
 
 /// OTA update state.
+///
+/// The resting states are `idle`, `completed`, `failed`, and `blocked`.
+/// The agent remains in one of these until the next check cycle begins
+/// or the blocking condition clears. `idle` means no update has been
+/// attempted yet; `completed` and `failed` retain the outcome of the
+/// last cycle; `blocked` indicates an update is available but deferred.
 #[json(tagged = externally, rename_all = "lowercase")]
 variant OtaUpdateState {
-    /// Update is currently being installed.
+    /// No update has been attempted yet.
+    Idle,
+    /// An update is being installed.
     Installing,
-    /// Update has been completed.
-    Completed,
-    /// Update failed.
-    Failed,
-    /// Device is rebooting.
+    /// The device is rebooting into the new version.
     Rebooting,
+    /// Committing the new version after a successful reboot.
+    Committing,
+    /// The last update completed successfully.
+    Completed,
+    /// The last update failed.
+    Failed,
+    /// The update is blocked by a condition on the device (e.g., the device
+    /// is not in a safe state or user approval is awaited).
+    Blocked,
+    /// The device is rolling back to the previous version.
+    Rollback,
 }
 
 /// Device health information (`dev.nexigon.system.health`).

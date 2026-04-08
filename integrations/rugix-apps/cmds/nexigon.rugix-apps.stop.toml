@@ -1,0 +1,22 @@
+[command]
+name = "nexigon.rugix-apps.stop"
+description = "Stop a Rugix App"
+category = "applications"
+
+[input]
+schema = '''
+{
+  "type": "object",
+  "properties": {
+    "app": {
+      "type": "string",
+      "description": "Name of the application"
+    }
+  },
+  "required": ["app"]
+}
+'''
+
+[exec]
+handler = ["/usr/libexec/nexigon/nexigon-rugix-apps", "stop"]
+timeout = 30

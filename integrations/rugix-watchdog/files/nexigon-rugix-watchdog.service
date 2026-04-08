@@ -1,0 +1,10 @@
+[Unit]
+Description=Nexigon Rugix Watchdog (auto-rollback uncommitted systems)
+After=multi-user.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/nexigon/nexigon-rugix-watchdog
+
+[Install]
+WantedBy=multi-user.target

@@ -48243,27 +48243,43 @@ pub mod properties {
             )
         }
     }
-    #[doc = "OTA update status.\n"]
+    #[doc = "OTA update status (`dev.nexigon.ota.status`).\n\nPublished by the device agent to report the effective OTA configuration\nand the current state of the update process.\n"]
     #[derive(Clone, Debug)]
     pub struct OtaUpdateStatus {
-        #[doc = "Current version.\n"]
+        #[doc = "Effective OTA configuration (TOML defaults merged with device overrides).\n"]
+        pub config: ::std::option::Option<OtaUpdateConfig>,
+        #[doc = "Currently installed version (matches a repository version tag).\n"]
         pub current_version: ::std::option::Option<::std::string::String>,
-        #[doc = "Target version.\n"]
-        pub target_version: ::std::option::Option<::std::string::String>,
-        #[doc = "State of the update.\n"]
+        #[doc = "Current state of the update process.\n"]
         pub state: ::std::option::Option<OtaUpdateState>,
-        #[doc = "Whether the device is currently performing an OTA update.\n"]
-        pub active: ::std::option::Option<bool>,
+        #[doc = "Target version being installed, if an update is in progress.\n"]
+        pub target_version: ::std::option::Option<::std::string::String>,
+        #[doc = "Number of consecutive failed update attempts for the current target.\nReset to zero when the config changes or an update succeeds.\n"]
+        pub failure_count: ::std::option::Option<u32>,
+        #[doc = "Error message from the last failed attempt, if any.\n"]
+        pub last_error: ::std::option::Option<::std::string::String>,
     }
     impl OtaUpdateStatus {
         #[doc = "Creates a new [`OtaUpdateStatus`]."]
         pub fn new() -> Self {
             Self {
+                config: ::std::default::Default::default(),
                 current_version: ::std::default::Default::default(),
-                target_version: ::std::default::Default::default(),
                 state: ::std::default::Default::default(),
-                active: ::std::default::Default::default(),
+                target_version: ::std::default::Default::default(),
+                failure_count: ::std::default::Default::default(),
+                last_error: ::std::default::Default::default(),
             }
+        }
+        #[doc = "Sets the value of `config`."]
+        pub fn set_config(&mut self, config: ::std::option::Option<OtaUpdateConfig>) -> &mut Self {
+            self.config = config;
+            self
+        }
+        #[doc = "Sets the value of `config`."]
+        pub fn with_config(mut self, config: ::std::option::Option<OtaUpdateConfig>) -> Self {
+            self.config = config;
+            self
         }
         #[doc = "Sets the value of `current_version`."]
         pub fn set_current_version(
@@ -48279,6 +48295,16 @@ pub mod properties {
             current_version: ::std::option::Option<::std::string::String>,
         ) -> Self {
             self.current_version = current_version;
+            self
+        }
+        #[doc = "Sets the value of `state`."]
+        pub fn set_state(&mut self, state: ::std::option::Option<OtaUpdateState>) -> &mut Self {
+            self.state = state;
+            self
+        }
+        #[doc = "Sets the value of `state`."]
+        pub fn with_state(mut self, state: ::std::option::Option<OtaUpdateState>) -> Self {
+            self.state = state;
             self
         }
         #[doc = "Sets the value of `target_version`."]
@@ -48297,24 +48323,33 @@ pub mod properties {
             self.target_version = target_version;
             self
         }
-        #[doc = "Sets the value of `state`."]
-        pub fn set_state(&mut self, state: ::std::option::Option<OtaUpdateState>) -> &mut Self {
-            self.state = state;
+        #[doc = "Sets the value of `failure_count`."]
+        pub fn set_failure_count(
+            &mut self,
+            failure_count: ::std::option::Option<u32>,
+        ) -> &mut Self {
+            self.failure_count = failure_count;
             self
         }
-        #[doc = "Sets the value of `state`."]
-        pub fn with_state(mut self, state: ::std::option::Option<OtaUpdateState>) -> Self {
-            self.state = state;
+        #[doc = "Sets the value of `failure_count`."]
+        pub fn with_failure_count(mut self, failure_count: ::std::option::Option<u32>) -> Self {
+            self.failure_count = failure_count;
             self
         }
-        #[doc = "Sets the value of `active`."]
-        pub fn set_active(&mut self, active: ::std::option::Option<bool>) -> &mut Self {
-            self.active = active;
+        #[doc = "Sets the value of `last_error`."]
+        pub fn set_last_error(
+            &mut self,
+            last_error: ::std::option::Option<::std::string::String>,
+        ) -> &mut Self {
+            self.last_error = last_error;
             self
         }
-        #[doc = "Sets the value of `active`."]
-        pub fn with_active(mut self, active: ::std::option::Option<bool>) -> Self {
-            self.active = active;
+        #[doc = "Sets the value of `last_error`."]
+        pub fn with_last_error(
+            mut self,
+            last_error: ::std::option::Option<::std::string::String>,
+        ) -> Self {
+            self.last_error = last_error;
             self
         }
     }
@@ -48330,19 +48365,27 @@ pub mod properties {
             __serializer: __S,
         ) -> ::std::result::Result<__S::Ok, __S::Error> {
             let mut __record =
-                __sidex_serde::ser::RecordSerializer::new(__serializer, "OtaUpdateStatus", 4usize)?;
+                __sidex_serde::ser::RecordSerializer::new(__serializer, "OtaUpdateStatus", 6usize)?;
+            __record
+                .serialize_optional_field("config", ::core::option::Option::as_ref(&self.config))?;
             __record.serialize_optional_field(
                 "currentVersion",
                 ::core::option::Option::as_ref(&self.current_version),
             )?;
+            __record
+                .serialize_optional_field("state", ::core::option::Option::as_ref(&self.state))?;
             __record.serialize_optional_field(
                 "targetVersion",
                 ::core::option::Option::as_ref(&self.target_version),
             )?;
-            __record
-                .serialize_optional_field("state", ::core::option::Option::as_ref(&self.state))?;
-            __record
-                .serialize_optional_field("active", ::core::option::Option::as_ref(&self.active))?;
+            __record.serialize_optional_field(
+                "failureCount",
+                ::core::option::Option::as_ref(&self.failure_count),
+            )?;
+            __record.serialize_optional_field(
+                "lastError",
+                ::core::option::Option::as_ref(&self.last_error),
+            )?;
             __record.end()
         }
     }
@@ -48372,13 +48415,13 @@ pub mod properties {
                     __A: __serde::de::SeqAccess<'de>,
                 {
                     let __field0 = match __serde::de::SeqAccess::next_element::<
-                        ::std::option::Option<::std::string::String>,
+                        ::std::option::Option<OtaUpdateConfig>,
                     >(&mut __seq)?
                     {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(0usize, &"record with 4 fields"),
+                                __serde::de::Error::invalid_length(0usize, &"record with 6 fields"),
                             );
                         }
                     };
@@ -48389,7 +48432,7 @@ pub mod properties {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(1usize, &"record with 4 fields"),
+                                __serde::de::Error::invalid_length(1usize, &"record with 6 fields"),
                             );
                         }
                     };
@@ -48400,26 +48443,50 @@ pub mod properties {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(2usize, &"record with 4 fields"),
+                                __serde::de::Error::invalid_length(2usize, &"record with 6 fields"),
                             );
                         }
                     };
                     let __field3 = match __serde::de::SeqAccess::next_element::<
-                        ::std::option::Option<bool>,
+                        ::std::option::Option<::std::string::String>,
                     >(&mut __seq)?
                     {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(3usize, &"record with 4 fields"),
+                                __serde::de::Error::invalid_length(3usize, &"record with 6 fields"),
+                            );
+                        }
+                    };
+                    let __field4 = match __serde::de::SeqAccess::next_element::<
+                        ::std::option::Option<u32>,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(4usize, &"record with 6 fields"),
+                            );
+                        }
+                    };
+                    let __field5 = match __serde::de::SeqAccess::next_element::<
+                        ::std::option::Option<::std::string::String>,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(5usize, &"record with 6 fields"),
                             );
                         }
                     };
                     ::core::result::Result::Ok(OtaUpdateStatus {
-                        current_version: __field0,
-                        target_version: __field1,
+                        config: __field0,
+                        current_version: __field1,
                         state: __field2,
-                        active: __field3,
+                        target_version: __field3,
+                        failure_count: __field4,
+                        last_error: __field5,
                     })
                 }
                 #[inline]
@@ -48431,10 +48498,16 @@ pub mod properties {
                     __A: __serde::de::MapAccess<'de>,
                 {
                     #[doc(hidden)]
-                    const __IDENTIFIERS: &'static [&'static str] =
-                        &["currentVersion", "targetVersion", "state", "active"];
+                    const __IDENTIFIERS: &'static [&'static str] = &[
+                        "config",
+                        "currentVersion",
+                        "state",
+                        "targetVersion",
+                        "failureCount",
+                        "lastError",
+                    ];
                     #[doc(hidden)]
-                    const __EXPECTING_IDENTIFIERS: &'static str = "an identifier in [\"currentVersion\", \"targetVersion\", \"state\", \"active\"]";
+                    const __EXPECTING_IDENTIFIERS: &'static str = "an identifier in [\"config\", \"currentVersion\", \"state\", \"targetVersion\", \"failureCount\", \"lastError\"]";
                     #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
                     #[doc(hidden)]
                     enum __Identifier {
@@ -48442,6 +48515,8 @@ pub mod properties {
                         __Identifier1,
                         __Identifier2,
                         __Identifier3,
+                        __Identifier4,
+                        __Identifier5,
                         __Unknown,
                     }
                     #[doc(hidden)]
@@ -48466,6 +48541,8 @@ pub mod properties {
                                 1u64 => ::core::result::Result::Ok(__Identifier::__Identifier1),
                                 2u64 => ::core::result::Result::Ok(__Identifier::__Identifier2),
                                 3u64 => ::core::result::Result::Ok(__Identifier::__Identifier3),
+                                4u64 => ::core::result::Result::Ok(__Identifier::__Identifier4),
+                                5u64 => ::core::result::Result::Ok(__Identifier::__Identifier5),
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
                         }
@@ -48477,14 +48554,20 @@ pub mod properties {
                             __E: __serde::de::Error,
                         {
                             match __value {
+                                "config" => ::core::result::Result::Ok(__Identifier::__Identifier0),
                                 "currentVersion" => {
-                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
-                                }
-                                "targetVersion" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier1)
                                 }
                                 "state" => ::core::result::Result::Ok(__Identifier::__Identifier2),
-                                "active" => ::core::result::Result::Ok(__Identifier::__Identifier3),
+                                "targetVersion" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier3)
+                                }
+                                "failureCount" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier4)
+                                }
+                                "lastError" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier5)
+                                }
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
                         }
@@ -48496,15 +48579,21 @@ pub mod properties {
                             __E: __serde::de::Error,
                         {
                             match __value {
-                                b"currentVersion" => {
+                                b"config" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier0)
                                 }
-                                b"targetVersion" => {
+                                b"currentVersion" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier1)
                                 }
                                 b"state" => ::core::result::Result::Ok(__Identifier::__Identifier2),
-                                b"active" => {
+                                b"targetVersion" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier3)
+                                }
+                                b"failureCount" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier4)
+                                }
+                                b"lastError" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier5)
                                 }
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
@@ -48525,7 +48614,7 @@ pub mod properties {
                         }
                     }
                     let mut __field0: ::core::option::Option<
-                        ::std::option::Option<::std::string::String>,
+                        ::std::option::Option<OtaUpdateConfig>,
                     > = ::core::option::Option::None;
                     let mut __field1: ::core::option::Option<
                         ::std::option::Option<::std::string::String>,
@@ -48533,8 +48622,14 @@ pub mod properties {
                     let mut __field2: ::core::option::Option<
                         ::std::option::Option<OtaUpdateState>,
                     > = ::core::option::Option::None;
-                    let mut __field3: ::core::option::Option<::std::option::Option<bool>> =
+                    let mut __field3: ::core::option::Option<
+                        ::std::option::Option<::std::string::String>,
+                    > = ::core::option::Option::None;
+                    let mut __field4: ::core::option::Option<::std::option::Option<u32>> =
                         ::core::option::Option::None;
+                    let mut __field5: ::core::option::Option<
+                        ::std::option::Option<::std::string::String>,
+                    > = ::core::option::Option::None;
                     while let ::core::option::Option::Some(__key) =
                         __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
                     {
@@ -48543,13 +48638,13 @@ pub mod properties {
                                 if ::core::option::Option::is_some(&__field0) {
                                     return ::core::result::Result::Err(
                                         <__A::Error as __serde::de::Error>::duplicate_field(
-                                            "currentVersion",
+                                            "config",
                                         ),
                                     );
                                 }
                                 __field0 = ::core::option::Option::Some(
                                     __serde::de::MapAccess::next_value::<
-                                        ::std::option::Option<::std::string::String>,
+                                        ::std::option::Option<OtaUpdateConfig>,
                                     >(&mut __map)?,
                                 );
                             }
@@ -48557,7 +48652,7 @@ pub mod properties {
                                 if ::core::option::Option::is_some(&__field1) {
                                     return ::core::result::Result::Err(
                                         <__A::Error as __serde::de::Error>::duplicate_field(
-                                            "targetVersion",
+                                            "currentVersion",
                                         ),
                                     );
                                 }
@@ -48585,13 +48680,41 @@ pub mod properties {
                                 if ::core::option::Option::is_some(&__field3) {
                                     return ::core::result::Result::Err(
                                         <__A::Error as __serde::de::Error>::duplicate_field(
-                                            "active",
+                                            "targetVersion",
                                         ),
                                     );
                                 }
                                 __field3 = ::core::option::Option::Some(
                                     __serde::de::MapAccess::next_value::<
-                                        ::std::option::Option<bool>,
+                                        ::std::option::Option<::std::string::String>,
+                                    >(&mut __map)?,
+                                );
+                            }
+                            __Identifier::__Identifier4 => {
+                                if ::core::option::Option::is_some(&__field4) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "failureCount",
+                                        ),
+                                    );
+                                }
+                                __field4 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<::std::option::Option<u32>>(
+                                        &mut __map,
+                                    )?,
+                                );
+                            }
+                            __Identifier::__Identifier5 => {
+                                if ::core::option::Option::is_some(&__field5) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "lastError",
+                                        ),
+                                    );
+                                }
+                                __field5 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<
+                                        ::std::option::Option<::std::string::String>,
                                     >(&mut __map)?,
                                 );
                             }
@@ -48618,17 +48741,33 @@ pub mod properties {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => ::core::option::Option::None,
                     };
+                    let __field4 = match __field4 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => ::core::option::Option::None,
+                    };
+                    let __field5 = match __field5 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => ::core::option::Option::None,
+                    };
                     ::core::result::Result::Ok(OtaUpdateStatus {
-                        current_version: __field0,
-                        target_version: __field1,
+                        config: __field0,
+                        current_version: __field1,
                         state: __field2,
-                        active: __field3,
+                        target_version: __field3,
+                        failure_count: __field4,
+                        last_error: __field5,
                     })
                 }
             }
             #[doc(hidden)]
-            const __FIELDS: &'static [&'static str] =
-                &["currentVersion", "targetVersion", "state", "active"];
+            const __FIELDS: &'static [&'static str] = &[
+                "config",
+                "currentVersion",
+                "state",
+                "targetVersion",
+                "failureCount",
+                "lastError",
+            ];
             __serde::Deserializer::deserialize_struct(
                 __deserializer,
                 "OtaUpdateStatus",
@@ -48639,17 +48778,232 @@ pub mod properties {
             )
         }
     }
-    #[doc = "OTA update state.\n"]
+    #[doc = "OTA update configuration identifying the update source.\n\nUsed as the shape of `/etc/nexigon-rugix-ota.json` and the\n`dev.nexigon.ota.config` device property. The device property is\nmerged on top of the file-based defaults.\n"]
+    #[derive(Clone, Debug)]
+    pub struct OtaUpdateConfig {
+        #[doc = "Repository path prefix for locating update artifacts.\n"]
+        pub path: ::std::option::Option<::std::string::String>,
+    }
+    impl OtaUpdateConfig {
+        #[doc = "Creates a new [`OtaUpdateConfig`]."]
+        pub fn new() -> Self {
+            Self {
+                path: ::std::default::Default::default(),
+            }
+        }
+        #[doc = "Sets the value of `path`."]
+        pub fn set_path(
+            &mut self,
+            path: ::std::option::Option<::std::string::String>,
+        ) -> &mut Self {
+            self.path = path;
+            self
+        }
+        #[doc = "Sets the value of `path`."]
+        pub fn with_path(mut self, path: ::std::option::Option<::std::string::String>) -> Self {
+            self.path = path;
+            self
+        }
+    }
+    impl ::std::default::Default for OtaUpdateConfig {
+        fn default() -> Self {
+            Self::new()
+        }
+    }
+    #[automatically_derived]
+    impl __serde::Serialize for OtaUpdateConfig {
+        fn serialize<__S: __serde::Serializer>(
+            &self,
+            __serializer: __S,
+        ) -> ::std::result::Result<__S::Ok, __S::Error> {
+            let mut __record =
+                __sidex_serde::ser::RecordSerializer::new(__serializer, "OtaUpdateConfig", 1usize)?;
+            __record
+                .serialize_optional_field("path", ::core::option::Option::as_ref(&self.path))?;
+            __record.end()
+        }
+    }
+    #[automatically_derived]
+    impl<'de> __serde::Deserialize<'de> for OtaUpdateConfig {
+        fn deserialize<__D: __serde::Deserializer<'de>>(
+            __deserializer: __D,
+        ) -> ::std::result::Result<Self, __D::Error> {
+            #[doc(hidden)]
+            struct __Visitor {
+                __phantom_vars: ::core::marker::PhantomData<fn(&())>,
+            }
+            impl<'de> __serde::de::Visitor<'de> for __Visitor {
+                type Value = OtaUpdateConfig;
+                fn expecting(
+                    &self,
+                    __formatter: &mut ::core::fmt::Formatter,
+                ) -> ::core::fmt::Result {
+                    ::core::fmt::Formatter::write_str(__formatter, "record OtaUpdateConfig")
+                }
+                #[inline]
+                fn visit_seq<__A>(
+                    self,
+                    mut __seq: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::SeqAccess<'de>,
+                {
+                    let __field0 = match __serde::de::SeqAccess::next_element::<
+                        ::std::option::Option<::std::string::String>,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(0usize, &"record with 1 fields"),
+                            );
+                        }
+                    };
+                    ::core::result::Result::Ok(OtaUpdateConfig { path: __field0 })
+                }
+                #[inline]
+                fn visit_map<__A>(
+                    self,
+                    mut __map: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::MapAccess<'de>,
+                {
+                    #[doc(hidden)]
+                    const __IDENTIFIERS: &'static [&'static str] = &["path"];
+                    #[doc(hidden)]
+                    const __EXPECTING_IDENTIFIERS: &'static str = "an identifier in [\"path\"]";
+                    #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
+                    #[doc(hidden)]
+                    enum __Identifier {
+                        __Identifier0,
+                        __Unknown,
+                    }
+                    #[doc(hidden)]
+                    struct __IdentifierVisitor;
+                    impl<'de> __serde::de::Visitor<'de> for __IdentifierVisitor {
+                        type Value = __Identifier;
+                        fn expecting(
+                            &self,
+                            __formatter: &mut ::core::fmt::Formatter,
+                        ) -> ::core::fmt::Result {
+                            ::core::fmt::Formatter::write_str(__formatter, __EXPECTING_IDENTIFIERS)
+                        }
+                        fn visit_u64<__E>(
+                            self,
+                            __value: u64,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                0u64 => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_str<__E>(
+                            self,
+                            __value: &str,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                "path" => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_bytes<__E>(
+                            self,
+                            __value: &[u8],
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                b"path" => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                    }
+                    impl<'de> __serde::Deserialize<'de> for __Identifier {
+                        #[inline]
+                        fn deserialize<__D>(
+                            __deserializer: __D,
+                        ) -> ::core::result::Result<Self, __D::Error>
+                        where
+                            __D: __serde::Deserializer<'de>,
+                        {
+                            __serde::Deserializer::deserialize_identifier(
+                                __deserializer,
+                                __IdentifierVisitor,
+                            )
+                        }
+                    }
+                    let mut __field0: ::core::option::Option<
+                        ::std::option::Option<::std::string::String>,
+                    > = ::core::option::Option::None;
+                    while let ::core::option::Option::Some(__key) =
+                        __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
+                    {
+                        match __key {
+                            __Identifier::__Identifier0 => {
+                                if ::core::option::Option::is_some(&__field0) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field("path"),
+                                    );
+                                }
+                                __field0 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<
+                                        ::std::option::Option<::std::string::String>,
+                                    >(&mut __map)?,
+                                );
+                            }
+                            _ => {
+                                __serde::de::MapAccess::next_value::<__serde::de::IgnoredAny>(
+                                    &mut __map,
+                                )?;
+                            }
+                        }
+                    }
+                    let __field0 = match __field0 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => ::core::option::Option::None,
+                    };
+                    ::core::result::Result::Ok(OtaUpdateConfig { path: __field0 })
+                }
+            }
+            #[doc(hidden)]
+            const __FIELDS: &'static [&'static str] = &["path"];
+            __serde::Deserializer::deserialize_struct(
+                __deserializer,
+                "OtaUpdateConfig",
+                __FIELDS,
+                __Visitor {
+                    __phantom_vars: ::core::marker::PhantomData,
+                },
+            )
+        }
+    }
+    #[doc = "OTA update state.\n\nThe resting states are `idle`, `completed`, `failed`, and `blocked`.\nThe agent remains in one of these until the next check cycle begins\nor the blocking condition clears. `idle` means no update has been\nattempted yet; `completed` and `failed` retain the outcome of the\nlast cycle; `blocked` indicates an update is available but deferred.\n"]
     #[derive(Clone, Debug)]
     pub enum OtaUpdateState {
-        #[doc = "Update is currently being installed.\n"]
+        #[doc = "No update has been attempted yet.\n"]
+        Idle,
+        #[doc = "An update is being installed.\n"]
         Installing,
-        #[doc = "Update has been completed.\n"]
-        Completed,
-        #[doc = "Update failed.\n"]
-        Failed,
-        #[doc = "Device is rebooting.\n"]
+        #[doc = "The device is rebooting into the new version.\n"]
         Rebooting,
+        #[doc = "Committing the new version after a successful reboot.\n"]
+        Committing,
+        #[doc = "The last update completed successfully.\n"]
+        Completed,
+        #[doc = "The last update failed.\n"]
+        Failed,
+        #[doc = "The update is blocked by a condition on the device (e.g., the device\nis not in a safe state or user approval is awaited).\n"]
+        Blocked,
+        #[doc = "The device is rolling back to the previous version.\n"]
+        Rollback,
     }
     #[automatically_derived]
     impl __serde::Serialize for OtaUpdateState {
@@ -48660,10 +49014,14 @@ pub mod properties {
             let __serializer =
                 __sidex_serde::ser::VariantSerializer::new(__serializer, "OtaUpdateState");
             match self {
-                Self::Installing => __serializer.serialize_tag("installing", 0u32),
-                Self::Completed => __serializer.serialize_tag("completed", 1u32),
-                Self::Failed => __serializer.serialize_tag("failed", 2u32),
-                Self::Rebooting => __serializer.serialize_tag("rebooting", 3u32),
+                Self::Idle => __serializer.serialize_tag("idle", 0u32),
+                Self::Installing => __serializer.serialize_tag("installing", 1u32),
+                Self::Rebooting => __serializer.serialize_tag("rebooting", 2u32),
+                Self::Committing => __serializer.serialize_tag("committing", 3u32),
+                Self::Completed => __serializer.serialize_tag("completed", 4u32),
+                Self::Failed => __serializer.serialize_tag("failed", 5u32),
+                Self::Blocked => __serializer.serialize_tag("blocked", 6u32),
+                Self::Rollback => __serializer.serialize_tag("rollback", 7u32),
             }
         }
     }
@@ -48673,11 +49031,18 @@ pub mod properties {
             __deserializer: __D,
         ) -> ::std::result::Result<Self, __D::Error> {
             #[doc(hidden)]
-            const __IDENTIFIERS: &'static [&'static str] =
-                &["installing", "completed", "failed", "rebooting"];
+            const __IDENTIFIERS: &'static [&'static str] = &[
+                "idle",
+                "installing",
+                "rebooting",
+                "committing",
+                "completed",
+                "failed",
+                "blocked",
+                "rollback",
+            ];
             #[doc(hidden)]
-            const __EXPECTING_IDENTIFIERS: &'static str =
-                "an identifier in [\"installing\", \"completed\", \"failed\", \"rebooting\"]";
+            const __EXPECTING_IDENTIFIERS: &'static str = "an identifier in [\"idle\", \"installing\", \"rebooting\", \"committing\", \"completed\", \"failed\", \"blocked\", \"rollback\"]";
             #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
             #[doc(hidden)]
             enum __Identifier {
@@ -48685,6 +49050,10 @@ pub mod properties {
                 __Identifier1,
                 __Identifier2,
                 __Identifier3,
+                __Identifier4,
+                __Identifier5,
+                __Identifier6,
+                __Identifier7,
             }
             #[doc(hidden)]
             struct __IdentifierVisitor;
@@ -48705,6 +49074,10 @@ pub mod properties {
                         1u64 => ::core::result::Result::Ok(__Identifier::__Identifier1),
                         2u64 => ::core::result::Result::Ok(__Identifier::__Identifier2),
                         3u64 => ::core::result::Result::Ok(__Identifier::__Identifier3),
+                        4u64 => ::core::result::Result::Ok(__Identifier::__Identifier4),
+                        5u64 => ::core::result::Result::Ok(__Identifier::__Identifier5),
+                        6u64 => ::core::result::Result::Ok(__Identifier::__Identifier6),
+                        7u64 => ::core::result::Result::Ok(__Identifier::__Identifier7),
                         __variant => {
                             ::core::result::Result::Err(__serde::de::Error::invalid_value(
                                 __serde::de::Unexpected::Unsigned(__variant),
@@ -48718,10 +49091,14 @@ pub mod properties {
                     __E: __serde::de::Error,
                 {
                     match __value {
-                        "installing" => ::core::result::Result::Ok(__Identifier::__Identifier0),
-                        "completed" => ::core::result::Result::Ok(__Identifier::__Identifier1),
-                        "failed" => ::core::result::Result::Ok(__Identifier::__Identifier2),
-                        "rebooting" => ::core::result::Result::Ok(__Identifier::__Identifier3),
+                        "idle" => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                        "installing" => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                        "rebooting" => ::core::result::Result::Ok(__Identifier::__Identifier2),
+                        "committing" => ::core::result::Result::Ok(__Identifier::__Identifier3),
+                        "completed" => ::core::result::Result::Ok(__Identifier::__Identifier4),
+                        "failed" => ::core::result::Result::Ok(__Identifier::__Identifier5),
+                        "blocked" => ::core::result::Result::Ok(__Identifier::__Identifier6),
+                        "rollback" => ::core::result::Result::Ok(__Identifier::__Identifier7),
                         __variant => ::core::result::Result::Err(
                             __serde::de::Error::unknown_variant(__variant, __IDENTIFIERS),
                         ),
@@ -48735,10 +49112,14 @@ pub mod properties {
                     __E: __serde::de::Error,
                 {
                     match __value {
-                        b"installing" => ::core::result::Result::Ok(__Identifier::__Identifier0),
-                        b"completed" => ::core::result::Result::Ok(__Identifier::__Identifier1),
-                        b"failed" => ::core::result::Result::Ok(__Identifier::__Identifier2),
-                        b"rebooting" => ::core::result::Result::Ok(__Identifier::__Identifier3),
+                        b"idle" => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                        b"installing" => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                        b"rebooting" => ::core::result::Result::Ok(__Identifier::__Identifier2),
+                        b"committing" => ::core::result::Result::Ok(__Identifier::__Identifier3),
+                        b"completed" => ::core::result::Result::Ok(__Identifier::__Identifier4),
+                        b"failed" => ::core::result::Result::Ok(__Identifier::__Identifier5),
+                        b"blocked" => ::core::result::Result::Ok(__Identifier::__Identifier6),
+                        b"rollback" => ::core::result::Result::Ok(__Identifier::__Identifier7),
                         __variant => {
                             ::core::result::Result::Err(__serde::de::Error::invalid_value(
                                 __serde::de::Unexpected::Bytes(__variant),
@@ -48761,8 +49142,16 @@ pub mod properties {
                 }
             }
             #[doc(hidden)]
-            const __VARIANTS: &'static [&'static str] =
-                &["installing", "completed", "failed", "rebooting"];
+            const __VARIANTS: &'static [&'static str] = &[
+                "idle",
+                "installing",
+                "rebooting",
+                "committing",
+                "completed",
+                "failed",
+                "blocked",
+                "rollback",
+            ];
             #[doc(hidden)]
             struct __Visitor {
                 __phantom_vars: ::core::marker::PhantomData<fn(&())>,
@@ -48784,16 +49173,28 @@ pub mod properties {
                     #[allow(unreachable_patterns)]
                     match __identifier {
                         __Identifier::__Identifier0 => {
-                            ::core::result::Result::Ok(OtaUpdateState::Installing)
+                            ::core::result::Result::Ok(OtaUpdateState::Idle)
                         }
                         __Identifier::__Identifier1 => {
-                            ::core::result::Result::Ok(OtaUpdateState::Completed)
+                            ::core::result::Result::Ok(OtaUpdateState::Installing)
                         }
                         __Identifier::__Identifier2 => {
-                            ::core::result::Result::Ok(OtaUpdateState::Failed)
+                            ::core::result::Result::Ok(OtaUpdateState::Rebooting)
                         }
                         __Identifier::__Identifier3 => {
-                            ::core::result::Result::Ok(OtaUpdateState::Rebooting)
+                            ::core::result::Result::Ok(OtaUpdateState::Committing)
+                        }
+                        __Identifier::__Identifier4 => {
+                            ::core::result::Result::Ok(OtaUpdateState::Completed)
+                        }
+                        __Identifier::__Identifier5 => {
+                            ::core::result::Result::Ok(OtaUpdateState::Failed)
+                        }
+                        __Identifier::__Identifier6 => {
+                            ::core::result::Result::Ok(OtaUpdateState::Blocked)
+                        }
+                        __Identifier::__Identifier7 => {
+                            ::core::result::Result::Ok(OtaUpdateState::Rollback)
                         }
                         _ => Err(__E::invalid_value(
                             __serde::de::Unexpected::Str(__value),
@@ -48812,19 +49213,35 @@ pub mod properties {
                     match __serde::de::EnumAccess::variant::<__Identifier>(__data)? {
                         (__Identifier::__Identifier0, __variant) => {
                             __serde::de::VariantAccess::unit_variant(__variant)?;
-                            ::core::result::Result::Ok(OtaUpdateState::Installing)
+                            ::core::result::Result::Ok(OtaUpdateState::Idle)
                         }
                         (__Identifier::__Identifier1, __variant) => {
                             __serde::de::VariantAccess::unit_variant(__variant)?;
-                            ::core::result::Result::Ok(OtaUpdateState::Completed)
+                            ::core::result::Result::Ok(OtaUpdateState::Installing)
                         }
                         (__Identifier::__Identifier2, __variant) => {
                             __serde::de::VariantAccess::unit_variant(__variant)?;
-                            ::core::result::Result::Ok(OtaUpdateState::Failed)
+                            ::core::result::Result::Ok(OtaUpdateState::Rebooting)
                         }
                         (__Identifier::__Identifier3, __variant) => {
                             __serde::de::VariantAccess::unit_variant(__variant)?;
-                            ::core::result::Result::Ok(OtaUpdateState::Rebooting)
+                            ::core::result::Result::Ok(OtaUpdateState::Committing)
+                        }
+                        (__Identifier::__Identifier4, __variant) => {
+                            __serde::de::VariantAccess::unit_variant(__variant)?;
+                            ::core::result::Result::Ok(OtaUpdateState::Completed)
+                        }
+                        (__Identifier::__Identifier5, __variant) => {
+                            __serde::de::VariantAccess::unit_variant(__variant)?;
+                            ::core::result::Result::Ok(OtaUpdateState::Failed)
+                        }
+                        (__Identifier::__Identifier6, __variant) => {
+                            __serde::de::VariantAccess::unit_variant(__variant)?;
+                            ::core::result::Result::Ok(OtaUpdateState::Blocked)
+                        }
+                        (__Identifier::__Identifier7, __variant) => {
+                            __serde::de::VariantAccess::unit_variant(__variant)?;
+                            ::core::result::Result::Ok(OtaUpdateState::Rollback)
                         }
                     }
                 }

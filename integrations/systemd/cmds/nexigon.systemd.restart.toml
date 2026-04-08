@@ -1,0 +1,22 @@
+[command]
+name = "nexigon.systemd.restart"
+description = "Restart a systemd unit"
+category = "services"
+
+[input]
+schema = '''
+{
+  "type": "object",
+  "properties": {
+    "unit": {
+      "type": "string",
+      "description": "Name of the systemd unit to restart"
+    }
+  },
+  "required": ["unit"]
+}
+'''
+
+[exec]
+handler = ["/usr/libexec/nexigon/nexigon-systemd-restart"]
+timeout = 30

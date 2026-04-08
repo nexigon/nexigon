@@ -20,12 +20,7 @@ use tokio::io::AsyncWriteExt;
 use tracing::debug;
 use tracing::error;
 use tracing::info;
-use tracing::warn;
 
-use nexigon_multiplex::ConnectionRef;
-
-use crate::builtins::BuiltinCommand;
-use crate::builtins::InvocationCtx;
 use crate::config::CommandDefinition;
 use crate::config::CommandSchemaBlock;
 use crate::config::Config;
@@ -36,15 +31,9 @@ const STDERR_TAIL_MAX_BYTES: usize = 8192;
 
 const DEFAULT_COMMAND_TIMEOUT: u64 = 30;
 
-/// A command in the registry, either external (TOML + script) or built-in.
-pub enum RegisteredCommand {
-    External(CommandDefinition),
-    Builtin(Box<dyn BuiltinCommand>),
-}
-
 /// Registry of loaded command definitions.
 pub struct CommandRegistry {
-    commands: HashMap<String, RegisteredCommand>,
+    commands: HashMap<String, CommandDefinition>,
 }
 
 impl CommandRegistry {
@@ -98,60 +87,35 @@ impl CommandRegistry {
             };
             info!(name = %def.command.name, ?path, "loaded command");
             let name = def.command.name.clone();
-            commands.insert(name, RegisteredCommand::External(def));
+            commands.insert(name, def);
         }
 
         info!(count = commands.len(), "loaded external commands");
         Ok(Self { commands })
     }
 
-    /// Add built-in commands to the registry, skipping any that collide with
-    /// already-registered external commands.
-    pub fn add_builtins(&mut self, builtins: Vec<Box<dyn BuiltinCommand>>) {
-        for builtin in builtins {
-            let descriptor = builtin.descriptor();
-            if self.commands.contains_key(&descriptor.name) {
-                warn!(
-                    name = %descriptor.name,
-                    "skipping built-in command that collides with external command"
-                );
-                continue;
-            }
-            info!(name = %descriptor.name, "registered built-in command");
-            let name = descriptor.name.clone();
-            self.commands
-                .insert(name, RegisteredCommand::Builtin(builtin));
-        }
-    }
-
     /// Get a command by name.
-    pub fn get(&self, name: &str) -> Option<&RegisteredCommand> {
+    pub fn get(&self, name: &str) -> Option<&CommandDefinition> {
         self.commands.get(name)
     }
 
     /// Build the capability manifest for publishing as a device property.
     pub fn manifest(&self) -> DeviceCommandManifest {
+        let parse_schema = |block: &Option<CommandSchemaBlock>| -> Option<serde_json::Value> {
+            block
+                .as_ref()
+                .and_then(|s| serde_json::from_str(&s.schema).ok())
+        };
         DeviceCommandManifest {
             commands: self
                 .commands
                 .values()
-                .map(|cmd| match cmd {
-                    RegisteredCommand::External(def) => {
-                        let parse_schema =
-                            |block: &Option<CommandSchemaBlock>| -> Option<serde_json::Value> {
-                                block
-                                    .as_ref()
-                                    .and_then(|s| serde_json::from_str(&s.schema).ok())
-                            };
-                        DeviceCommandDescriptor {
-                            name: def.command.name.clone(),
-                            description: def.command.description.clone(),
-                            category: def.command.category.clone(),
-                            input: parse_schema(&def.input),
-                            output: parse_schema(&def.output),
-                        }
-                    }
-                    RegisteredCommand::Builtin(cmd) => cmd.descriptor(),
+                .map(|def| DeviceCommandDescriptor {
+                    name: def.command.name.clone(),
+                    description: def.command.description.clone(),
+                    category: def.command.category.clone(),
+                    input: parse_schema(&def.input),
+                    output: parse_schema(&def.output),
                 })
                 .collect(),
         }
@@ -163,11 +127,9 @@ pub async fn handle_handler_channel(
     channel: nexigon_multiplex::Channel,
     _config: &Arc<Config>,
     registry: &Arc<CommandRegistry>,
-    connection_ref: ConnectionRef,
 ) -> anyhow::Result<()> {
     let (mut chan_writer, mut chan_reader) = channel.split();
 
-    // Read the Invoke frame.
     let DeviceCommandHubFrame::Invoke(request) = read_hub_frame(&mut chan_reader).await?;
 
     debug!(
@@ -176,7 +138,7 @@ pub async fn handle_handler_channel(
         "command invocation"
     );
 
-    let Some(registered) = registry.get(&request.command) else {
+    let Some(command_def) = registry.get(&request.command) else {
         let frame = DeviceCommandDeviceFrame::Done(DeviceCommandDoneData {
             status: DeviceCommandStatus::Error,
             output: None,
@@ -188,35 +150,7 @@ pub async fn handle_handler_channel(
         return Ok(());
     };
 
-    let done_frame = match registered {
-        RegisteredCommand::External(command_def) => {
-            execute_external_command(command_def, &request, &mut chan_writer).await?
-        }
-        RegisteredCommand::Builtin(cmd) => {
-            let timeout_secs: Option<u64> = request.timeout_secs.map(|t| t.into());
-            let ctx = InvocationCtx {
-                input: request.input.clone(),
-                connection_ref: Some(connection_ref),
-            };
-            let started = std::time::Instant::now();
-            let done = if let Some(timeout_secs) = timeout_secs {
-                let timeout = std::time::Duration::from_secs(timeout_secs);
-                match tokio::time::timeout(timeout, cmd.execute(ctx)).await {
-                    Ok(done) => done,
-                    Err(_) => DeviceCommandDoneData {
-                        status: DeviceCommandStatus::Error,
-                        output: None,
-                        error: Some(format!("command timed out after {timeout_secs}s")),
-                        log_tail: Vec::new(),
-                        duration_ms: started.elapsed().as_millis() as u64,
-                    },
-                }
-            } else {
-                cmd.execute(ctx).await
-            };
-            DeviceCommandDeviceFrame::Done(done)
-        }
-    };
+    let done_frame = execute_external_command(command_def, &request, &mut chan_writer).await?;
 
     write_device_frame(&mut chan_writer, &done_frame).await.ok();
 

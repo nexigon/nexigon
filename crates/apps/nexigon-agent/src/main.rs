@@ -38,10 +38,8 @@ use crate::config::Config;
 use crate::handlers::CommandRegistry;
 use crate::system_info::get_system_info;
 
-pub mod builtins;
 pub mod config;
 pub mod handlers;
-pub mod integrations;
 pub mod system_info;
 #[cfg(target_os = "linux")]
 pub mod terminal;
@@ -136,29 +134,19 @@ async fn main() -> anyhow::Result<()> {
             .as_ref()
             .and_then(|h| h.directory.as_deref())
             .unwrap_or(Path::new("/etc/nexigon/agent/commands"));
-        let mut registry = CommandRegistry::load_external(commands_dir)
+        let registry = CommandRegistry::load_external(commands_dir)
             .context("failed to load command definitions")?;
-        if let Some(builtins_config) = config.commands.as_ref().and_then(|c| c.builtins.as_ref()) {
-            let builtins = builtins::collect_builtins(builtins_config);
-            registry.add_builtins(builtins);
-        }
-        if let Some(integrations_config) = config.integrations.as_ref() {
-            let integration_commands = integrations::collect_commands(integrations_config);
-            registry.add_builtins(integration_commands);
-        }
         Some(Arc::new(registry))
     } else {
         None
     };
 
     let mut connection_ref = connection.make_ref();
-    let handler_connection_ref = connection.make_ref();
     let connection_config = config.clone();
     let connection_registry = command_registry.clone();
     let connection_handle = tokio::spawn(async move {
         let config = connection_config;
         let command_registry = connection_registry;
-        let handler_connection_ref = handler_connection_ref;
         while let Some(event) = connection.next().await {
             match event {
                 Ok(ConnectionEvent::RequestChannel(request)) => {
@@ -223,13 +211,11 @@ async fn main() -> anyhow::Result<()> {
                         };
                         let config = config.clone();
                         let registry = registry.clone();
-                        let conn_ref = handler_connection_ref.clone();
                         request.accept(move |channel| {
                             tokio::spawn(async move {
-                                if let Err(e) = handlers::handle_handler_channel(
-                                    channel, &config, &registry, conn_ref,
-                                )
-                                .await
+                                if let Err(e) =
+                                    handlers::handle_handler_channel(channel, &config, &registry)
+                                        .await
                                 {
                                     warn!("handler channel error: {e:?}");
                                 }

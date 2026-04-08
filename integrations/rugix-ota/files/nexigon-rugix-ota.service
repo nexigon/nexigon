@@ -1,0 +1,8 @@
+[Unit]
+Description=Nexigon Rugix OTA Update
+Wants=network-online.target
+After=network-online.target nexigon-agent.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/nexigon-rugix-ota

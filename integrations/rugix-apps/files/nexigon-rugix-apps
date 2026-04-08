@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+# Dispatches rugix-apps commands to rugix-ctrl.
+# Usage: nexigon-rugix-apps <subcommand>
+# Commands with input read the app name from stdin JSON.
+# Commands with JSON output wrap it in the agent output envelope.
+set -euo pipefail
+
+subcommand="${1:?missing subcommand}"
+
+case "$subcommand" in
+    list)
+        output=$(rugix-ctrl apps list)
+        echo "{\"type\": \"Output\", \"data\": $output}"
+        ;;
+    info)
+        read -r input
+        app=$(echo "$input" | jq -r '.app')
+        output=$(rugix-ctrl apps info "$app")
+        echo "{\"type\": \"Output\", \"data\": $output}"
+        ;;
+    start|stop|rollback|remove)
+        read -r input
+        app=$(echo "$input" | jq -r '.app')
+        rugix-ctrl apps "$subcommand" "$app"
+        ;;
+    *)
+        echo "unknown subcommand: $subcommand" >&2
+        exit 1
+        ;;
+esac

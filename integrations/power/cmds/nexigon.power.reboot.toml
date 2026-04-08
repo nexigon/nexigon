@@ -1,0 +1,8 @@
+[command]
+name = "nexigon.power.reboot"
+description = "Reboot the system"
+category = "power"
+
+[exec]
+handler = ["reboot"]
+timeout = 10

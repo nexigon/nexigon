@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+read -r input
+
+unit=$(echo "$input" | jq -r '.unit')
+systemctl restart "$unit"

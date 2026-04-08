@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+# Deploys a Rugix App from a Nexigon package version.
+# Reads versionId and optional assetFilename from stdin JSON.
+# Uses nexigon-agent CLI to resolve download URLs from the repository.
+set -euo pipefail
+
+read -r input
+version_id=$(echo "$input" | jq -r '.versionId')
+asset_filename=$(echo "$input" | jq -r '.assetFilename // empty')
+
+echo "Resolving version $version_id..." >&2
+
+version_info=$(nexigon-agent repositories versions info "$version_id")
+
+if [ -n "$asset_filename" ]; then
+    asset_path=$(echo "$version_info" | jq -r --arg f "$asset_filename" \
+        '.assets[] | select(.filename == $f) | .path')
+else
+    asset_path=$(echo "$version_info" | jq -r \
+        '.assets[] | select(.filename | endswith(".rugixb")) | .path')
+fi
+
+if [ -z "$asset_path" ]; then
+    echo "No matching .rugixb asset found in version $version_id" >&2
+    exit 1
+fi
+
+echo "Issuing download URL for $asset_path..." >&2
+
+download_url=$(nexigon-agent repositories issue-url "$asset_path" | jq -r '.url')
+
+echo "Installing app from $download_url..." >&2
+
+output=$(rugix-ctrl apps install "$download_url")
+echo "{\"type\": \"Output\", \"data\": $output}"

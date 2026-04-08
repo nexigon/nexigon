@@ -1,0 +1,22 @@
+[command]
+name = "nexigon.rugix-apps.remove"
+description = "Remove a Rugix App"
+category = "applications"
+
+[input]
+schema = '''
+{
+  "type": "object",
+  "properties": {
+    "app": {
+      "type": "string",
+      "description": "Name of the application"
+    }
+  },
+  "required": ["app"]
+}
+'''
+
+[exec]
+handler = ["/usr/libexec/nexigon/nexigon-rugix-apps", "remove"]
+timeout = 30

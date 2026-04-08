@@ -1,0 +1,22 @@
+[command]
+name = "nexigon.systemd.status"
+description = "Get the status of a systemd unit"
+category = "services"
+
+[input]
+schema = '''
+{
+  "type": "object",
+  "properties": {
+    "unit": {
+      "type": "string",
+      "description": "Name of the systemd unit"
+    }
+  },
+  "required": ["unit"]
+}
+'''
+
+[exec]
+handler = ["/usr/libexec/nexigon/nexigon-systemd-status"]
+timeout = 15
