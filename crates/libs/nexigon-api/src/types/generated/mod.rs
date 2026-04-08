@@ -19296,6 +19296,8 @@ pub mod devices {
         pub value: super::json::JsonValue,
         #[doc = "Indicates whether the property should be protected.\n"]
         pub protected: ::std::option::Option<bool>,
+        #[doc = "If set, the property is only updated when its current version matches\nthis value (compare-and-swap). Returns `VersionConflict` when the\nversion does not match, or `Deleted` when the property no longer exists.\n"]
+        pub expected_version: ::std::option::Option<u64>,
     }
     impl SetDevicePropertyAction {
         #[doc = "Creates a new [`SetDevicePropertyAction`]."]
@@ -19309,6 +19311,7 @@ pub mod devices {
                 name,
                 value,
                 protected: ::std::default::Default::default(),
+                expected_version: ::std::default::Default::default(),
             }
         }
         #[doc = "Sets the value of `device_id`."]
@@ -19351,6 +19354,22 @@ pub mod devices {
             self.protected = protected;
             self
         }
+        #[doc = "Sets the value of `expected_version`."]
+        pub fn set_expected_version(
+            &mut self,
+            expected_version: ::std::option::Option<u64>,
+        ) -> &mut Self {
+            self.expected_version = expected_version;
+            self
+        }
+        #[doc = "Sets the value of `expected_version`."]
+        pub fn with_expected_version(
+            mut self,
+            expected_version: ::std::option::Option<u64>,
+        ) -> Self {
+            self.expected_version = expected_version;
+            self
+        }
     }
     #[automatically_derived]
     impl __serde::Serialize for SetDevicePropertyAction {
@@ -19361,7 +19380,7 @@ pub mod devices {
             let mut __record = __sidex_serde::ser::RecordSerializer::new(
                 __serializer,
                 "SetDevicePropertyAction",
-                4usize,
+                5usize,
             )?;
             __record.serialize_field("deviceId", &self.device_id)?;
             __record.serialize_field("name", &self.name)?;
@@ -19369,6 +19388,10 @@ pub mod devices {
             __record.serialize_optional_field(
                 "protected",
                 ::core::option::Option::as_ref(&self.protected),
+            )?;
+            __record.serialize_optional_field(
+                "expectedVersion",
+                ::core::option::Option::as_ref(&self.expected_version),
             )?;
             __record.end()
         }
@@ -19405,7 +19428,7 @@ pub mod devices {
                                 return ::core::result::Result::Err(
                                     __serde::de::Error::invalid_length(
                                         0usize,
-                                        &"record with 4 fields",
+                                        &"record with 5 fields",
                                     ),
                                 );
                             }
@@ -19417,7 +19440,7 @@ pub mod devices {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(1usize, &"record with 4 fields"),
+                                __serde::de::Error::invalid_length(1usize, &"record with 5 fields"),
                             );
                         }
                     };
@@ -19428,7 +19451,7 @@ pub mod devices {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(2usize, &"record with 4 fields"),
+                                __serde::de::Error::invalid_length(2usize, &"record with 5 fields"),
                             );
                         }
                     };
@@ -19439,7 +19462,18 @@ pub mod devices {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(3usize, &"record with 4 fields"),
+                                __serde::de::Error::invalid_length(3usize, &"record with 5 fields"),
+                            );
+                        }
+                    };
+                    let __field4 = match __serde::de::SeqAccess::next_element::<
+                        ::std::option::Option<u64>,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(4usize, &"record with 5 fields"),
                             );
                         }
                     };
@@ -19448,6 +19482,7 @@ pub mod devices {
                         name: __field1,
                         value: __field2,
                         protected: __field3,
+                        expected_version: __field4,
                     })
                 }
                 #[inline]
@@ -19460,10 +19495,9 @@ pub mod devices {
                 {
                     #[doc(hidden)]
                     const __IDENTIFIERS: &'static [&'static str] =
-                        &["deviceId", "name", "value", "protected"];
+                        &["deviceId", "name", "value", "protected", "expectedVersion"];
                     #[doc(hidden)]
-                    const __EXPECTING_IDENTIFIERS: &'static str =
-                        "an identifier in [\"deviceId\", \"name\", \"value\", \"protected\"]";
+                    const __EXPECTING_IDENTIFIERS: &'static str = "an identifier in [\"deviceId\", \"name\", \"value\", \"protected\", \"expectedVersion\"]";
                     #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
                     #[doc(hidden)]
                     enum __Identifier {
@@ -19471,6 +19505,7 @@ pub mod devices {
                         __Identifier1,
                         __Identifier2,
                         __Identifier3,
+                        __Identifier4,
                         __Unknown,
                     }
                     #[doc(hidden)]
@@ -19495,6 +19530,7 @@ pub mod devices {
                                 1u64 => ::core::result::Result::Ok(__Identifier::__Identifier1),
                                 2u64 => ::core::result::Result::Ok(__Identifier::__Identifier2),
                                 3u64 => ::core::result::Result::Ok(__Identifier::__Identifier3),
+                                4u64 => ::core::result::Result::Ok(__Identifier::__Identifier4),
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
                         }
@@ -19514,6 +19550,9 @@ pub mod devices {
                                 "protected" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier3)
                                 }
+                                "expectedVersion" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier4)
+                                }
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
                         }
@@ -19532,6 +19571,9 @@ pub mod devices {
                                 b"value" => ::core::result::Result::Ok(__Identifier::__Identifier2),
                                 b"protected" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier3)
+                                }
+                                b"expectedVersion" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier4)
                                 }
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
@@ -19558,6 +19600,8 @@ pub mod devices {
                     let mut __field2: ::core::option::Option<super::json::JsonValue> =
                         ::core::option::Option::None;
                     let mut __field3: ::core::option::Option<::std::option::Option<bool>> =
+                        ::core::option::Option::None;
+                    let mut __field4: ::core::option::Option<::std::option::Option<u64>> =
                         ::core::option::Option::None;
                     while let ::core::option::Option::Some(__key) =
                         __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
@@ -19615,6 +19659,20 @@ pub mod devices {
                                     >(&mut __map)?,
                                 );
                             }
+                            __Identifier::__Identifier4 => {
+                                if ::core::option::Option::is_some(&__field4) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "expectedVersion",
+                                        ),
+                                    );
+                                }
+                                __field4 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<::std::option::Option<u64>>(
+                                        &mut __map,
+                                    )?,
+                                );
+                            }
                             _ => {
                                 __serde::de::MapAccess::next_value::<__serde::de::IgnoredAny>(
                                     &mut __map,
@@ -19650,19 +19708,443 @@ pub mod devices {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => ::core::option::Option::None,
                     };
+                    let __field4 = match __field4 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => ::core::option::Option::None,
+                    };
                     ::core::result::Result::Ok(SetDevicePropertyAction {
                         device_id: __field0,
                         name: __field1,
                         value: __field2,
                         protected: __field3,
+                        expected_version: __field4,
                     })
                 }
             }
             #[doc(hidden)]
-            const __FIELDS: &'static [&'static str] = &["deviceId", "name", "value", "protected"];
+            const __FIELDS: &'static [&'static str] =
+                &["deviceId", "name", "value", "protected", "expectedVersion"];
             __serde::Deserializer::deserialize_struct(
                 __deserializer,
                 "SetDevicePropertyAction",
+                __FIELDS,
+                __Visitor {
+                    __phantom_vars: ::core::marker::PhantomData,
+                },
+            )
+        }
+    }
+    #[doc = "Output of setting a device property.\n"]
+    #[derive(Clone, Debug)]
+    pub enum SetDevicePropertyOutput {
+        #[doc = "The property was set successfully.\n"]
+        Set,
+        #[doc = "The property was not updated because its version did not match the\nexpected version (compare-and-swap conflict).\n"]
+        VersionConflict(SetDevicePropertyVersionConflict),
+        #[doc = "The property was not updated because it has been deleted while an\nexpected version was specified.\n"]
+        Deleted,
+    }
+    #[automatically_derived]
+    impl __serde::Serialize for SetDevicePropertyOutput {
+        fn serialize<__S: __serde::Serializer>(
+            &self,
+            __serializer: __S,
+        ) -> ::std::result::Result<__S::Ok, __S::Error> {
+            let __serializer =
+                __sidex_serde::ser::VariantSerializer::new(__serializer, "SetDevicePropertyOutput");
+            match self {
+                Self::Set => __serializer.serialize_internal_tag("result", "Set", 0u32),
+                Self::VersionConflict(__value) => __serializer.serialize_internally_tagged(
+                    "result",
+                    "VersionConflict",
+                    1u32,
+                    __value,
+                ),
+                Self::Deleted => __serializer.serialize_internal_tag("result", "Deleted", 2u32),
+            }
+        }
+    }
+    #[automatically_derived]
+    impl<'de> __serde::Deserialize<'de> for SetDevicePropertyOutput {
+        fn deserialize<__D: __serde::Deserializer<'de>>(
+            __deserializer: __D,
+        ) -> ::std::result::Result<Self, __D::Error> {
+            #[doc(hidden)]
+            const __IDENTIFIERS: &'static [&'static str] = &["Set", "VersionConflict", "Deleted"];
+            #[doc(hidden)]
+            const __EXPECTING_IDENTIFIERS: &'static str =
+                "an identifier in [\"Set\", \"VersionConflict\", \"Deleted\"]";
+            #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
+            #[doc(hidden)]
+            enum __Identifier {
+                __Identifier0,
+                __Identifier1,
+                __Identifier2,
+            }
+            #[doc(hidden)]
+            struct __IdentifierVisitor;
+            impl<'de> __serde::de::Visitor<'de> for __IdentifierVisitor {
+                type Value = __Identifier;
+                fn expecting(
+                    &self,
+                    __formatter: &mut ::core::fmt::Formatter,
+                ) -> ::core::fmt::Result {
+                    ::core::fmt::Formatter::write_str(__formatter, __EXPECTING_IDENTIFIERS)
+                }
+                fn visit_u64<__E>(self, __value: u64) -> ::core::result::Result<Self::Value, __E>
+                where
+                    __E: __serde::de::Error,
+                {
+                    match __value {
+                        0u64 => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                        1u64 => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                        2u64 => ::core::result::Result::Ok(__Identifier::__Identifier2),
+                        __variant => {
+                            ::core::result::Result::Err(__serde::de::Error::invalid_value(
+                                __serde::de::Unexpected::Unsigned(__variant),
+                                &__EXPECTING_IDENTIFIERS,
+                            ))
+                        }
+                    }
+                }
+                fn visit_str<__E>(self, __value: &str) -> ::core::result::Result<Self::Value, __E>
+                where
+                    __E: __serde::de::Error,
+                {
+                    match __value {
+                        "Set" => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                        "VersionConflict" => {
+                            ::core::result::Result::Ok(__Identifier::__Identifier1)
+                        }
+                        "Deleted" => ::core::result::Result::Ok(__Identifier::__Identifier2),
+                        __variant => ::core::result::Result::Err(
+                            __serde::de::Error::unknown_variant(__variant, __IDENTIFIERS),
+                        ),
+                    }
+                }
+                fn visit_bytes<__E>(
+                    self,
+                    __value: &[u8],
+                ) -> ::core::result::Result<Self::Value, __E>
+                where
+                    __E: __serde::de::Error,
+                {
+                    match __value {
+                        b"Set" => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                        b"VersionConflict" => {
+                            ::core::result::Result::Ok(__Identifier::__Identifier1)
+                        }
+                        b"Deleted" => ::core::result::Result::Ok(__Identifier::__Identifier2),
+                        __variant => {
+                            ::core::result::Result::Err(__serde::de::Error::invalid_value(
+                                __serde::de::Unexpected::Bytes(__variant),
+                                &__EXPECTING_IDENTIFIERS,
+                            ))
+                        }
+                    }
+                }
+            }
+            impl<'de> __serde::Deserialize<'de> for __Identifier {
+                #[inline]
+                fn deserialize<__D>(__deserializer: __D) -> ::core::result::Result<Self, __D::Error>
+                where
+                    __D: __serde::Deserializer<'de>,
+                {
+                    __serde::Deserializer::deserialize_identifier(
+                        __deserializer,
+                        __IdentifierVisitor,
+                    )
+                }
+            }
+            #[doc(hidden)]
+            const __VARIANTS: &'static [&'static str] = &["Set", "VersionConflict", "Deleted"];
+            if __serde::Deserializer::is_human_readable(&__deserializer) {
+                let __tagged = __sidex_serde::de::tagged::deserialize_tagged_variant::<
+                    __Identifier,
+                    __D,
+                >(__deserializer, "result")?;
+                match __tagged . tag { __Identifier :: __Identifier0 => { :: core :: result :: Result :: Ok (SetDevicePropertyOutput :: Set) } , __Identifier :: __Identifier1 => { :: core :: result :: Result :: Ok (SetDevicePropertyOutput :: VersionConflict (__tagged . deserialize_internally_tagged :: < SetDevicePropertyVersionConflict < > , __D :: Error > () ?)) } , __Identifier :: __Identifier2 => { :: core :: result :: Result :: Ok (SetDevicePropertyOutput :: Deleted) } , }
+            } else {
+                #[doc(hidden)]
+                struct __Visitor {
+                    __phantom_vars: ::core::marker::PhantomData<fn(&())>,
+                }
+                impl<'de> __serde::de::Visitor<'de> for __Visitor {
+                    type Value = SetDevicePropertyOutput;
+                    fn expecting(
+                        &self,
+                        __formatter: &mut ::core::fmt::Formatter,
+                    ) -> ::core::fmt::Result {
+                        ::core::fmt::Formatter::write_str(
+                            __formatter,
+                            "enum SetDevicePropertyOutput",
+                        )
+                    }
+                    #[inline]
+                    fn visit_str<__E>(
+                        self,
+                        __value: &str,
+                    ) -> ::core::result::Result<Self::Value, __E>
+                    where
+                        __E: __serde::de::Error,
+                    {
+                        let __identifier = __IdentifierVisitor.visit_str(__value)?;
+                        #[allow(unreachable_patterns)]
+                        match __identifier {
+                            __Identifier::__Identifier0 => {
+                                ::core::result::Result::Ok(SetDevicePropertyOutput::Set)
+                            }
+                            __Identifier::__Identifier2 => {
+                                ::core::result::Result::Ok(SetDevicePropertyOutput::Deleted)
+                            }
+                            _ => Err(__E::invalid_value(
+                                __serde::de::Unexpected::Str(__value),
+                                &self,
+                            )),
+                        }
+                    }
+                    #[inline]
+                    fn visit_enum<__A>(
+                        self,
+                        __data: __A,
+                    ) -> ::core::result::Result<Self::Value, __A::Error>
+                    where
+                        __A: __serde::de::EnumAccess<'de>,
+                    {
+                        match __serde::de::EnumAccess::variant::<__Identifier>(__data)? {
+                            (__Identifier::__Identifier0, __variant) => {
+                                __serde::de::VariantAccess::unit_variant(__variant)?;
+                                ::core::result::Result::Ok(SetDevicePropertyOutput::Set)
+                            }
+                            (__Identifier::__Identifier1, __variant) => {
+                                let __value = __serde::de::VariantAccess::newtype_variant::<
+                                    SetDevicePropertyVersionConflict,
+                                >(__variant)?;
+                                ::core::result::Result::Ok(
+                                    SetDevicePropertyOutput::VersionConflict(__value),
+                                )
+                            }
+                            (__Identifier::__Identifier2, __variant) => {
+                                __serde::de::VariantAccess::unit_variant(__variant)?;
+                                ::core::result::Result::Ok(SetDevicePropertyOutput::Deleted)
+                            }
+                        }
+                    }
+                }
+                __serde::Deserializer::deserialize_enum(
+                    __deserializer,
+                    "SetDevicePropertyOutput",
+                    __VARIANTS,
+                    __Visitor {
+                        __phantom_vars: ::core::marker::PhantomData,
+                    },
+                )
+            }
+        }
+    }
+    #[doc = "Details of a version conflict when setting a device property.\n"]
+    #[derive(Clone, Debug)]
+    pub struct SetDevicePropertyVersionConflict {
+        #[doc = "The current version of the property.\n"]
+        pub current_version: u64,
+    }
+    impl SetDevicePropertyVersionConflict {
+        #[doc = "Creates a new [`SetDevicePropertyVersionConflict`]."]
+        pub fn new(current_version: u64) -> Self {
+            Self { current_version }
+        }
+        #[doc = "Sets the value of `current_version`."]
+        pub fn set_current_version(&mut self, current_version: u64) -> &mut Self {
+            self.current_version = current_version;
+            self
+        }
+        #[doc = "Sets the value of `current_version`."]
+        pub fn with_current_version(mut self, current_version: u64) -> Self {
+            self.current_version = current_version;
+            self
+        }
+    }
+    #[automatically_derived]
+    impl __serde::Serialize for SetDevicePropertyVersionConflict {
+        fn serialize<__S: __serde::Serializer>(
+            &self,
+            __serializer: __S,
+        ) -> ::std::result::Result<__S::Ok, __S::Error> {
+            let mut __record = __sidex_serde::ser::RecordSerializer::new(
+                __serializer,
+                "SetDevicePropertyVersionConflict",
+                1usize,
+            )?;
+            __record.serialize_field("currentVersion", &self.current_version)?;
+            __record.end()
+        }
+    }
+    #[automatically_derived]
+    impl<'de> __serde::Deserialize<'de> for SetDevicePropertyVersionConflict {
+        fn deserialize<__D: __serde::Deserializer<'de>>(
+            __deserializer: __D,
+        ) -> ::std::result::Result<Self, __D::Error> {
+            #[doc(hidden)]
+            struct __Visitor {
+                __phantom_vars: ::core::marker::PhantomData<fn(&())>,
+            }
+            impl<'de> __serde::de::Visitor<'de> for __Visitor {
+                type Value = SetDevicePropertyVersionConflict;
+                fn expecting(
+                    &self,
+                    __formatter: &mut ::core::fmt::Formatter,
+                ) -> ::core::fmt::Result {
+                    ::core::fmt::Formatter::write_str(
+                        __formatter,
+                        "record SetDevicePropertyVersionConflict",
+                    )
+                }
+                #[inline]
+                fn visit_seq<__A>(
+                    self,
+                    mut __seq: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::SeqAccess<'de>,
+                {
+                    let __field0 = match __serde::de::SeqAccess::next_element::<u64>(&mut __seq)? {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(0usize, &"record with 1 fields"),
+                            );
+                        }
+                    };
+                    ::core::result::Result::Ok(SetDevicePropertyVersionConflict {
+                        current_version: __field0,
+                    })
+                }
+                #[inline]
+                fn visit_map<__A>(
+                    self,
+                    mut __map: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::MapAccess<'de>,
+                {
+                    #[doc(hidden)]
+                    const __IDENTIFIERS: &'static [&'static str] = &["currentVersion"];
+                    #[doc(hidden)]
+                    const __EXPECTING_IDENTIFIERS: &'static str =
+                        "an identifier in [\"currentVersion\"]";
+                    #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
+                    #[doc(hidden)]
+                    enum __Identifier {
+                        __Identifier0,
+                        __Unknown,
+                    }
+                    #[doc(hidden)]
+                    struct __IdentifierVisitor;
+                    impl<'de> __serde::de::Visitor<'de> for __IdentifierVisitor {
+                        type Value = __Identifier;
+                        fn expecting(
+                            &self,
+                            __formatter: &mut ::core::fmt::Formatter,
+                        ) -> ::core::fmt::Result {
+                            ::core::fmt::Formatter::write_str(__formatter, __EXPECTING_IDENTIFIERS)
+                        }
+                        fn visit_u64<__E>(
+                            self,
+                            __value: u64,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                0u64 => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_str<__E>(
+                            self,
+                            __value: &str,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                "currentVersion" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
+                                }
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_bytes<__E>(
+                            self,
+                            __value: &[u8],
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                b"currentVersion" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
+                                }
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                    }
+                    impl<'de> __serde::Deserialize<'de> for __Identifier {
+                        #[inline]
+                        fn deserialize<__D>(
+                            __deserializer: __D,
+                        ) -> ::core::result::Result<Self, __D::Error>
+                        where
+                            __D: __serde::Deserializer<'de>,
+                        {
+                            __serde::Deserializer::deserialize_identifier(
+                                __deserializer,
+                                __IdentifierVisitor,
+                            )
+                        }
+                    }
+                    let mut __field0: ::core::option::Option<u64> = ::core::option::Option::None;
+                    while let ::core::option::Option::Some(__key) =
+                        __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
+                    {
+                        match __key {
+                            __Identifier::__Identifier0 => {
+                                if ::core::option::Option::is_some(&__field0) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "currentVersion",
+                                        ),
+                                    );
+                                }
+                                __field0 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<u64>(&mut __map)?,
+                                );
+                            }
+                            _ => {
+                                __serde::de::MapAccess::next_value::<__serde::de::IgnoredAny>(
+                                    &mut __map,
+                                )?;
+                            }
+                        }
+                    }
+                    let __field0 = match __field0 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                <__A::Error as __serde::de::Error>::missing_field("currentVersion"),
+                            );
+                        }
+                    };
+                    ::core::result::Result::Ok(SetDevicePropertyVersionConflict {
+                        current_version: __field0,
+                    })
+                }
+            }
+            #[doc(hidden)]
+            const __FIELDS: &'static [&'static str] = &["currentVersion"];
+            __serde::Deserializer::deserialize_struct(
+                __deserializer,
+                "SetDevicePropertyVersionConflict",
                 __FIELDS,
                 __Visitor {
                     __phantom_vars: ::core::marker::PhantomData,

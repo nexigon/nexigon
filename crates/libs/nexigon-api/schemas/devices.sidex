@@ -468,6 +468,29 @@ record SetDevicePropertyAction {
     value: JsonValue,
     /// Indicates whether the property should be protected.
     protected?: bool,
+    /// If set, the property is only updated when its current version matches
+    /// this value (compare-and-swap). Returns `VersionConflict` when the
+    /// version does not match, or `Deleted` when the property no longer exists.
+    expected_version?: u64,
+}
+
+/// Output of setting a device property.
+#[json(tag = "result")]
+variant SetDevicePropertyOutput {
+    /// The property was set successfully.
+    Set,
+    /// The property was not updated because its version did not match the
+    /// expected version (compare-and-swap conflict).
+    VersionConflict: SetDevicePropertyVersionConflict,
+    /// The property was not updated because it has been deleted while an
+    /// expected version was specified.
+    Deleted,
+}
+
+/// Details of a version conflict when setting a device property.
+record SetDevicePropertyVersionConflict {
+    /// The current version of the property.
+    current_version: u64,
 }
 
 /// Get a property of a device.

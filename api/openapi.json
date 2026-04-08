@@ -2261,7 +2261,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/nexigon_api.outputs.Empty"
+                  "$ref": "#/components/schemas/nexigon_api.devices.SetDevicePropertyOutput"
                 }
               }
             }
@@ -5687,12 +5687,73 @@
           },
           "protected": {
             "type": "boolean"
+          },
+          "expectedVersion": {
+            "type": "integer",
+            "format": "uint64"
           }
         },
         "required": [
           "deviceId",
           "name",
           "value"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.devices.SetDevicePropertyOutput": {
+        "description": "Output of setting a device property.",
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "result": {
+                "const": "Set"
+              }
+            },
+            "required": [
+              "result"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "result": {
+                "const": "VersionConflict"
+              },
+              "currentVersion": {
+                "type": "integer",
+                "format": "uint64"
+              }
+            },
+            "required": [
+              "result",
+              "currentVersion"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "result": {
+                "const": "Deleted"
+              }
+            },
+            "required": [
+              "result"
+            ]
+          }
+        ]
+      },
+      "nexigon_api.devices.SetDevicePropertyVersionConflict": {
+        "type": "object",
+        "description": "Details of a version conflict when setting a device property.",
+        "properties": {
+          "currentVersion": {
+            "type": "integer",
+            "format": "uint64"
+          }
+        },
+        "required": [
+          "currentVersion"
         ],
         "unevaluatedProperties": false
       },
