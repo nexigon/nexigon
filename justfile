@@ -41,6 +41,7 @@ generate:
     mv build/agent-json-schema/nexigon_agent.config.Config.schema.json schemas/nexigon-agent.schema.json
     cargo run --bin nexigon-gen-openapi >api/openapi.json
     cargo run --bin nexigon-gen-py-bindings >sdks/python/src/nexigon_hub_sdk/_actions.py
+    cd sdks/python && just fmt
     just fmt
 
 # Run tests.

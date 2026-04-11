@@ -450,7 +450,7 @@ class IssueDeviceHttpProxyTokenAction(pydantic.BaseModel):
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
     device_id: DeviceId = pydantic.Field(
-        alias="deviceId", serialization_alias="deviceId"
+        validation_alias="deviceId", serialization_alias="deviceId"
     )
     valid_for_secs: int | None = pydantic.Field(
         default=None,
