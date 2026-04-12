@@ -1,0 +1,86 @@
+site_name: Nexigon Hub Python SDK
+site_description: Python SDK for the Nexigon Hub IoT device management platform.
+repo_url: https://github.com/nexigon/nexigon
+
+theme:
+  name: material
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - content.code.copy
+    - navigation.sections
+    - navigation.expand
+    - search.highlight
+    - toc.follow
+
+nav:
+  - Getting Started:
+      - Installation: index.md
+      - Quick Start: guide/quickstart.md
+      - Actions: guide/actions.md
+      - Device Commands: guide/device-commands.md
+      - Error Handling: guide/errors.md
+  - API Reference:
+      - Client: reference/client.md
+      - Errors: reference/errors.md
+      - API Types:
+          - Users: reference/types/users.md
+          - Organizations: reference/types/organizations.md
+          - Projects: reference/types/projects.md
+          - Devices: reference/types/devices.md
+          - Repositories: reference/types/repositories.md
+          - Fleet: reference/types/fleet.md
+          - Audit: reference/types/audit.md
+          - Jobs: reference/types/jobs.md
+          - Instance: reference/types/instance.md
+          - Cluster: reference/types/cluster.md
+          - Properties: reference/types/properties.md
+          - Actor: reference/types/actor.md
+
+plugins:
+  - search
+  - mkdocstrings:
+      default_handler: python
+      handlers:
+        python:
+          paths: [src]
+          options:
+            show_source: false
+            show_bases: true
+            show_root_heading: true
+            show_root_full_path: false
+            members_order: source
+            group_by_category: false
+            show_category_heading: false
+            show_symbol_type_heading: true
+            show_symbol_type_toc: true
+            docstring_style: google
+            merge_init_into_class: true
+            show_if_no_docstring: false
+            signature_crossrefs: true
+            separate_signature: true
+            filters:
+              - "!^_"
+              - "!^model_config$"
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - toc:
+      permalink: true

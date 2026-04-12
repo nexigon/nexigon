@@ -42,16 +42,26 @@ class AuditLogEvent(pydantic.BaseModel):
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
     event_id: AuditLogEventId = pydantic.Field(
-        validation_alias="eventId", serialization_alias="eventId"
+        description="ID of the audit log event.",
+        validation_alias="eventId",
+        serialization_alias="eventId",
     )
-    actor: actor.Actor
-    event: str
-    data: json.JsonValue
+    actor: actor.Actor = pydantic.Field(description="Actor causing the event.")
+    event: str = pydantic.Field(description="Type of the event that was recorded.")
+    data: json.JsonValue = pydantic.Field(
+        description="Additional audit data associated with the event."
+    )
     created_at: datetime.Timestamp = pydantic.Field(
-        validation_alias="createdAt", serialization_alias="createdAt"
+        description="Timestamp indicating when the audit log event was recorded.",
+        validation_alias="createdAt",
+        serialization_alias="createdAt",
     )
-    action: AuditLogEventAction | None = None
-    job: AuditLogEventJob | None = None
+    action: AuditLogEventAction | None = pydantic.Field(
+        default=None, description="Action the event has been caused by (if any)."
+    )
+    job: AuditLogEventJob | None = pydantic.Field(
+        default=None, description="Job the event has been caused by (if any)."
+    )
 
 
 class AuditLogEventAction(pydantic.BaseModel):
@@ -60,7 +70,9 @@ class AuditLogEventAction(pydantic.BaseModel):
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
     action_id: AuditLogActionId = pydantic.Field(
-        validation_alias="actionId", serialization_alias="actionId"
+        description="ID of the action.",
+        validation_alias="actionId",
+        serialization_alias="actionId",
     )
 
 
@@ -70,7 +82,9 @@ class AuditLogEventJob(pydantic.BaseModel):
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
     job_id: jobs.JobId = pydantic.Field(
-        validation_alias="jobId", serialization_alias="jobId"
+        description="ID of the job.",
+        validation_alias="jobId",
+        serialization_alias="jobId",
     )
 
 
@@ -82,14 +96,22 @@ class AuditLogAction(pydantic.BaseModel):
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
     action_id: AuditLogActionId = pydantic.Field(
-        validation_alias="actionId", serialization_alias="actionId"
+        description="ID of the audit log action.",
+        validation_alias="actionId",
+        serialization_alias="actionId",
     )
-    actor: actor.Actor
-    action: str
-    data: dict[str, json.JsonValue]
-    status: AuditLogActionStatus
+    actor: actor.Actor = pydantic.Field(description="Actor that performed the action.")
+    action: str = pydantic.Field(description="Type of the action that was performed.")
+    data: dict[str, json.JsonValue] = pydantic.Field(
+        description="Additional audit data associated with the action."
+    )
+    status: AuditLogActionStatus = pydantic.Field(
+        description="Status associated with the action"
+    )
     created_at: datetime.Timestamp = pydantic.Field(
-        validation_alias="createdAt", serialization_alias="createdAt"
+        description="Timestamp indicating when the audit log action was recorded.",
+        validation_alias="createdAt",
+        serialization_alias="createdAt",
     )
 
 
@@ -106,7 +128,7 @@ class QueryAuditLogEventsOutput(pydantic.BaseModel):
 
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
-    events: list[AuditLogEvent]
+    events: list[AuditLogEvent] = pydantic.Field(description="List of audit events.")
 
 
 class QueryAuditLogActionsAction(pydantic.BaseModel):
@@ -122,7 +144,7 @@ class QueryAuditLogActionsOutput(pydantic.BaseModel):
 
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
-    actions: list[AuditLogAction]
+    actions: list[AuditLogAction] = pydantic.Field(description="List of actions.")
 
 
 class AuditLogActionStatus_Rejected(pydantic.RootModel[Literal["Rejected"]]):

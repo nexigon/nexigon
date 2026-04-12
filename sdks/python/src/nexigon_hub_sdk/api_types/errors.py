@@ -15,8 +15,8 @@ class ActionError(pydantic.BaseModel):
 
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
-    kind: ActionErrorKind
-    message: str
+    kind: ActionErrorKind = pydantic.Field(description="Kind of the error.")
+    message: str = pydantic.Field(description="Message of the error.")
 
 
 class ActionErrorKind_Invalid(pydantic.RootModel[Literal["Invalid"]]):

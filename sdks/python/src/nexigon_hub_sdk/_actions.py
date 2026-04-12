@@ -551,619 +551,874 @@ class _SyncExecuteMixin:
     """Type overloads for the synchronous client."""
 
     @overload
-    def execute(self, action: users.QueryUsersAction) -> users.QueryUsersOutput: ...
+    def execute(self, action: users.QueryUsersAction) -> users.QueryUsersOutput:
+        """Query the users of the instance."""
+        ...
 
     @overload
-    def execute(
-        self, action: users.GetUserDetailsAction
-    ) -> users.GetUserDetailsOutput: ...
+    def execute(self, action: users.GetUserDetailsAction) -> users.GetUserDetailsOutput:
+        """Get information about a user."""
+        ...
 
     @overload
-    def execute(self, action: users.CreateUserAction) -> users.CreateUserOutput: ...
+    def execute(self, action: users.CreateUserAction) -> users.CreateUserOutput:
+        """Create a new user."""
+        ...
 
     @overload
-    def execute(self, action: users.DeleteUserAction) -> outputs.Empty: ...
+    def execute(self, action: users.DeleteUserAction) -> outputs.Empty:
+        """Delete a user."""
+        ...
 
     @overload
-    def execute(self, action: users.SetUserDisplayNameAction) -> outputs.Empty: ...
+    def execute(self, action: users.SetUserDisplayNameAction) -> outputs.Empty:
+        """Set the display name of a user."""
+        ...
 
     @overload
-    def execute(self, action: users.SetUserPasswordAction) -> outputs.Empty: ...
+    def execute(self, action: users.SetUserPasswordAction) -> outputs.Empty:
+        """Set the password of a user."""
+        ...
 
     @overload
-    def execute(self, action: users.SetUserIsAdminAction) -> outputs.Empty: ...
+    def execute(self, action: users.SetUserIsAdminAction) -> outputs.Empty:
+        """Set whether the user is an instance administrator."""
+        ...
 
     @overload
-    def execute(self, action: users.ResetUserPasswordAction) -> outputs.Empty: ...
+    def execute(self, action: users.ResetUserPasswordAction) -> outputs.Empty:
+        """Reset the password of a user.
+
+        This will send an email to the user with a link to reset their password."""
+        ...
 
     @overload
     def execute(
         self, action: users.CompleteUserPasswordResetAction
-    ) -> users.CompleteUserPasswordResetOutput: ...
+    ) -> users.CompleteUserPasswordResetOutput:
+        """Complete the password reset of a user."""
+        ...
 
     @overload
     def execute(
         self, action: users.QueryUserTokensAction
-    ) -> users.QueryUserTokensOutput: ...
+    ) -> users.QueryUserTokensOutput:
+        """Query the tokens of a user."""
+        ...
 
     @overload
     def execute(
         self, action: users.QueryUserOrganizationsAction
-    ) -> users.QueryUserOrganizationsOutput: ...
+    ) -> users.QueryUserOrganizationsOutput:
+        """Query the organizations of a user."""
+        ...
 
     @overload
     def execute(
         self, action: users.QueryUserOrganizationInvitationsAction
-    ) -> users.QueryUserOrganizationInvitationsOutput: ...
+    ) -> users.QueryUserOrganizationInvitationsOutput:
+        """Query the organization invitations of a user."""
+        ...
 
     @overload
     def execute(
         self, action: users.QueryUserSessionsAction
-    ) -> users.QueryUserSessionsOutput: ...
+    ) -> users.QueryUserSessionsOutput:
+        """Query the sessions of a user."""
+        ...
 
     @overload
     def execute(
         self, action: users.AuthenticateWithUserTokenAction
-    ) -> users.AuthenticateWithUserTokenOutput: ...
+    ) -> users.AuthenticateWithUserTokenOutput:
+        """Authenticate a user with a token."""
+        ...
 
     @overload
     def execute(
         self, action: users.AuthenticateWithSessionTokenAction
-    ) -> users.AuthenticateWithSessionTokenOutput: ...
+    ) -> users.AuthenticateWithSessionTokenOutput:
+        """Authenticate a user with a session token."""
+        ...
 
     @overload
     def execute(
         self, action: users.GetDevicePermissionsAction
-    ) -> users.GetDevicePermissionsOutput: ...
+    ) -> users.GetDevicePermissionsOutput:
+        """Check the permissions of a user for a given device."""
+        ...
 
     @overload
     def execute(
         self, action: users.CreateUserTokenAction
-    ) -> users.CreateUserTokenOutput: ...
+    ) -> users.CreateUserTokenOutput:
+        """Create a user token."""
+        ...
 
     @overload
-    def execute(self, action: users.DeleteUserTokenAction) -> outputs.Empty: ...
+    def execute(self, action: users.DeleteUserTokenAction) -> outputs.Empty:
+        """Delete a user token."""
+        ...
 
     @overload
     def execute(
         self, action: users.InitiateUserSessionAction
-    ) -> users.InitiateUserSessionOutput: ...
+    ) -> users.InitiateUserSessionOutput:
+        """Initiate a user session."""
+        ...
 
     @overload
-    def execute(self, action: users.TerminateUserSessionAction) -> outputs.Empty: ...
+    def execute(self, action: users.TerminateUserSessionAction) -> outputs.Empty:
+        """Terminate a user session."""
+        ...
 
     @overload
-    def execute(
-        self, action: users.CleanupExpiredUserSessionsAction
-    ) -> outputs.Empty: ...
+    def execute(self, action: users.CleanupExpiredUserSessionsAction) -> outputs.Empty:
+        """Cleanup expired user sessions."""
+        ...
 
     @overload
-    def execute(self, action: users.RegisterUserAction) -> users.RegisterUserOutput: ...
+    def execute(self, action: users.RegisterUserAction) -> users.RegisterUserOutput:
+        """Register a new user with an email and password."""
+        ...
 
     @overload
-    def execute(self, action: users.ResendRegistrationEmailAction) -> outputs.Empty: ...
+    def execute(self, action: users.ResendRegistrationEmailAction) -> outputs.Empty:
+        """"""
+        ...
 
     @overload
     def execute(
         self, action: users.CompleteRegistrationAction
-    ) -> users.CompleteRegistrationOutput: ...
+    ) -> users.CompleteRegistrationOutput:
+        """Complete the registration of a user."""
+        ...
 
     @overload
     def execute(
         self, action: users.AcceptOrganizationInvitationAction
-    ) -> outputs.Empty: ...
+    ) -> outputs.Empty:
+        """Accept a organization invitation."""
+        ...
 
     @overload
     def execute(
         self, action: organizations.QueryOrganizationsAction
-    ) -> organizations.QueryOrganizationsOutput: ...
+    ) -> organizations.QueryOrganizationsOutput:
+        """Query the organizations of the instance."""
+        ...
 
     @overload
     def execute(
         self, action: organizations.QueryOrganizationMembersAction
-    ) -> organizations.QueryOrganizationMembersOutput: ...
+    ) -> organizations.QueryOrganizationMembersOutput:
+        """Query the members of an organization."""
+        ...
 
     @overload
     def execute(
         self, action: organizations.QueryOrganizationProjectsAction
-    ) -> organizations.QueryOrganizationProjectsOutput: ...
+    ) -> organizations.QueryOrganizationProjectsOutput:
+        """Query the projects of an organization."""
+        ...
 
     @overload
     def execute(
         self, action: organizations.QueryOrganizationRepositoriesAction
-    ) -> organizations.QueryOrganizationRepositoriesOutput: ...
+    ) -> organizations.QueryOrganizationRepositoriesOutput:
+        """Query the repositories of an organization."""
+        ...
 
     @overload
     def execute(
         self, action: organizations.QueryOrganizationInvitationsAction
-    ) -> organizations.QueryOrganizationInvitationsOutput: ...
+    ) -> organizations.QueryOrganizationInvitationsOutput:
+        """Query the invitations of an organization."""
+        ...
 
     @overload
     def execute(
         self, action: organizations.CreateOrganizationAction
-    ) -> organizations.CreateOrganizationOutput: ...
+    ) -> organizations.CreateOrganizationOutput:
+        """Create an organization."""
+        ...
 
     @overload
-    def execute(
-        self, action: organizations.DeleteOrganizationAction
-    ) -> outputs.Empty: ...
+    def execute(self, action: organizations.DeleteOrganizationAction) -> outputs.Empty:
+        """Delete an organization."""
+        ...
 
     @overload
     def execute(
         self, action: organizations.AddOrganizationMemberAction
-    ) -> outputs.Empty: ...
+    ) -> outputs.Empty:
+        """Add a user to an organization."""
+        ...
 
     @overload
     def execute(
         self, action: organizations.RemoveOrganizationMemberAction
-    ) -> outputs.Empty: ...
+    ) -> outputs.Empty:
+        """Remove a user from an organization."""
+        ...
 
     @overload
     def execute(
         self, action: organizations.SetOrganizationMemberIsAdminAction
-    ) -> outputs.Empty: ...
+    ) -> outputs.Empty:
+        """Set whether the user is an administrator of the organization."""
+        ...
 
     @overload
     def execute(
         self, action: organizations.InviteOrganizationMemberAction
-    ) -> organizations.InviteOrganizationMemberOutput: ...
+    ) -> organizations.InviteOrganizationMemberOutput:
+        """Invite a user to an organization."""
+        ...
 
     @overload
     def execute(
         self, action: organizations.DeleteOrganizationInvitationAction
-    ) -> outputs.Empty: ...
+    ) -> outputs.Empty:
+        """Delete an invitation to an organization."""
+        ...
 
     @overload
     def execute(
         self, action: organizations.QueryOrganizationAuditLogAction
-    ) -> organizations.QueryOrganizationAuditLogOutput: ...
+    ) -> organizations.QueryOrganizationAuditLogOutput:
+        """Query the audit log of an organization."""
+        ...
 
     @overload
     def execute(
         self, action: projects.QueryProjectsAction
-    ) -> projects.QueryProjectsOutput: ...
+    ) -> projects.QueryProjectsOutput:
+        """Query the projects of the instance."""
+        ...
 
     @overload
     def execute(
         self, action: projects.GetProjectDetailsAction
-    ) -> projects.GetProjectDetailsOutput: ...
+    ) -> projects.GetProjectDetailsOutput:
+        """Get information about a project."""
+        ...
 
     @overload
     def execute(
         self, action: projects.CreateProjectAction
-    ) -> projects.CreateProjectOutput: ...
+    ) -> projects.CreateProjectOutput:
+        """Create a new project."""
+        ...
 
     @overload
-    def execute(self, action: projects.DeleteProjectAction) -> outputs.Empty: ...
+    def execute(self, action: projects.DeleteProjectAction) -> outputs.Empty:
+        """Delete a project."""
+        ...
 
     @overload
     def execute(
         self, action: projects.QueryProjectDevicesAction
-    ) -> projects.QueryProjectDevicesOutput: ...
+    ) -> projects.QueryProjectDevicesOutput:
+        """Query the devices of a project."""
+        ...
 
     @overload
     def execute(
         self, action: projects.QueryProjectDeploymentTokensAction
-    ) -> projects.QueryProjectDeploymentTokensOutput: ...
+    ) -> projects.QueryProjectDeploymentTokensOutput:
+        """Query the deployment tokens of a project."""
+        ...
 
     @overload
     def execute(
         self, action: projects.QueryProjectRepositoriesAction
-    ) -> projects.QueryProjectRepositoriesOutput: ...
+    ) -> projects.QueryProjectRepositoriesOutput:
+        """Query repositories of a project."""
+        ...
 
     @overload
-    def execute(self, action: projects.SetProjectNameAction) -> outputs.Empty: ...
+    def execute(self, action: projects.SetProjectNameAction) -> outputs.Empty:
+        """Set the name of a project."""
+        ...
 
     @overload
     def execute(
         self, action: projects.CreateDeploymentTokenAction
-    ) -> projects.CreateDeploymentTokenOutput: ...
+    ) -> projects.CreateDeploymentTokenOutput:
+        """Create a deployment token."""
+        ...
 
     @overload
-    def execute(
-        self, action: projects.DeleteDeploymentTokenAction
-    ) -> outputs.Empty: ...
+    def execute(self, action: projects.DeleteDeploymentTokenAction) -> outputs.Empty:
+        """Delete a deployment token."""
+        ...
 
     @overload
-    def execute(
-        self, action: projects.SetDeploymentTokenFlagsAction
-    ) -> outputs.Empty: ...
+    def execute(self, action: projects.SetDeploymentTokenFlagsAction) -> outputs.Empty:
+        """Set the flags of a deployment token."""
+        ...
 
     @overload
     def execute(
         self, action: projects.QueryAuditLogEventsAction
-    ) -> projects.QueryAuditLogEventsOutput: ...
+    ) -> projects.QueryAuditLogEventsOutput:
+        """Query the audit log of the project."""
+        ...
 
     @overload
-    def execute(self, action: projects.AddProjectRepositoryAction) -> outputs.Empty: ...
+    def execute(self, action: projects.AddProjectRepositoryAction) -> outputs.Empty:
+        """Add a repository to the project."""
+        ...
 
     @overload
-    def execute(
-        self, action: projects.RemoveProjectRepositoryAction
-    ) -> outputs.Empty: ...
+    def execute(self, action: projects.RemoveProjectRepositoryAction) -> outputs.Empty:
+        """Remove a repository from the project."""
+        ...
 
     @overload
     def execute(
         self, action: projects.GetProjectOtlpConfigAction
-    ) -> projects.GetProjectOtlpConfigOutput: ...
+    ) -> projects.GetProjectOtlpConfigOutput:
+        """Get the OTLP event forwarding configuration for a project."""
+        ...
 
     @overload
-    def execute(self, action: projects.SetProjectOtlpConfigAction) -> outputs.Empty: ...
+    def execute(self, action: projects.SetProjectOtlpConfigAction) -> outputs.Empty:
+        """Set the OTLP event forwarding configuration for a project."""
+        ...
 
     @overload
-    def execute(
-        self, action: devices.QueryDevicesAction
-    ) -> devices.QueryDevicesOutput: ...
+    def execute(self, action: devices.QueryDevicesAction) -> devices.QueryDevicesOutput:
+        """Query the devices of the instance."""
+        ...
 
     @overload
     def execute(
         self, action: devices.GetDeviceDetailsAction
-    ) -> devices.GetDeviceDetailsOutput: ...
+    ) -> devices.GetDeviceDetailsOutput:
+        """Get information about a device."""
+        ...
 
     @overload
-    def execute(
-        self, action: devices.CreateDeviceAction
-    ) -> devices.CreateDeviceOutput: ...
+    def execute(self, action: devices.CreateDeviceAction) -> devices.CreateDeviceOutput:
+        """Create a new device."""
+        ...
 
     @overload
-    def execute(self, action: devices.DeleteDeviceAction) -> outputs.Empty: ...
+    def execute(self, action: devices.DeleteDeviceAction) -> outputs.Empty:
+        """Delete a device."""
+        ...
 
     @overload
-    def execute(self, action: devices.SetDeviceNameAction) -> outputs.Empty: ...
+    def execute(self, action: devices.SetDeviceNameAction) -> outputs.Empty:
+        """Set the name of a device."""
+        ...
 
     @overload
     def execute(
         self, action: devices.IssueDeviceTokenAction
-    ) -> devices.IssueDeviceTokenOutput: ...
+    ) -> devices.IssueDeviceTokenOutput:
+        """Issue a JWT for a device with user-defined claims.
+
+        **Note: Only use this action for integration with external systems.**"""
+        ...
 
     @overload
     def execute(
         self, action: devices.ValidateDeviceTokenAction
-    ) -> devices.ValidateDeviceTokenOutput: ...
+    ) -> devices.ValidateDeviceTokenOutput:
+        """Validate a device JWT.
+
+        **Note: Only use this action for integration with external systems.**"""
+        ...
 
     @overload
     def execute(
         self, action: devices.AuthenticateDeviceAction
-    ) -> devices.AuthenticateDeviceOutput: ...
+    ) -> devices.AuthenticateDeviceOutput:
+        """Authenticate a device.
+
+        **Note: The certificate fingerprint must be externally verified (mutual TLS).**"""
+        ...
 
     @overload
     def execute(
         self, action: devices.AddDeviceCertificateAction
-    ) -> devices.AddDeviceCertificateOutput: ...
+    ) -> devices.AddDeviceCertificateOutput:
+        """Add a device certificate."""
+        ...
 
     @overload
-    def execute(
-        self, action: devices.DeleteDeviceCertificateAction
-    ) -> outputs.Empty: ...
+    def execute(self, action: devices.DeleteDeviceCertificateAction) -> outputs.Empty:
+        """Delete a device certificate."""
+        ...
 
     @overload
     def execute(
         self, action: devices.SetDeviceCertificateStatusAction
-    ) -> outputs.Empty: ...
+    ) -> outputs.Empty:
+        """Set the status of a device certificate."""
+        ...
 
     @overload
     def execute(
         self, action: devices.RegisterDeviceConnectionAction
-    ) -> devices.RegisterDeviceConnectionOutput: ...
+    ) -> devices.RegisterDeviceConnectionOutput:
+        """Register a connection of a device to a cluster node."""
+        ...
 
     @overload
     def execute(
         self, action: devices.UnregisterDeviceConnectionAction
-    ) -> outputs.Empty: ...
+    ) -> outputs.Empty:
+        """Unregister a connection of a device to a cluster node."""
+        ...
 
     @overload
     def execute(
         self, action: devices.QueryDeviceConnectionsAction
-    ) -> devices.QueryDeviceConnectionsOutput: ...
+    ) -> devices.QueryDeviceConnectionsOutput:
+        """Query the connection history of a device."""
+        ...
 
     @overload
     def execute(
         self, action: devices.IssueDeviceHttpProxyTokenAction
-    ) -> devices.IssueDeviceHttpProxyTokenOutput: ...
+    ) -> devices.IssueDeviceHttpProxyTokenOutput:
+        """Issue a HTTP proxy JWT."""
+        ...
 
     @overload
     def execute(
         self, action: devices.ValidateDeviceHttpProxyTokenAction
-    ) -> devices.ValidateDeviceHttpProxyTokenOutput: ...
+    ) -> devices.ValidateDeviceHttpProxyTokenOutput:
+        """Validate a HTTP proxy JWT."""
+        ...
 
     @overload
-    def execute(self, action: devices.PublishDeviceEventsAction) -> outputs.Empty: ...
+    def execute(self, action: devices.PublishDeviceEventsAction) -> outputs.Empty:
+        """Publish device events."""
+        ...
 
     @overload
     def execute(
         self, action: devices.QueryDeviceEventsAction
-    ) -> devices.QueryDeviceEventsOutput: ...
+    ) -> devices.QueryDeviceEventsOutput:
+        """Query device events."""
+        ...
 
     @overload
     def execute(
         self, action: devices.SetDevicePropertyAction
-    ) -> devices.SetDevicePropertyOutput: ...
+    ) -> devices.SetDevicePropertyOutput:
+        """Set a property of a device."""
+        ...
 
     @overload
     def execute(
         self, action: devices.GetDevicePropertyAction
-    ) -> devices.GetDevicePropertyOutput: ...
+    ) -> devices.GetDevicePropertyOutput:
+        """Get a property of a device."""
+        ...
 
     @overload
     def execute(
         self, action: devices.RemoveDevicePropertyAction
-    ) -> devices.RemoveDevicePropertyOutput: ...
+    ) -> devices.RemoveDevicePropertyOutput:
+        """Remove a property from a device."""
+        ...
 
     @overload
     def execute(
         self, action: devices.QueryDevicePropertiesAction
-    ) -> devices.QueryDevicePropertiesOutput: ...
+    ) -> devices.QueryDevicePropertiesOutput:
+        """Query the properties of a device."""
+        ...
 
     @overload
     def execute(
         self, action: devices.QueryDeviceAuditLogAction
-    ) -> devices.QueryDeviceAuditLogOutput: ...
+    ) -> devices.QueryDeviceAuditLogOutput:
+        """Query the audit log of a device."""
+        ...
 
     @overload
     def execute(
         self, action: devices.QueryDeviceCommandsAction
-    ) -> devices.QueryDeviceCommandsOutput: ...
+    ) -> devices.QueryDeviceCommandsOutput:
+        """Query the on-demand commands supported by a device."""
+        ...
 
     @overload
-    def execute(self, action: fleet.SetFleetPropertyAction) -> outputs.Empty: ...
+    def execute(self, action: fleet.SetFleetPropertyAction) -> outputs.Empty:
+        """Set a fleet property manually."""
+        ...
 
     @overload
     def execute(
         self, action: fleet.GetFleetPropertyAction
-    ) -> fleet.GetFleetPropertyOutput: ...
+    ) -> fleet.GetFleetPropertyOutput:
+        """Get a fleet property by name."""
+        ...
 
     @overload
     def execute(
         self, action: fleet.RemoveFleetPropertyAction
-    ) -> fleet.RemoveFleetPropertyOutput: ...
+    ) -> fleet.RemoveFleetPropertyOutput:
+        """Remove a fleet property.
+
+        Handles both manual and computed properties. For computed properties, the
+        associated definition is removed as well."""
+        ...
 
     @overload
     def execute(
         self, action: fleet.QueryFleetPropertiesAction
-    ) -> fleet.QueryFleetPropertiesOutput: ...
+    ) -> fleet.QueryFleetPropertiesOutput:
+        """Query all fleet properties of a project."""
+        ...
 
     @overload
-    def execute(
-        self, action: fleet.DefineComputedFleetPropertyAction
-    ) -> outputs.Empty: ...
+    def execute(self, action: fleet.DefineComputedFleetPropertyAction) -> outputs.Empty:
+        """Define a computed fleet property."""
+        ...
 
     @overload
     def execute(
         self, action: fleet.QueryComputedFleetPropertyDefinitionsAction
-    ) -> fleet.QueryComputedFleetPropertyDefinitionsOutput: ...
+    ) -> fleet.QueryComputedFleetPropertyDefinitionsOutput:
+        """Query computed fleet property definitions for a project."""
+        ...
 
     @overload
     def execute(
         self, action: repositories.ResolveRepositoryNameAction
-    ) -> repositories.ResolveRepositoryNameOutput: ...
+    ) -> repositories.ResolveRepositoryNameOutput:
+        """Resolve a repository by its name."""
+        ...
 
     @overload
     def execute(
         self, action: repositories.GetRepositoryDetailsAction
-    ) -> repositories.GetRepositoryDetailsOutput: ...
+    ) -> repositories.GetRepositoryDetailsOutput:
+        """Get information about a repository."""
+        ...
 
     @overload
     def execute(
         self, action: repositories.CreateRepositoryAction
-    ) -> repositories.CreateRepositoryOutput: ...
+    ) -> repositories.CreateRepositoryOutput:
+        """Create a new repository."""
+        ...
 
     @overload
-    def execute(self, action: repositories.DeleteRepositoryAction) -> outputs.Empty: ...
+    def execute(self, action: repositories.DeleteRepositoryAction) -> outputs.Empty:
+        """Delete a repository."""
+        ...
 
     @overload
     def execute(
         self, action: repositories.SetRepositoryVisibilityAction
-    ) -> outputs.Empty: ...
+    ) -> outputs.Empty:
+        """Set the visibility of a repository."""
+        ...
 
     @overload
     def execute(
         self, action: repositories.SetRepositoryDisplayNameAction
-    ) -> outputs.Empty: ...
+    ) -> outputs.Empty:
+        """Set the display name of a repository."""
+        ...
 
     @overload
     def execute(
         self, action: repositories.SetRepositoryPublicNameAction
-    ) -> repositories.SetRepositoryPublicNameOutput: ...
+    ) -> repositories.SetRepositoryPublicNameOutput:
+        """Set the public name of a repository.
+
+        Note: Setting the public name requires the `public_repositories` subscription feature."""
+        ...
 
     @overload
     def execute(
         self, action: repositories.QueryRepositoryPackagesAction
-    ) -> repositories.QueryRepositoryPackagesOutput: ...
+    ) -> repositories.QueryRepositoryPackagesOutput:
+        """Query the packages of a repository."""
+        ...
 
     @overload
     def execute(
         self, action: repositories.QueryRepositoryAssetsAction
-    ) -> repositories.QueryRepositoryAssetsOutput: ...
+    ) -> repositories.QueryRepositoryAssetsOutput:
+        """Query the assets of a repository."""
+        ...
 
     @overload
     def execute(
         self, action: repositories.QueryRepositoryProjectsAction
-    ) -> repositories.QueryRepositoryProjectsOutput: ...
+    ) -> repositories.QueryRepositoryProjectsOutput:
+        """Query repository projects."""
+        ...
 
     @overload
     def execute(
         self, action: repositories.ResolvePackageByPathAction
-    ) -> repositories.ResolvePackageByPathOutput: ...
+    ) -> repositories.ResolvePackageByPathOutput:
+        """Resolve a package by its path."""
+        ...
 
     @overload
     def execute(
         self, action: repositories.GetPackageDetailsAction
-    ) -> repositories.GetPackageDetailsOutput: ...
+    ) -> repositories.GetPackageDetailsOutput:
+        """Get information about a package."""
+        ...
 
     @overload
     def execute(
         self, action: repositories.CreatePackageAction
-    ) -> repositories.CreatePackageOutput: ...
+    ) -> repositories.CreatePackageOutput:
+        """Create a new package."""
+        ...
 
     @overload
-    def execute(self, action: repositories.DeletePackageAction) -> outputs.Empty: ...
+    def execute(self, action: repositories.DeletePackageAction) -> outputs.Empty:
+        """Delete a package."""
+        ...
 
     @overload
     def execute(
         self, action: repositories.SetPackageNameAction
-    ) -> repositories.SetPackageNameOutput: ...
+    ) -> repositories.SetPackageNameOutput:
+        """Set the name of a package."""
+        ...
 
     @overload
-    def execute(self, action: repositories.SetPackageKindAction) -> outputs.Empty: ...
+    def execute(self, action: repositories.SetPackageKindAction) -> outputs.Empty:
+        """Set the kind of a package."""
+        ...
 
     @overload
-    def execute(
-        self, action: repositories.SetPackageMetadataAction
-    ) -> outputs.Empty: ...
+    def execute(self, action: repositories.SetPackageMetadataAction) -> outputs.Empty:
+        """Set metadata on a package."""
+        ...
 
     @overload
     def execute(
         self, action: repositories.QueryPackageVersionsAction
-    ) -> repositories.QueryPackageVersionsOutput: ...
+    ) -> repositories.QueryPackageVersionsOutput:
+        """Query the versions of a package."""
+        ...
 
     @overload
     def execute(
         self, action: repositories.ResolvePackageVersionByPathAction
-    ) -> repositories.ResolvePackageVersionByPathOutput: ...
+    ) -> repositories.ResolvePackageVersionByPathOutput:
+        """Resolve a package version by its path."""
+        ...
 
     @overload
     def execute(
         self, action: repositories.GetPackageVersionDetailsAction
-    ) -> repositories.GetPackageVersionDetailsOutput: ...
+    ) -> repositories.GetPackageVersionDetailsOutput:
+        """Get information about a package version."""
+        ...
 
     @overload
     def execute(
         self, action: repositories.CreatePackageVersionAction
-    ) -> repositories.CreatePackageVersionOutput: ...
+    ) -> repositories.CreatePackageVersionOutput:
+        """Create a new package version."""
+        ...
 
     @overload
-    def execute(
-        self, action: repositories.DeletePackageVersionAction
-    ) -> outputs.Empty: ...
+    def execute(self, action: repositories.DeletePackageVersionAction) -> outputs.Empty:
+        """Delete a package version."""
+        ...
 
     @overload
     def execute(
         self, action: repositories.SetPackageVersionNameAction
-    ) -> outputs.Empty: ...
+    ) -> outputs.Empty:
+        """Set the name of a package version."""
+        ...
 
     @overload
     def execute(
         self, action: repositories.SetPackageVersionMetadataAction
-    ) -> outputs.Empty: ...
+    ) -> outputs.Empty:
+        """Set metadata on a package version."""
+        ...
 
     @overload
     def execute(
         self, action: repositories.AddPackageVersionAssetAction
-    ) -> repositories.AddPackageVersionAssetOutput: ...
+    ) -> repositories.AddPackageVersionAssetOutput:
+        """Add an asset to a package version."""
+        ...
 
     @overload
     def execute(
         self, action: repositories.RemovePackageVersionAssetAction
-    ) -> outputs.Empty: ...
+    ) -> outputs.Empty:
+        """Remove an asset from a package version."""
+        ...
 
     @overload
     def execute(
         self, action: repositories.SetPackageVersionAssetMetadataAction
-    ) -> outputs.Empty: ...
+    ) -> outputs.Empty:
+        """Set metadata on a package version asset."""
+        ...
 
     @overload
-    def execute(
-        self, action: repositories.TagPackageVersionAction
-    ) -> outputs.Empty: ...
+    def execute(self, action: repositories.TagPackageVersionAction) -> outputs.Empty:
+        """Add tags to a version."""
+        ...
 
     @overload
-    def execute(
-        self, action: repositories.UntagPackageVersionAction
-    ) -> outputs.Empty: ...
+    def execute(self, action: repositories.UntagPackageVersionAction) -> outputs.Empty:
+        """Remove tags from a version."""
+        ...
 
     @overload
     def execute(
         self, action: repositories.ResolvePackageVersionAssetByPathAction
-    ) -> repositories.ResolvePackageVersionAssetByPathOutput: ...
+    ) -> repositories.ResolvePackageVersionAssetByPathOutput:
+        """Resolve a version asset by its path."""
+        ...
 
     @overload
     def execute(
         self, action: repositories.SetRepositoryS3ConfigAction
-    ) -> outputs.Empty: ...
+    ) -> outputs.Empty:
+        """Set the S3 configuration for the repository."""
+        ...
 
     @overload
     def execute(
         self, action: repositories.GetRepositoryS3ConfigAction
-    ) -> repositories.GetRepositoryS3ConfigOutput: ...
+    ) -> repositories.GetRepositoryS3ConfigOutput:
+        """Get the S3 configuration for the repository."""
+        ...
 
     @overload
     def execute(
         self, action: repositories.GetAssetDetailsAction
-    ) -> repositories.GetAssetDetailsOutput: ...
+    ) -> repositories.GetAssetDetailsOutput:
+        """Get information about an asset."""
+        ...
 
     @overload
     def execute(
         self, action: repositories.CreateAssetAction
-    ) -> repositories.CreateAssetOutput: ...
+    ) -> repositories.CreateAssetOutput:
+        """Create an asset."""
+        ...
 
     @overload
-    def execute(self, action: repositories.DeleteAssetAction) -> outputs.Empty: ...
+    def execute(self, action: repositories.DeleteAssetAction) -> outputs.Empty:
+        """Delete an asset."""
+        ...
 
     @overload
     def execute(
         self, action: repositories.IssueAssetDownloadUrlAction
-    ) -> repositories.IssueAssetDownloadUrlOutput: ...
+    ) -> repositories.IssueAssetDownloadUrlOutput:
+        """Issue a URL for downloading an asset."""
+        ...
 
     @overload
     def execute(
         self, action: repositories.IssueAssetUploadUrlAction
-    ) -> repositories.IssueAssetUploadUrlOutput: ...
+    ) -> repositories.IssueAssetUploadUrlOutput:
+        """Issue a URL for uploading an asset."""
+        ...
 
     @overload
     def execute(
         self, action: repositories.QueryAuditLogEventsAction
-    ) -> repositories.QueryAuditLogEventsOutput: ...
+    ) -> repositories.QueryAuditLogEventsOutput:
+        """Query the audit log of the repository."""
+        ...
 
     @overload
     def execute(
         self, action: audit.QueryAuditLogEventsAction
-    ) -> audit.QueryAuditLogEventsOutput: ...
+    ) -> audit.QueryAuditLogEventsOutput:
+        """Query the events recorded in the audit log.
+
+        Requires administrator permissions."""
+        ...
 
     @overload
     def execute(
         self, action: audit.QueryAuditLogActionsAction
-    ) -> audit.QueryAuditLogActionsOutput: ...
+    ) -> audit.QueryAuditLogActionsOutput:
+        """Query the actions recorded in the audit log.
+
+        Requires administrator permissions."""
+        ...
 
     @overload
-    def execute(self, action: jobs.QueryJobsAction) -> jobs.QueryJobsOutput: ...
+    def execute(self, action: jobs.QueryJobsAction) -> jobs.QueryJobsOutput:
+        """Query the jobs of the instance."""
+        ...
 
     @overload
     def execute(
         self, action: instance.GetInstanceStatisticsAction
-    ) -> instance.GetInstanceStatisticsOutput: ...
+    ) -> instance.GetInstanceStatisticsOutput:
+        """Get instance statistics."""
+        ...
 
     @overload
     def execute(
         self, action: instance.GetInstanceSettingsRawAction
-    ) -> instance.GetInstanceSettingsRawOutput: ...
+    ) -> instance.GetInstanceSettingsRawOutput:
+        """Get the settings of the instance."""
+        ...
 
     @overload
-    def execute(
-        self, action: instance.SetInstanceSettingRawAction
-    ) -> outputs.Empty: ...
+    def execute(self, action: instance.SetInstanceSettingRawAction) -> outputs.Empty:
+        """Set a setting of the instance."""
+        ...
 
     @overload
     def execute(
         self, action: cluster.GetClusterDetailsAction
-    ) -> cluster.GetClusterDetailsOutput: ...
+    ) -> cluster.GetClusterDetailsOutput:
+        """Get information about the cluster."""
+        ...
 
     @overload
     def execute(
         self, action: cluster.RegisterClusterNodeAction
-    ) -> cluster.RegisterClusterNodeOutput: ...
+    ) -> cluster.RegisterClusterNodeOutput:
+        """Register a new cluster node."""
+        ...
 
     @overload
     def execute(
         self, action: cluster.ReportClusterNodeHeartbeatAction
-    ) -> outputs.Empty: ...
+    ) -> outputs.Empty:
+        """Report the heartbeat of a cluster node."""
+        ...
 
     @overload
     def execute(
         self, action: cluster.CleanupInactiveClusterNodesAction
-    ) -> outputs.Empty: ...
+    ) -> outputs.Empty:
+        """Cleanup inactive cluster nodes."""
+        ...
 
     @overload
-    def execute(self, action: actor.GetActorAction) -> actor.GetActorOutput: ...
+    def execute(self, action: actor.GetActorAction) -> actor.GetActorOutput:
+        """Get the actor.
+
+        This action is used to get the actor that is used to invoke the action."""
+        ...
 
     def execute(self, action: pydantic.BaseModel) -> pydantic.BaseModel:
         return self._execute_action(action)
@@ -1176,645 +1431,914 @@ class _AsyncExecuteMixin:
     """Type overloads for the asynchronous client."""
 
     @overload
-    async def execute(
-        self, action: users.QueryUsersAction
-    ) -> users.QueryUsersOutput: ...
+    async def execute(self, action: users.QueryUsersAction) -> users.QueryUsersOutput:
+        """Query the users of the instance."""
+        ...
 
     @overload
     async def execute(
         self, action: users.GetUserDetailsAction
-    ) -> users.GetUserDetailsOutput: ...
+    ) -> users.GetUserDetailsOutput:
+        """Get information about a user."""
+        ...
 
     @overload
-    async def execute(
-        self, action: users.CreateUserAction
-    ) -> users.CreateUserOutput: ...
+    async def execute(self, action: users.CreateUserAction) -> users.CreateUserOutput:
+        """Create a new user."""
+        ...
 
     @overload
-    async def execute(self, action: users.DeleteUserAction) -> outputs.Empty: ...
+    async def execute(self, action: users.DeleteUserAction) -> outputs.Empty:
+        """Delete a user."""
+        ...
 
     @overload
-    async def execute(
-        self, action: users.SetUserDisplayNameAction
-    ) -> outputs.Empty: ...
+    async def execute(self, action: users.SetUserDisplayNameAction) -> outputs.Empty:
+        """Set the display name of a user."""
+        ...
 
     @overload
-    async def execute(self, action: users.SetUserPasswordAction) -> outputs.Empty: ...
+    async def execute(self, action: users.SetUserPasswordAction) -> outputs.Empty:
+        """Set the password of a user."""
+        ...
 
     @overload
-    async def execute(self, action: users.SetUserIsAdminAction) -> outputs.Empty: ...
+    async def execute(self, action: users.SetUserIsAdminAction) -> outputs.Empty:
+        """Set whether the user is an instance administrator."""
+        ...
 
     @overload
-    async def execute(self, action: users.ResetUserPasswordAction) -> outputs.Empty: ...
+    async def execute(self, action: users.ResetUserPasswordAction) -> outputs.Empty:
+        """Reset the password of a user.
+
+        This will send an email to the user with a link to reset their password."""
+        ...
 
     @overload
     async def execute(
         self, action: users.CompleteUserPasswordResetAction
-    ) -> users.CompleteUserPasswordResetOutput: ...
+    ) -> users.CompleteUserPasswordResetOutput:
+        """Complete the password reset of a user."""
+        ...
 
     @overload
     async def execute(
         self, action: users.QueryUserTokensAction
-    ) -> users.QueryUserTokensOutput: ...
+    ) -> users.QueryUserTokensOutput:
+        """Query the tokens of a user."""
+        ...
 
     @overload
     async def execute(
         self, action: users.QueryUserOrganizationsAction
-    ) -> users.QueryUserOrganizationsOutput: ...
+    ) -> users.QueryUserOrganizationsOutput:
+        """Query the organizations of a user."""
+        ...
 
     @overload
     async def execute(
         self, action: users.QueryUserOrganizationInvitationsAction
-    ) -> users.QueryUserOrganizationInvitationsOutput: ...
+    ) -> users.QueryUserOrganizationInvitationsOutput:
+        """Query the organization invitations of a user."""
+        ...
 
     @overload
     async def execute(
         self, action: users.QueryUserSessionsAction
-    ) -> users.QueryUserSessionsOutput: ...
+    ) -> users.QueryUserSessionsOutput:
+        """Query the sessions of a user."""
+        ...
 
     @overload
     async def execute(
         self, action: users.AuthenticateWithUserTokenAction
-    ) -> users.AuthenticateWithUserTokenOutput: ...
+    ) -> users.AuthenticateWithUserTokenOutput:
+        """Authenticate a user with a token."""
+        ...
 
     @overload
     async def execute(
         self, action: users.AuthenticateWithSessionTokenAction
-    ) -> users.AuthenticateWithSessionTokenOutput: ...
+    ) -> users.AuthenticateWithSessionTokenOutput:
+        """Authenticate a user with a session token."""
+        ...
 
     @overload
     async def execute(
         self, action: users.GetDevicePermissionsAction
-    ) -> users.GetDevicePermissionsOutput: ...
+    ) -> users.GetDevicePermissionsOutput:
+        """Check the permissions of a user for a given device."""
+        ...
 
     @overload
     async def execute(
         self, action: users.CreateUserTokenAction
-    ) -> users.CreateUserTokenOutput: ...
+    ) -> users.CreateUserTokenOutput:
+        """Create a user token."""
+        ...
 
     @overload
-    async def execute(self, action: users.DeleteUserTokenAction) -> outputs.Empty: ...
+    async def execute(self, action: users.DeleteUserTokenAction) -> outputs.Empty:
+        """Delete a user token."""
+        ...
 
     @overload
     async def execute(
         self, action: users.InitiateUserSessionAction
-    ) -> users.InitiateUserSessionOutput: ...
+    ) -> users.InitiateUserSessionOutput:
+        """Initiate a user session."""
+        ...
 
     @overload
-    async def execute(
-        self, action: users.TerminateUserSessionAction
-    ) -> outputs.Empty: ...
+    async def execute(self, action: users.TerminateUserSessionAction) -> outputs.Empty:
+        """Terminate a user session."""
+        ...
 
     @overload
     async def execute(
         self, action: users.CleanupExpiredUserSessionsAction
-    ) -> outputs.Empty: ...
+    ) -> outputs.Empty:
+        """Cleanup expired user sessions."""
+        ...
 
     @overload
     async def execute(
         self, action: users.RegisterUserAction
-    ) -> users.RegisterUserOutput: ...
+    ) -> users.RegisterUserOutput:
+        """Register a new user with an email and password."""
+        ...
 
     @overload
     async def execute(
         self, action: users.ResendRegistrationEmailAction
-    ) -> outputs.Empty: ...
+    ) -> outputs.Empty:
+        """"""
+        ...
 
     @overload
     async def execute(
         self, action: users.CompleteRegistrationAction
-    ) -> users.CompleteRegistrationOutput: ...
+    ) -> users.CompleteRegistrationOutput:
+        """Complete the registration of a user."""
+        ...
 
     @overload
     async def execute(
         self, action: users.AcceptOrganizationInvitationAction
-    ) -> outputs.Empty: ...
+    ) -> outputs.Empty:
+        """Accept a organization invitation."""
+        ...
 
     @overload
     async def execute(
         self, action: organizations.QueryOrganizationsAction
-    ) -> organizations.QueryOrganizationsOutput: ...
+    ) -> organizations.QueryOrganizationsOutput:
+        """Query the organizations of the instance."""
+        ...
 
     @overload
     async def execute(
         self, action: organizations.QueryOrganizationMembersAction
-    ) -> organizations.QueryOrganizationMembersOutput: ...
+    ) -> organizations.QueryOrganizationMembersOutput:
+        """Query the members of an organization."""
+        ...
 
     @overload
     async def execute(
         self, action: organizations.QueryOrganizationProjectsAction
-    ) -> organizations.QueryOrganizationProjectsOutput: ...
+    ) -> organizations.QueryOrganizationProjectsOutput:
+        """Query the projects of an organization."""
+        ...
 
     @overload
     async def execute(
         self, action: organizations.QueryOrganizationRepositoriesAction
-    ) -> organizations.QueryOrganizationRepositoriesOutput: ...
+    ) -> organizations.QueryOrganizationRepositoriesOutput:
+        """Query the repositories of an organization."""
+        ...
 
     @overload
     async def execute(
         self, action: organizations.QueryOrganizationInvitationsAction
-    ) -> organizations.QueryOrganizationInvitationsOutput: ...
+    ) -> organizations.QueryOrganizationInvitationsOutput:
+        """Query the invitations of an organization."""
+        ...
 
     @overload
     async def execute(
         self, action: organizations.CreateOrganizationAction
-    ) -> organizations.CreateOrganizationOutput: ...
+    ) -> organizations.CreateOrganizationOutput:
+        """Create an organization."""
+        ...
 
     @overload
     async def execute(
         self, action: organizations.DeleteOrganizationAction
-    ) -> outputs.Empty: ...
+    ) -> outputs.Empty:
+        """Delete an organization."""
+        ...
 
     @overload
     async def execute(
         self, action: organizations.AddOrganizationMemberAction
-    ) -> outputs.Empty: ...
+    ) -> outputs.Empty:
+        """Add a user to an organization."""
+        ...
 
     @overload
     async def execute(
         self, action: organizations.RemoveOrganizationMemberAction
-    ) -> outputs.Empty: ...
+    ) -> outputs.Empty:
+        """Remove a user from an organization."""
+        ...
 
     @overload
     async def execute(
         self, action: organizations.SetOrganizationMemberIsAdminAction
-    ) -> outputs.Empty: ...
+    ) -> outputs.Empty:
+        """Set whether the user is an administrator of the organization."""
+        ...
 
     @overload
     async def execute(
         self, action: organizations.InviteOrganizationMemberAction
-    ) -> organizations.InviteOrganizationMemberOutput: ...
+    ) -> organizations.InviteOrganizationMemberOutput:
+        """Invite a user to an organization."""
+        ...
 
     @overload
     async def execute(
         self, action: organizations.DeleteOrganizationInvitationAction
-    ) -> outputs.Empty: ...
+    ) -> outputs.Empty:
+        """Delete an invitation to an organization."""
+        ...
 
     @overload
     async def execute(
         self, action: organizations.QueryOrganizationAuditLogAction
-    ) -> organizations.QueryOrganizationAuditLogOutput: ...
+    ) -> organizations.QueryOrganizationAuditLogOutput:
+        """Query the audit log of an organization."""
+        ...
 
     @overload
     async def execute(
         self, action: projects.QueryProjectsAction
-    ) -> projects.QueryProjectsOutput: ...
+    ) -> projects.QueryProjectsOutput:
+        """Query the projects of the instance."""
+        ...
 
     @overload
     async def execute(
         self, action: projects.GetProjectDetailsAction
-    ) -> projects.GetProjectDetailsOutput: ...
+    ) -> projects.GetProjectDetailsOutput:
+        """Get information about a project."""
+        ...
 
     @overload
     async def execute(
         self, action: projects.CreateProjectAction
-    ) -> projects.CreateProjectOutput: ...
+    ) -> projects.CreateProjectOutput:
+        """Create a new project."""
+        ...
 
     @overload
-    async def execute(self, action: projects.DeleteProjectAction) -> outputs.Empty: ...
+    async def execute(self, action: projects.DeleteProjectAction) -> outputs.Empty:
+        """Delete a project."""
+        ...
 
     @overload
     async def execute(
         self, action: projects.QueryProjectDevicesAction
-    ) -> projects.QueryProjectDevicesOutput: ...
+    ) -> projects.QueryProjectDevicesOutput:
+        """Query the devices of a project."""
+        ...
 
     @overload
     async def execute(
         self, action: projects.QueryProjectDeploymentTokensAction
-    ) -> projects.QueryProjectDeploymentTokensOutput: ...
+    ) -> projects.QueryProjectDeploymentTokensOutput:
+        """Query the deployment tokens of a project."""
+        ...
 
     @overload
     async def execute(
         self, action: projects.QueryProjectRepositoriesAction
-    ) -> projects.QueryProjectRepositoriesOutput: ...
+    ) -> projects.QueryProjectRepositoriesOutput:
+        """Query repositories of a project."""
+        ...
 
     @overload
-    async def execute(self, action: projects.SetProjectNameAction) -> outputs.Empty: ...
+    async def execute(self, action: projects.SetProjectNameAction) -> outputs.Empty:
+        """Set the name of a project."""
+        ...
 
     @overload
     async def execute(
         self, action: projects.CreateDeploymentTokenAction
-    ) -> projects.CreateDeploymentTokenOutput: ...
+    ) -> projects.CreateDeploymentTokenOutput:
+        """Create a deployment token."""
+        ...
 
     @overload
     async def execute(
         self, action: projects.DeleteDeploymentTokenAction
-    ) -> outputs.Empty: ...
+    ) -> outputs.Empty:
+        """Delete a deployment token."""
+        ...
 
     @overload
     async def execute(
         self, action: projects.SetDeploymentTokenFlagsAction
-    ) -> outputs.Empty: ...
+    ) -> outputs.Empty:
+        """Set the flags of a deployment token."""
+        ...
 
     @overload
     async def execute(
         self, action: projects.QueryAuditLogEventsAction
-    ) -> projects.QueryAuditLogEventsOutput: ...
+    ) -> projects.QueryAuditLogEventsOutput:
+        """Query the audit log of the project."""
+        ...
 
     @overload
     async def execute(
         self, action: projects.AddProjectRepositoryAction
-    ) -> outputs.Empty: ...
+    ) -> outputs.Empty:
+        """Add a repository to the project."""
+        ...
 
     @overload
     async def execute(
         self, action: projects.RemoveProjectRepositoryAction
-    ) -> outputs.Empty: ...
+    ) -> outputs.Empty:
+        """Remove a repository from the project."""
+        ...
 
     @overload
     async def execute(
         self, action: projects.GetProjectOtlpConfigAction
-    ) -> projects.GetProjectOtlpConfigOutput: ...
+    ) -> projects.GetProjectOtlpConfigOutput:
+        """Get the OTLP event forwarding configuration for a project."""
+        ...
 
     @overload
     async def execute(
         self, action: projects.SetProjectOtlpConfigAction
-    ) -> outputs.Empty: ...
+    ) -> outputs.Empty:
+        """Set the OTLP event forwarding configuration for a project."""
+        ...
 
     @overload
     async def execute(
         self, action: devices.QueryDevicesAction
-    ) -> devices.QueryDevicesOutput: ...
+    ) -> devices.QueryDevicesOutput:
+        """Query the devices of the instance."""
+        ...
 
     @overload
     async def execute(
         self, action: devices.GetDeviceDetailsAction
-    ) -> devices.GetDeviceDetailsOutput: ...
+    ) -> devices.GetDeviceDetailsOutput:
+        """Get information about a device."""
+        ...
 
     @overload
     async def execute(
         self, action: devices.CreateDeviceAction
-    ) -> devices.CreateDeviceOutput: ...
+    ) -> devices.CreateDeviceOutput:
+        """Create a new device."""
+        ...
 
     @overload
-    async def execute(self, action: devices.DeleteDeviceAction) -> outputs.Empty: ...
+    async def execute(self, action: devices.DeleteDeviceAction) -> outputs.Empty:
+        """Delete a device."""
+        ...
 
     @overload
-    async def execute(self, action: devices.SetDeviceNameAction) -> outputs.Empty: ...
+    async def execute(self, action: devices.SetDeviceNameAction) -> outputs.Empty:
+        """Set the name of a device."""
+        ...
 
     @overload
     async def execute(
         self, action: devices.IssueDeviceTokenAction
-    ) -> devices.IssueDeviceTokenOutput: ...
+    ) -> devices.IssueDeviceTokenOutput:
+        """Issue a JWT for a device with user-defined claims.
+
+        **Note: Only use this action for integration with external systems.**"""
+        ...
 
     @overload
     async def execute(
         self, action: devices.ValidateDeviceTokenAction
-    ) -> devices.ValidateDeviceTokenOutput: ...
+    ) -> devices.ValidateDeviceTokenOutput:
+        """Validate a device JWT.
+
+        **Note: Only use this action for integration with external systems.**"""
+        ...
 
     @overload
     async def execute(
         self, action: devices.AuthenticateDeviceAction
-    ) -> devices.AuthenticateDeviceOutput: ...
+    ) -> devices.AuthenticateDeviceOutput:
+        """Authenticate a device.
+
+        **Note: The certificate fingerprint must be externally verified (mutual TLS).**"""
+        ...
 
     @overload
     async def execute(
         self, action: devices.AddDeviceCertificateAction
-    ) -> devices.AddDeviceCertificateOutput: ...
+    ) -> devices.AddDeviceCertificateOutput:
+        """Add a device certificate."""
+        ...
 
     @overload
     async def execute(
         self, action: devices.DeleteDeviceCertificateAction
-    ) -> outputs.Empty: ...
+    ) -> outputs.Empty:
+        """Delete a device certificate."""
+        ...
 
     @overload
     async def execute(
         self, action: devices.SetDeviceCertificateStatusAction
-    ) -> outputs.Empty: ...
+    ) -> outputs.Empty:
+        """Set the status of a device certificate."""
+        ...
 
     @overload
     async def execute(
         self, action: devices.RegisterDeviceConnectionAction
-    ) -> devices.RegisterDeviceConnectionOutput: ...
+    ) -> devices.RegisterDeviceConnectionOutput:
+        """Register a connection of a device to a cluster node."""
+        ...
 
     @overload
     async def execute(
         self, action: devices.UnregisterDeviceConnectionAction
-    ) -> outputs.Empty: ...
+    ) -> outputs.Empty:
+        """Unregister a connection of a device to a cluster node."""
+        ...
 
     @overload
     async def execute(
         self, action: devices.QueryDeviceConnectionsAction
-    ) -> devices.QueryDeviceConnectionsOutput: ...
+    ) -> devices.QueryDeviceConnectionsOutput:
+        """Query the connection history of a device."""
+        ...
 
     @overload
     async def execute(
         self, action: devices.IssueDeviceHttpProxyTokenAction
-    ) -> devices.IssueDeviceHttpProxyTokenOutput: ...
+    ) -> devices.IssueDeviceHttpProxyTokenOutput:
+        """Issue a HTTP proxy JWT."""
+        ...
 
     @overload
     async def execute(
         self, action: devices.ValidateDeviceHttpProxyTokenAction
-    ) -> devices.ValidateDeviceHttpProxyTokenOutput: ...
+    ) -> devices.ValidateDeviceHttpProxyTokenOutput:
+        """Validate a HTTP proxy JWT."""
+        ...
 
     @overload
-    async def execute(
-        self, action: devices.PublishDeviceEventsAction
-    ) -> outputs.Empty: ...
+    async def execute(self, action: devices.PublishDeviceEventsAction) -> outputs.Empty:
+        """Publish device events."""
+        ...
 
     @overload
     async def execute(
         self, action: devices.QueryDeviceEventsAction
-    ) -> devices.QueryDeviceEventsOutput: ...
+    ) -> devices.QueryDeviceEventsOutput:
+        """Query device events."""
+        ...
 
     @overload
     async def execute(
         self, action: devices.SetDevicePropertyAction
-    ) -> devices.SetDevicePropertyOutput: ...
+    ) -> devices.SetDevicePropertyOutput:
+        """Set a property of a device."""
+        ...
 
     @overload
     async def execute(
         self, action: devices.GetDevicePropertyAction
-    ) -> devices.GetDevicePropertyOutput: ...
+    ) -> devices.GetDevicePropertyOutput:
+        """Get a property of a device."""
+        ...
 
     @overload
     async def execute(
         self, action: devices.RemoveDevicePropertyAction
-    ) -> devices.RemoveDevicePropertyOutput: ...
+    ) -> devices.RemoveDevicePropertyOutput:
+        """Remove a property from a device."""
+        ...
 
     @overload
     async def execute(
         self, action: devices.QueryDevicePropertiesAction
-    ) -> devices.QueryDevicePropertiesOutput: ...
+    ) -> devices.QueryDevicePropertiesOutput:
+        """Query the properties of a device."""
+        ...
 
     @overload
     async def execute(
         self, action: devices.QueryDeviceAuditLogAction
-    ) -> devices.QueryDeviceAuditLogOutput: ...
+    ) -> devices.QueryDeviceAuditLogOutput:
+        """Query the audit log of a device."""
+        ...
 
     @overload
     async def execute(
         self, action: devices.QueryDeviceCommandsAction
-    ) -> devices.QueryDeviceCommandsOutput: ...
+    ) -> devices.QueryDeviceCommandsOutput:
+        """Query the on-demand commands supported by a device."""
+        ...
 
     @overload
-    async def execute(self, action: fleet.SetFleetPropertyAction) -> outputs.Empty: ...
+    async def execute(self, action: fleet.SetFleetPropertyAction) -> outputs.Empty:
+        """Set a fleet property manually."""
+        ...
 
     @overload
     async def execute(
         self, action: fleet.GetFleetPropertyAction
-    ) -> fleet.GetFleetPropertyOutput: ...
+    ) -> fleet.GetFleetPropertyOutput:
+        """Get a fleet property by name."""
+        ...
 
     @overload
     async def execute(
         self, action: fleet.RemoveFleetPropertyAction
-    ) -> fleet.RemoveFleetPropertyOutput: ...
+    ) -> fleet.RemoveFleetPropertyOutput:
+        """Remove a fleet property.
+
+        Handles both manual and computed properties. For computed properties, the
+        associated definition is removed as well."""
+        ...
 
     @overload
     async def execute(
         self, action: fleet.QueryFleetPropertiesAction
-    ) -> fleet.QueryFleetPropertiesOutput: ...
+    ) -> fleet.QueryFleetPropertiesOutput:
+        """Query all fleet properties of a project."""
+        ...
 
     @overload
     async def execute(
         self, action: fleet.DefineComputedFleetPropertyAction
-    ) -> outputs.Empty: ...
+    ) -> outputs.Empty:
+        """Define a computed fleet property."""
+        ...
 
     @overload
     async def execute(
         self, action: fleet.QueryComputedFleetPropertyDefinitionsAction
-    ) -> fleet.QueryComputedFleetPropertyDefinitionsOutput: ...
+    ) -> fleet.QueryComputedFleetPropertyDefinitionsOutput:
+        """Query computed fleet property definitions for a project."""
+        ...
 
     @overload
     async def execute(
         self, action: repositories.ResolveRepositoryNameAction
-    ) -> repositories.ResolveRepositoryNameOutput: ...
+    ) -> repositories.ResolveRepositoryNameOutput:
+        """Resolve a repository by its name."""
+        ...
 
     @overload
     async def execute(
         self, action: repositories.GetRepositoryDetailsAction
-    ) -> repositories.GetRepositoryDetailsOutput: ...
+    ) -> repositories.GetRepositoryDetailsOutput:
+        """Get information about a repository."""
+        ...
 
     @overload
     async def execute(
         self, action: repositories.CreateRepositoryAction
-    ) -> repositories.CreateRepositoryOutput: ...
+    ) -> repositories.CreateRepositoryOutput:
+        """Create a new repository."""
+        ...
 
     @overload
     async def execute(
         self, action: repositories.DeleteRepositoryAction
-    ) -> outputs.Empty: ...
+    ) -> outputs.Empty:
+        """Delete a repository."""
+        ...
 
     @overload
     async def execute(
         self, action: repositories.SetRepositoryVisibilityAction
-    ) -> outputs.Empty: ...
+    ) -> outputs.Empty:
+        """Set the visibility of a repository."""
+        ...
 
     @overload
     async def execute(
         self, action: repositories.SetRepositoryDisplayNameAction
-    ) -> outputs.Empty: ...
+    ) -> outputs.Empty:
+        """Set the display name of a repository."""
+        ...
 
     @overload
     async def execute(
         self, action: repositories.SetRepositoryPublicNameAction
-    ) -> repositories.SetRepositoryPublicNameOutput: ...
+    ) -> repositories.SetRepositoryPublicNameOutput:
+        """Set the public name of a repository.
+
+        Note: Setting the public name requires the `public_repositories` subscription feature."""
+        ...
 
     @overload
     async def execute(
         self, action: repositories.QueryRepositoryPackagesAction
-    ) -> repositories.QueryRepositoryPackagesOutput: ...
+    ) -> repositories.QueryRepositoryPackagesOutput:
+        """Query the packages of a repository."""
+        ...
 
     @overload
     async def execute(
         self, action: repositories.QueryRepositoryAssetsAction
-    ) -> repositories.QueryRepositoryAssetsOutput: ...
+    ) -> repositories.QueryRepositoryAssetsOutput:
+        """Query the assets of a repository."""
+        ...
 
     @overload
     async def execute(
         self, action: repositories.QueryRepositoryProjectsAction
-    ) -> repositories.QueryRepositoryProjectsOutput: ...
+    ) -> repositories.QueryRepositoryProjectsOutput:
+        """Query repository projects."""
+        ...
 
     @overload
     async def execute(
         self, action: repositories.ResolvePackageByPathAction
-    ) -> repositories.ResolvePackageByPathOutput: ...
+    ) -> repositories.ResolvePackageByPathOutput:
+        """Resolve a package by its path."""
+        ...
 
     @overload
     async def execute(
         self, action: repositories.GetPackageDetailsAction
-    ) -> repositories.GetPackageDetailsOutput: ...
+    ) -> repositories.GetPackageDetailsOutput:
+        """Get information about a package."""
+        ...
 
     @overload
     async def execute(
         self, action: repositories.CreatePackageAction
-    ) -> repositories.CreatePackageOutput: ...
+    ) -> repositories.CreatePackageOutput:
+        """Create a new package."""
+        ...
 
     @overload
-    async def execute(
-        self, action: repositories.DeletePackageAction
-    ) -> outputs.Empty: ...
+    async def execute(self, action: repositories.DeletePackageAction) -> outputs.Empty:
+        """Delete a package."""
+        ...
 
     @overload
     async def execute(
         self, action: repositories.SetPackageNameAction
-    ) -> repositories.SetPackageNameOutput: ...
+    ) -> repositories.SetPackageNameOutput:
+        """Set the name of a package."""
+        ...
 
     @overload
-    async def execute(
-        self, action: repositories.SetPackageKindAction
-    ) -> outputs.Empty: ...
+    async def execute(self, action: repositories.SetPackageKindAction) -> outputs.Empty:
+        """Set the kind of a package."""
+        ...
 
     @overload
     async def execute(
         self, action: repositories.SetPackageMetadataAction
-    ) -> outputs.Empty: ...
+    ) -> outputs.Empty:
+        """Set metadata on a package."""
+        ...
 
     @overload
     async def execute(
         self, action: repositories.QueryPackageVersionsAction
-    ) -> repositories.QueryPackageVersionsOutput: ...
+    ) -> repositories.QueryPackageVersionsOutput:
+        """Query the versions of a package."""
+        ...
 
     @overload
     async def execute(
         self, action: repositories.ResolvePackageVersionByPathAction
-    ) -> repositories.ResolvePackageVersionByPathOutput: ...
+    ) -> repositories.ResolvePackageVersionByPathOutput:
+        """Resolve a package version by its path."""
+        ...
 
     @overload
     async def execute(
         self, action: repositories.GetPackageVersionDetailsAction
-    ) -> repositories.GetPackageVersionDetailsOutput: ...
+    ) -> repositories.GetPackageVersionDetailsOutput:
+        """Get information about a package version."""
+        ...
 
     @overload
     async def execute(
         self, action: repositories.CreatePackageVersionAction
-    ) -> repositories.CreatePackageVersionOutput: ...
+    ) -> repositories.CreatePackageVersionOutput:
+        """Create a new package version."""
+        ...
 
     @overload
     async def execute(
         self, action: repositories.DeletePackageVersionAction
-    ) -> outputs.Empty: ...
+    ) -> outputs.Empty:
+        """Delete a package version."""
+        ...
 
     @overload
     async def execute(
         self, action: repositories.SetPackageVersionNameAction
-    ) -> outputs.Empty: ...
+    ) -> outputs.Empty:
+        """Set the name of a package version."""
+        ...
 
     @overload
     async def execute(
         self, action: repositories.SetPackageVersionMetadataAction
-    ) -> outputs.Empty: ...
+    ) -> outputs.Empty:
+        """Set metadata on a package version."""
+        ...
 
     @overload
     async def execute(
         self, action: repositories.AddPackageVersionAssetAction
-    ) -> repositories.AddPackageVersionAssetOutput: ...
+    ) -> repositories.AddPackageVersionAssetOutput:
+        """Add an asset to a package version."""
+        ...
 
     @overload
     async def execute(
         self, action: repositories.RemovePackageVersionAssetAction
-    ) -> outputs.Empty: ...
+    ) -> outputs.Empty:
+        """Remove an asset from a package version."""
+        ...
 
     @overload
     async def execute(
         self, action: repositories.SetPackageVersionAssetMetadataAction
-    ) -> outputs.Empty: ...
+    ) -> outputs.Empty:
+        """Set metadata on a package version asset."""
+        ...
 
     @overload
     async def execute(
         self, action: repositories.TagPackageVersionAction
-    ) -> outputs.Empty: ...
+    ) -> outputs.Empty:
+        """Add tags to a version."""
+        ...
 
     @overload
     async def execute(
         self, action: repositories.UntagPackageVersionAction
-    ) -> outputs.Empty: ...
+    ) -> outputs.Empty:
+        """Remove tags from a version."""
+        ...
 
     @overload
     async def execute(
         self, action: repositories.ResolvePackageVersionAssetByPathAction
-    ) -> repositories.ResolvePackageVersionAssetByPathOutput: ...
+    ) -> repositories.ResolvePackageVersionAssetByPathOutput:
+        """Resolve a version asset by its path."""
+        ...
 
     @overload
     async def execute(
         self, action: repositories.SetRepositoryS3ConfigAction
-    ) -> outputs.Empty: ...
+    ) -> outputs.Empty:
+        """Set the S3 configuration for the repository."""
+        ...
 
     @overload
     async def execute(
         self, action: repositories.GetRepositoryS3ConfigAction
-    ) -> repositories.GetRepositoryS3ConfigOutput: ...
+    ) -> repositories.GetRepositoryS3ConfigOutput:
+        """Get the S3 configuration for the repository."""
+        ...
 
     @overload
     async def execute(
         self, action: repositories.GetAssetDetailsAction
-    ) -> repositories.GetAssetDetailsOutput: ...
+    ) -> repositories.GetAssetDetailsOutput:
+        """Get information about an asset."""
+        ...
 
     @overload
     async def execute(
         self, action: repositories.CreateAssetAction
-    ) -> repositories.CreateAssetOutput: ...
+    ) -> repositories.CreateAssetOutput:
+        """Create an asset."""
+        ...
 
     @overload
-    async def execute(
-        self, action: repositories.DeleteAssetAction
-    ) -> outputs.Empty: ...
+    async def execute(self, action: repositories.DeleteAssetAction) -> outputs.Empty:
+        """Delete an asset."""
+        ...
 
     @overload
     async def execute(
         self, action: repositories.IssueAssetDownloadUrlAction
-    ) -> repositories.IssueAssetDownloadUrlOutput: ...
+    ) -> repositories.IssueAssetDownloadUrlOutput:
+        """Issue a URL for downloading an asset."""
+        ...
 
     @overload
     async def execute(
         self, action: repositories.IssueAssetUploadUrlAction
-    ) -> repositories.IssueAssetUploadUrlOutput: ...
+    ) -> repositories.IssueAssetUploadUrlOutput:
+        """Issue a URL for uploading an asset."""
+        ...
 
     @overload
     async def execute(
         self, action: repositories.QueryAuditLogEventsAction
-    ) -> repositories.QueryAuditLogEventsOutput: ...
+    ) -> repositories.QueryAuditLogEventsOutput:
+        """Query the audit log of the repository."""
+        ...
 
     @overload
     async def execute(
         self, action: audit.QueryAuditLogEventsAction
-    ) -> audit.QueryAuditLogEventsOutput: ...
+    ) -> audit.QueryAuditLogEventsOutput:
+        """Query the events recorded in the audit log.
+
+        Requires administrator permissions."""
+        ...
 
     @overload
     async def execute(
         self, action: audit.QueryAuditLogActionsAction
-    ) -> audit.QueryAuditLogActionsOutput: ...
+    ) -> audit.QueryAuditLogActionsOutput:
+        """Query the actions recorded in the audit log.
+
+        Requires administrator permissions."""
+        ...
 
     @overload
-    async def execute(self, action: jobs.QueryJobsAction) -> jobs.QueryJobsOutput: ...
+    async def execute(self, action: jobs.QueryJobsAction) -> jobs.QueryJobsOutput:
+        """Query the jobs of the instance."""
+        ...
 
     @overload
     async def execute(
         self, action: instance.GetInstanceStatisticsAction
-    ) -> instance.GetInstanceStatisticsOutput: ...
+    ) -> instance.GetInstanceStatisticsOutput:
+        """Get instance statistics."""
+        ...
 
     @overload
     async def execute(
         self, action: instance.GetInstanceSettingsRawAction
-    ) -> instance.GetInstanceSettingsRawOutput: ...
+    ) -> instance.GetInstanceSettingsRawOutput:
+        """Get the settings of the instance."""
+        ...
 
     @overload
     async def execute(
         self, action: instance.SetInstanceSettingRawAction
-    ) -> outputs.Empty: ...
+    ) -> outputs.Empty:
+        """Set a setting of the instance."""
+        ...
 
     @overload
     async def execute(
         self, action: cluster.GetClusterDetailsAction
-    ) -> cluster.GetClusterDetailsOutput: ...
+    ) -> cluster.GetClusterDetailsOutput:
+        """Get information about the cluster."""
+        ...
 
     @overload
     async def execute(
         self, action: cluster.RegisterClusterNodeAction
-    ) -> cluster.RegisterClusterNodeOutput: ...
+    ) -> cluster.RegisterClusterNodeOutput:
+        """Register a new cluster node."""
+        ...
 
     @overload
     async def execute(
         self, action: cluster.ReportClusterNodeHeartbeatAction
-    ) -> outputs.Empty: ...
+    ) -> outputs.Empty:
+        """Report the heartbeat of a cluster node."""
+        ...
 
     @overload
     async def execute(
         self, action: cluster.CleanupInactiveClusterNodesAction
-    ) -> outputs.Empty: ...
+    ) -> outputs.Empty:
+        """Cleanup inactive cluster nodes."""
+        ...
 
     @overload
-    async def execute(self, action: actor.GetActorAction) -> actor.GetActorOutput: ...
+    async def execute(self, action: actor.GetActorAction) -> actor.GetActorOutput:
+        """Get the actor.
+
+        This action is used to get the actor that is used to invoke the action."""
+        ...
 
     async def execute(self, action: pydantic.BaseModel) -> pydantic.BaseModel:
         return await self._execute_action(action)

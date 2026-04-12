@@ -56,7 +56,7 @@ class QueryProjectsOutput(pydantic.BaseModel):
 
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
-    projects: list[QueryProjectsItem]
+    projects: list[QueryProjectsItem] = pydantic.Field(description="List of projects.")
 
 
 class QueryProjectsItem(pydantic.BaseModel):
@@ -65,9 +65,11 @@ class QueryProjectsItem(pydantic.BaseModel):
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
     project_id: ProjectId = pydantic.Field(
-        validation_alias="projectId", serialization_alias="projectId"
+        description="ID of the project.",
+        validation_alias="projectId",
+        serialization_alias="projectId",
     )
-    name: str
+    name: str = pydantic.Field(description="Name of the project.")
 
 
 class GetProjectDetailsAction(pydantic.BaseModel):
@@ -76,7 +78,9 @@ class GetProjectDetailsAction(pydantic.BaseModel):
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
     project_id: ProjectId = pydantic.Field(
-        validation_alias="projectId", serialization_alias="projectId"
+        description="ID of the project.",
+        validation_alias="projectId",
+        serialization_alias="projectId",
     )
 
 
@@ -86,11 +90,15 @@ class GetProjectDetailsOutput(pydantic.BaseModel):
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
     project_id: ProjectId = pydantic.Field(
-        validation_alias="projectId", serialization_alias="projectId"
+        description="ID of the project.",
+        validation_alias="projectId",
+        serialization_alias="projectId",
     )
-    name: str
+    name: str = pydantic.Field(description="Name of the project.")
     device_count: int = pydantic.Field(
-        validation_alias="deviceCount", serialization_alias="deviceCount"
+        description="Number of devices in the project.",
+        validation_alias="deviceCount",
+        serialization_alias="deviceCount",
     )
 
 
@@ -100,9 +108,11 @@ class SetProjectNameAction(pydantic.BaseModel):
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
     project_id: ProjectId = pydantic.Field(
-        validation_alias="projectId", serialization_alias="projectId"
+        description="ID of the project.",
+        validation_alias="projectId",
+        serialization_alias="projectId",
     )
-    name: str
+    name: str = pydantic.Field(description="New name of the project.")
 
 
 class CreateProjectAction(pydantic.BaseModel):
@@ -111,9 +121,11 @@ class CreateProjectAction(pydantic.BaseModel):
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
     organization_id: organizations.OrganizationId = pydantic.Field(
-        validation_alias="organizationId", serialization_alias="organizationId"
+        description="Organization to create the project in.",
+        validation_alias="organizationId",
+        serialization_alias="organizationId",
     )
-    name: str
+    name: str = pydantic.Field(description="Name of the project.")
 
 
 class CreateProjectSuccess(pydantic.BaseModel):
@@ -122,7 +134,9 @@ class CreateProjectSuccess(pydantic.BaseModel):
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
     project_id: ProjectId = pydantic.Field(
-        validation_alias="projectId", serialization_alias="projectId"
+        description="ID of the project.",
+        validation_alias="projectId",
+        serialization_alias="projectId",
     )
 
 
@@ -132,7 +146,9 @@ class DeleteProjectAction(pydantic.BaseModel):
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
     project_id: ProjectId = pydantic.Field(
-        validation_alias="projectId", serialization_alias="projectId"
+        description="ID of the project.",
+        validation_alias="projectId",
+        serialization_alias="projectId",
     )
 
 
@@ -142,7 +158,9 @@ class QueryProjectDevicesAction(pydantic.BaseModel):
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
     project_id: ProjectId = pydantic.Field(
-        validation_alias="projectId", serialization_alias="projectId"
+        description="ID of the project.",
+        validation_alias="projectId",
+        serialization_alias="projectId",
     )
 
 
@@ -151,7 +169,9 @@ class QueryProjectDevicesOutput(pydantic.BaseModel):
 
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
-    devices: list[QueryProjectDevicesItem]
+    devices: list[QueryProjectDevicesItem] = pydantic.Field(
+        description="List of devices."
+    )
 
 
 class QueryProjectDevicesItem(pydantic.BaseModel):
@@ -160,27 +180,38 @@ class QueryProjectDevicesItem(pydantic.BaseModel):
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
     device_id: devices.DeviceId = pydantic.Field(
-        validation_alias="deviceId", serialization_alias="deviceId"
+        description="ID of the device.",
+        validation_alias="deviceId",
+        serialization_alias="deviceId",
     )
-    name: str | None = None
+    name: str | None = pydantic.Field(default=None, description="Name of the device.")
     first_seen: datetime.Timestamp = pydantic.Field(
-        validation_alias="firstSeen", serialization_alias="firstSeen"
+        description="Timestamp when the device was first seen.",
+        validation_alias="firstSeen",
+        serialization_alias="firstSeen",
     )
-    status: devices.DeviceStatus
+    status: devices.DeviceStatus = pydantic.Field(
+        description="Combined device status (connection + health)."
+    )
     is_connected: bool = pydantic.Field(
-        validation_alias="isConnected", serialization_alias="isConnected"
+        description="Indicates whether the device is online.",
+        validation_alias="isConnected",
+        serialization_alias="isConnected",
     )
     pending_certificates_count: int = pydantic.Field(
+        description="Pending device certificates.",
         validation_alias="pendingCertificatesCount",
         serialization_alias="pendingCertificatesCount",
     )
     last_connected_at: datetime.Timestamp | None = pydantic.Field(
         default=None,
+        description="Timestamp when the device was last connected (current or most recent connection).",
         validation_alias="lastConnectedAt",
         serialization_alias="lastConnectedAt",
     )
     current_connection_duration_secs: int | None = pydantic.Field(
         default=None,
+        description="Duration of the current connection in seconds (null if not connected).",
         validation_alias="currentConnectionDurationSecs",
         serialization_alias="currentConnectionDurationSecs",
     )
@@ -192,7 +223,9 @@ class QueryProjectDeploymentTokensAction(pydantic.BaseModel):
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
     project_id: ProjectId = pydantic.Field(
-        validation_alias="projectId", serialization_alias="projectId"
+        description="ID of the project.",
+        validation_alias="projectId",
+        serialization_alias="projectId",
     )
 
 
@@ -201,7 +234,9 @@ class QueryProjectDeploymentTokensOutput(pydantic.BaseModel):
 
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
-    tokens: list[QueryProjectDeploymentTokensItem]
+    tokens: list[QueryProjectDeploymentTokensItem] = pydantic.Field(
+        description="List of deployment tokens."
+    )
 
 
 class QueryProjectDeploymentTokensItem(pydantic.BaseModel):
@@ -210,13 +245,17 @@ class QueryProjectDeploymentTokensItem(pydantic.BaseModel):
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
     token_id: DeploymentTokenId = pydantic.Field(
-        validation_alias="tokenId", serialization_alias="tokenId"
+        description="ID of the token.",
+        validation_alias="tokenId",
+        serialization_alias="tokenId",
     )
     created_at: datetime.Timestamp = pydantic.Field(
-        validation_alias="createdAt", serialization_alias="createdAt"
+        description="Creation date of the token.",
+        validation_alias="createdAt",
+        serialization_alias="createdAt",
     )
-    name: str | None = None
-    flags: DeploymentTokenFlags
+    name: str | None = pydantic.Field(default=None, description="Name of the token.")
+    flags: DeploymentTokenFlags = pydantic.Field(description="Flags.")
 
 
 class QueryProjectRepositoriesAction(pydantic.BaseModel):
@@ -225,7 +264,9 @@ class QueryProjectRepositoriesAction(pydantic.BaseModel):
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
     project_id: ProjectId = pydantic.Field(
-        validation_alias="projectId", serialization_alias="projectId"
+        description="ID of the project.",
+        validation_alias="projectId",
+        serialization_alias="projectId",
     )
 
 
@@ -234,7 +275,9 @@ class QueryProjectRepositoriesOutput(pydantic.BaseModel):
 
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
-    repositories: list[QueryProjectRepositoriesItem]
+    repositories: list[QueryProjectRepositoriesItem] = pydantic.Field(
+        description="List of repositories."
+    )
 
 
 class QueryProjectRepositoriesItem(pydantic.BaseModel):
@@ -243,13 +286,20 @@ class QueryProjectRepositoriesItem(pydantic.BaseModel):
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
     repository_id: repositories.RepositoryId = pydantic.Field(
-        validation_alias="repositoryId", serialization_alias="repositoryId"
+        description="ID of the repository.",
+        validation_alias="repositoryId",
+        serialization_alias="repositoryId",
     )
     public_name: str = pydantic.Field(
-        validation_alias="publicName", serialization_alias="publicName"
+        description="Public name of the repository.",
+        validation_alias="publicName",
+        serialization_alias="publicName",
     )
     display_name: str | None = pydantic.Field(
-        default=None, validation_alias="displayName", serialization_alias="displayName"
+        default=None,
+        description="Display name of the repository (if any).",
+        validation_alias="displayName",
+        serialization_alias="displayName",
     )
 
 
@@ -259,7 +309,10 @@ class DeploymentTokenFlags(pydantic.BaseModel):
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
     auto_accept: bool | None = pydantic.Field(
-        default=None, validation_alias="autoAccept", serialization_alias="autoAccept"
+        default=None,
+        description="Whether to automatically accept new devices.",
+        validation_alias="autoAccept",
+        serialization_alias="autoAccept",
     )
 
 
@@ -269,10 +322,14 @@ class CreateDeploymentTokenAction(pydantic.BaseModel):
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
     project_id: ProjectId = pydantic.Field(
-        validation_alias="projectId", serialization_alias="projectId"
+        description="ID of the project.",
+        validation_alias="projectId",
+        serialization_alias="projectId",
     )
-    name: str
-    flags: DeploymentTokenFlags | None = None
+    name: str = pydantic.Field(description="Name of the token.")
+    flags: DeploymentTokenFlags | None = pydantic.Field(
+        default=None, description="Flags."
+    )
 
 
 class CreateDeploymentTokenOutput(pydantic.BaseModel):
@@ -281,9 +338,11 @@ class CreateDeploymentTokenOutput(pydantic.BaseModel):
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
     token_id: DeploymentTokenId = pydantic.Field(
-        validation_alias="tokenId", serialization_alias="tokenId"
+        description="ID of the token.",
+        validation_alias="tokenId",
+        serialization_alias="tokenId",
     )
-    token: DeploymentToken
+    token: DeploymentToken = pydantic.Field(description="Token.")
 
 
 class DeleteDeploymentTokenAction(pydantic.BaseModel):
@@ -292,7 +351,9 @@ class DeleteDeploymentTokenAction(pydantic.BaseModel):
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
     token_id: DeploymentTokenId = pydantic.Field(
-        validation_alias="tokenId", serialization_alias="tokenId"
+        description="ID of the token.",
+        validation_alias="tokenId",
+        serialization_alias="tokenId",
     )
 
 
@@ -302,9 +363,11 @@ class SetDeploymentTokenFlagsAction(pydantic.BaseModel):
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
     token_id: DeploymentTokenId = pydantic.Field(
-        validation_alias="tokenId", serialization_alias="tokenId"
+        description="ID of the token.",
+        validation_alias="tokenId",
+        serialization_alias="tokenId",
     )
-    flags: DeploymentTokenFlags
+    flags: DeploymentTokenFlags = pydantic.Field(description="Flags.")
 
 
 class QueryAuditLogEventsAction(pydantic.BaseModel):
@@ -313,7 +376,9 @@ class QueryAuditLogEventsAction(pydantic.BaseModel):
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
     project_id: ProjectId = pydantic.Field(
-        validation_alias="projectId", serialization_alias="projectId"
+        description="ID of the project.",
+        validation_alias="projectId",
+        serialization_alias="projectId",
     )
 
 
@@ -322,7 +387,9 @@ class QueryAuditLogEventsOutput(pydantic.BaseModel):
 
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
-    events: list[audit.AuditLogEvent]
+    events: list[audit.AuditLogEvent] = pydantic.Field(
+        description="List of audit log events."
+    )
 
 
 class AddProjectRepositoryAction(pydantic.BaseModel):
@@ -331,10 +398,14 @@ class AddProjectRepositoryAction(pydantic.BaseModel):
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
     project_id: ProjectId = pydantic.Field(
-        validation_alias="projectId", serialization_alias="projectId"
+        description="ID of the project.",
+        validation_alias="projectId",
+        serialization_alias="projectId",
     )
     repository_id: repositories.RepositoryId = pydantic.Field(
-        validation_alias="repositoryId", serialization_alias="repositoryId"
+        description="ID of the repository.",
+        validation_alias="repositoryId",
+        serialization_alias="repositoryId",
     )
 
 
@@ -344,10 +415,14 @@ class RemoveProjectRepositoryAction(pydantic.BaseModel):
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
     project_id: ProjectId = pydantic.Field(
-        validation_alias="projectId", serialization_alias="projectId"
+        description="ID of the project.",
+        validation_alias="projectId",
+        serialization_alias="projectId",
     )
     repository_id: repositories.RepositoryId = pydantic.Field(
-        validation_alias="repositoryId", serialization_alias="repositoryId"
+        description="ID of the repository.",
+        validation_alias="repositoryId",
+        serialization_alias="repositoryId",
     )
 
 
@@ -356,9 +431,14 @@ class ProjectOtlpConfig(pydantic.BaseModel):
 
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
-    enabled: bool
-    endpoint: str | None = None
-    headers: dict[str, str]
+    enabled: bool = pydantic.Field(description="Whether OTLP forwarding is enabled.")
+    endpoint: str | None = pydantic.Field(
+        default=None,
+        description="OTLP endpoint URL (e.g., https://otel-collector.example.com/v1/logs).",
+    )
+    headers: dict[str, str] = pydantic.Field(
+        description="HTTP headers to include with OTLP requests (e.g., for authentication).\nValues are masked when read back."
+    )
 
 
 class GetProjectOtlpConfigAction(pydantic.BaseModel):
@@ -367,7 +447,9 @@ class GetProjectOtlpConfigAction(pydantic.BaseModel):
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
     project_id: ProjectId = pydantic.Field(
-        validation_alias="projectId", serialization_alias="projectId"
+        description="ID of the project.",
+        validation_alias="projectId",
+        serialization_alias="projectId",
     )
 
 
@@ -376,7 +458,7 @@ class GetProjectOtlpConfigOutput(pydantic.BaseModel):
 
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
-    config: ProjectOtlpConfig
+    config: ProjectOtlpConfig = pydantic.Field(description="OTLP configuration.")
 
 
 class SetProjectOtlpConfigAction(pydantic.BaseModel):
@@ -385,9 +467,11 @@ class SetProjectOtlpConfigAction(pydantic.BaseModel):
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
     project_id: ProjectId = pydantic.Field(
-        validation_alias="projectId", serialization_alias="projectId"
+        description="ID of the project.",
+        validation_alias="projectId",
+        serialization_alias="projectId",
     )
-    config: ProjectOtlpConfig
+    config: ProjectOtlpConfig = pydantic.Field(description="OTLP configuration.")
 
 
 class CreateProjectOutput_Created(CreateProjectSuccess):

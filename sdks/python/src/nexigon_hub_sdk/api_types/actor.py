@@ -33,10 +33,14 @@ class DeviceActor(pydantic.BaseModel):
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
     device_id: devices.DeviceId = pydantic.Field(
-        validation_alias="deviceId", serialization_alias="deviceId"
+        description="ID of the device.",
+        validation_alias="deviceId",
+        serialization_alias="deviceId",
     )
     token_id: projects.DeploymentTokenId = pydantic.Field(
-        validation_alias="tokenId", serialization_alias="tokenId"
+        description="ID of the deployment token used for authentication.",
+        validation_alias="tokenId",
+        serialization_alias="tokenId",
     )
 
 
@@ -46,7 +50,9 @@ class UserActor(pydantic.BaseModel):
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
     user_id: users.UserId = pydantic.Field(
-        validation_alias="userId", serialization_alias="userId"
+        description="ID of the user.",
+        validation_alias="userId",
+        serialization_alias="userId",
     )
 
 
@@ -56,10 +62,14 @@ class UserTokenActor(pydantic.BaseModel):
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
     user_id: users.UserId = pydantic.Field(
-        validation_alias="userId", serialization_alias="userId"
+        description="ID of the user.",
+        validation_alias="userId",
+        serialization_alias="userId",
     )
     token_id: users.UserTokenId = pydantic.Field(
-        validation_alias="tokenId", serialization_alias="tokenId"
+        description="ID of the user token used for authentication.",
+        validation_alias="tokenId",
+        serialization_alias="tokenId",
     )
 
 
@@ -69,7 +79,9 @@ class ClusterNodeActor(pydantic.BaseModel):
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
     node_id: cluster.ClusterNodeId = pydantic.Field(
-        validation_alias="nodeId", serialization_alias="nodeId"
+        description="ID of the cluster node.",
+        validation_alias="nodeId",
+        serialization_alias="nodeId",
     )
 
 
@@ -79,10 +91,14 @@ class OrganizationApiTokenActor(pydantic.BaseModel):
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
     organization_id: organizations.OrganizationId = pydantic.Field(
-        validation_alias="organizationId", serialization_alias="organizationId"
+        description="ID of the organization.",
+        validation_alias="organizationId",
+        serialization_alias="organizationId",
     )
     token_id: organizations.OrganizationApiTokenId = pydantic.Field(
-        validation_alias="tokenId", serialization_alias="tokenId"
+        description="ID of the API token.",
+        validation_alias="tokenId",
+        serialization_alias="tokenId",
     )
 
 
@@ -99,7 +115,7 @@ class GetActorOutput(pydantic.BaseModel):
 
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
-    actor: Actor
+    actor: Actor = pydantic.Field(description="The actor.")
 
 
 class Actor_Anonymous(AnonymousActor):

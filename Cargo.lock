@@ -1121,6 +1121,7 @@ name = "nexigon-gen-py-bindings"
 version = "0.1.0"
 dependencies = [
  "nexigon-api",
+ "serde_json",
 ]
 
 [[package]]

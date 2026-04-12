@@ -23,3 +23,11 @@ lint:
 fmt:
     uv run --group dev ruff check --fix src/ tests/
     uv run --group dev ruff format src/ tests/
+
+# Build documentation.
+docs:
+    uv run --group docs mkdocs build
+
+# Serve documentation locally with live reload.
+docs-serve:
+    uv run --group docs mkdocs serve

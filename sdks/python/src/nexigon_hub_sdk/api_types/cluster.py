@@ -28,6 +28,7 @@ class GetClusterDetailsAction(pydantic.BaseModel):
 
     include_terminated: bool | None = pydantic.Field(
         default=None,
+        description="Include terminated nodes in the response.",
         validation_alias="includeTerminated",
         serialization_alias="includeTerminated",
     )
@@ -38,7 +39,7 @@ class GetClusterDetailsOutput(pydantic.BaseModel):
 
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
-    nodes: list[ClusterNode]
+    nodes: list[ClusterNode] = pydantic.Field(description="Nodes of the cluster.")
 
 
 class ClusterNode(pydantic.BaseModel):
@@ -47,26 +48,40 @@ class ClusterNode(pydantic.BaseModel):
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
     node_id: ClusterNodeId = pydantic.Field(
-        validation_alias="nodeId", serialization_alias="nodeId"
+        description="ID of the cluster node.",
+        validation_alias="nodeId",
+        serialization_alias="nodeId",
     )
-    name: str | None = None
-    status: ClusterNodeStatus
+    name: str | None = pydantic.Field(
+        default=None, description="Name of the cluster node."
+    )
+    status: ClusterNodeStatus = pydantic.Field(
+        description="Status of the cluster node."
+    )
     joined_at: datetime.Timestamp = pydantic.Field(
-        validation_alias="joinedAt", serialization_alias="joinedAt"
+        description="Timestamp when the node joined the cluster.",
+        validation_alias="joinedAt",
+        serialization_alias="joinedAt",
     )
     uptime_secs: int = pydantic.Field(
-        validation_alias="uptimeSecs", serialization_alias="uptimeSecs"
+        description="Uptime of the node in seconds.",
+        validation_alias="uptimeSecs",
+        serialization_alias="uptimeSecs",
     )
     last_heartbeat: datetime.Timestamp = pydantic.Field(
-        validation_alias="lastHeartbeat", serialization_alias="lastHeartbeat"
+        description="Timestamp when the node last reported a heartbeat.",
+        validation_alias="lastHeartbeat",
+        serialization_alias="lastHeartbeat",
     )
     terminated_at: datetime.Timestamp | None = pydantic.Field(
         default=None,
+        description="Timestamp when the node was terminated.",
         validation_alias="terminatedAt",
         serialization_alias="terminatedAt",
     )
     termination_reason: ClusterNodeTerminationReason | None = pydantic.Field(
         default=None,
+        description="Reason why the node was terminated.",
         validation_alias="terminationReason",
         serialization_alias="terminationReason",
     )
@@ -77,7 +92,9 @@ class RegisterClusterNodeAction(pydantic.BaseModel):
 
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
-    name: str | None = None
+    name: str | None = pydantic.Field(
+        default=None, description="Name of the cluster node."
+    )
 
 
 class RegisterClusterNodeOutput(pydantic.BaseModel):
@@ -86,7 +103,9 @@ class RegisterClusterNodeOutput(pydantic.BaseModel):
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
     node_id: ClusterNodeId = pydantic.Field(
-        validation_alias="nodeId", serialization_alias="nodeId"
+        description="ID of the cluster node.",
+        validation_alias="nodeId",
+        serialization_alias="nodeId",
     )
 
 

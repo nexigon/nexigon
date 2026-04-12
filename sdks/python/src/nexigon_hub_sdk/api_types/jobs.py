@@ -27,24 +27,38 @@ class Job(pydantic.BaseModel):
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
     job_id: JobId = pydantic.Field(
-        validation_alias="jobId", serialization_alias="jobId"
+        description="Job ID.", validation_alias="jobId", serialization_alias="jobId"
     )
-    status: JobStatus
-    job: str
-    queued: bool
-    attempts: int
+    status: JobStatus = pydantic.Field(description="Status of the job.")
+    job: str = pydantic.Field(description="Type of the job.")
+    queued: bool = pydantic.Field(
+        description="Indicates whether the job is currently queued for execution."
+    )
+    attempts: int = pydantic.Field(description="Attempts of executing the job.")
     retry_limit: int | None = pydantic.Field(
-        default=None, validation_alias="retryLimit", serialization_alias="retryLimit"
+        default=None,
+        description="Maximum number of retries for the job.",
+        validation_alias="retryLimit",
+        serialization_alias="retryLimit",
     )
     retry_delay: int = pydantic.Field(
-        validation_alias="retryDelay", serialization_alias="retryDelay"
+        description="Delay in seconds for retrying the job.",
+        validation_alias="retryDelay",
+        serialization_alias="retryDelay",
     )
-    timeout: int
+    timeout: int = pydantic.Field(
+        description="Timeout for an individual execution of the job (defaults to 30 minutes)."
+    )
     created_at: datetime.Timestamp = pydantic.Field(
-        validation_alias="createdAt", serialization_alias="createdAt"
+        description="Timestamp indicating when the job was created.",
+        validation_alias="createdAt",
+        serialization_alias="createdAt",
     )
     finished_at: datetime.Timestamp | None = pydantic.Field(
-        default=None, validation_alias="finishedAt", serialization_alias="finishedAt"
+        default=None,
+        description="Timestamp indicating when the job has finished (if applicable).",
+        validation_alias="finishedAt",
+        serialization_alias="finishedAt",
     )
 
 
@@ -59,7 +73,7 @@ class QueryJobsOutput(pydantic.BaseModel):
 
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
-    jobs: list[Job]
+    jobs: list[Job] = pydantic.Field(description="List of jobs.")
 
 
 class JobStatus_Pending(pydantic.RootModel[Literal["Pending"]]):

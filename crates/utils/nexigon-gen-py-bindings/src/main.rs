@@ -2,7 +2,21 @@ use std::collections::BTreeSet;
 
 use nexigon_api::with_actions;
 
+/// Looks up the description for an action input type from the JSON schemas.
+fn action_description(
+    schemas: &serde_json::Map<String, serde_json::Value>,
+    input_type: &str,
+) -> Option<String> {
+    let key = format!("nexigon_api.{input_type}");
+    let desc = schemas.get(&key)?.get("description")?.as_str()?;
+    let escaped = desc.replace('\\', "\\\\").replace("\"\"\"", "\\\"\\\"\\\"");
+    Some(escaped)
+}
+
 pub fn main() {
+    let schemas: serde_json::Map<String, serde_json::Value> =
+        serde_json::from_str(include_str!("../../nexigon-gen-openapi/schemas.json")).unwrap();
+
     // Collect all referenced modules from both input and output types.
     let mut modules = BTreeSet::new();
     macro_rules! collect_modules {
@@ -86,7 +100,11 @@ pub fn main() {
                 let output_type = output_parts.join(".");
                 println!();
                 println!("    @overload");
-                println!("    def execute(self, action: {input_type}) -> {output_type}: ...");
+                println!("    def execute(self, action: {input_type}) -> {output_type}:");
+                if let Some(desc) = action_description(&schemas, &input_type) {
+                    println!("        \"\"\"{desc}\"\"\"");
+                }
+                println!("        ...");
             )*
         };
     }
@@ -119,7 +137,11 @@ pub fn main() {
                 let output_type = output_parts.join(".");
                 println!();
                 println!("    @overload");
-                println!("    async def execute(self, action: {input_type}) -> {output_type}: ...");
+                println!("    async def execute(self, action: {input_type}) -> {output_type}:");
+                if let Some(desc) = action_description(&schemas, &input_type) {
+                    println!("        \"\"\"{desc}\"\"\"");
+                }
+                println!("        ...");
             )*
         };
     }

@@ -16,17 +16,25 @@ class SystemInfo(pydantic.BaseModel):
 
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
-    name: str | None = None
-    version: str | None = None
-    kernel: str | None = None
-    hostname: str | None = None
-    arch: str | None = None
-    memory: MemoryInfo
-    networks: list[NetworkInterfaceInfo]
-    disks: list[DiskInfo]
-    exports: list[ExportInfo] | None = None
-    rugix: RugixSystemInfo | None = None
-    yocto: YoctoSystemInfo | None = None
+    name: str | None = pydantic.Field(default=None, description="System name.")
+    version: str | None = pydantic.Field(default=None, description="System version.")
+    kernel: str | None = pydantic.Field(default=None, description="Kernel version.")
+    hostname: str | None = pydantic.Field(default=None, description="Hostname.")
+    arch: str | None = pydantic.Field(default=None, description="Architecture.")
+    memory: MemoryInfo = pydantic.Field(description="Memory information.")
+    networks: list[NetworkInterfaceInfo] = pydantic.Field(
+        description="Network information."
+    )
+    disks: list[DiskInfo] = pydantic.Field(description="Disk information.")
+    exports: list[ExportInfo] | None = pydantic.Field(
+        default=None, description="Exported services."
+    )
+    rugix: RugixSystemInfo | None = pydantic.Field(
+        default=None, description="Rugix-specific system information."
+    )
+    yocto: YoctoSystemInfo | None = pydantic.Field(
+        default=None, description="Yocto-specific system information."
+    )
 
 
 class MemoryInfo(pydantic.BaseModel):
@@ -34,7 +42,7 @@ class MemoryInfo(pydantic.BaseModel):
 
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
-    total: int
+    total: int = pydantic.Field(description="Total memory in bytes.")
 
 
 class NetworkInterfaceInfo(pydantic.BaseModel):
@@ -42,12 +50,16 @@ class NetworkInterfaceInfo(pydantic.BaseModel):
 
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
-    name: str
+    name: str = pydantic.Field(description="Name of the network interface.")
     mac_address: str = pydantic.Field(
-        validation_alias="macAddress", serialization_alias="macAddress"
+        description="MAC address of the network interface.",
+        validation_alias="macAddress",
+        serialization_alias="macAddress",
     )
     ip_addresses: list[str] = pydantic.Field(
-        validation_alias="ipAddresses", serialization_alias="ipAddresses"
+        description="IP addresses of the network interface.",
+        validation_alias="ipAddresses",
+        serialization_alias="ipAddresses",
     )
 
 
@@ -56,16 +68,22 @@ class DiskInfo(pydantic.BaseModel):
 
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
-    name: str
-    filesystem: str
+    name: str = pydantic.Field(description="Name of the disk.")
+    filesystem: str = pydantic.Field(description="Filesystem type.")
     mount_point: str = pydantic.Field(
-        validation_alias="mountPoint", serialization_alias="mountPoint"
+        description="Mount point.",
+        validation_alias="mountPoint",
+        serialization_alias="mountPoint",
     )
     total_space: int = pydantic.Field(
-        validation_alias="totalSpace", serialization_alias="totalSpace"
+        description="Total disk space in bytes.",
+        validation_alias="totalSpace",
+        serialization_alias="totalSpace",
     )
     available_space: int = pydantic.Field(
-        validation_alias="availableSpace", serialization_alias="availableSpace"
+        description="Available disk space in bytes.",
+        validation_alias="availableSpace",
+        serialization_alias="availableSpace",
     )
 
 
@@ -77,25 +95,36 @@ class OtaUpdateStatus(pydantic.BaseModel):
 
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
-    config: OtaUpdateConfig | None = None
+    config: OtaUpdateConfig | None = pydantic.Field(
+        default=None,
+        description="Effective OTA configuration (TOML defaults merged with device overrides).",
+    )
     current_version: str | None = pydantic.Field(
         default=None,
+        description="Currently installed version (matches a repository version tag).",
         validation_alias="currentVersion",
         serialization_alias="currentVersion",
     )
-    state: OtaUpdateState | None = None
+    state: OtaUpdateState | None = pydantic.Field(
+        default=None, description="Current state of the update process."
+    )
     target_version: str | None = pydantic.Field(
         default=None,
+        description="Target version being installed, if an update is in progress.",
         validation_alias="targetVersion",
         serialization_alias="targetVersion",
     )
     failure_count: int | None = pydantic.Field(
         default=None,
+        description="Number of consecutive failed update attempts for the current target.\nReset to zero when the config changes or an update succeeds.",
         validation_alias="failureCount",
         serialization_alias="failureCount",
     )
     last_error: str | None = pydantic.Field(
-        default=None, validation_alias="lastError", serialization_alias="lastError"
+        default=None,
+        description="Error message from the last failed attempt, if any.",
+        validation_alias="lastError",
+        serialization_alias="lastError",
     )
 
 
@@ -108,7 +137,10 @@ class OtaUpdateConfig(pydantic.BaseModel):
 
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
-    path: str | None = None
+    path: str | None = pydantic.Field(
+        default=None,
+        description="Repository path prefix for locating update artifacts.",
+    )
 
 
 class DeviceHealth(pydantic.BaseModel):
@@ -116,7 +148,9 @@ class DeviceHealth(pydantic.BaseModel):
 
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
-    status: DeviceHealthStatus
+    status: DeviceHealthStatus = pydantic.Field(
+        description="Health status of the device."
+    )
 
 
 class HttpExportInfo(pydantic.BaseModel):
@@ -124,9 +158,9 @@ class HttpExportInfo(pydantic.BaseModel):
 
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
-    name: str
-    port: int
-    path: str | None = None
+    name: str = pydantic.Field(description="Name of the export.")
+    port: int = pydantic.Field(description="Port the service listens on.")
+    path: str | None = pydantic.Field(default=None, description="URL path prefix.")
 
 
 class RugixSystemInfo(pydantic.BaseModel):
@@ -134,10 +168,19 @@ class RugixSystemInfo(pydantic.BaseModel):
 
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
-    slots: dict[str, RugixSlotInfo]
-    boot: RugixBootInfo | None = None
-    state: RugixStateManagementInfo
-    build: RugixBakeryBuildInfo | None = None
+    slots: dict[str, RugixSlotInfo] = pydantic.Field(
+        description="Information about the update slots."
+    )
+    boot: RugixBootInfo | None = pydantic.Field(
+        default=None, description="Rugix-specific boot information."
+    )
+    state: RugixStateManagementInfo = pydantic.Field(
+        description="Information about the state management mechanism."
+    )
+    build: RugixBakeryBuildInfo | None = pydantic.Field(
+        default=None,
+        description="Rugix Bakery build information (only when built with Rugix Bakery).",
+    )
 
 
 class RugixSlotInfo(pydantic.BaseModel):
@@ -145,11 +188,22 @@ class RugixSlotInfo(pydantic.BaseModel):
 
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
-    active: bool | None = None
-    hashes: dict[str, str] | None = None
-    size: int | None = None
+    active: bool | None = pydantic.Field(
+        default=None, description="Indicates whether the slot is active, i.e., in use."
+    )
+    hashes: dict[str, str] | None = pydantic.Field(
+        default=None,
+        description="Hashes of the slot data according to the slot database.",
+    )
+    size: int | None = pydantic.Field(
+        default=None,
+        description="Size of the slot data according to the slot database.",
+    )
     updated_at: str | None = pydantic.Field(
-        default=None, validation_alias="updatedAt", serialization_alias="updatedAt"
+        default=None,
+        description="Last time the slot has been updated according to the slot database.",
+        validation_alias="updatedAt",
+        serialization_alias="updatedAt",
     )
 
 
@@ -159,17 +213,25 @@ class RugixBootInfo(pydantic.BaseModel):
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
     boot_flow: str = pydantic.Field(
-        validation_alias="bootFlow", serialization_alias="bootFlow"
+        description="Name of the boot flow.",
+        validation_alias="bootFlow",
+        serialization_alias="bootFlow",
     )
     active_group: str | None = pydantic.Field(
-        default=None, validation_alias="activeGroup", serialization_alias="activeGroup"
+        default=None,
+        description="Active boot group.",
+        validation_alias="activeGroup",
+        serialization_alias="activeGroup",
     )
     default_group: str | None = pydantic.Field(
         default=None,
+        description="Default boot group.",
         validation_alias="defaultGroup",
         serialization_alias="defaultGroup",
     )
-    groups: dict[str, RugixBootGroupInfo]
+    groups: dict[str, RugixBootGroupInfo] = pydantic.Field(
+        description="Information about the boot groups."
+    )
 
 
 class RugixBootGroupInfo(pydantic.BaseModel):
@@ -185,6 +247,7 @@ class RugixActiveStateManagementInfo(pydantic.BaseModel):
 
     data_partition: str | None = pydantic.Field(
         default=None,
+        description="Device backing the data partition, if any.",
         validation_alias="dataPartition",
         serialization_alias="dataPartition",
     )
@@ -195,8 +258,10 @@ class RugixBakeryBuildInfo(pydantic.BaseModel):
 
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
-    name: str
-    release: RugixBakeryReleaseInfo
+    name: str = pydantic.Field(description="System name.")
+    release: RugixBakeryReleaseInfo = pydantic.Field(
+        description="Rugix Bakery build release information."
+    )
 
 
 class RugixBakeryReleaseInfo(pydantic.BaseModel):
@@ -204,8 +269,8 @@ class RugixBakeryReleaseInfo(pydantic.BaseModel):
 
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
-    id: str
-    version: str
+    id: str = pydantic.Field(description="Release ID.")
+    version: str = pydantic.Field(description="Release version.")
 
 
 class YoctoSystemInfo(pydantic.BaseModel):
@@ -214,7 +279,9 @@ class YoctoSystemInfo(pydantic.BaseModel):
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
     build_info: dict[str, str] = pydantic.Field(
-        validation_alias="buildInfo", serialization_alias="buildInfo"
+        description="Build information key-value pairs read from `/etc/buildinfo`.",
+        validation_alias="buildInfo",
+        serialization_alias="buildInfo",
     )
 
 
@@ -223,7 +290,9 @@ class DeviceCommandManifest(pydantic.BaseModel):
 
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
-    commands: list[DeviceCommandDescriptor]
+    commands: list[DeviceCommandDescriptor] = pydantic.Field(
+        description="Available commands."
+    )
 
 
 class DeviceCommandDescriptor(pydantic.BaseModel):
@@ -231,11 +300,19 @@ class DeviceCommandDescriptor(pydantic.BaseModel):
 
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
-    name: str
-    description: str | None = None
-    category: str | None = None
-    input: json.JsonValue | None = None
-    output: json.JsonValue | None = None
+    name: str = pydantic.Field(description="Command name.")
+    description: str | None = pydantic.Field(
+        default=None, description="Description of what the command does."
+    )
+    category: str | None = pydantic.Field(
+        default=None, description="Category for grouping in the UI."
+    )
+    input: json.JsonValue | None = pydantic.Field(
+        default=None, description="JSON Schema for the command input."
+    )
+    output: json.JsonValue | None = pydantic.Field(
+        default=None, description="JSON Schema for the command output."
+    )
 
 
 class OtaUpdateState_Idle(pydantic.RootModel[Literal["idle"]]):

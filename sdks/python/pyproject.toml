@@ -17,6 +17,10 @@ repository = "https://github.com/nexigon/nexigon"
 
 [dependency-groups]
 dev = ["pytest>=7.0", "pytest-asyncio>=0.24", "mypy>=1.0", "ruff>=0.4"]
+docs = [
+    "mkdocs-material>=9.6",
+    "mkdocstrings[python]>=0.29",
+]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/nexigon_hub_sdk"]

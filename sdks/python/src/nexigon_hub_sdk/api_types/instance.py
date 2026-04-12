@@ -22,9 +22,9 @@ class GetInstanceStatisticsOutput(pydantic.BaseModel):
 
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
-    users: int
-    projects: int
-    devices: int
+    users: int = pydantic.Field(description="Number of users.")
+    projects: int = pydantic.Field(description="Number of projects.")
+    devices: int = pydantic.Field(description="Number of devices.")
 
 
 class GetInstanceSettingsRawAction(pydantic.BaseModel):
@@ -38,7 +38,9 @@ class GetInstanceSettingsRawOutput(pydantic.BaseModel):
 
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
-    settings: dict[str, json.JsonValue]
+    settings: dict[str, json.JsonValue] = pydantic.Field(
+        description="Settings of the instance."
+    )
 
 
 class SetInstanceSettingRawAction(pydantic.BaseModel):
@@ -46,5 +48,5 @@ class SetInstanceSettingRawAction(pydantic.BaseModel):
 
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
-    key: str
-    value: json.JsonValue
+    key: str = pydantic.Field(description="Name of the setting.")
+    value: json.JsonValue = pydantic.Field(description="Value of the setting.")

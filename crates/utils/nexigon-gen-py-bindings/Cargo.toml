@@ -9,3 +9,4 @@ homepage.workspace = true
 
 [dependencies]
 nexigon-api.workspace = true
+serde_json.workspace = true

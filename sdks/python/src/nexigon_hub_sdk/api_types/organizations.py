@@ -55,7 +55,9 @@ class QueryOrganizationsOutput(pydantic.BaseModel):
 
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
-    organizations: list[QueryOrganizationsItem]
+    organizations: list[QueryOrganizationsItem] = pydantic.Field(
+        description="List of organizations."
+    )
 
 
 class QueryOrganizationsItem(pydantic.BaseModel):
@@ -64,9 +66,11 @@ class QueryOrganizationsItem(pydantic.BaseModel):
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
     organization_id: OrganizationId = pydantic.Field(
-        validation_alias="organizationId", serialization_alias="organizationId"
+        description="ID of the organization.",
+        validation_alias="organizationId",
+        serialization_alias="organizationId",
     )
-    name: str
+    name: str = pydantic.Field(description="Name of the organization.")
 
 
 class QueryOrganizationMembersAction(pydantic.BaseModel):
@@ -75,7 +79,9 @@ class QueryOrganizationMembersAction(pydantic.BaseModel):
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
     organization_id: OrganizationId = pydantic.Field(
-        validation_alias="organizationId", serialization_alias="organizationId"
+        description="ID of the organization.",
+        validation_alias="organizationId",
+        serialization_alias="organizationId",
     )
 
 
@@ -84,7 +90,9 @@ class QueryOrganizationMembersOutput(pydantic.BaseModel):
 
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
-    members: list[QueryOrganizationMembersItem]
+    members: list[QueryOrganizationMembersItem] = pydantic.Field(
+        description="List of members."
+    )
 
 
 class QueryOrganizationMembersItem(pydantic.BaseModel):
@@ -93,14 +101,21 @@ class QueryOrganizationMembersItem(pydantic.BaseModel):
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
     user_id: users.UserId = pydantic.Field(
-        validation_alias="userId", serialization_alias="userId"
+        description="ID of the user.",
+        validation_alias="userId",
+        serialization_alias="userId",
     )
     display_name: str | None = pydantic.Field(
-        default=None, validation_alias="displayName", serialization_alias="displayName"
+        default=None,
+        description="Name of the user.",
+        validation_alias="displayName",
+        serialization_alias="displayName",
     )
-    email: str
+    email: str = pydantic.Field(description="Email of the user.")
     is_admin: bool = pydantic.Field(
-        validation_alias="isAdmin", serialization_alias="isAdmin"
+        description="Whether the user is an administrator of the organization.",
+        validation_alias="isAdmin",
+        serialization_alias="isAdmin",
     )
 
 
@@ -110,7 +125,9 @@ class QueryOrganizationProjectsAction(pydantic.BaseModel):
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
     organization_id: OrganizationId = pydantic.Field(
-        validation_alias="organizationId", serialization_alias="organizationId"
+        description="ID of the organization.",
+        validation_alias="organizationId",
+        serialization_alias="organizationId",
     )
 
 
@@ -119,7 +136,9 @@ class QueryOrganizationProjectsOutput(pydantic.BaseModel):
 
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
-    projects: list[QueryOrganizationProjectsItem]
+    projects: list[QueryOrganizationProjectsItem] = pydantic.Field(
+        description="List of projects."
+    )
 
 
 class QueryOrganizationProjectsItem(pydantic.BaseModel):
@@ -128,9 +147,11 @@ class QueryOrganizationProjectsItem(pydantic.BaseModel):
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
     project_id: projects.ProjectId = pydantic.Field(
-        validation_alias="projectId", serialization_alias="projectId"
+        description="ID of the project.",
+        validation_alias="projectId",
+        serialization_alias="projectId",
     )
-    name: str
+    name: str = pydantic.Field(description="Name of the project.")
 
 
 class QueryOrganizationRepositoriesAction(pydantic.BaseModel):
@@ -139,7 +160,9 @@ class QueryOrganizationRepositoriesAction(pydantic.BaseModel):
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
     organization_id: OrganizationId = pydantic.Field(
-        validation_alias="organizationId", serialization_alias="organizationId"
+        description="ID of the organization.",
+        validation_alias="organizationId",
+        serialization_alias="organizationId",
     )
 
 
@@ -148,7 +171,9 @@ class QueryOrganizationRepositoriesOutput(pydantic.BaseModel):
 
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
-    repositories: list[QueryOrganizationRepositoriesItem]
+    repositories: list[QueryOrganizationRepositoriesItem] = pydantic.Field(
+        description="List of repositories."
+    )
 
 
 class QueryOrganizationRepositoriesItem(pydantic.BaseModel):
@@ -157,13 +182,20 @@ class QueryOrganizationRepositoriesItem(pydantic.BaseModel):
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
     repository_id: repositories.RepositoryId = pydantic.Field(
-        validation_alias="repositoryId", serialization_alias="repositoryId"
+        description="ID of the repository.",
+        validation_alias="repositoryId",
+        serialization_alias="repositoryId",
     )
     public_name: str = pydantic.Field(
-        validation_alias="publicName", serialization_alias="publicName"
+        description="Public name of the repository.",
+        validation_alias="publicName",
+        serialization_alias="publicName",
     )
     display_name: str | None = pydantic.Field(
-        default=None, validation_alias="displayName", serialization_alias="displayName"
+        default=None,
+        description="Display name of the repository (if any).",
+        validation_alias="displayName",
+        serialization_alias="displayName",
     )
 
 
@@ -173,7 +205,9 @@ class QueryOrganizationInvitationsAction(pydantic.BaseModel):
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
     organization_id: OrganizationId = pydantic.Field(
-        validation_alias="organizationId", serialization_alias="organizationId"
+        description="ID of the organization.",
+        validation_alias="organizationId",
+        serialization_alias="organizationId",
     )
 
 
@@ -182,7 +216,9 @@ class QueryOrganizationInvitationsOutput(pydantic.BaseModel):
 
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
-    invitations: list[QueryOrganizationInvitationsItem]
+    invitations: list[QueryOrganizationInvitationsItem] = pydantic.Field(
+        description="List of outstanding invitations."
+    )
 
 
 class QueryOrganizationInvitationsItem(pydantic.BaseModel):
@@ -191,11 +227,14 @@ class QueryOrganizationInvitationsItem(pydantic.BaseModel):
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
     invitation_id: OrganizationInvitationId = pydantic.Field(
-        validation_alias="invitationId", serialization_alias="invitationId"
+        description="ID of the invitation.",
+        validation_alias="invitationId",
+        serialization_alias="invitationId",
     )
-    email: str
+    email: str = pydantic.Field(description="Email address of the invited user.")
     inviting_user_id: users.UserId | None = pydantic.Field(
         default=None,
+        description="ID of the inviting user.",
         validation_alias="invitingUserId",
         serialization_alias="invitingUserId",
     )
@@ -206,9 +245,12 @@ class CreateOrganizationAction(pydantic.BaseModel):
 
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
-    name: str
-    admins: list[users.UserId] | None = None
+    name: str = pydantic.Field(description="Name of the organization.")
+    admins: list[users.UserId] | None = pydantic.Field(
+        default=None, description="Admins of the organization."
+    )
     requires_subscription: bool = pydantic.Field(
+        description="Whether the organization requires a subscription.",
         validation_alias="requiresSubscription",
         serialization_alias="requiresSubscription",
     )
@@ -220,7 +262,9 @@ class CreateOrganizationOutput(pydantic.BaseModel):
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
     organization_id: OrganizationId = pydantic.Field(
-        validation_alias="organizationId", serialization_alias="organizationId"
+        description="ID of the organization.",
+        validation_alias="organizationId",
+        serialization_alias="organizationId",
     )
 
 
@@ -230,7 +274,9 @@ class DeleteOrganizationAction(pydantic.BaseModel):
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
     organization_id: OrganizationId = pydantic.Field(
-        validation_alias="organizationId", serialization_alias="organizationId"
+        description="ID of the organization.",
+        validation_alias="organizationId",
+        serialization_alias="organizationId",
     )
 
 
@@ -240,13 +286,20 @@ class AddOrganizationMemberAction(pydantic.BaseModel):
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
     organization_id: OrganizationId = pydantic.Field(
-        validation_alias="organizationId", serialization_alias="organizationId"
+        description="ID of the organization.",
+        validation_alias="organizationId",
+        serialization_alias="organizationId",
     )
     user_id: users.UserId = pydantic.Field(
-        validation_alias="userId", serialization_alias="userId"
+        description="ID of the user to add.",
+        validation_alias="userId",
+        serialization_alias="userId",
     )
     is_admin: bool | None = pydantic.Field(
-        default=None, validation_alias="isAdmin", serialization_alias="isAdmin"
+        default=None,
+        description="Whether the user should be an administrator of the organization.",
+        validation_alias="isAdmin",
+        serialization_alias="isAdmin",
     )
 
 
@@ -256,10 +309,14 @@ class RemoveOrganizationMemberAction(pydantic.BaseModel):
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
     organization_id: OrganizationId = pydantic.Field(
-        validation_alias="organizationId", serialization_alias="organizationId"
+        description="ID of the organization.",
+        validation_alias="organizationId",
+        serialization_alias="organizationId",
     )
     user_id: users.UserId = pydantic.Field(
-        validation_alias="userId", serialization_alias="userId"
+        description="ID of the user.",
+        validation_alias="userId",
+        serialization_alias="userId",
     )
 
 
@@ -269,13 +326,19 @@ class SetOrganizationMemberIsAdminAction(pydantic.BaseModel):
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
     organization_id: OrganizationId = pydantic.Field(
-        validation_alias="organizationId", serialization_alias="organizationId"
+        description="ID of the organization.",
+        validation_alias="organizationId",
+        serialization_alias="organizationId",
     )
     user_id: users.UserId = pydantic.Field(
-        validation_alias="userId", serialization_alias="userId"
+        description="ID of the user.",
+        validation_alias="userId",
+        serialization_alias="userId",
     )
     is_admin: bool = pydantic.Field(
-        validation_alias="isAdmin", serialization_alias="isAdmin"
+        description="Whether the user should be an administrator of the organization.",
+        validation_alias="isAdmin",
+        serialization_alias="isAdmin",
     )
 
 
@@ -285,9 +348,11 @@ class InviteOrganizationMemberAction(pydantic.BaseModel):
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
     organization_id: OrganizationId = pydantic.Field(
-        validation_alias="organizationId", serialization_alias="organizationId"
+        description="ID of the organization.",
+        validation_alias="organizationId",
+        serialization_alias="organizationId",
     )
-    email: str
+    email: str = pydantic.Field(description="Email address of the user to invite.")
 
 
 class InviteOrganizationMemberOutput(pydantic.BaseModel):
@@ -296,7 +361,9 @@ class InviteOrganizationMemberOutput(pydantic.BaseModel):
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
     invitation_id: OrganizationInvitationId = pydantic.Field(
-        validation_alias="invitationId", serialization_alias="invitationId"
+        description="ID of the invitation.",
+        validation_alias="invitationId",
+        serialization_alias="invitationId",
     )
 
 
@@ -306,7 +373,9 @@ class DeleteOrganizationInvitationAction(pydantic.BaseModel):
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
     invitation_id: OrganizationInvitationId = pydantic.Field(
-        validation_alias="invitationId", serialization_alias="invitationId"
+        description="ID of the invitation.",
+        validation_alias="invitationId",
+        serialization_alias="invitationId",
     )
 
 
@@ -316,7 +385,9 @@ class QueryOrganizationAuditLogAction(pydantic.BaseModel):
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
     organization_id: OrganizationId = pydantic.Field(
-        validation_alias="organizationId", serialization_alias="organizationId"
+        description="ID of the organization.",
+        validation_alias="organizationId",
+        serialization_alias="organizationId",
     )
 
 
@@ -325,4 +396,6 @@ class QueryOrganizationAuditLogOutput(pydantic.BaseModel):
 
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
-    events: list[audit.AuditLogEvent]
+    events: list[audit.AuditLogEvent] = pydantic.Field(
+        description="List of audit log events."
+    )
