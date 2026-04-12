@@ -8,14 +8,14 @@ import pydantic  # noqa: F401
 import pydantic_core  # noqa: F401
 
 if TYPE_CHECKING:
-    from . import actor  # noqa: F401
-    from . import audit  # noqa: F401
-    from . import cluster  # noqa: F401
-    from . import datetime  # noqa: F401
-    from . import json  # noqa: F401
-    from . import jwt  # noqa: F401
-    from . import projects  # noqa: F401
-    from . import properties  # noqa: F401
+    from . import actor as _schema_actor  # noqa: F401
+    from . import audit as _schema_audit  # noqa: F401
+    from . import cluster as _schema_cluster  # noqa: F401
+    from . import datetime as _schema_datetime  # noqa: F401
+    from . import json as _schema_json  # noqa: F401
+    from . import jwt as _schema_jwt  # noqa: F401
+    from . import projects as _schema_projects  # noqa: F401
+    from . import properties as _schema_properties  # noqa: F401
 
 
 class DeviceId(str):
@@ -112,7 +112,7 @@ class QueryDevicesItem(pydantic.BaseModel):
         validation_alias="deviceId",
         serialization_alias="deviceId",
     )
-    project_id: projects.ProjectId = pydantic.Field(
+    project_id: _schema_projects.ProjectId = pydantic.Field(
         description="Project ID of the device.",
         validation_alias="projectId",
         serialization_alias="projectId",
@@ -122,7 +122,7 @@ class QueryDevicesItem(pydantic.BaseModel):
         validation_alias="isConnected",
         serialization_alias="isConnected",
     )
-    last_connected_at: datetime.Timestamp | None = pydantic.Field(
+    last_connected_at: _schema_datetime.Timestamp | None = pydantic.Field(
         default=None,
         description="Timestamp when the device was last connected (current or most recent connection).",
         validation_alias="lastConnectedAt",
@@ -158,7 +158,7 @@ class GetDeviceDetailsOutput(pydantic.BaseModel):
         validation_alias="deviceId",
         serialization_alias="deviceId",
     )
-    project_id: projects.ProjectId = pydantic.Field(
+    project_id: _schema_projects.ProjectId = pydantic.Field(
         description="Project ID of the device.",
         validation_alias="projectId",
         serialization_alias="projectId",
@@ -198,7 +198,7 @@ class DeviceCertificate(pydantic.BaseModel):
     fingerprint: CertificateFingerprint = pydantic.Field(
         description="Fingerprint of the certificate."
     )
-    first_seen: datetime.Timestamp = pydantic.Field(
+    first_seen: _schema_datetime.Timestamp = pydantic.Field(
         description="Timestamp when the certificate was first seen.",
         validation_alias="firstSeen",
         serialization_alias="firstSeen",
@@ -215,12 +215,12 @@ class DeviceConnection(pydantic.BaseModel):
         validation_alias="connectionId",
         serialization_alias="connectionId",
     )
-    node_id: cluster.ClusterNodeId = pydantic.Field(
+    node_id: _schema_cluster.ClusterNodeId = pydantic.Field(
         description="ID of the cluster node.",
         validation_alias="nodeId",
         serialization_alias="nodeId",
     )
-    connected_at: datetime.Timestamp = pydantic.Field(
+    connected_at: _schema_datetime.Timestamp = pydantic.Field(
         description="Timestamp when the connection was established.",
         validation_alias="connectedAt",
         serialization_alias="connectedAt",
@@ -242,17 +242,17 @@ class DeviceConnectionLog(pydantic.BaseModel):
         validation_alias="connectionId",
         serialization_alias="connectionId",
     )
-    node_id: cluster.ClusterNodeId = pydantic.Field(
+    node_id: _schema_cluster.ClusterNodeId = pydantic.Field(
         description="ID of the cluster node.",
         validation_alias="nodeId",
         serialization_alias="nodeId",
     )
-    connected_at: datetime.Timestamp = pydantic.Field(
+    connected_at: _schema_datetime.Timestamp = pydantic.Field(
         description="Timestamp when the connection was established.",
         validation_alias="connectedAt",
         serialization_alias="connectedAt",
     )
-    ended_at: datetime.Timestamp | None = pydantic.Field(
+    ended_at: _schema_datetime.Timestamp | None = pydantic.Field(
         default=None,
         description="Timestamp when the connection ended (null if still connected).",
         validation_alias="endedAt",
@@ -276,7 +276,7 @@ class CreateDeviceAction(pydantic.BaseModel):
 
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
-    project_id: projects.ProjectId = pydantic.Field(
+    project_id: _schema_projects.ProjectId = pydantic.Field(
         description="ID of the project.",
         validation_alias="projectId",
         serialization_alias="projectId",
@@ -343,7 +343,7 @@ class IssueDeviceTokenAction(pydantic.BaseModel):
         validation_alias="validForSecs",
         serialization_alias="validForSecs",
     )
-    claims: json.JsonValue | None = pydantic.Field(
+    claims: _schema_json.JsonValue | None = pydantic.Field(
         default=None, description="Additional user-defined claims."
     )
 
@@ -353,7 +353,7 @@ class IssueDeviceTokenOutput(pydantic.BaseModel):
 
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
-    jwt: jwt.Jwt = pydantic.Field(description="Issued JWT.")
+    jwt: _schema_jwt.Jwt = pydantic.Field(description="Issued JWT.")
 
 
 class ValidateDeviceTokenAction(pydantic.BaseModel):
@@ -363,7 +363,7 @@ class ValidateDeviceTokenAction(pydantic.BaseModel):
 
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
-    jwt: jwt.Jwt = pydantic.Field(description="JWT to validate.")
+    jwt: _schema_jwt.Jwt = pydantic.Field(description="JWT to validate.")
 
 
 class ValidateDeviceTokenSuccess(pydantic.BaseModel):
@@ -376,7 +376,7 @@ class ValidateDeviceTokenSuccess(pydantic.BaseModel):
         validation_alias="deviceId",
         serialization_alias="deviceId",
     )
-    claims: json.JsonValue = pydantic.Field(description="User-defined claims.")
+    claims: _schema_json.JsonValue = pydantic.Field(description="User-defined claims.")
 
 
 class AuthenticateDeviceAction(pydantic.BaseModel):
@@ -389,7 +389,7 @@ class AuthenticateDeviceAction(pydantic.BaseModel):
     fingerprint: DeviceFingerprint = pydantic.Field(
         description="Fingerprint of the device."
     )
-    token: projects.DeploymentToken = pydantic.Field(
+    token: _schema_projects.DeploymentToken = pydantic.Field(
         description="Deployment token used for authentication."
     )
     certificate: CertificateFingerprint = pydantic.Field(
@@ -407,7 +407,7 @@ class AuthenticateDeviceOutput(pydantic.BaseModel):
         validation_alias="deviceId",
         serialization_alias="deviceId",
     )
-    token_id: projects.DeploymentTokenId = pydantic.Field(
+    token_id: _schema_projects.DeploymentTokenId = pydantic.Field(
         description="ID of the deployment token.",
         validation_alias="tokenId",
         serialization_alias="tokenId",
@@ -422,7 +422,9 @@ class AuthenticateDeviceOutput(pydantic.BaseModel):
         validation_alias="certificateId",
         serialization_alias="certificateId",
     )
-    actor: actor.Actor = pydantic.Field(description="Actor to use for further actions.")
+    actor: _schema_actor.Actor = pydantic.Field(
+        description="Actor to use for further actions."
+    )
 
 
 class AddDeviceCertificateAction(pydantic.BaseModel):
@@ -493,7 +495,7 @@ class RegisterDeviceConnectionAction(pydantic.BaseModel):
         validation_alias="deviceId",
         serialization_alias="deviceId",
     )
-    node_id: cluster.ClusterNodeId = pydantic.Field(
+    node_id: _schema_cluster.ClusterNodeId = pydantic.Field(
         description="ID of the cluster node.",
         validation_alias="nodeId",
         serialization_alias="nodeId",
@@ -599,7 +601,7 @@ class IssueDeviceHttpProxyTokenOutput(pydantic.BaseModel):
 
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
-    jwt: jwt.Jwt = pydantic.Field(description="JWT proxy token.")
+    jwt: _schema_jwt.Jwt = pydantic.Field(description="JWT proxy token.")
     url: str = pydantic.Field(description="Proxy URL.")
 
 
@@ -608,7 +610,7 @@ class ValidateDeviceHttpProxyTokenAction(pydantic.BaseModel):
 
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
-    jwt: jwt.Jwt = pydantic.Field(description="JWT to validate.")
+    jwt: _schema_jwt.Jwt = pydantic.Field(description="JWT to validate.")
 
 
 class ValidateDeviceHttpProxyTokenInvalid(pydantic.BaseModel):
@@ -691,16 +693,16 @@ class DeviceEvent(pydantic.BaseModel):
         description="Event category (optional, low-cardinality category of the event).",
     )
     severity: DeviceEventSeverity = pydantic.Field(description="Severity of the event.")
-    body: json.JsonValue = pydantic.Field(description="Event body.")
-    attributes: dict[str, json.JsonValue] = pydantic.Field(
+    body: _schema_json.JsonValue = pydantic.Field(description="Event body.")
+    attributes: dict[str, _schema_json.JsonValue] = pydantic.Field(
         description="Event attributes."
     )
-    emitted_at: datetime.Timestamp = pydantic.Field(
+    emitted_at: _schema_datetime.Timestamp = pydantic.Field(
         description="Timestamp when the event was emitted.",
         validation_alias="emittedAt",
         serialization_alias="emittedAt",
     )
-    received_at: datetime.Timestamp | None = pydantic.Field(
+    received_at: _schema_datetime.Timestamp | None = pydantic.Field(
         default=None,
         description="Timestamp when the event was received.",
         validation_alias="receivedAt",
@@ -719,7 +721,7 @@ class SetDevicePropertyAction(pydantic.BaseModel):
         serialization_alias="deviceId",
     )
     name: str = pydantic.Field(description="Name of the property.")
-    value: json.JsonValue = pydantic.Field(description="Value of the property.")
+    value: _schema_json.JsonValue = pydantic.Field(description="Value of the property.")
     protected: bool | None = pydantic.Field(
         default=None, description="Indicates whether the property should be protected."
     )
@@ -797,14 +799,14 @@ class DeviceProperty(pydantic.BaseModel):
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
     name: str = pydantic.Field(description="Name of the property.")
-    value: json.JsonValue = pydantic.Field(description="Value of the property.")
+    value: _schema_json.JsonValue = pydantic.Field(description="Value of the property.")
     protected: bool = pydantic.Field(
         description="Indicates whether the property is protected."
     )
     version: int = pydantic.Field(
         description="Incremental version number, incremented on each update."
     )
-    last_updated: datetime.Timestamp = pydantic.Field(
+    last_updated: _schema_datetime.Timestamp = pydantic.Field(
         description="Last time the property was updated.",
         validation_alias="lastUpdated",
         serialization_alias="lastUpdated",
@@ -828,7 +830,7 @@ class QueryDeviceAuditLogOutput(pydantic.BaseModel):
 
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
-    events: list[audit.AuditLogEvent] = pydantic.Field(
+    events: list[_schema_audit.AuditLogEvent] = pydantic.Field(
         description="List of audit log events."
     )
 
@@ -850,7 +852,7 @@ class QueryDeviceCommandsOutput(pydantic.BaseModel):
 
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
-    manifest: properties.DeviceCommandManifest = pydantic.Field(
+    manifest: _schema_properties.DeviceCommandManifest = pydantic.Field(
         description="Command manifest."
     )
 
@@ -861,7 +863,7 @@ class DeviceCommandInvokeData(pydantic.BaseModel):
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
     command: str = pydantic.Field(description="Command name.")
-    input: json.JsonValue = pydantic.Field(description="Command input.")
+    input: _schema_json.JsonValue = pydantic.Field(description="Command input.")
     stream_log: bool | None = pydantic.Field(
         default=None,
         description="Stream log output back to the hub during execution (defaults to false).",
@@ -892,7 +894,7 @@ class DeviceCommandDoneData(pydantic.BaseModel):
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
     status: DeviceCommandStatus = pydantic.Field(description="Completion status.")
-    output: json.JsonValue | None = pydantic.Field(
+    output: _schema_json.JsonValue | None = pydantic.Field(
         default=None, description="Command output."
     )
     error: str | None = pydantic.Field(

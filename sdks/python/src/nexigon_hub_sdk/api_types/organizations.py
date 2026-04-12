@@ -8,10 +8,10 @@ import pydantic  # noqa: F401
 import pydantic_core  # noqa: F401
 
 if TYPE_CHECKING:
-    from . import audit  # noqa: F401
-    from . import projects  # noqa: F401
-    from . import repositories  # noqa: F401
-    from . import users  # noqa: F401
+    from . import audit as _schema_audit  # noqa: F401
+    from . import projects as _schema_projects  # noqa: F401
+    from . import repositories as _schema_repositories  # noqa: F401
+    from . import users as _schema_users  # noqa: F401
 
 
 class OrganizationId(str):
@@ -100,7 +100,7 @@ class QueryOrganizationMembersItem(pydantic.BaseModel):
 
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
-    user_id: users.UserId = pydantic.Field(
+    user_id: _schema_users.UserId = pydantic.Field(
         description="ID of the user.",
         validation_alias="userId",
         serialization_alias="userId",
@@ -146,7 +146,7 @@ class QueryOrganizationProjectsItem(pydantic.BaseModel):
 
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
-    project_id: projects.ProjectId = pydantic.Field(
+    project_id: _schema_projects.ProjectId = pydantic.Field(
         description="ID of the project.",
         validation_alias="projectId",
         serialization_alias="projectId",
@@ -181,7 +181,7 @@ class QueryOrganizationRepositoriesItem(pydantic.BaseModel):
 
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
-    repository_id: repositories.RepositoryId = pydantic.Field(
+    repository_id: _schema_repositories.RepositoryId = pydantic.Field(
         description="ID of the repository.",
         validation_alias="repositoryId",
         serialization_alias="repositoryId",
@@ -232,7 +232,7 @@ class QueryOrganizationInvitationsItem(pydantic.BaseModel):
         serialization_alias="invitationId",
     )
     email: str = pydantic.Field(description="Email address of the invited user.")
-    inviting_user_id: users.UserId | None = pydantic.Field(
+    inviting_user_id: _schema_users.UserId | None = pydantic.Field(
         default=None,
         description="ID of the inviting user.",
         validation_alias="invitingUserId",
@@ -246,7 +246,7 @@ class CreateOrganizationAction(pydantic.BaseModel):
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
     name: str = pydantic.Field(description="Name of the organization.")
-    admins: list[users.UserId] | None = pydantic.Field(
+    admins: list[_schema_users.UserId] | None = pydantic.Field(
         default=None, description="Admins of the organization."
     )
     requires_subscription: bool = pydantic.Field(
@@ -290,7 +290,7 @@ class AddOrganizationMemberAction(pydantic.BaseModel):
         validation_alias="organizationId",
         serialization_alias="organizationId",
     )
-    user_id: users.UserId = pydantic.Field(
+    user_id: _schema_users.UserId = pydantic.Field(
         description="ID of the user to add.",
         validation_alias="userId",
         serialization_alias="userId",
@@ -313,7 +313,7 @@ class RemoveOrganizationMemberAction(pydantic.BaseModel):
         validation_alias="organizationId",
         serialization_alias="organizationId",
     )
-    user_id: users.UserId = pydantic.Field(
+    user_id: _schema_users.UserId = pydantic.Field(
         description="ID of the user.",
         validation_alias="userId",
         serialization_alias="userId",
@@ -330,7 +330,7 @@ class SetOrganizationMemberIsAdminAction(pydantic.BaseModel):
         validation_alias="organizationId",
         serialization_alias="organizationId",
     )
-    user_id: users.UserId = pydantic.Field(
+    user_id: _schema_users.UserId = pydantic.Field(
         description="ID of the user.",
         validation_alias="userId",
         serialization_alias="userId",
@@ -396,6 +396,6 @@ class QueryOrganizationAuditLogOutput(pydantic.BaseModel):
 
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
-    events: list[audit.AuditLogEvent] = pydantic.Field(
+    events: list[_schema_audit.AuditLogEvent] = pydantic.Field(
         description="List of audit log events."
     )

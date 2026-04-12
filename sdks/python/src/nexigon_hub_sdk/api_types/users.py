@@ -8,11 +8,11 @@ import pydantic  # noqa: F401
 import pydantic_core  # noqa: F401
 
 if TYPE_CHECKING:
-    from . import actor  # noqa: F401
-    from . import datetime  # noqa: F401
-    from . import devices  # noqa: F401
-    from . import jwt  # noqa: F401
-    from . import organizations  # noqa: F401
+    from . import actor as _schema_actor  # noqa: F401
+    from . import datetime as _schema_datetime  # noqa: F401
+    from . import devices as _schema_devices  # noqa: F401
+    from . import jwt as _schema_jwt  # noqa: F401
+    from . import organizations as _schema_organizations  # noqa: F401
 
 
 class UserId(str):
@@ -248,7 +248,7 @@ class CompleteUserPasswordResetAction(pydantic.BaseModel):
 
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
-    reset_token: jwt.Jwt = pydantic.Field(
+    reset_token: _schema_jwt.Jwt = pydantic.Field(
         description="Token to use for password reset.",
         validation_alias="resetToken",
         serialization_alias="resetToken",
@@ -288,7 +288,7 @@ class QueryUserTokensItem(pydantic.BaseModel):
         validation_alias="tokenId",
         serialization_alias="tokenId",
     )
-    created_at: datetime.Timestamp = pydantic.Field(
+    created_at: _schema_datetime.Timestamp = pydantic.Field(
         description="Creation date of the token.",
         validation_alias="createdAt",
         serialization_alias="createdAt",
@@ -323,7 +323,7 @@ class QueryUserOrganizationsItem(pydantic.BaseModel):
 
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
-    organization_id: organizations.OrganizationId = pydantic.Field(
+    organization_id: _schema_organizations.OrganizationId = pydantic.Field(
         description="ID of the organization.",
         validation_alias="organizationId",
         serialization_alias="organizationId",
@@ -369,7 +369,7 @@ class QueryUserOrganizationInvitationsItem(pydantic.BaseModel):
 
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
-    invitation_id: organizations.OrganizationInvitationId = pydantic.Field(
+    invitation_id: _schema_organizations.OrganizationInvitationId = pydantic.Field(
         description="ID of the invitation.",
         validation_alias="invitationId",
         serialization_alias="invitationId",
@@ -384,7 +384,7 @@ class QueryUserOrganizationInvitationsItemOrganization(pydantic.BaseModel):
 
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
-    organization_id: organizations.OrganizationId = pydantic.Field(
+    organization_id: _schema_organizations.OrganizationId = pydantic.Field(
         description="ID of the organization.",
         validation_alias="organizationId",
         serialization_alias="organizationId",
@@ -422,12 +422,12 @@ class UserSession(pydantic.BaseModel):
         validation_alias="sessionId",
         serialization_alias="sessionId",
     )
-    created_at: datetime.Timestamp = pydantic.Field(
+    created_at: _schema_datetime.Timestamp = pydantic.Field(
         description="Creation date of the session.",
         validation_alias="createdAt",
         serialization_alias="createdAt",
     )
-    expires_at: datetime.Timestamp = pydantic.Field(
+    expires_at: _schema_datetime.Timestamp = pydantic.Field(
         description="Expiration date of the session.",
         validation_alias="expiresAt",
         serialization_alias="expiresAt",
@@ -457,7 +457,7 @@ class AuthenticateWithUserTokenSuccess(pydantic.BaseModel):
         validation_alias="userId",
         serialization_alias="userId",
     )
-    actor: actor.Actor = pydantic.Field(
+    actor: _schema_actor.Actor = pydantic.Field(
         description="Resulting actor to use for further actions."
     )
 
@@ -485,7 +485,7 @@ class AuthenticateWithSessionTokenSuccess(pydantic.BaseModel):
         validation_alias="sessionId",
         serialization_alias="sessionId",
     )
-    actor: actor.Actor = pydantic.Field(
+    actor: _schema_actor.Actor = pydantic.Field(
         description="Resulting actor to use for further actions."
     )
 
@@ -500,7 +500,7 @@ class GetDevicePermissionsAction(pydantic.BaseModel):
         validation_alias="userId",
         serialization_alias="userId",
     )
-    device_id: devices.DeviceId = pydantic.Field(
+    device_id: _schema_devices.DeviceId = pydantic.Field(
         description="ID of the device.",
         validation_alias="deviceId",
         serialization_alias="deviceId",
@@ -652,7 +652,7 @@ class UserRegistration(pydantic.BaseModel):
     message: str | None = pydantic.Field(
         default=None, description="Optional message to show to the user."
     )
-    created_at: datetime.Timestamp = pydantic.Field(
+    created_at: _schema_datetime.Timestamp = pydantic.Field(
         description="Timestamp when the registration was created.",
         validation_alias="createdAt",
         serialization_alias="createdAt",
@@ -670,7 +670,7 @@ class CompleteRegistrationAction(pydantic.BaseModel):
 
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
-    activation_token: jwt.Jwt = pydantic.Field(
+    activation_token: _schema_jwt.Jwt = pydantic.Field(
         description="Token to use for account activation.",
         validation_alias="activationToken",
         serialization_alias="activationToken",
@@ -682,7 +682,7 @@ class AcceptOrganizationInvitationAction(pydantic.BaseModel):
 
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
-    invitation_id: organizations.OrganizationInvitationId = pydantic.Field(
+    invitation_id: _schema_organizations.OrganizationInvitationId = pydantic.Field(
         description="ID of the invitation.",
         validation_alias="invitationId",
         serialization_alias="invitationId",

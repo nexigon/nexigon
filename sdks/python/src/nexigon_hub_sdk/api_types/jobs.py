@@ -8,7 +8,7 @@ import pydantic  # noqa: F401
 import pydantic_core  # noqa: F401
 
 if TYPE_CHECKING:
-    from . import datetime  # noqa: F401
+    from . import datetime as _schema_datetime  # noqa: F401
 
 
 class JobId(str):
@@ -49,12 +49,12 @@ class Job(pydantic.BaseModel):
     timeout: int = pydantic.Field(
         description="Timeout for an individual execution of the job (defaults to 30 minutes)."
     )
-    created_at: datetime.Timestamp = pydantic.Field(
+    created_at: _schema_datetime.Timestamp = pydantic.Field(
         description="Timestamp indicating when the job was created.",
         validation_alias="createdAt",
         serialization_alias="createdAt",
     )
-    finished_at: datetime.Timestamp | None = pydantic.Field(
+    finished_at: _schema_datetime.Timestamp | None = pydantic.Field(
         default=None,
         description="Timestamp indicating when the job has finished (if applicable).",
         validation_alias="finishedAt",

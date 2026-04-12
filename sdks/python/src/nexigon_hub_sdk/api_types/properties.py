@@ -8,7 +8,7 @@ import pydantic  # noqa: F401
 import pydantic_core  # noqa: F401
 
 if TYPE_CHECKING:
-    from . import json  # noqa: F401
+    from . import json as _schema_json  # noqa: F401
 
 
 class SystemInfo(pydantic.BaseModel):
@@ -307,10 +307,10 @@ class DeviceCommandDescriptor(pydantic.BaseModel):
     category: str | None = pydantic.Field(
         default=None, description="Category for grouping in the UI."
     )
-    input: json.JsonValue | None = pydantic.Field(
+    input: _schema_json.JsonValue | None = pydantic.Field(
         default=None, description="JSON Schema for the command input."
     )
-    output: json.JsonValue | None = pydantic.Field(
+    output: _schema_json.JsonValue | None = pydantic.Field(
         default=None, description="JSON Schema for the command output."
     )
 

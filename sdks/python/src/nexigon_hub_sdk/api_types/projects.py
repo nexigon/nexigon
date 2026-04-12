@@ -8,11 +8,11 @@ import pydantic  # noqa: F401
 import pydantic_core  # noqa: F401
 
 if TYPE_CHECKING:
-    from . import audit  # noqa: F401
-    from . import datetime  # noqa: F401
-    from . import devices  # noqa: F401
-    from . import organizations  # noqa: F401
-    from . import repositories  # noqa: F401
+    from . import audit as _schema_audit  # noqa: F401
+    from . import datetime as _schema_datetime  # noqa: F401
+    from . import devices as _schema_devices  # noqa: F401
+    from . import organizations as _schema_organizations  # noqa: F401
+    from . import repositories as _schema_repositories  # noqa: F401
 
 
 class ProjectId(str):
@@ -120,7 +120,7 @@ class CreateProjectAction(pydantic.BaseModel):
 
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
-    organization_id: organizations.OrganizationId = pydantic.Field(
+    organization_id: _schema_organizations.OrganizationId = pydantic.Field(
         description="Organization to create the project in.",
         validation_alias="organizationId",
         serialization_alias="organizationId",
@@ -179,18 +179,18 @@ class QueryProjectDevicesItem(pydantic.BaseModel):
 
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
-    device_id: devices.DeviceId = pydantic.Field(
+    device_id: _schema_devices.DeviceId = pydantic.Field(
         description="ID of the device.",
         validation_alias="deviceId",
         serialization_alias="deviceId",
     )
     name: str | None = pydantic.Field(default=None, description="Name of the device.")
-    first_seen: datetime.Timestamp = pydantic.Field(
+    first_seen: _schema_datetime.Timestamp = pydantic.Field(
         description="Timestamp when the device was first seen.",
         validation_alias="firstSeen",
         serialization_alias="firstSeen",
     )
-    status: devices.DeviceStatus = pydantic.Field(
+    status: _schema_devices.DeviceStatus = pydantic.Field(
         description="Combined device status (connection + health)."
     )
     is_connected: bool = pydantic.Field(
@@ -203,7 +203,7 @@ class QueryProjectDevicesItem(pydantic.BaseModel):
         validation_alias="pendingCertificatesCount",
         serialization_alias="pendingCertificatesCount",
     )
-    last_connected_at: datetime.Timestamp | None = pydantic.Field(
+    last_connected_at: _schema_datetime.Timestamp | None = pydantic.Field(
         default=None,
         description="Timestamp when the device was last connected (current or most recent connection).",
         validation_alias="lastConnectedAt",
@@ -249,7 +249,7 @@ class QueryProjectDeploymentTokensItem(pydantic.BaseModel):
         validation_alias="tokenId",
         serialization_alias="tokenId",
     )
-    created_at: datetime.Timestamp = pydantic.Field(
+    created_at: _schema_datetime.Timestamp = pydantic.Field(
         description="Creation date of the token.",
         validation_alias="createdAt",
         serialization_alias="createdAt",
@@ -285,7 +285,7 @@ class QueryProjectRepositoriesItem(pydantic.BaseModel):
 
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
-    repository_id: repositories.RepositoryId = pydantic.Field(
+    repository_id: _schema_repositories.RepositoryId = pydantic.Field(
         description="ID of the repository.",
         validation_alias="repositoryId",
         serialization_alias="repositoryId",
@@ -387,7 +387,7 @@ class QueryAuditLogEventsOutput(pydantic.BaseModel):
 
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
-    events: list[audit.AuditLogEvent] = pydantic.Field(
+    events: list[_schema_audit.AuditLogEvent] = pydantic.Field(
         description="List of audit log events."
     )
 
@@ -402,7 +402,7 @@ class AddProjectRepositoryAction(pydantic.BaseModel):
         validation_alias="projectId",
         serialization_alias="projectId",
     )
-    repository_id: repositories.RepositoryId = pydantic.Field(
+    repository_id: _schema_repositories.RepositoryId = pydantic.Field(
         description="ID of the repository.",
         validation_alias="repositoryId",
         serialization_alias="repositoryId",
@@ -419,7 +419,7 @@ class RemoveProjectRepositoryAction(pydantic.BaseModel):
         validation_alias="projectId",
         serialization_alias="projectId",
     )
-    repository_id: repositories.RepositoryId = pydantic.Field(
+    repository_id: _schema_repositories.RepositoryId = pydantic.Field(
         description="ID of the repository.",
         validation_alias="repositoryId",
         serialization_alias="repositoryId",

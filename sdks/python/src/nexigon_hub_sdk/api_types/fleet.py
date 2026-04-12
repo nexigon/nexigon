@@ -8,9 +8,9 @@ import pydantic  # noqa: F401
 import pydantic_core  # noqa: F401
 
 if TYPE_CHECKING:
-    from . import datetime  # noqa: F401
-    from . import json  # noqa: F401
-    from . import projects  # noqa: F401
+    from . import datetime as _schema_datetime  # noqa: F401
+    from . import json as _schema_json  # noqa: F401
+    from . import projects as _schema_projects  # noqa: F401
 
 
 class SetFleetPropertyAction(pydantic.BaseModel):
@@ -18,13 +18,13 @@ class SetFleetPropertyAction(pydantic.BaseModel):
 
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
-    project_id: projects.ProjectId = pydantic.Field(
+    project_id: _schema_projects.ProjectId = pydantic.Field(
         description="ID of the project.",
         validation_alias="projectId",
         serialization_alias="projectId",
     )
     name: str = pydantic.Field(description="Name of the property.")
-    value: json.JsonValue = pydantic.Field(description="Value of the property.")
+    value: _schema_json.JsonValue = pydantic.Field(description="Value of the property.")
 
 
 class GetFleetPropertyAction(pydantic.BaseModel):
@@ -32,7 +32,7 @@ class GetFleetPropertyAction(pydantic.BaseModel):
 
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
-    project_id: projects.ProjectId = pydantic.Field(
+    project_id: _schema_projects.ProjectId = pydantic.Field(
         description="ID of the project.",
         validation_alias="projectId",
         serialization_alias="projectId",
@@ -48,7 +48,7 @@ class RemoveFleetPropertyAction(pydantic.BaseModel):
 
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
-    project_id: projects.ProjectId = pydantic.Field(
+    project_id: _schema_projects.ProjectId = pydantic.Field(
         description="ID of the project.",
         validation_alias="projectId",
         serialization_alias="projectId",
@@ -61,7 +61,7 @@ class QueryFleetPropertiesAction(pydantic.BaseModel):
 
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
-    project_id: projects.ProjectId = pydantic.Field(
+    project_id: _schema_projects.ProjectId = pydantic.Field(
         description="ID of the project.",
         validation_alias="projectId",
         serialization_alias="projectId",
@@ -84,7 +84,7 @@ class FleetProperty(pydantic.BaseModel):
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
     name: str = pydantic.Field(description="Name of the property.")
-    value: json.JsonValue = pydantic.Field(description="Current value.")
+    value: _schema_json.JsonValue = pydantic.Field(description="Current value.")
     kind: FleetPropertyKind = pydantic.Field(
         description="How this property is managed."
     )
@@ -94,7 +94,7 @@ class FleetProperty(pydantic.BaseModel):
     error: str | None = pydantic.Field(
         default=None, description="Error from the last computation attempt, if any."
     )
-    last_updated: datetime.Timestamp = pydantic.Field(
+    last_updated: _schema_datetime.Timestamp = pydantic.Field(
         description="When the value was last updated.",
         validation_alias="lastUpdated",
         serialization_alias="lastUpdated",
@@ -106,7 +106,7 @@ class DefineComputedFleetPropertyAction(pydantic.BaseModel):
 
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
-    project_id: projects.ProjectId = pydantic.Field(
+    project_id: _schema_projects.ProjectId = pydantic.Field(
         description="ID of the project.",
         validation_alias="projectId",
         serialization_alias="projectId",
@@ -118,7 +118,7 @@ class DefineComputedFleetPropertyAction(pydantic.BaseModel):
         serialization_alias="inputProperties",
     )
     strategy: str = pydantic.Field(description="Name of the computation strategy.")
-    config: json.JsonValue | None = pydantic.Field(
+    config: _schema_json.JsonValue | None = pydantic.Field(
         default=None, description="Strategy-specific configuration."
     )
 
@@ -128,7 +128,7 @@ class QueryComputedFleetPropertyDefinitionsAction(pydantic.BaseModel):
 
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
-    project_id: projects.ProjectId = pydantic.Field(
+    project_id: _schema_projects.ProjectId = pydantic.Field(
         description="ID of the project.",
         validation_alias="projectId",
         serialization_alias="projectId",
@@ -157,10 +157,10 @@ class ComputedFleetPropertyDefinition(pydantic.BaseModel):
         serialization_alias="inputProperties",
     )
     strategy: str = pydantic.Field(description="Name of the computation strategy.")
-    config: json.JsonValue = pydantic.Field(
+    config: _schema_json.JsonValue = pydantic.Field(
         description="Strategy-specific configuration."
     )
-    created_at: datetime.Timestamp = pydantic.Field(
+    created_at: _schema_datetime.Timestamp = pydantic.Field(
         description="When the definition was created.",
         validation_alias="createdAt",
         serialization_alias="createdAt",

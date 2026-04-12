@@ -8,7 +8,7 @@ import pydantic  # noqa: F401
 import pydantic_core  # noqa: F401
 
 if TYPE_CHECKING:
-    from . import datetime  # noqa: F401
+    from . import datetime as _schema_datetime  # noqa: F401
 
 
 class ClusterNodeId(str):
@@ -58,7 +58,7 @@ class ClusterNode(pydantic.BaseModel):
     status: ClusterNodeStatus = pydantic.Field(
         description="Status of the cluster node."
     )
-    joined_at: datetime.Timestamp = pydantic.Field(
+    joined_at: _schema_datetime.Timestamp = pydantic.Field(
         description="Timestamp when the node joined the cluster.",
         validation_alias="joinedAt",
         serialization_alias="joinedAt",
@@ -68,12 +68,12 @@ class ClusterNode(pydantic.BaseModel):
         validation_alias="uptimeSecs",
         serialization_alias="uptimeSecs",
     )
-    last_heartbeat: datetime.Timestamp = pydantic.Field(
+    last_heartbeat: _schema_datetime.Timestamp = pydantic.Field(
         description="Timestamp when the node last reported a heartbeat.",
         validation_alias="lastHeartbeat",
         serialization_alias="lastHeartbeat",
     )
-    terminated_at: datetime.Timestamp | None = pydantic.Field(
+    terminated_at: _schema_datetime.Timestamp | None = pydantic.Field(
         default=None,
         description="Timestamp when the node was terminated.",
         validation_alias="terminatedAt",

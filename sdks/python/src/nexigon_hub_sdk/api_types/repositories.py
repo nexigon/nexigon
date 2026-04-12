@@ -8,12 +8,12 @@ import pydantic  # noqa: F401
 import pydantic_core  # noqa: F401
 
 if TYPE_CHECKING:
-    from . import audit  # noqa: F401
-    from . import datetime  # noqa: F401
-    from . import digest  # noqa: F401
-    from . import json  # noqa: F401
-    from . import organizations  # noqa: F401
-    from . import projects  # noqa: F401
+    from . import audit as _schema_audit  # noqa: F401
+    from . import datetime as _schema_datetime  # noqa: F401
+    from . import digest as _schema_digest  # noqa: F401
+    from . import json as _schema_json  # noqa: F401
+    from . import organizations as _schema_organizations  # noqa: F401
+    from . import projects as _schema_projects  # noqa: F401
 
 
 class RepositoryId(str):
@@ -147,7 +147,7 @@ class CreateRepositoryAction(pydantic.BaseModel):
 
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
-    organization_id: organizations.OrganizationId = pydantic.Field(
+    organization_id: _schema_organizations.OrganizationId = pydantic.Field(
         description="Organization to create the repository in.",
         validation_alias="organizationId",
         serialization_alias="organizationId",
@@ -270,7 +270,7 @@ class QueryRepositoryPackagesItem(pydantic.BaseModel):
     kind: str | None = pydantic.Field(
         default=None, description='Free-form kind of the package (e.g., "rugix-app").'
     )
-    created_at: datetime.Timestamp = pydantic.Field(
+    created_at: _schema_datetime.Timestamp = pydantic.Field(
         description="Timestamp when the package was created.",
         validation_alias="createdAt",
         serialization_alias="createdAt",
@@ -310,7 +310,7 @@ class QueryRepositoryAssetsItem(pydantic.BaseModel):
         serialization_alias="assetId",
     )
     size: int = pydantic.Field(description="Size of the asset.")
-    digest: digest.Digest = pydantic.Field(description="Digest of the asset.")
+    digest: _schema_digest.Digest = pydantic.Field(description="Digest of the asset.")
 
 
 class QueryRepositoryProjectsAction(pydantic.BaseModel):
@@ -340,7 +340,7 @@ class QueryRepositoryProjectsItem(pydantic.BaseModel):
 
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
-    project_id: projects.ProjectId = pydantic.Field(
+    project_id: _schema_projects.ProjectId = pydantic.Field(
         description="ID of the project.",
         validation_alias="projectId",
         serialization_alias="projectId",
@@ -405,7 +405,7 @@ class GetPackageDetailsOutput(pydantic.BaseModel):
         validation_alias="versionCount",
         serialization_alias="versionCount",
     )
-    metadata: dict[str, json.JsonValue] = pydantic.Field(
+    metadata: dict[str, _schema_json.JsonValue] = pydantic.Field(
         description="Package-level metadata."
     )
 
@@ -424,7 +424,7 @@ class CreatePackageAction(pydantic.BaseModel):
     kind: str | None = pydantic.Field(
         default=None, description='Free-form kind of the package (e.g., "rugix-app").'
     )
-    metadata: dict[str, json.JsonValue] | None = pydantic.Field(
+    metadata: dict[str, _schema_json.JsonValue] | None = pydantic.Field(
         default=None, description="Optional initial metadata."
     )
 
@@ -463,7 +463,7 @@ class SetPackageMetadataAction(pydantic.BaseModel):
         validation_alias="packageId",
         serialization_alias="packageId",
     )
-    metadata: dict[str, json.JsonValue] = pydantic.Field(
+    metadata: dict[str, _schema_json.JsonValue] = pydantic.Field(
         description="Metadata to set (replaces existing metadata)."
     )
 
@@ -532,7 +532,7 @@ class QueryPackageVersionsItem(pydantic.BaseModel):
     name: str | None = pydantic.Field(
         default=None, description="Optional name of the version."
     )
-    created_at: datetime.Timestamp = pydantic.Field(
+    created_at: _schema_datetime.Timestamp = pydantic.Field(
         description="Timestamp when the package version was created.",
         validation_alias="createdAt",
         serialization_alias="createdAt",
@@ -587,9 +587,9 @@ class PackageVersionAsset(pydantic.BaseModel):
         serialization_alias="assetId",
     )
     size: int = pydantic.Field(description="Size of the asset.")
-    digest: digest.Digest = pydantic.Field(description="Digest of the asset.")
+    digest: _schema_digest.Digest = pydantic.Field(description="Digest of the asset.")
     status: RepositoryAssetStatus = pydantic.Field(description="Status of the asset.")
-    metadata: dict[str, json.JsonValue] = pydantic.Field(
+    metadata: dict[str, _schema_json.JsonValue] = pydantic.Field(
         description="Arbitrary metadata associated with this asset in the version."
     )
 
@@ -665,7 +665,7 @@ class GetPackageVersionDetailsOutput(pydantic.BaseModel):
         description="Assets of the version."
     )
     tags: list[PackageVersionTag] = pydantic.Field(description="Tags of the version.")
-    metadata: dict[str, json.JsonValue] = pydantic.Field(
+    metadata: dict[str, _schema_json.JsonValue] = pydantic.Field(
         description="Version-level metadata."
     )
 
@@ -686,7 +686,7 @@ class CreatePackageVersionAction(pydantic.BaseModel):
     tags: list[AddTagItem] | None = pydantic.Field(
         default=None, description="Tags to add to the package version."
     )
-    metadata: dict[str, json.JsonValue] | None = pydantic.Field(
+    metadata: dict[str, _schema_json.JsonValue] | None = pydantic.Field(
         default=None, description="Optional initial metadata."
     )
 
@@ -740,7 +740,7 @@ class SetPackageVersionMetadataAction(pydantic.BaseModel):
         validation_alias="versionId",
         serialization_alias="versionId",
     )
-    metadata: dict[str, json.JsonValue] = pydantic.Field(
+    metadata: dict[str, _schema_json.JsonValue] = pydantic.Field(
         description="Metadata to set (replaces existing metadata)."
     )
 
@@ -761,7 +761,7 @@ class AddPackageVersionAssetAction(pydantic.BaseModel):
         serialization_alias="assetId",
     )
     filename: str = pydantic.Field(description="Filename of the asset.")
-    metadata: dict[str, json.JsonValue] | None = pydantic.Field(
+    metadata: dict[str, _schema_json.JsonValue] | None = pydantic.Field(
         default=None,
         description="Optional metadata to associate with this asset in the version.",
     )
@@ -791,7 +791,7 @@ class SetPackageVersionAssetMetadataAction(pydantic.BaseModel):
         serialization_alias="versionId",
     )
     filename: str = pydantic.Field(description="Filename of the asset.")
-    metadata: dict[str, json.JsonValue] = pydantic.Field(
+    metadata: dict[str, _schema_json.JsonValue] = pydantic.Field(
         description="Metadata to set (replaces existing metadata)."
     )
 
@@ -926,7 +926,7 @@ class GetAssetDetailsOutput(pydantic.BaseModel):
         serialization_alias="assetId",
     )
     size: int = pydantic.Field(description="Size of the asset.")
-    digest: digest.Digest = pydantic.Field(description="Digest of the asset.")
+    digest: _schema_digest.Digest = pydantic.Field(description="Digest of the asset.")
     status: RepositoryAssetStatus = pydantic.Field(description="Status of the asset.")
     reference_count: int = pydantic.Field(
         description="Number of package versions that refer to the asset.",
@@ -946,7 +946,7 @@ class CreateAssetAction(pydantic.BaseModel):
         serialization_alias="repositoryId",
     )
     size: int = pydantic.Field(description="Size of the asset.")
-    digest: digest.Digest = pydantic.Field(description="Digest of the asset.")
+    digest: _schema_digest.Digest = pydantic.Field(description="Digest of the asset.")
 
 
 class DeleteAssetAction(pydantic.BaseModel):
@@ -1021,7 +1021,7 @@ class QueryAuditLogEventsOutput(pydantic.BaseModel):
 
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
-    events: list[audit.AuditLogEvent] = pydantic.Field(
+    events: list[_schema_audit.AuditLogEvent] = pydantic.Field(
         description="List of audit log events."
     )
 

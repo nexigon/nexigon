@@ -8,10 +8,10 @@ import pydantic  # noqa: F401
 import pydantic_core  # noqa: F401
 
 if TYPE_CHECKING:
-    from . import actor  # noqa: F401
-    from . import datetime  # noqa: F401
-    from . import jobs  # noqa: F401
-    from . import json  # noqa: F401
+    from . import actor as _schema_actor  # noqa: F401
+    from . import datetime as _schema_datetime  # noqa: F401
+    from . import jobs as _schema_jobs  # noqa: F401
+    from . import json as _schema_json  # noqa: F401
 
 
 class AuditLogActionId(str):
@@ -46,12 +46,12 @@ class AuditLogEvent(pydantic.BaseModel):
         validation_alias="eventId",
         serialization_alias="eventId",
     )
-    actor: actor.Actor = pydantic.Field(description="Actor causing the event.")
+    actor: _schema_actor.Actor = pydantic.Field(description="Actor causing the event.")
     event: str = pydantic.Field(description="Type of the event that was recorded.")
-    data: json.JsonValue = pydantic.Field(
+    data: _schema_json.JsonValue = pydantic.Field(
         description="Additional audit data associated with the event."
     )
-    created_at: datetime.Timestamp = pydantic.Field(
+    created_at: _schema_datetime.Timestamp = pydantic.Field(
         description="Timestamp indicating when the audit log event was recorded.",
         validation_alias="createdAt",
         serialization_alias="createdAt",
@@ -81,7 +81,7 @@ class AuditLogEventJob(pydantic.BaseModel):
 
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
-    job_id: jobs.JobId = pydantic.Field(
+    job_id: _schema_jobs.JobId = pydantic.Field(
         description="ID of the job.",
         validation_alias="jobId",
         serialization_alias="jobId",
@@ -100,15 +100,17 @@ class AuditLogAction(pydantic.BaseModel):
         validation_alias="actionId",
         serialization_alias="actionId",
     )
-    actor: actor.Actor = pydantic.Field(description="Actor that performed the action.")
+    actor: _schema_actor.Actor = pydantic.Field(
+        description="Actor that performed the action."
+    )
     action: str = pydantic.Field(description="Type of the action that was performed.")
-    data: dict[str, json.JsonValue] = pydantic.Field(
+    data: dict[str, _schema_json.JsonValue] = pydantic.Field(
         description="Additional audit data associated with the action."
     )
     status: AuditLogActionStatus = pydantic.Field(
         description="Status associated with the action"
     )
-    created_at: datetime.Timestamp = pydantic.Field(
+    created_at: _schema_datetime.Timestamp = pydantic.Field(
         description="Timestamp indicating when the audit log action was recorded.",
         validation_alias="createdAt",
         serialization_alias="createdAt",

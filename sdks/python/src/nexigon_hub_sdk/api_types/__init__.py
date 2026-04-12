@@ -41,31 +41,14 @@ _schemas = {
     "repositories": repositories,
     "users": users,
 }
-for _mod in [
-    actor,
-    audit,
-    cluster,
-    datetime,
-    devices,
-    digest,
-    errors,
-    fleet,
-    instance,
-    jobs,
-    json,
-    jwt,
-    organizations,
-    outputs,
-    projects,
-    properties,
-    repositories,
-    users,
-]:
+for _m in _schemas.values():
     for _name, _other in _schemas.items():
-        if not hasattr(_mod, _name):
-            setattr(_mod, _name, _other)
-    for _attr in dir(_mod):
-        _obj = getattr(_mod, _attr)
+        _alias = f"_schema_{_name}"
+        if not hasattr(_m, _alias):
+            setattr(_m, _alias, _other)
+for _m in _schemas.values():
+    for _attr in dir(_m):
+        _obj = getattr(_m, _attr)
         if (
             isinstance(_obj, type)
             and issubclass(_obj, pydantic.BaseModel)

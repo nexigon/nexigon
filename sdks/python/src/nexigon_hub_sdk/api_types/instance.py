@@ -8,7 +8,7 @@ import pydantic  # noqa: F401
 import pydantic_core  # noqa: F401
 
 if TYPE_CHECKING:
-    from . import json  # noqa: F401
+    from . import json as _schema_json  # noqa: F401
 
 
 class GetInstanceStatisticsAction(pydantic.BaseModel):
@@ -38,7 +38,7 @@ class GetInstanceSettingsRawOutput(pydantic.BaseModel):
 
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
-    settings: dict[str, json.JsonValue] = pydantic.Field(
+    settings: dict[str, _schema_json.JsonValue] = pydantic.Field(
         description="Settings of the instance."
     )
 
@@ -49,4 +49,4 @@ class SetInstanceSettingRawAction(pydantic.BaseModel):
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
     key: str = pydantic.Field(description="Name of the setting.")
-    value: json.JsonValue = pydantic.Field(description="Value of the setting.")
+    value: _schema_json.JsonValue = pydantic.Field(description="Value of the setting.")

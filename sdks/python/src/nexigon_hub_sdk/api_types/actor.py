@@ -8,11 +8,11 @@ import pydantic  # noqa: F401
 import pydantic_core  # noqa: F401
 
 if TYPE_CHECKING:
-    from . import cluster  # noqa: F401
-    from . import devices  # noqa: F401
-    from . import organizations  # noqa: F401
-    from . import projects  # noqa: F401
-    from . import users  # noqa: F401
+    from . import cluster as _schema_cluster  # noqa: F401
+    from . import devices as _schema_devices  # noqa: F401
+    from . import organizations as _schema_organizations  # noqa: F401
+    from . import projects as _schema_projects  # noqa: F401
+    from . import users as _schema_users  # noqa: F401
 
 
 class AnonymousActor(pydantic.BaseModel):
@@ -32,12 +32,12 @@ class DeviceActor(pydantic.BaseModel):
 
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
-    device_id: devices.DeviceId = pydantic.Field(
+    device_id: _schema_devices.DeviceId = pydantic.Field(
         description="ID of the device.",
         validation_alias="deviceId",
         serialization_alias="deviceId",
     )
-    token_id: projects.DeploymentTokenId = pydantic.Field(
+    token_id: _schema_projects.DeploymentTokenId = pydantic.Field(
         description="ID of the deployment token used for authentication.",
         validation_alias="tokenId",
         serialization_alias="tokenId",
@@ -49,7 +49,7 @@ class UserActor(pydantic.BaseModel):
 
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
-    user_id: users.UserId = pydantic.Field(
+    user_id: _schema_users.UserId = pydantic.Field(
         description="ID of the user.",
         validation_alias="userId",
         serialization_alias="userId",
@@ -61,12 +61,12 @@ class UserTokenActor(pydantic.BaseModel):
 
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
-    user_id: users.UserId = pydantic.Field(
+    user_id: _schema_users.UserId = pydantic.Field(
         description="ID of the user.",
         validation_alias="userId",
         serialization_alias="userId",
     )
-    token_id: users.UserTokenId = pydantic.Field(
+    token_id: _schema_users.UserTokenId = pydantic.Field(
         description="ID of the user token used for authentication.",
         validation_alias="tokenId",
         serialization_alias="tokenId",
@@ -78,7 +78,7 @@ class ClusterNodeActor(pydantic.BaseModel):
 
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
-    node_id: cluster.ClusterNodeId = pydantic.Field(
+    node_id: _schema_cluster.ClusterNodeId = pydantic.Field(
         description="ID of the cluster node.",
         validation_alias="nodeId",
         serialization_alias="nodeId",
@@ -90,12 +90,12 @@ class OrganizationApiTokenActor(pydantic.BaseModel):
 
     model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
 
-    organization_id: organizations.OrganizationId = pydantic.Field(
+    organization_id: _schema_organizations.OrganizationId = pydantic.Field(
         description="ID of the organization.",
         validation_alias="organizationId",
         serialization_alias="organizationId",
     )
-    token_id: organizations.OrganizationApiTokenId = pydantic.Field(
+    token_id: _schema_organizations.OrganizationApiTokenId = pydantic.Field(
         description="ID of the API token.",
         validation_alias="tokenId",
         serialization_alias="tokenId",
