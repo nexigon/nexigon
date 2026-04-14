@@ -142,6 +142,8 @@ variant DeviceCertificateStatus {
     Rejected,
     /// The certificate has been revoked.
     Revoked,
+    /// The certificate fingerprint was seen on multiple devices.
+    Conflict,
 }
 
 /// Reason why a device connection ended.

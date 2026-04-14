@@ -9731,6 +9731,8 @@ pub mod devices {
         Rejected,
         #[doc = "The certificate has been revoked.\n"]
         Revoked,
+        #[doc = "The certificate fingerprint was seen on multiple devices.\n"]
+        Conflict,
     }
     #[automatically_derived]
     impl __serde::Serialize for DeviceCertificateStatus {
@@ -9745,6 +9747,7 @@ pub mod devices {
                 Self::Active => __serializer.serialize_tag("Active", 1u32),
                 Self::Rejected => __serializer.serialize_tag("Rejected", 2u32),
                 Self::Revoked => __serializer.serialize_tag("Revoked", 3u32),
+                Self::Conflict => __serializer.serialize_tag("Conflict", 4u32),
             }
         }
     }
@@ -9755,10 +9758,9 @@ pub mod devices {
         ) -> ::std::result::Result<Self, __D::Error> {
             #[doc(hidden)]
             const __IDENTIFIERS: &'static [&'static str] =
-                &["Pending", "Active", "Rejected", "Revoked"];
+                &["Pending", "Active", "Rejected", "Revoked", "Conflict"];
             #[doc(hidden)]
-            const __EXPECTING_IDENTIFIERS: &'static str =
-                "an identifier in [\"Pending\", \"Active\", \"Rejected\", \"Revoked\"]";
+            const __EXPECTING_IDENTIFIERS: &'static str = "an identifier in [\"Pending\", \"Active\", \"Rejected\", \"Revoked\", \"Conflict\"]";
             #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
             #[doc(hidden)]
             enum __Identifier {
@@ -9766,6 +9768,7 @@ pub mod devices {
                 __Identifier1,
                 __Identifier2,
                 __Identifier3,
+                __Identifier4,
             }
             #[doc(hidden)]
             struct __IdentifierVisitor;
@@ -9786,6 +9789,7 @@ pub mod devices {
                         1u64 => ::core::result::Result::Ok(__Identifier::__Identifier1),
                         2u64 => ::core::result::Result::Ok(__Identifier::__Identifier2),
                         3u64 => ::core::result::Result::Ok(__Identifier::__Identifier3),
+                        4u64 => ::core::result::Result::Ok(__Identifier::__Identifier4),
                         __variant => {
                             ::core::result::Result::Err(__serde::de::Error::invalid_value(
                                 __serde::de::Unexpected::Unsigned(__variant),
@@ -9803,6 +9807,7 @@ pub mod devices {
                         "Active" => ::core::result::Result::Ok(__Identifier::__Identifier1),
                         "Rejected" => ::core::result::Result::Ok(__Identifier::__Identifier2),
                         "Revoked" => ::core::result::Result::Ok(__Identifier::__Identifier3),
+                        "Conflict" => ::core::result::Result::Ok(__Identifier::__Identifier4),
                         __variant => ::core::result::Result::Err(
                             __serde::de::Error::unknown_variant(__variant, __IDENTIFIERS),
                         ),
@@ -9820,6 +9825,7 @@ pub mod devices {
                         b"Active" => ::core::result::Result::Ok(__Identifier::__Identifier1),
                         b"Rejected" => ::core::result::Result::Ok(__Identifier::__Identifier2),
                         b"Revoked" => ::core::result::Result::Ok(__Identifier::__Identifier3),
+                        b"Conflict" => ::core::result::Result::Ok(__Identifier::__Identifier4),
                         __variant => {
                             ::core::result::Result::Err(__serde::de::Error::invalid_value(
                                 __serde::de::Unexpected::Bytes(__variant),
@@ -9843,7 +9849,7 @@ pub mod devices {
             }
             #[doc(hidden)]
             const __VARIANTS: &'static [&'static str] =
-                &["Pending", "Active", "Rejected", "Revoked"];
+                &["Pending", "Active", "Rejected", "Revoked", "Conflict"];
             #[doc(hidden)]
             struct __Visitor {
                 __phantom_vars: ::core::marker::PhantomData<fn(&())>,
@@ -9876,6 +9882,9 @@ pub mod devices {
                         __Identifier::__Identifier3 => {
                             ::core::result::Result::Ok(DeviceCertificateStatus::Revoked)
                         }
+                        __Identifier::__Identifier4 => {
+                            ::core::result::Result::Ok(DeviceCertificateStatus::Conflict)
+                        }
                         _ => Err(__E::invalid_value(
                             __serde::de::Unexpected::Str(__value),
                             &self,
@@ -9906,6 +9915,10 @@ pub mod devices {
                         (__Identifier::__Identifier3, __variant) => {
                             __serde::de::VariantAccess::unit_variant(__variant)?;
                             ::core::result::Result::Ok(DeviceCertificateStatus::Revoked)
+                        }
+                        (__Identifier::__Identifier4, __variant) => {
+                            __serde::de::VariantAccess::unit_variant(__variant)?;
+                            ::core::result::Result::Ok(DeviceCertificateStatus::Conflict)
                         }
                     }
                 }

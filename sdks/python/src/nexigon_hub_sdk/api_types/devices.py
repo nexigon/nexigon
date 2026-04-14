@@ -953,12 +953,17 @@ class DeviceCertificateStatus_Revoked(pydantic.RootModel[Literal["Revoked"]]):
     pass
 
 
+class DeviceCertificateStatus_Conflict(pydantic.RootModel[Literal["Conflict"]]):
+    pass
+
+
 # Status of a device certificate.
 type DeviceCertificateStatus = (
     DeviceCertificateStatus_Pending
     | DeviceCertificateStatus_Active
     | DeviceCertificateStatus_Rejected
     | DeviceCertificateStatus_Revoked
+    | DeviceCertificateStatus_Conflict
 )
 
 

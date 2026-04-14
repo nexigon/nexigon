@@ -4840,7 +4840,8 @@
           "Pending",
           "Active",
           "Rejected",
-          "Revoked"
+          "Revoked",
+          "Conflict"
         ],
         "description": "Status of a device certificate."
       },
