@@ -1,8 +1,0 @@
-[command]
-name = "nexigon.power.shutdown"
-description = "Shut down the system"
-category = "power"
-
-[exec]
-handler = ["shutdown", "now"]
-timeout = 10

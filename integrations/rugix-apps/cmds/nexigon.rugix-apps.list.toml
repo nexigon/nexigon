@@ -1,8 +1,0 @@
-[command]
-name = "nexigon.rugix-apps.list"
-description = "List installed Rugix Apps"
-category = "applications"
-
-[exec]
-handler = ["/usr/libexec/nexigon/nexigon-rugix-apps", "list"]
-timeout = 15

@@ -1,7 +1,0 @@
-#!/usr/bin/env bash
-
-set -euo pipefail
-
-output=$(systemctl list-units --output=json)
-
-echo "{\"type\": \"Output\", \"data\": $output}"
