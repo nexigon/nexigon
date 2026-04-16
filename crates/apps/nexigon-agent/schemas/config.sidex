@@ -57,11 +57,11 @@ record HttpExportConfig {
 record TerminalConfig {
     /// Whether terminal access is enabled (defaults to false).
     enabled?: bool,
-    /// Default Unix user for terminal sessions.
+    /// Default Unix user for terminal sessions (defaults to `root`).
     user?: string,
     /// Default shell to use (fallback: user's login shell, then /bin/sh).
     shell?: string,
-    /// Allowed users for terminal sessions. If not set, any user is allowed.
+    /// Allowed users for terminal sessions. If not set, only the default user is permitted.
     allowed_users?: [string],
 }
 
