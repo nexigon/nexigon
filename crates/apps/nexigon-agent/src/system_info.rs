@@ -1,3 +1,7 @@
+use nexigon_api::types::properties::AgentCommandsConfig;
+use nexigon_api::types::properties::AgentConfig;
+use nexigon_api::types::properties::AgentInfo;
+use nexigon_api::types::properties::AgentTerminalConfig;
 use nexigon_api::types::properties::DiskInfo;
 use nexigon_api::types::properties::ExportInfo;
 use nexigon_api::types::properties::HttpExportInfo;
@@ -56,6 +60,10 @@ pub fn get_system_info(config: &Config) -> SystemInfo {
         exports,
         rugix: get_rugix_info(),
         yocto: get_yocto_info(),
+        agent: Some(AgentInfo::new(
+            nexigon_version::NEXIGON_GIT_VERSION.to_owned(),
+            build_agent_config(config),
+        )),
     }
 }
 
@@ -85,6 +93,47 @@ fn get_rugix_info() -> Option<RugixSystemInfo> {
             }
             info
         })
+}
+
+/// Build agent config from the device configuration.
+fn build_agent_config(config: &Config) -> AgentConfig {
+    let terminal_enabled = config
+        .terminal
+        .as_ref()
+        .and_then(|t| t.enabled)
+        .unwrap_or(false);
+    let commands_enabled = config
+        .commands
+        .as_ref()
+        .and_then(|c| c.enabled)
+        .unwrap_or(false);
+    AgentConfig::new()
+        .with_terminal(Some(
+            AgentTerminalConfig::new()
+                .with_enabled(Some(terminal_enabled))
+                .with_users(terminal_users(config)),
+        ))
+        .with_commands(Some(
+            AgentCommandsConfig::new().with_enabled(Some(commands_enabled)),
+        ))
+}
+
+/// Collect available terminal users from the config.
+fn terminal_users(config: &Config) -> Option<Vec<String>> {
+    let terminal = config.terminal.as_ref()?;
+    if !terminal.enabled.unwrap_or(false) {
+        return None;
+    }
+    let default_user = terminal.user.clone().unwrap_or_else(|| "root".to_owned());
+    let mut users = vec![default_user];
+    if let Some(allowed) = &terminal.allowed_users {
+        for user in allowed {
+            if !users.contains(user) {
+                users.push(user.clone());
+            }
+        }
+    }
+    Some(users)
 }
 
 /// Read Yocto build information from `/etc/buildinfo` (if available).

@@ -46465,6 +46465,8 @@ pub mod properties {
         pub rugix: ::std::option::Option<RugixSystemInfo>,
         #[doc = "Yocto-specific system information.\n"]
         pub yocto: ::std::option::Option<YoctoSystemInfo>,
+        #[doc = "Agent information.\n"]
+        pub agent: ::std::option::Option<AgentInfo>,
     }
     impl SystemInfo {
         #[doc = "Creates a new [`SystemInfo`]."]
@@ -46485,6 +46487,7 @@ pub mod properties {
                 exports: ::std::default::Default::default(),
                 rugix: ::std::default::Default::default(),
                 yocto: ::std::default::Default::default(),
+                agent: ::std::default::Default::default(),
             }
         }
         #[doc = "Sets the value of `name`."]
@@ -46627,6 +46630,16 @@ pub mod properties {
             self.yocto = yocto;
             self
         }
+        #[doc = "Sets the value of `agent`."]
+        pub fn set_agent(&mut self, agent: ::std::option::Option<AgentInfo>) -> &mut Self {
+            self.agent = agent;
+            self
+        }
+        #[doc = "Sets the value of `agent`."]
+        pub fn with_agent(mut self, agent: ::std::option::Option<AgentInfo>) -> Self {
+            self.agent = agent;
+            self
+        }
     }
     #[automatically_derived]
     impl __serde::Serialize for SystemInfo {
@@ -46635,7 +46648,7 @@ pub mod properties {
             __serializer: __S,
         ) -> ::std::result::Result<__S::Ok, __S::Error> {
             let mut __record =
-                __sidex_serde::ser::RecordSerializer::new(__serializer, "SystemInfo", 11usize)?;
+                __sidex_serde::ser::RecordSerializer::new(__serializer, "SystemInfo", 12usize)?;
             __record
                 .serialize_optional_field("name", ::core::option::Option::as_ref(&self.name))?;
             __record.serialize_optional_field(
@@ -46661,6 +46674,8 @@ pub mod properties {
                 .serialize_optional_field("rugix", ::core::option::Option::as_ref(&self.rugix))?;
             __record
                 .serialize_optional_field("yocto", ::core::option::Option::as_ref(&self.yocto))?;
+            __record
+                .serialize_optional_field("agent", ::core::option::Option::as_ref(&self.agent))?;
             __record.end()
         }
     }
@@ -46698,7 +46713,7 @@ pub mod properties {
                             return ::core::result::Result::Err(
                                 __serde::de::Error::invalid_length(
                                     0usize,
-                                    &"record with 11 fields",
+                                    &"record with 12 fields",
                                 ),
                             );
                         }
@@ -46712,7 +46727,7 @@ pub mod properties {
                             return ::core::result::Result::Err(
                                 __serde::de::Error::invalid_length(
                                     1usize,
-                                    &"record with 11 fields",
+                                    &"record with 12 fields",
                                 ),
                             );
                         }
@@ -46726,7 +46741,7 @@ pub mod properties {
                             return ::core::result::Result::Err(
                                 __serde::de::Error::invalid_length(
                                     2usize,
-                                    &"record with 11 fields",
+                                    &"record with 12 fields",
                                 ),
                             );
                         }
@@ -46740,7 +46755,7 @@ pub mod properties {
                             return ::core::result::Result::Err(
                                 __serde::de::Error::invalid_length(
                                     3usize,
-                                    &"record with 11 fields",
+                                    &"record with 12 fields",
                                 ),
                             );
                         }
@@ -46754,7 +46769,7 @@ pub mod properties {
                             return ::core::result::Result::Err(
                                 __serde::de::Error::invalid_length(
                                     4usize,
-                                    &"record with 11 fields",
+                                    &"record with 12 fields",
                                 ),
                             );
                         }
@@ -46766,7 +46781,7 @@ pub mod properties {
                                 return ::core::result::Result::Err(
                                     __serde::de::Error::invalid_length(
                                         5usize,
-                                        &"record with 11 fields",
+                                        &"record with 12 fields",
                                     ),
                                 );
                             }
@@ -46780,7 +46795,7 @@ pub mod properties {
                             return ::core::result::Result::Err(
                                 __serde::de::Error::invalid_length(
                                     6usize,
-                                    &"record with 11 fields",
+                                    &"record with 12 fields",
                                 ),
                             );
                         }
@@ -46794,7 +46809,7 @@ pub mod properties {
                             return ::core::result::Result::Err(
                                 __serde::de::Error::invalid_length(
                                     7usize,
-                                    &"record with 11 fields",
+                                    &"record with 12 fields",
                                 ),
                             );
                         }
@@ -46808,7 +46823,7 @@ pub mod properties {
                             return ::core::result::Result::Err(
                                 __serde::de::Error::invalid_length(
                                     8usize,
-                                    &"record with 11 fields",
+                                    &"record with 12 fields",
                                 ),
                             );
                         }
@@ -46822,7 +46837,7 @@ pub mod properties {
                             return ::core::result::Result::Err(
                                 __serde::de::Error::invalid_length(
                                     9usize,
-                                    &"record with 11 fields",
+                                    &"record with 12 fields",
                                 ),
                             );
                         }
@@ -46836,7 +46851,21 @@ pub mod properties {
                             return ::core::result::Result::Err(
                                 __serde::de::Error::invalid_length(
                                     10usize,
-                                    &"record with 11 fields",
+                                    &"record with 12 fields",
+                                ),
+                            );
+                        }
+                    };
+                    let __field11 = match __serde::de::SeqAccess::next_element::<
+                        ::std::option::Option<AgentInfo>,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(
+                                    11usize,
+                                    &"record with 12 fields",
                                 ),
                             );
                         }
@@ -46853,6 +46882,7 @@ pub mod properties {
                         exports: __field8,
                         rugix: __field9,
                         yocto: __field10,
+                        agent: __field11,
                     })
                 }
                 #[inline]
@@ -46866,10 +46896,10 @@ pub mod properties {
                     #[doc(hidden)]
                     const __IDENTIFIERS: &'static [&'static str] = &[
                         "name", "version", "kernel", "hostname", "arch", "memory", "networks",
-                        "disks", "exports", "rugix", "yocto",
+                        "disks", "exports", "rugix", "yocto", "agent",
                     ];
                     #[doc(hidden)]
-                    const __EXPECTING_IDENTIFIERS: &'static str = "an identifier in [\"name\", \"version\", \"kernel\", \"hostname\", \"arch\", \"memory\", \"networks\", \"disks\", \"exports\", \"rugix\", \"yocto\"]";
+                    const __EXPECTING_IDENTIFIERS: &'static str = "an identifier in [\"name\", \"version\", \"kernel\", \"hostname\", \"arch\", \"memory\", \"networks\", \"disks\", \"exports\", \"rugix\", \"yocto\", \"agent\"]";
                     #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
                     #[doc(hidden)]
                     enum __Identifier {
@@ -46884,6 +46914,7 @@ pub mod properties {
                         __Identifier8,
                         __Identifier9,
                         __Identifier10,
+                        __Identifier11,
                         __Unknown,
                     }
                     #[doc(hidden)]
@@ -46915,6 +46946,7 @@ pub mod properties {
                                 8u64 => ::core::result::Result::Ok(__Identifier::__Identifier8),
                                 9u64 => ::core::result::Result::Ok(__Identifier::__Identifier9),
                                 10u64 => ::core::result::Result::Ok(__Identifier::__Identifier10),
+                                11u64 => ::core::result::Result::Ok(__Identifier::__Identifier11),
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
                         }
@@ -46945,6 +46977,7 @@ pub mod properties {
                                 }
                                 "rugix" => ::core::result::Result::Ok(__Identifier::__Identifier9),
                                 "yocto" => ::core::result::Result::Ok(__Identifier::__Identifier10),
+                                "agent" => ::core::result::Result::Ok(__Identifier::__Identifier11),
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
                         }
@@ -46980,6 +47013,9 @@ pub mod properties {
                                 b"rugix" => ::core::result::Result::Ok(__Identifier::__Identifier9),
                                 b"yocto" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier10)
+                                }
+                                b"agent" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier11)
                                 }
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
@@ -47030,6 +47066,8 @@ pub mod properties {
                     let mut __field10: ::core::option::Option<
                         ::std::option::Option<YoctoSystemInfo>,
                     > = ::core::option::Option::None;
+                    let mut __field11: ::core::option::Option<::std::option::Option<AgentInfo>> =
+                        ::core::option::Option::None;
                     while let ::core::option::Option::Some(__key) =
                         __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
                     {
@@ -47182,6 +47220,20 @@ pub mod properties {
                                     >(&mut __map)?,
                                 );
                             }
+                            __Identifier::__Identifier11 => {
+                                if ::core::option::Option::is_some(&__field11) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "agent",
+                                        ),
+                                    );
+                                }
+                                __field11 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<
+                                        ::std::option::Option<AgentInfo>,
+                                    >(&mut __map)?,
+                                );
+                            }
                             _ => {
                                 __serde::de::MapAccess::next_value::<__serde::de::IgnoredAny>(
                                     &mut __map,
@@ -47245,6 +47297,10 @@ pub mod properties {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => ::core::option::Option::None,
                     };
+                    let __field11 = match __field11 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => ::core::option::Option::None,
+                    };
                     ::core::result::Result::Ok(SystemInfo {
                         name: __field0,
                         version: __field1,
@@ -47257,13 +47313,14 @@ pub mod properties {
                         exports: __field8,
                         rugix: __field9,
                         yocto: __field10,
+                        agent: __field11,
                     })
                 }
             }
             #[doc(hidden)]
             const __FIELDS: &'static [&'static str] = &[
                 "name", "version", "kernel", "hostname", "arch", "memory", "networks", "disks",
-                "exports", "rugix", "yocto",
+                "exports", "rugix", "yocto", "agent",
             ];
             __serde::Deserializer::deserialize_struct(
                 __deserializer,
@@ -52672,6 +52729,1053 @@ pub mod properties {
             __serde::Deserializer::deserialize_struct(
                 __deserializer,
                 "YoctoSystemInfo",
+                __FIELDS,
+                __Visitor {
+                    __phantom_vars: ::core::marker::PhantomData,
+                },
+            )
+        }
+    }
+    #[doc = "Agent information.\n"]
+    #[derive(Clone, Debug)]
+    pub struct AgentInfo {
+        #[doc = "Agent version.\n"]
+        pub version: ::std::string::String,
+        #[doc = "Agent feature configuration.\n"]
+        pub config: AgentConfig,
+    }
+    impl AgentInfo {
+        #[doc = "Creates a new [`AgentInfo`]."]
+        pub fn new(version: ::std::string::String, config: AgentConfig) -> Self {
+            Self { version, config }
+        }
+        #[doc = "Sets the value of `version`."]
+        pub fn set_version(&mut self, version: ::std::string::String) -> &mut Self {
+            self.version = version;
+            self
+        }
+        #[doc = "Sets the value of `version`."]
+        pub fn with_version(mut self, version: ::std::string::String) -> Self {
+            self.version = version;
+            self
+        }
+        #[doc = "Sets the value of `config`."]
+        pub fn set_config(&mut self, config: AgentConfig) -> &mut Self {
+            self.config = config;
+            self
+        }
+        #[doc = "Sets the value of `config`."]
+        pub fn with_config(mut self, config: AgentConfig) -> Self {
+            self.config = config;
+            self
+        }
+    }
+    #[automatically_derived]
+    impl __serde::Serialize for AgentInfo {
+        fn serialize<__S: __serde::Serializer>(
+            &self,
+            __serializer: __S,
+        ) -> ::std::result::Result<__S::Ok, __S::Error> {
+            let mut __record =
+                __sidex_serde::ser::RecordSerializer::new(__serializer, "AgentInfo", 2usize)?;
+            __record.serialize_field("version", &self.version)?;
+            __record.serialize_field("config", &self.config)?;
+            __record.end()
+        }
+    }
+    #[automatically_derived]
+    impl<'de> __serde::Deserialize<'de> for AgentInfo {
+        fn deserialize<__D: __serde::Deserializer<'de>>(
+            __deserializer: __D,
+        ) -> ::std::result::Result<Self, __D::Error> {
+            #[doc(hidden)]
+            struct __Visitor {
+                __phantom_vars: ::core::marker::PhantomData<fn(&())>,
+            }
+            impl<'de> __serde::de::Visitor<'de> for __Visitor {
+                type Value = AgentInfo;
+                fn expecting(
+                    &self,
+                    __formatter: &mut ::core::fmt::Formatter,
+                ) -> ::core::fmt::Result {
+                    ::core::fmt::Formatter::write_str(__formatter, "record AgentInfo")
+                }
+                #[inline]
+                fn visit_seq<__A>(
+                    self,
+                    mut __seq: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::SeqAccess<'de>,
+                {
+                    let __field0 = match __serde::de::SeqAccess::next_element::<
+                        ::std::string::String,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(0usize, &"record with 2 fields"),
+                            );
+                        }
+                    };
+                    let __field1 =
+                        match __serde::de::SeqAccess::next_element::<AgentConfig>(&mut __seq)? {
+                            ::core::option::Option::Some(__value) => __value,
+                            ::core::option::Option::None => {
+                                return ::core::result::Result::Err(
+                                    __serde::de::Error::invalid_length(
+                                        1usize,
+                                        &"record with 2 fields",
+                                    ),
+                                );
+                            }
+                        };
+                    ::core::result::Result::Ok(AgentInfo {
+                        version: __field0,
+                        config: __field1,
+                    })
+                }
+                #[inline]
+                fn visit_map<__A>(
+                    self,
+                    mut __map: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::MapAccess<'de>,
+                {
+                    #[doc(hidden)]
+                    const __IDENTIFIERS: &'static [&'static str] = &["version", "config"];
+                    #[doc(hidden)]
+                    const __EXPECTING_IDENTIFIERS: &'static str =
+                        "an identifier in [\"version\", \"config\"]";
+                    #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
+                    #[doc(hidden)]
+                    enum __Identifier {
+                        __Identifier0,
+                        __Identifier1,
+                        __Unknown,
+                    }
+                    #[doc(hidden)]
+                    struct __IdentifierVisitor;
+                    impl<'de> __serde::de::Visitor<'de> for __IdentifierVisitor {
+                        type Value = __Identifier;
+                        fn expecting(
+                            &self,
+                            __formatter: &mut ::core::fmt::Formatter,
+                        ) -> ::core::fmt::Result {
+                            ::core::fmt::Formatter::write_str(__formatter, __EXPECTING_IDENTIFIERS)
+                        }
+                        fn visit_u64<__E>(
+                            self,
+                            __value: u64,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                0u64 => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                                1u64 => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_str<__E>(
+                            self,
+                            __value: &str,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                "version" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
+                                }
+                                "config" => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_bytes<__E>(
+                            self,
+                            __value: &[u8],
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                b"version" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
+                                }
+                                b"config" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier1)
+                                }
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                    }
+                    impl<'de> __serde::Deserialize<'de> for __Identifier {
+                        #[inline]
+                        fn deserialize<__D>(
+                            __deserializer: __D,
+                        ) -> ::core::result::Result<Self, __D::Error>
+                        where
+                            __D: __serde::Deserializer<'de>,
+                        {
+                            __serde::Deserializer::deserialize_identifier(
+                                __deserializer,
+                                __IdentifierVisitor,
+                            )
+                        }
+                    }
+                    let mut __field0: ::core::option::Option<::std::string::String> =
+                        ::core::option::Option::None;
+                    let mut __field1: ::core::option::Option<AgentConfig> =
+                        ::core::option::Option::None;
+                    while let ::core::option::Option::Some(__key) =
+                        __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
+                    {
+                        match __key {
+                            __Identifier::__Identifier0 => {
+                                if ::core::option::Option::is_some(&__field0) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "version",
+                                        ),
+                                    );
+                                }
+                                __field0 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<::std::string::String>(
+                                        &mut __map,
+                                    )?,
+                                );
+                            }
+                            __Identifier::__Identifier1 => {
+                                if ::core::option::Option::is_some(&__field1) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "config",
+                                        ),
+                                    );
+                                }
+                                __field1 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<AgentConfig>(&mut __map)?,
+                                );
+                            }
+                            _ => {
+                                __serde::de::MapAccess::next_value::<__serde::de::IgnoredAny>(
+                                    &mut __map,
+                                )?;
+                            }
+                        }
+                    }
+                    let __field0 = match __field0 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                <__A::Error as __serde::de::Error>::missing_field("version"),
+                            );
+                        }
+                    };
+                    let __field1 = match __field1 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                <__A::Error as __serde::de::Error>::missing_field("config"),
+                            );
+                        }
+                    };
+                    ::core::result::Result::Ok(AgentInfo {
+                        version: __field0,
+                        config: __field1,
+                    })
+                }
+            }
+            #[doc(hidden)]
+            const __FIELDS: &'static [&'static str] = &["version", "config"];
+            __serde::Deserializer::deserialize_struct(
+                __deserializer,
+                "AgentInfo",
+                __FIELDS,
+                __Visitor {
+                    __phantom_vars: ::core::marker::PhantomData,
+                },
+            )
+        }
+    }
+    #[doc = "Agent feature configuration.\n"]
+    #[derive(Clone, Debug)]
+    pub struct AgentConfig {
+        #[doc = "Terminal feature configuration.\n"]
+        pub terminal: ::std::option::Option<AgentTerminalConfig>,
+        #[doc = "Commands feature configuration.\n"]
+        pub commands: ::std::option::Option<AgentCommandsConfig>,
+    }
+    impl AgentConfig {
+        #[doc = "Creates a new [`AgentConfig`]."]
+        pub fn new() -> Self {
+            Self {
+                terminal: ::std::default::Default::default(),
+                commands: ::std::default::Default::default(),
+            }
+        }
+        #[doc = "Sets the value of `terminal`."]
+        pub fn set_terminal(
+            &mut self,
+            terminal: ::std::option::Option<AgentTerminalConfig>,
+        ) -> &mut Self {
+            self.terminal = terminal;
+            self
+        }
+        #[doc = "Sets the value of `terminal`."]
+        pub fn with_terminal(
+            mut self,
+            terminal: ::std::option::Option<AgentTerminalConfig>,
+        ) -> Self {
+            self.terminal = terminal;
+            self
+        }
+        #[doc = "Sets the value of `commands`."]
+        pub fn set_commands(
+            &mut self,
+            commands: ::std::option::Option<AgentCommandsConfig>,
+        ) -> &mut Self {
+            self.commands = commands;
+            self
+        }
+        #[doc = "Sets the value of `commands`."]
+        pub fn with_commands(
+            mut self,
+            commands: ::std::option::Option<AgentCommandsConfig>,
+        ) -> Self {
+            self.commands = commands;
+            self
+        }
+    }
+    impl ::std::default::Default for AgentConfig {
+        fn default() -> Self {
+            Self::new()
+        }
+    }
+    #[automatically_derived]
+    impl __serde::Serialize for AgentConfig {
+        fn serialize<__S: __serde::Serializer>(
+            &self,
+            __serializer: __S,
+        ) -> ::std::result::Result<__S::Ok, __S::Error> {
+            let mut __record =
+                __sidex_serde::ser::RecordSerializer::new(__serializer, "AgentConfig", 2usize)?;
+            __record.serialize_optional_field(
+                "terminal",
+                ::core::option::Option::as_ref(&self.terminal),
+            )?;
+            __record.serialize_optional_field(
+                "commands",
+                ::core::option::Option::as_ref(&self.commands),
+            )?;
+            __record.end()
+        }
+    }
+    #[automatically_derived]
+    impl<'de> __serde::Deserialize<'de> for AgentConfig {
+        fn deserialize<__D: __serde::Deserializer<'de>>(
+            __deserializer: __D,
+        ) -> ::std::result::Result<Self, __D::Error> {
+            #[doc(hidden)]
+            struct __Visitor {
+                __phantom_vars: ::core::marker::PhantomData<fn(&())>,
+            }
+            impl<'de> __serde::de::Visitor<'de> for __Visitor {
+                type Value = AgentConfig;
+                fn expecting(
+                    &self,
+                    __formatter: &mut ::core::fmt::Formatter,
+                ) -> ::core::fmt::Result {
+                    ::core::fmt::Formatter::write_str(__formatter, "record AgentConfig")
+                }
+                #[inline]
+                fn visit_seq<__A>(
+                    self,
+                    mut __seq: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::SeqAccess<'de>,
+                {
+                    let __field0 = match __serde::de::SeqAccess::next_element::<
+                        ::std::option::Option<AgentTerminalConfig>,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(0usize, &"record with 2 fields"),
+                            );
+                        }
+                    };
+                    let __field1 = match __serde::de::SeqAccess::next_element::<
+                        ::std::option::Option<AgentCommandsConfig>,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(1usize, &"record with 2 fields"),
+                            );
+                        }
+                    };
+                    ::core::result::Result::Ok(AgentConfig {
+                        terminal: __field0,
+                        commands: __field1,
+                    })
+                }
+                #[inline]
+                fn visit_map<__A>(
+                    self,
+                    mut __map: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::MapAccess<'de>,
+                {
+                    #[doc(hidden)]
+                    const __IDENTIFIERS: &'static [&'static str] = &["terminal", "commands"];
+                    #[doc(hidden)]
+                    const __EXPECTING_IDENTIFIERS: &'static str =
+                        "an identifier in [\"terminal\", \"commands\"]";
+                    #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
+                    #[doc(hidden)]
+                    enum __Identifier {
+                        __Identifier0,
+                        __Identifier1,
+                        __Unknown,
+                    }
+                    #[doc(hidden)]
+                    struct __IdentifierVisitor;
+                    impl<'de> __serde::de::Visitor<'de> for __IdentifierVisitor {
+                        type Value = __Identifier;
+                        fn expecting(
+                            &self,
+                            __formatter: &mut ::core::fmt::Formatter,
+                        ) -> ::core::fmt::Result {
+                            ::core::fmt::Formatter::write_str(__formatter, __EXPECTING_IDENTIFIERS)
+                        }
+                        fn visit_u64<__E>(
+                            self,
+                            __value: u64,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                0u64 => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                                1u64 => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_str<__E>(
+                            self,
+                            __value: &str,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                "terminal" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
+                                }
+                                "commands" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier1)
+                                }
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_bytes<__E>(
+                            self,
+                            __value: &[u8],
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                b"terminal" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
+                                }
+                                b"commands" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier1)
+                                }
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                    }
+                    impl<'de> __serde::Deserialize<'de> for __Identifier {
+                        #[inline]
+                        fn deserialize<__D>(
+                            __deserializer: __D,
+                        ) -> ::core::result::Result<Self, __D::Error>
+                        where
+                            __D: __serde::Deserializer<'de>,
+                        {
+                            __serde::Deserializer::deserialize_identifier(
+                                __deserializer,
+                                __IdentifierVisitor,
+                            )
+                        }
+                    }
+                    let mut __field0: ::core::option::Option<
+                        ::std::option::Option<AgentTerminalConfig>,
+                    > = ::core::option::Option::None;
+                    let mut __field1: ::core::option::Option<
+                        ::std::option::Option<AgentCommandsConfig>,
+                    > = ::core::option::Option::None;
+                    while let ::core::option::Option::Some(__key) =
+                        __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
+                    {
+                        match __key {
+                            __Identifier::__Identifier0 => {
+                                if ::core::option::Option::is_some(&__field0) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "terminal",
+                                        ),
+                                    );
+                                }
+                                __field0 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<
+                                        ::std::option::Option<AgentTerminalConfig>,
+                                    >(&mut __map)?,
+                                );
+                            }
+                            __Identifier::__Identifier1 => {
+                                if ::core::option::Option::is_some(&__field1) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "commands",
+                                        ),
+                                    );
+                                }
+                                __field1 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<
+                                        ::std::option::Option<AgentCommandsConfig>,
+                                    >(&mut __map)?,
+                                );
+                            }
+                            _ => {
+                                __serde::de::MapAccess::next_value::<__serde::de::IgnoredAny>(
+                                    &mut __map,
+                                )?;
+                            }
+                        }
+                    }
+                    let __field0 = match __field0 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => ::core::option::Option::None,
+                    };
+                    let __field1 = match __field1 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => ::core::option::Option::None,
+                    };
+                    ::core::result::Result::Ok(AgentConfig {
+                        terminal: __field0,
+                        commands: __field1,
+                    })
+                }
+            }
+            #[doc(hidden)]
+            const __FIELDS: &'static [&'static str] = &["terminal", "commands"];
+            __serde::Deserializer::deserialize_struct(
+                __deserializer,
+                "AgentConfig",
+                __FIELDS,
+                __Visitor {
+                    __phantom_vars: ::core::marker::PhantomData,
+                },
+            )
+        }
+    }
+    #[doc = "Agent terminal feature configuration.\n"]
+    #[derive(Clone, Debug)]
+    pub struct AgentTerminalConfig {
+        #[doc = "Whether the remote terminal is enabled.\n"]
+        pub enabled: ::std::option::Option<bool>,
+        #[doc = "Available terminal users.\n"]
+        pub users: ::std::option::Option<::std::vec::Vec<::std::string::String>>,
+    }
+    impl AgentTerminalConfig {
+        #[doc = "Creates a new [`AgentTerminalConfig`]."]
+        pub fn new() -> Self {
+            Self {
+                enabled: ::std::default::Default::default(),
+                users: ::std::default::Default::default(),
+            }
+        }
+        #[doc = "Sets the value of `enabled`."]
+        pub fn set_enabled(&mut self, enabled: ::std::option::Option<bool>) -> &mut Self {
+            self.enabled = enabled;
+            self
+        }
+        #[doc = "Sets the value of `enabled`."]
+        pub fn with_enabled(mut self, enabled: ::std::option::Option<bool>) -> Self {
+            self.enabled = enabled;
+            self
+        }
+        #[doc = "Sets the value of `users`."]
+        pub fn set_users(
+            &mut self,
+            users: ::std::option::Option<::std::vec::Vec<::std::string::String>>,
+        ) -> &mut Self {
+            self.users = users;
+            self
+        }
+        #[doc = "Sets the value of `users`."]
+        pub fn with_users(
+            mut self,
+            users: ::std::option::Option<::std::vec::Vec<::std::string::String>>,
+        ) -> Self {
+            self.users = users;
+            self
+        }
+    }
+    impl ::std::default::Default for AgentTerminalConfig {
+        fn default() -> Self {
+            Self::new()
+        }
+    }
+    #[automatically_derived]
+    impl __serde::Serialize for AgentTerminalConfig {
+        fn serialize<__S: __serde::Serializer>(
+            &self,
+            __serializer: __S,
+        ) -> ::std::result::Result<__S::Ok, __S::Error> {
+            let mut __record = __sidex_serde::ser::RecordSerializer::new(
+                __serializer,
+                "AgentTerminalConfig",
+                2usize,
+            )?;
+            __record.serialize_optional_field(
+                "enabled",
+                ::core::option::Option::as_ref(&self.enabled),
+            )?;
+            __record
+                .serialize_optional_field("users", ::core::option::Option::as_ref(&self.users))?;
+            __record.end()
+        }
+    }
+    #[automatically_derived]
+    impl<'de> __serde::Deserialize<'de> for AgentTerminalConfig {
+        fn deserialize<__D: __serde::Deserializer<'de>>(
+            __deserializer: __D,
+        ) -> ::std::result::Result<Self, __D::Error> {
+            #[doc(hidden)]
+            struct __Visitor {
+                __phantom_vars: ::core::marker::PhantomData<fn(&())>,
+            }
+            impl<'de> __serde::de::Visitor<'de> for __Visitor {
+                type Value = AgentTerminalConfig;
+                fn expecting(
+                    &self,
+                    __formatter: &mut ::core::fmt::Formatter,
+                ) -> ::core::fmt::Result {
+                    ::core::fmt::Formatter::write_str(__formatter, "record AgentTerminalConfig")
+                }
+                #[inline]
+                fn visit_seq<__A>(
+                    self,
+                    mut __seq: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::SeqAccess<'de>,
+                {
+                    let __field0 = match __serde::de::SeqAccess::next_element::<
+                        ::std::option::Option<bool>,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(0usize, &"record with 2 fields"),
+                            );
+                        }
+                    };
+                    let __field1 = match __serde::de::SeqAccess::next_element::<
+                        ::std::option::Option<::std::vec::Vec<::std::string::String>>,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(1usize, &"record with 2 fields"),
+                            );
+                        }
+                    };
+                    ::core::result::Result::Ok(AgentTerminalConfig {
+                        enabled: __field0,
+                        users: __field1,
+                    })
+                }
+                #[inline]
+                fn visit_map<__A>(
+                    self,
+                    mut __map: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::MapAccess<'de>,
+                {
+                    #[doc(hidden)]
+                    const __IDENTIFIERS: &'static [&'static str] = &["enabled", "users"];
+                    #[doc(hidden)]
+                    const __EXPECTING_IDENTIFIERS: &'static str =
+                        "an identifier in [\"enabled\", \"users\"]";
+                    #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
+                    #[doc(hidden)]
+                    enum __Identifier {
+                        __Identifier0,
+                        __Identifier1,
+                        __Unknown,
+                    }
+                    #[doc(hidden)]
+                    struct __IdentifierVisitor;
+                    impl<'de> __serde::de::Visitor<'de> for __IdentifierVisitor {
+                        type Value = __Identifier;
+                        fn expecting(
+                            &self,
+                            __formatter: &mut ::core::fmt::Formatter,
+                        ) -> ::core::fmt::Result {
+                            ::core::fmt::Formatter::write_str(__formatter, __EXPECTING_IDENTIFIERS)
+                        }
+                        fn visit_u64<__E>(
+                            self,
+                            __value: u64,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                0u64 => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                                1u64 => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_str<__E>(
+                            self,
+                            __value: &str,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                "enabled" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
+                                }
+                                "users" => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_bytes<__E>(
+                            self,
+                            __value: &[u8],
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                b"enabled" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
+                                }
+                                b"users" => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                    }
+                    impl<'de> __serde::Deserialize<'de> for __Identifier {
+                        #[inline]
+                        fn deserialize<__D>(
+                            __deserializer: __D,
+                        ) -> ::core::result::Result<Self, __D::Error>
+                        where
+                            __D: __serde::Deserializer<'de>,
+                        {
+                            __serde::Deserializer::deserialize_identifier(
+                                __deserializer,
+                                __IdentifierVisitor,
+                            )
+                        }
+                    }
+                    let mut __field0: ::core::option::Option<::std::option::Option<bool>> =
+                        ::core::option::Option::None;
+                    let mut __field1: ::core::option::Option<
+                        ::std::option::Option<::std::vec::Vec<::std::string::String>>,
+                    > = ::core::option::Option::None;
+                    while let ::core::option::Option::Some(__key) =
+                        __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
+                    {
+                        match __key {
+                            __Identifier::__Identifier0 => {
+                                if ::core::option::Option::is_some(&__field0) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "enabled",
+                                        ),
+                                    );
+                                }
+                                __field0 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<
+                                        ::std::option::Option<bool>,
+                                    >(&mut __map)?,
+                                );
+                            }
+                            __Identifier::__Identifier1 => {
+                                if ::core::option::Option::is_some(&__field1) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "users",
+                                        ),
+                                    );
+                                }
+                                __field1 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<
+                                        ::std::option::Option<
+                                            ::std::vec::Vec<::std::string::String>,
+                                        >,
+                                    >(&mut __map)?,
+                                );
+                            }
+                            _ => {
+                                __serde::de::MapAccess::next_value::<__serde::de::IgnoredAny>(
+                                    &mut __map,
+                                )?;
+                            }
+                        }
+                    }
+                    let __field0 = match __field0 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => ::core::option::Option::None,
+                    };
+                    let __field1 = match __field1 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => ::core::option::Option::None,
+                    };
+                    ::core::result::Result::Ok(AgentTerminalConfig {
+                        enabled: __field0,
+                        users: __field1,
+                    })
+                }
+            }
+            #[doc(hidden)]
+            const __FIELDS: &'static [&'static str] = &["enabled", "users"];
+            __serde::Deserializer::deserialize_struct(
+                __deserializer,
+                "AgentTerminalConfig",
+                __FIELDS,
+                __Visitor {
+                    __phantom_vars: ::core::marker::PhantomData,
+                },
+            )
+        }
+    }
+    #[doc = "Agent commands feature configuration.\n"]
+    #[derive(Clone, Debug)]
+    pub struct AgentCommandsConfig {
+        #[doc = "Whether on-demand commands are enabled.\n"]
+        pub enabled: ::std::option::Option<bool>,
+    }
+    impl AgentCommandsConfig {
+        #[doc = "Creates a new [`AgentCommandsConfig`]."]
+        pub fn new() -> Self {
+            Self {
+                enabled: ::std::default::Default::default(),
+            }
+        }
+        #[doc = "Sets the value of `enabled`."]
+        pub fn set_enabled(&mut self, enabled: ::std::option::Option<bool>) -> &mut Self {
+            self.enabled = enabled;
+            self
+        }
+        #[doc = "Sets the value of `enabled`."]
+        pub fn with_enabled(mut self, enabled: ::std::option::Option<bool>) -> Self {
+            self.enabled = enabled;
+            self
+        }
+    }
+    impl ::std::default::Default for AgentCommandsConfig {
+        fn default() -> Self {
+            Self::new()
+        }
+    }
+    #[automatically_derived]
+    impl __serde::Serialize for AgentCommandsConfig {
+        fn serialize<__S: __serde::Serializer>(
+            &self,
+            __serializer: __S,
+        ) -> ::std::result::Result<__S::Ok, __S::Error> {
+            let mut __record = __sidex_serde::ser::RecordSerializer::new(
+                __serializer,
+                "AgentCommandsConfig",
+                1usize,
+            )?;
+            __record.serialize_optional_field(
+                "enabled",
+                ::core::option::Option::as_ref(&self.enabled),
+            )?;
+            __record.end()
+        }
+    }
+    #[automatically_derived]
+    impl<'de> __serde::Deserialize<'de> for AgentCommandsConfig {
+        fn deserialize<__D: __serde::Deserializer<'de>>(
+            __deserializer: __D,
+        ) -> ::std::result::Result<Self, __D::Error> {
+            #[doc(hidden)]
+            struct __Visitor {
+                __phantom_vars: ::core::marker::PhantomData<fn(&())>,
+            }
+            impl<'de> __serde::de::Visitor<'de> for __Visitor {
+                type Value = AgentCommandsConfig;
+                fn expecting(
+                    &self,
+                    __formatter: &mut ::core::fmt::Formatter,
+                ) -> ::core::fmt::Result {
+                    ::core::fmt::Formatter::write_str(__formatter, "record AgentCommandsConfig")
+                }
+                #[inline]
+                fn visit_seq<__A>(
+                    self,
+                    mut __seq: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::SeqAccess<'de>,
+                {
+                    let __field0 = match __serde::de::SeqAccess::next_element::<
+                        ::std::option::Option<bool>,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(0usize, &"record with 1 fields"),
+                            );
+                        }
+                    };
+                    ::core::result::Result::Ok(AgentCommandsConfig { enabled: __field0 })
+                }
+                #[inline]
+                fn visit_map<__A>(
+                    self,
+                    mut __map: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::MapAccess<'de>,
+                {
+                    #[doc(hidden)]
+                    const __IDENTIFIERS: &'static [&'static str] = &["enabled"];
+                    #[doc(hidden)]
+                    const __EXPECTING_IDENTIFIERS: &'static str = "an identifier in [\"enabled\"]";
+                    #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
+                    #[doc(hidden)]
+                    enum __Identifier {
+                        __Identifier0,
+                        __Unknown,
+                    }
+                    #[doc(hidden)]
+                    struct __IdentifierVisitor;
+                    impl<'de> __serde::de::Visitor<'de> for __IdentifierVisitor {
+                        type Value = __Identifier;
+                        fn expecting(
+                            &self,
+                            __formatter: &mut ::core::fmt::Formatter,
+                        ) -> ::core::fmt::Result {
+                            ::core::fmt::Formatter::write_str(__formatter, __EXPECTING_IDENTIFIERS)
+                        }
+                        fn visit_u64<__E>(
+                            self,
+                            __value: u64,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                0u64 => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_str<__E>(
+                            self,
+                            __value: &str,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                "enabled" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
+                                }
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_bytes<__E>(
+                            self,
+                            __value: &[u8],
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                b"enabled" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
+                                }
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                    }
+                    impl<'de> __serde::Deserialize<'de> for __Identifier {
+                        #[inline]
+                        fn deserialize<__D>(
+                            __deserializer: __D,
+                        ) -> ::core::result::Result<Self, __D::Error>
+                        where
+                            __D: __serde::Deserializer<'de>,
+                        {
+                            __serde::Deserializer::deserialize_identifier(
+                                __deserializer,
+                                __IdentifierVisitor,
+                            )
+                        }
+                    }
+                    let mut __field0: ::core::option::Option<::std::option::Option<bool>> =
+                        ::core::option::Option::None;
+                    while let ::core::option::Option::Some(__key) =
+                        __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
+                    {
+                        match __key {
+                            __Identifier::__Identifier0 => {
+                                if ::core::option::Option::is_some(&__field0) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "enabled",
+                                        ),
+                                    );
+                                }
+                                __field0 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<
+                                        ::std::option::Option<bool>,
+                                    >(&mut __map)?,
+                                );
+                            }
+                            _ => {
+                                __serde::de::MapAccess::next_value::<__serde::de::IgnoredAny>(
+                                    &mut __map,
+                                )?;
+                            }
+                        }
+                    }
+                    let __field0 = match __field0 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => ::core::option::Option::None,
+                    };
+                    ::core::result::Result::Ok(AgentCommandsConfig { enabled: __field0 })
+                }
+            }
+            #[doc(hidden)]
+            const __FIELDS: &'static [&'static str] = &["enabled"];
+            __serde::Deserializer::deserialize_struct(
+                __deserializer,
+                "AgentCommandsConfig",
                 __FIELDS,
                 __Visitor {
                     __phantom_vars: ::core::marker::PhantomData,

@@ -1691,11 +1691,11 @@ pub mod config {
     pub struct TerminalConfig {
         #[doc = "Whether terminal access is enabled (defaults to false).\n"]
         pub enabled: ::std::option::Option<bool>,
-        #[doc = "Default Unix user for terminal sessions.\n"]
+        #[doc = "Default Unix user for terminal sessions (defaults to `root`).\n"]
         pub user: ::std::option::Option<::std::string::String>,
         #[doc = "Default shell to use (fallback: user's login shell, then /bin/sh).\n"]
         pub shell: ::std::option::Option<::std::string::String>,
-        #[doc = "Allowed users for terminal sessions. If not set, any user is allowed.\n"]
+        #[doc = "Allowed users for terminal sessions. If not set, only the default user is permitted.\n"]
         pub allowed_users: ::std::option::Option<::std::vec::Vec<::std::string::String>>,
     }
     impl TerminalConfig {

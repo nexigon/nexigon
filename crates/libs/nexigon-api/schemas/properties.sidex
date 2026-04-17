@@ -26,6 +26,8 @@ record SystemInfo {
     rugix?: RugixSystemInfo,
     /// Yocto-specific system information.
     yocto?: YoctoSystemInfo,
+    /// Agent information.
+    agent?: AgentInfo,
 }
 
 /// Memory information.
@@ -228,6 +230,36 @@ record RugixBakeryReleaseInfo {
 record YoctoSystemInfo {
     /// Build information key-value pairs read from `/etc/buildinfo`.
     build_info: [string: string],
+}
+
+/// Agent information.
+record AgentInfo {
+    /// Agent version.
+    version: string,
+    /// Agent feature configuration.
+    config: AgentConfig,
+}
+
+/// Agent feature configuration.
+record AgentConfig {
+    /// Terminal feature configuration.
+    terminal?: AgentTerminalConfig,
+    /// Commands feature configuration.
+    commands?: AgentCommandsConfig,
+}
+
+/// Agent terminal feature configuration.
+record AgentTerminalConfig {
+    /// Whether the remote terminal is enabled.
+    enabled?: bool,
+    /// Available terminal users.
+    users?: [string],
+}
+
+/// Agent commands feature configuration.
+record AgentCommandsConfig {
+    /// Whether on-demand commands are enabled.
+    enabled?: bool,
 }
 
 /// Command manifest (`dev.nexigon.commands` property).

@@ -35,6 +35,9 @@ class SystemInfo(pydantic.BaseModel):
     yocto: YoctoSystemInfo | None = pydantic.Field(
         default=None, description="Yocto-specific system information."
     )
+    agent: AgentInfo | None = pydantic.Field(
+        default=None, description="Agent information."
+    )
 
 
 class MemoryInfo(pydantic.BaseModel):
@@ -282,6 +285,51 @@ class YoctoSystemInfo(pydantic.BaseModel):
         description="Build information key-value pairs read from `/etc/buildinfo`.",
         validation_alias="buildInfo",
         serialization_alias="buildInfo",
+    )
+
+
+class AgentInfo(pydantic.BaseModel):
+    """Agent information."""
+
+    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+
+    version: str = pydantic.Field(description="Agent version.")
+    config: AgentConfig = pydantic.Field(description="Agent feature configuration.")
+
+
+class AgentConfig(pydantic.BaseModel):
+    """Agent feature configuration."""
+
+    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+
+    terminal: AgentTerminalConfig | None = pydantic.Field(
+        default=None, description="Terminal feature configuration."
+    )
+    commands: AgentCommandsConfig | None = pydantic.Field(
+        default=None, description="Commands feature configuration."
+    )
+
+
+class AgentTerminalConfig(pydantic.BaseModel):
+    """Agent terminal feature configuration."""
+
+    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+
+    enabled: bool | None = pydantic.Field(
+        default=None, description="Whether the remote terminal is enabled."
+    )
+    users: list[str] | None = pydantic.Field(
+        default=None, description="Available terminal users."
+    )
+
+
+class AgentCommandsConfig(pydantic.BaseModel):
+    """Agent commands feature configuration."""
+
+    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+
+    enabled: bool | None = pydantic.Field(
+        default=None, description="Whether on-demand commands are enabled."
     )
 
 

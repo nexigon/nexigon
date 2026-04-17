@@ -3348,6 +3348,65 @@
     ],
     "unevaluatedProperties": false
   },
+  "nexigon_api.properties.AgentCommandsConfig": {
+    "type": "object",
+    "description": "Agent commands feature configuration.",
+    "properties": {
+      "enabled": {
+        "type": "boolean"
+      }
+    },
+    "required": [],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.properties.AgentConfig": {
+    "type": "object",
+    "description": "Agent feature configuration.",
+    "properties": {
+      "terminal": {
+        "$ref": "#/components/schemas/nexigon_api.properties.AgentTerminalConfig"
+      },
+      "commands": {
+        "$ref": "#/components/schemas/nexigon_api.properties.AgentCommandsConfig"
+      }
+    },
+    "required": [],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.properties.AgentInfo": {
+    "type": "object",
+    "description": "Agent information.",
+    "properties": {
+      "version": {
+        "type": "string"
+      },
+      "config": {
+        "$ref": "#/components/schemas/nexigon_api.properties.AgentConfig"
+      }
+    },
+    "required": [
+      "version",
+      "config"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.properties.AgentTerminalConfig": {
+    "type": "object",
+    "description": "Agent terminal feature configuration.",
+    "properties": {
+      "enabled": {
+        "type": "boolean"
+      },
+      "users": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      }
+    },
+    "required": [],
+    "unevaluatedProperties": false
+  },
   "nexigon_api.properties.DeviceCommandDescriptor": {
     "type": "object",
     "description": "Descriptor for an on-demand command.",
@@ -3787,6 +3846,9 @@
       },
       "yocto": {
         "$ref": "#/components/schemas/nexigon_api.properties.YoctoSystemInfo"
+      },
+      "agent": {
+        "$ref": "#/components/schemas/nexigon_api.properties.AgentInfo"
       }
     },
     "required": [
