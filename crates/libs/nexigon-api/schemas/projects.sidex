@@ -108,6 +108,8 @@ record QueryProjectDevicesItem {
     device_id: DeviceId,
     /// Name of the device.
     name?: string,
+    /// Hostname reported by the device (from `dev.nexigon.system.info`).
+    hostname?: string,
     /// Timestamp when the device was first seen.
     first_seen: Timestamp,
     /// Combined device status (connection + health).

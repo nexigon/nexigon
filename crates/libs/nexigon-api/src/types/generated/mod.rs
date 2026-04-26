@@ -40847,6 +40847,8 @@ pub mod projects {
         pub device_id: super::devices::DeviceId,
         #[doc = "Name of the device.\n"]
         pub name: ::std::option::Option<::std::string::String>,
+        #[doc = "Hostname reported by the device (from `dev.nexigon.system.info`).\n"]
+        pub hostname: ::std::option::Option<::std::string::String>,
         #[doc = "Timestamp when the device was first seen.\n"]
         pub first_seen: super::datetime::Timestamp,
         #[doc = "Combined device status (connection + health).\n"]
@@ -40876,6 +40878,7 @@ pub mod projects {
                 is_connected,
                 pending_certificates_count,
                 name: ::std::default::Default::default(),
+                hostname: ::std::default::Default::default(),
                 last_connected_at: ::std::default::Default::default(),
                 current_connection_duration_secs: ::std::default::Default::default(),
             }
@@ -40901,6 +40904,22 @@ pub mod projects {
         #[doc = "Sets the value of `name`."]
         pub fn with_name(mut self, name: ::std::option::Option<::std::string::String>) -> Self {
             self.name = name;
+            self
+        }
+        #[doc = "Sets the value of `hostname`."]
+        pub fn set_hostname(
+            &mut self,
+            hostname: ::std::option::Option<::std::string::String>,
+        ) -> &mut Self {
+            self.hostname = hostname;
+            self
+        }
+        #[doc = "Sets the value of `hostname`."]
+        pub fn with_hostname(
+            mut self,
+            hostname: ::std::option::Option<::std::string::String>,
+        ) -> Self {
+            self.hostname = hostname;
             self
         }
         #[doc = "Sets the value of `first_seen`."]
@@ -40988,11 +41007,15 @@ pub mod projects {
             let mut __record = __sidex_serde::ser::RecordSerializer::new(
                 __serializer,
                 "QueryProjectDevicesItem",
-                8usize,
+                9usize,
             )?;
             __record.serialize_field("deviceId", &self.device_id)?;
             __record
                 .serialize_optional_field("name", ::core::option::Option::as_ref(&self.name))?;
+            __record.serialize_optional_field(
+                "hostname",
+                ::core::option::Option::as_ref(&self.hostname),
+            )?;
             __record.serialize_field("firstSeen", &self.first_seen)?;
             __record.serialize_field("status", &self.status)?;
             __record.serialize_field("isConnected", &self.is_connected)?;
@@ -41041,7 +41064,7 @@ pub mod projects {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(0usize, &"record with 8 fields"),
+                                __serde::de::Error::invalid_length(0usize, &"record with 9 fields"),
                             );
                         }
                     };
@@ -41052,79 +41075,91 @@ pub mod projects {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(1usize, &"record with 8 fields"),
+                                __serde::de::Error::invalid_length(1usize, &"record with 9 fields"),
                             );
                         }
                     };
                     let __field2 = match __serde::de::SeqAccess::next_element::<
+                        ::std::option::Option<::std::string::String>,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(2usize, &"record with 9 fields"),
+                            );
+                        }
+                    };
+                    let __field3 = match __serde::de::SeqAccess::next_element::<
                         super::datetime::Timestamp,
                     >(&mut __seq)?
                     {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(2usize, &"record with 8 fields"),
+                                __serde::de::Error::invalid_length(3usize, &"record with 9 fields"),
                             );
                         }
                     };
-                    let __field3 = match __serde::de::SeqAccess::next_element::<
+                    let __field4 = match __serde::de::SeqAccess::next_element::<
                         super::devices::DeviceStatus,
                     >(&mut __seq)?
                     {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(3usize, &"record with 8 fields"),
+                                __serde::de::Error::invalid_length(4usize, &"record with 9 fields"),
                             );
                         }
                     };
-                    let __field4 = match __serde::de::SeqAccess::next_element::<bool>(&mut __seq)? {
+                    let __field5 = match __serde::de::SeqAccess::next_element::<bool>(&mut __seq)? {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(4usize, &"record with 8 fields"),
+                                __serde::de::Error::invalid_length(5usize, &"record with 9 fields"),
                             );
                         }
                     };
-                    let __field5 = match __serde::de::SeqAccess::next_element::<u32>(&mut __seq)? {
+                    let __field6 = match __serde::de::SeqAccess::next_element::<u32>(&mut __seq)? {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(5usize, &"record with 8 fields"),
+                                __serde::de::Error::invalid_length(6usize, &"record with 9 fields"),
                             );
                         }
                     };
-                    let __field6 = match __serde::de::SeqAccess::next_element::<
+                    let __field7 = match __serde::de::SeqAccess::next_element::<
                         ::std::option::Option<super::datetime::Timestamp>,
                     >(&mut __seq)?
                     {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(6usize, &"record with 8 fields"),
+                                __serde::de::Error::invalid_length(7usize, &"record with 9 fields"),
                             );
                         }
                     };
-                    let __field7 = match __serde::de::SeqAccess::next_element::<
+                    let __field8 = match __serde::de::SeqAccess::next_element::<
                         ::std::option::Option<u32>,
                     >(&mut __seq)?
                     {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                __serde::de::Error::invalid_length(7usize, &"record with 8 fields"),
+                                __serde::de::Error::invalid_length(8usize, &"record with 9 fields"),
                             );
                         }
                     };
                     ::core::result::Result::Ok(QueryProjectDevicesItem {
                         device_id: __field0,
                         name: __field1,
-                        first_seen: __field2,
-                        status: __field3,
-                        is_connected: __field4,
-                        pending_certificates_count: __field5,
-                        last_connected_at: __field6,
-                        current_connection_duration_secs: __field7,
+                        hostname: __field2,
+                        first_seen: __field3,
+                        status: __field4,
+                        is_connected: __field5,
+                        pending_certificates_count: __field6,
+                        last_connected_at: __field7,
+                        current_connection_duration_secs: __field8,
                     })
                 }
                 #[inline]
@@ -41139,6 +41174,7 @@ pub mod projects {
                     const __IDENTIFIERS: &'static [&'static str] = &[
                         "deviceId",
                         "name",
+                        "hostname",
                         "firstSeen",
                         "status",
                         "isConnected",
@@ -41147,7 +41183,7 @@ pub mod projects {
                         "currentConnectionDurationSecs",
                     ];
                     #[doc(hidden)]
-                    const __EXPECTING_IDENTIFIERS: &'static str = "an identifier in [\"deviceId\", \"name\", \"firstSeen\", \"status\", \"isConnected\", \"pendingCertificatesCount\", \"lastConnectedAt\", \"currentConnectionDurationSecs\"]";
+                    const __EXPECTING_IDENTIFIERS: &'static str = "an identifier in [\"deviceId\", \"name\", \"hostname\", \"firstSeen\", \"status\", \"isConnected\", \"pendingCertificatesCount\", \"lastConnectedAt\", \"currentConnectionDurationSecs\"]";
                     #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
                     #[doc(hidden)]
                     enum __Identifier {
@@ -41159,6 +41195,7 @@ pub mod projects {
                         __Identifier5,
                         __Identifier6,
                         __Identifier7,
+                        __Identifier8,
                         __Unknown,
                     }
                     #[doc(hidden)]
@@ -41187,6 +41224,7 @@ pub mod projects {
                                 5u64 => ::core::result::Result::Ok(__Identifier::__Identifier5),
                                 6u64 => ::core::result::Result::Ok(__Identifier::__Identifier6),
                                 7u64 => ::core::result::Result::Ok(__Identifier::__Identifier7),
+                                8u64 => ::core::result::Result::Ok(__Identifier::__Identifier8),
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
                         }
@@ -41202,21 +41240,24 @@ pub mod projects {
                                     ::core::result::Result::Ok(__Identifier::__Identifier0)
                                 }
                                 "name" => ::core::result::Result::Ok(__Identifier::__Identifier1),
-                                "firstSeen" => {
+                                "hostname" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier2)
                                 }
-                                "status" => ::core::result::Result::Ok(__Identifier::__Identifier3),
-                                "isConnected" => {
-                                    ::core::result::Result::Ok(__Identifier::__Identifier4)
+                                "firstSeen" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier3)
                                 }
-                                "pendingCertificatesCount" => {
+                                "status" => ::core::result::Result::Ok(__Identifier::__Identifier4),
+                                "isConnected" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier5)
                                 }
-                                "lastConnectedAt" => {
+                                "pendingCertificatesCount" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier6)
                                 }
-                                "currentConnectionDurationSecs" => {
+                                "lastConnectedAt" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier7)
+                                }
+                                "currentConnectionDurationSecs" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier8)
                                 }
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
@@ -41233,23 +41274,26 @@ pub mod projects {
                                     ::core::result::Result::Ok(__Identifier::__Identifier0)
                                 }
                                 b"name" => ::core::result::Result::Ok(__Identifier::__Identifier1),
-                                b"firstSeen" => {
+                                b"hostname" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier2)
                                 }
-                                b"status" => {
+                                b"firstSeen" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier3)
                                 }
-                                b"isConnected" => {
+                                b"status" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier4)
                                 }
-                                b"pendingCertificatesCount" => {
+                                b"isConnected" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier5)
                                 }
-                                b"lastConnectedAt" => {
+                                b"pendingCertificatesCount" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier6)
                                 }
-                                b"currentConnectionDurationSecs" => {
+                                b"lastConnectedAt" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier7)
+                                }
+                                b"currentConnectionDurationSecs" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier8)
                                 }
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
@@ -41274,16 +41318,19 @@ pub mod projects {
                     let mut __field1: ::core::option::Option<
                         ::std::option::Option<::std::string::String>,
                     > = ::core::option::Option::None;
-                    let mut __field2: ::core::option::Option<super::datetime::Timestamp> =
+                    let mut __field2: ::core::option::Option<
+                        ::std::option::Option<::std::string::String>,
+                    > = ::core::option::Option::None;
+                    let mut __field3: ::core::option::Option<super::datetime::Timestamp> =
                         ::core::option::Option::None;
-                    let mut __field3: ::core::option::Option<super::devices::DeviceStatus> =
+                    let mut __field4: ::core::option::Option<super::devices::DeviceStatus> =
                         ::core::option::Option::None;
-                    let mut __field4: ::core::option::Option<bool> = ::core::option::Option::None;
-                    let mut __field5: ::core::option::Option<u32> = ::core::option::Option::None;
-                    let mut __field6: ::core::option::Option<
+                    let mut __field5: ::core::option::Option<bool> = ::core::option::Option::None;
+                    let mut __field6: ::core::option::Option<u32> = ::core::option::Option::None;
+                    let mut __field7: ::core::option::Option<
                         ::std::option::Option<super::datetime::Timestamp>,
                     > = ::core::option::Option::None;
-                    let mut __field7: ::core::option::Option<::std::option::Option<u32>> =
+                    let mut __field8: ::core::option::Option<::std::option::Option<u32>> =
                         ::core::option::Option::None;
                     while let ::core::option::Option::Some(__key) =
                         __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
@@ -41319,77 +41366,91 @@ pub mod projects {
                                 if ::core::option::Option::is_some(&__field2) {
                                     return ::core::result::Result::Err(
                                         <__A::Error as __serde::de::Error>::duplicate_field(
-                                            "firstSeen",
+                                            "hostname",
                                         ),
                                     );
                                 }
                                 __field2 = ::core::option::Option::Some(
-                                    __serde::de::MapAccess::next_value::<super::datetime::Timestamp>(
-                                        &mut __map,
-                                    )?,
+                                    __serde::de::MapAccess::next_value::<
+                                        ::std::option::Option<::std::string::String>,
+                                    >(&mut __map)?,
                                 );
                             }
                             __Identifier::__Identifier3 => {
                                 if ::core::option::Option::is_some(&__field3) {
                                     return ::core::result::Result::Err(
                                         <__A::Error as __serde::de::Error>::duplicate_field(
-                                            "status",
+                                            "firstSeen",
                                         ),
                                     );
                                 }
                                 __field3 = ::core::option::Option::Some(
-                                    __serde::de::MapAccess::next_value::<
-                                        super::devices::DeviceStatus,
-                                    >(&mut __map)?,
+                                    __serde::de::MapAccess::next_value::<super::datetime::Timestamp>(
+                                        &mut __map,
+                                    )?,
                                 );
                             }
                             __Identifier::__Identifier4 => {
                                 if ::core::option::Option::is_some(&__field4) {
                                     return ::core::result::Result::Err(
                                         <__A::Error as __serde::de::Error>::duplicate_field(
-                                            "isConnected",
+                                            "status",
                                         ),
                                     );
                                 }
                                 __field4 = ::core::option::Option::Some(
-                                    __serde::de::MapAccess::next_value::<bool>(&mut __map)?,
+                                    __serde::de::MapAccess::next_value::<
+                                        super::devices::DeviceStatus,
+                                    >(&mut __map)?,
                                 );
                             }
                             __Identifier::__Identifier5 => {
                                 if ::core::option::Option::is_some(&__field5) {
                                     return ::core::result::Result::Err(
                                         <__A::Error as __serde::de::Error>::duplicate_field(
-                                            "pendingCertificatesCount",
+                                            "isConnected",
                                         ),
                                     );
                                 }
                                 __field5 = ::core::option::Option::Some(
-                                    __serde::de::MapAccess::next_value::<u32>(&mut __map)?,
+                                    __serde::de::MapAccess::next_value::<bool>(&mut __map)?,
                                 );
                             }
                             __Identifier::__Identifier6 => {
                                 if ::core::option::Option::is_some(&__field6) {
                                     return ::core::result::Result::Err(
                                         <__A::Error as __serde::de::Error>::duplicate_field(
-                                            "lastConnectedAt",
+                                            "pendingCertificatesCount",
                                         ),
                                     );
                                 }
                                 __field6 = ::core::option::Option::Some(
-                                    __serde::de::MapAccess::next_value::<
-                                        ::std::option::Option<super::datetime::Timestamp>,
-                                    >(&mut __map)?,
+                                    __serde::de::MapAccess::next_value::<u32>(&mut __map)?,
                                 );
                             }
                             __Identifier::__Identifier7 => {
                                 if ::core::option::Option::is_some(&__field7) {
                                     return ::core::result::Result::Err(
                                         <__A::Error as __serde::de::Error>::duplicate_field(
-                                            "currentConnectionDurationSecs",
+                                            "lastConnectedAt",
                                         ),
                                     );
                                 }
                                 __field7 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<
+                                        ::std::option::Option<super::datetime::Timestamp>,
+                                    >(&mut __map)?,
+                                );
+                            }
+                            __Identifier::__Identifier8 => {
+                                if ::core::option::Option::is_some(&__field8) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "currentConnectionDurationSecs",
+                                        ),
+                                    );
+                                }
+                                __field8 = ::core::option::Option::Some(
                                     __serde::de::MapAccess::next_value::<::std::option::Option<u32>>(
                                         &mut __map,
                                     )?,
@@ -41416,17 +41477,13 @@ pub mod projects {
                     };
                     let __field2 = match __field2 {
                         ::core::option::Option::Some(__value) => __value,
-                        ::core::option::Option::None => {
-                            return ::core::result::Result::Err(
-                                <__A::Error as __serde::de::Error>::missing_field("firstSeen"),
-                            );
-                        }
+                        ::core::option::Option::None => ::core::option::Option::None,
                     };
                     let __field3 = match __field3 {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                <__A::Error as __serde::de::Error>::missing_field("status"),
+                                <__A::Error as __serde::de::Error>::missing_field("firstSeen"),
                             );
                         }
                     };
@@ -41434,11 +41491,19 @@ pub mod projects {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
-                                <__A::Error as __serde::de::Error>::missing_field("isConnected"),
+                                <__A::Error as __serde::de::Error>::missing_field("status"),
                             );
                         }
                     };
                     let __field5 = match __field5 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                <__A::Error as __serde::de::Error>::missing_field("isConnected"),
+                            );
+                        }
+                    };
+                    let __field6 = match __field6 {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => {
                             return ::core::result::Result::Err(
@@ -41448,23 +41513,24 @@ pub mod projects {
                             );
                         }
                     };
-                    let __field6 = match __field6 {
+                    let __field7 = match __field7 {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => ::core::option::Option::None,
                     };
-                    let __field7 = match __field7 {
+                    let __field8 = match __field8 {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => ::core::option::Option::None,
                     };
                     ::core::result::Result::Ok(QueryProjectDevicesItem {
                         device_id: __field0,
                         name: __field1,
-                        first_seen: __field2,
-                        status: __field3,
-                        is_connected: __field4,
-                        pending_certificates_count: __field5,
-                        last_connected_at: __field6,
-                        current_connection_duration_secs: __field7,
+                        hostname: __field2,
+                        first_seen: __field3,
+                        status: __field4,
+                        is_connected: __field5,
+                        pending_certificates_count: __field6,
+                        last_connected_at: __field7,
+                        current_connection_duration_secs: __field8,
                     })
                 }
             }
@@ -41472,6 +41538,7 @@ pub mod projects {
             const __FIELDS: &'static [&'static str] = &[
                 "deviceId",
                 "name",
+                "hostname",
                 "firstSeen",
                 "status",
                 "isConnected",

@@ -7174,6 +7174,9 @@
           "name": {
             "type": "string"
           },
+          "hostname": {
+            "type": "string"
+          },
           "firstSeen": {
             "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
           },

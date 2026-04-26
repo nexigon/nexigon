@@ -185,6 +185,10 @@ class QueryProjectDevicesItem(pydantic.BaseModel):
         serialization_alias="deviceId",
     )
     name: str | None = pydantic.Field(default=None, description="Name of the device.")
+    hostname: str | None = pydantic.Field(
+        default=None,
+        description="Hostname reported by the device (from `dev.nexigon.system.info`).",
+    )
     first_seen: _schema_datetime.Timestamp = pydantic.Field(
         description="Timestamp when the device was first seen.",
         validation_alias="firstSeen",
