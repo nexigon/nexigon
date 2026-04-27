@@ -19,6 +19,8 @@ pub use nexigon_client::install_crypto_provider;
 
 pub mod config;
 pub mod handlers;
+#[cfg(unix)]
+pub mod local_api;
 pub mod system_info;
 #[cfg(target_os = "linux")]
 pub mod terminal;

@@ -32,6 +32,22 @@ record Config {
     terminal?: TerminalConfig,
     /// On-demand command configuration.
     commands?: CommandsConfig,
+    /// Local API configuration.
+    local_api?: LocalApiConfig,
+}
+
+/// Local API configuration.
+///
+/// Controls the Unix socket exposed by the agent for in-host clients
+/// (CLI, SDKs) to invoke hub actions over the agent's existing
+/// connection without establishing a fresh one.
+#[json(rename_all = "kebab-case")]
+record LocalApiConfig {
+    /// Whether the local API is enabled (defaults to true).
+    enabled?: bool,
+    /// Path to the Unix socket
+    /// (defaults to `/run/nexigon/agent/control/socket.sock`).
+    socket_path?: PathBuf,
 }
 
 /// Telemetry configuration.

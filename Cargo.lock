@@ -1119,6 +1119,7 @@ dependencies = [
  "clap",
  "futures",
  "libc",
+ "nexigon-agent-api",
  "nexigon-api",
  "nexigon-cert",
  "nexigon-client",

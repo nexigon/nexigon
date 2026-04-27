@@ -417,6 +417,8 @@ pub mod config {
         pub terminal: ::std::option::Option<TerminalConfig>,
         #[doc = "On-demand command configuration.\n"]
         pub commands: ::std::option::Option<CommandsConfig>,
+        #[doc = "Local API configuration.\n"]
+        pub local_api: ::std::option::Option<LocalApiConfig>,
     }
     impl Config {
         #[doc = "Creates a new [`Config`]."]
@@ -436,6 +438,7 @@ pub mod config {
                 exports: ::std::default::Default::default(),
                 terminal: ::std::default::Default::default(),
                 commands: ::std::default::Default::default(),
+                local_api: ::std::default::Default::default(),
             }
         }
         #[doc = "Sets the value of `hub_url`."]
@@ -559,6 +562,19 @@ pub mod config {
             self.commands = commands;
             self
         }
+        #[doc = "Sets the value of `local_api`."]
+        pub fn set_local_api(
+            &mut self,
+            local_api: ::std::option::Option<LocalApiConfig>,
+        ) -> &mut Self {
+            self.local_api = local_api;
+            self
+        }
+        #[doc = "Sets the value of `local_api`."]
+        pub fn with_local_api(mut self, local_api: ::std::option::Option<LocalApiConfig>) -> Self {
+            self.local_api = local_api;
+            self
+        }
     }
     #[automatically_derived]
     impl __serde::Serialize for Config {
@@ -567,7 +583,7 @@ pub mod config {
             __serializer: __S,
         ) -> ::std::result::Result<__S::Ok, __S::Error> {
             let mut __record =
-                __sidex_serde::ser::RecordSerializer::new(__serializer, "Config", 10usize)?;
+                __sidex_serde::ser::RecordSerializer::new(__serializer, "Config", 11usize)?;
             __record.serialize_field("hub-url", &self.hub_url)?;
             __record.serialize_field("token", &self.token)?;
             __record.serialize_field("fingerprint-script", &self.fingerprint_script)?;
@@ -598,6 +614,10 @@ pub mod config {
             __record.serialize_optional_field(
                 "commands",
                 ::core::option::Option::as_ref(&self.commands),
+            )?;
+            __record.serialize_optional_field(
+                "local-api",
+                ::core::option::Option::as_ref(&self.local_api),
             )?;
             __record.end()
         }
@@ -636,7 +656,7 @@ pub mod config {
                             return ::core::result::Result::Err(
                                 __serde::de::Error::invalid_length(
                                     0usize,
-                                    &"record with 10 fields",
+                                    &"record with 11 fields",
                                 ),
                             );
                         }
@@ -649,7 +669,7 @@ pub mod config {
                             return ::core::result::Result::Err(
                                 __serde::de::Error::invalid_length(
                                     1usize,
-                                    &"record with 10 fields",
+                                    &"record with 11 fields",
                                 ),
                             );
                         }
@@ -661,7 +681,7 @@ pub mod config {
                                 return ::core::result::Result::Err(
                                     __serde::de::Error::invalid_length(
                                         2usize,
-                                        &"record with 10 fields",
+                                        &"record with 11 fields",
                                     ),
                                 );
                             }
@@ -675,7 +695,7 @@ pub mod config {
                             return ::core::result::Result::Err(
                                 __serde::de::Error::invalid_length(
                                     3usize,
-                                    &"record with 10 fields",
+                                    &"record with 11 fields",
                                 ),
                             );
                         }
@@ -689,7 +709,7 @@ pub mod config {
                             return ::core::result::Result::Err(
                                 __serde::de::Error::invalid_length(
                                     4usize,
-                                    &"record with 10 fields",
+                                    &"record with 11 fields",
                                 ),
                             );
                         }
@@ -703,7 +723,7 @@ pub mod config {
                             return ::core::result::Result::Err(
                                 __serde::de::Error::invalid_length(
                                     5usize,
-                                    &"record with 10 fields",
+                                    &"record with 11 fields",
                                 ),
                             );
                         }
@@ -717,7 +737,7 @@ pub mod config {
                             return ::core::result::Result::Err(
                                 __serde::de::Error::invalid_length(
                                     6usize,
-                                    &"record with 10 fields",
+                                    &"record with 11 fields",
                                 ),
                             );
                         }
@@ -731,7 +751,7 @@ pub mod config {
                             return ::core::result::Result::Err(
                                 __serde::de::Error::invalid_length(
                                     7usize,
-                                    &"record with 10 fields",
+                                    &"record with 11 fields",
                                 ),
                             );
                         }
@@ -745,7 +765,7 @@ pub mod config {
                             return ::core::result::Result::Err(
                                 __serde::de::Error::invalid_length(
                                     8usize,
-                                    &"record with 10 fields",
+                                    &"record with 11 fields",
                                 ),
                             );
                         }
@@ -759,7 +779,21 @@ pub mod config {
                             return ::core::result::Result::Err(
                                 __serde::de::Error::invalid_length(
                                     9usize,
-                                    &"record with 10 fields",
+                                    &"record with 11 fields",
+                                ),
+                            );
+                        }
+                    };
+                    let __field10 = match __serde::de::SeqAccess::next_element::<
+                        ::std::option::Option<LocalApiConfig>,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(
+                                    10usize,
+                                    &"record with 11 fields",
                                 ),
                             );
                         }
@@ -775,6 +809,7 @@ pub mod config {
                         exports: __field7,
                         terminal: __field8,
                         commands: __field9,
+                        local_api: __field10,
                     })
                 }
                 #[inline]
@@ -797,9 +832,10 @@ pub mod config {
                         "exports",
                         "terminal",
                         "commands",
+                        "local-api",
                     ];
                     #[doc(hidden)]
-                    const __EXPECTING_IDENTIFIERS: &'static str = "an identifier in [\"hub-url\", \"token\", \"fingerprint-script\", \"ssl-cert\", \"ssl-key\", \"dangerous-disable-tls\", \"telemetry\", \"exports\", \"terminal\", \"commands\"]";
+                    const __EXPECTING_IDENTIFIERS: &'static str = "an identifier in [\"hub-url\", \"token\", \"fingerprint-script\", \"ssl-cert\", \"ssl-key\", \"dangerous-disable-tls\", \"telemetry\", \"exports\", \"terminal\", \"commands\", \"local-api\"]";
                     #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
                     #[doc(hidden)]
                     enum __Identifier {
@@ -813,6 +849,7 @@ pub mod config {
                         __Identifier7,
                         __Identifier8,
                         __Identifier9,
+                        __Identifier10,
                         __Unknown,
                     }
                     #[doc(hidden)]
@@ -843,6 +880,7 @@ pub mod config {
                                 7u64 => ::core::result::Result::Ok(__Identifier::__Identifier7),
                                 8u64 => ::core::result::Result::Ok(__Identifier::__Identifier8),
                                 9u64 => ::core::result::Result::Ok(__Identifier::__Identifier9),
+                                10u64 => ::core::result::Result::Ok(__Identifier::__Identifier10),
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
                         }
@@ -882,6 +920,9 @@ pub mod config {
                                 "commands" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier9)
                                 }
+                                "local-api" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier10)
+                                }
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
                         }
@@ -920,6 +961,9 @@ pub mod config {
                                 }
                                 b"commands" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier9)
+                                }
+                                b"local-api" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier10)
                                 }
                                 _ => ::core::result::Result::Ok(__Identifier::__Unknown),
                             }
@@ -962,6 +1006,9 @@ pub mod config {
                     > = ::core::option::Option::None;
                     let mut __field9: ::core::option::Option<
                         ::std::option::Option<CommandsConfig>,
+                    > = ::core::option::Option::None;
+                    let mut __field10: ::core::option::Option<
+                        ::std::option::Option<LocalApiConfig>,
                     > = ::core::option::Option::None;
                     while let ::core::option::Option::Some(__key) =
                         __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
@@ -1105,6 +1152,20 @@ pub mod config {
                                     >(&mut __map)?,
                                 );
                             }
+                            __Identifier::__Identifier10 => {
+                                if ::core::option::Option::is_some(&__field10) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "local-api",
+                                        ),
+                                    );
+                                }
+                                __field10 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<
+                                        ::std::option::Option<LocalApiConfig>,
+                                    >(&mut __map)?,
+                                );
+                            }
                             _ => {
                                 __serde::de::MapAccess::next_value::<__serde::de::IgnoredAny>(
                                     &mut __map,
@@ -1166,6 +1227,10 @@ pub mod config {
                         ::core::option::Option::Some(__value) => __value,
                         ::core::option::Option::None => ::core::option::Option::None,
                     };
+                    let __field10 = match __field10 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => ::core::option::Option::None,
+                    };
                     ::core::result::Result::Ok(Config {
                         hub_url: __field0,
                         token: __field1,
@@ -1177,6 +1242,7 @@ pub mod config {
                         exports: __field7,
                         terminal: __field8,
                         commands: __field9,
+                        local_api: __field10,
                     })
                 }
             }
@@ -1192,10 +1258,288 @@ pub mod config {
                 "exports",
                 "terminal",
                 "commands",
+                "local-api",
             ];
             __serde::Deserializer::deserialize_struct(
                 __deserializer,
                 "Config",
+                __FIELDS,
+                __Visitor {
+                    __phantom_vars: ::core::marker::PhantomData,
+                },
+            )
+        }
+    }
+    #[doc = "Local API configuration.\n\nControls the Unix socket exposed by the agent for in-host clients\n(CLI, SDKs) to invoke hub actions over the agent's existing\nconnection without establishing a fresh one.\n"]
+    #[derive(Clone, Debug)]
+    pub struct LocalApiConfig {
+        #[doc = "Whether the local API is enabled (defaults to true).\n"]
+        pub enabled: ::std::option::Option<bool>,
+        #[doc = "Path to the Unix socket\n(defaults to `/run/nexigon/agent/control/socket.sock`).\n"]
+        pub socket_path: ::std::option::Option<PathBuf>,
+    }
+    impl LocalApiConfig {
+        #[doc = "Creates a new [`LocalApiConfig`]."]
+        pub fn new() -> Self {
+            Self {
+                enabled: ::std::default::Default::default(),
+                socket_path: ::std::default::Default::default(),
+            }
+        }
+        #[doc = "Sets the value of `enabled`."]
+        pub fn set_enabled(&mut self, enabled: ::std::option::Option<bool>) -> &mut Self {
+            self.enabled = enabled;
+            self
+        }
+        #[doc = "Sets the value of `enabled`."]
+        pub fn with_enabled(mut self, enabled: ::std::option::Option<bool>) -> Self {
+            self.enabled = enabled;
+            self
+        }
+        #[doc = "Sets the value of `socket_path`."]
+        pub fn set_socket_path(
+            &mut self,
+            socket_path: ::std::option::Option<PathBuf>,
+        ) -> &mut Self {
+            self.socket_path = socket_path;
+            self
+        }
+        #[doc = "Sets the value of `socket_path`."]
+        pub fn with_socket_path(mut self, socket_path: ::std::option::Option<PathBuf>) -> Self {
+            self.socket_path = socket_path;
+            self
+        }
+    }
+    impl ::std::default::Default for LocalApiConfig {
+        fn default() -> Self {
+            Self::new()
+        }
+    }
+    #[automatically_derived]
+    impl __serde::Serialize for LocalApiConfig {
+        fn serialize<__S: __serde::Serializer>(
+            &self,
+            __serializer: __S,
+        ) -> ::std::result::Result<__S::Ok, __S::Error> {
+            let mut __record =
+                __sidex_serde::ser::RecordSerializer::new(__serializer, "LocalApiConfig", 2usize)?;
+            __record.serialize_optional_field(
+                "enabled",
+                ::core::option::Option::as_ref(&self.enabled),
+            )?;
+            __record.serialize_optional_field(
+                "socket-path",
+                ::core::option::Option::as_ref(&self.socket_path),
+            )?;
+            __record.end()
+        }
+    }
+    #[automatically_derived]
+    impl<'de> __serde::Deserialize<'de> for LocalApiConfig {
+        fn deserialize<__D: __serde::Deserializer<'de>>(
+            __deserializer: __D,
+        ) -> ::std::result::Result<Self, __D::Error> {
+            #[doc(hidden)]
+            struct __Visitor {
+                __phantom_vars: ::core::marker::PhantomData<fn(&())>,
+            }
+            impl<'de> __serde::de::Visitor<'de> for __Visitor {
+                type Value = LocalApiConfig;
+                fn expecting(
+                    &self,
+                    __formatter: &mut ::core::fmt::Formatter,
+                ) -> ::core::fmt::Result {
+                    ::core::fmt::Formatter::write_str(__formatter, "record LocalApiConfig")
+                }
+                #[inline]
+                fn visit_seq<__A>(
+                    self,
+                    mut __seq: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::SeqAccess<'de>,
+                {
+                    let __field0 = match __serde::de::SeqAccess::next_element::<
+                        ::std::option::Option<bool>,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(0usize, &"record with 2 fields"),
+                            );
+                        }
+                    };
+                    let __field1 = match __serde::de::SeqAccess::next_element::<
+                        ::std::option::Option<PathBuf>,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(1usize, &"record with 2 fields"),
+                            );
+                        }
+                    };
+                    ::core::result::Result::Ok(LocalApiConfig {
+                        enabled: __field0,
+                        socket_path: __field1,
+                    })
+                }
+                #[inline]
+                fn visit_map<__A>(
+                    self,
+                    mut __map: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::MapAccess<'de>,
+                {
+                    #[doc(hidden)]
+                    const __IDENTIFIERS: &'static [&'static str] = &["enabled", "socket-path"];
+                    #[doc(hidden)]
+                    const __EXPECTING_IDENTIFIERS: &'static str =
+                        "an identifier in [\"enabled\", \"socket-path\"]";
+                    #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
+                    #[doc(hidden)]
+                    enum __Identifier {
+                        __Identifier0,
+                        __Identifier1,
+                        __Unknown,
+                    }
+                    #[doc(hidden)]
+                    struct __IdentifierVisitor;
+                    impl<'de> __serde::de::Visitor<'de> for __IdentifierVisitor {
+                        type Value = __Identifier;
+                        fn expecting(
+                            &self,
+                            __formatter: &mut ::core::fmt::Formatter,
+                        ) -> ::core::fmt::Result {
+                            ::core::fmt::Formatter::write_str(__formatter, __EXPECTING_IDENTIFIERS)
+                        }
+                        fn visit_u64<__E>(
+                            self,
+                            __value: u64,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                0u64 => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                                1u64 => ::core::result::Result::Ok(__Identifier::__Identifier1),
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_str<__E>(
+                            self,
+                            __value: &str,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                "enabled" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
+                                }
+                                "socket-path" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier1)
+                                }
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_bytes<__E>(
+                            self,
+                            __value: &[u8],
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                b"enabled" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
+                                }
+                                b"socket-path" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier1)
+                                }
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                    }
+                    impl<'de> __serde::Deserialize<'de> for __Identifier {
+                        #[inline]
+                        fn deserialize<__D>(
+                            __deserializer: __D,
+                        ) -> ::core::result::Result<Self, __D::Error>
+                        where
+                            __D: __serde::Deserializer<'de>,
+                        {
+                            __serde::Deserializer::deserialize_identifier(
+                                __deserializer,
+                                __IdentifierVisitor,
+                            )
+                        }
+                    }
+                    let mut __field0: ::core::option::Option<::std::option::Option<bool>> =
+                        ::core::option::Option::None;
+                    let mut __field1: ::core::option::Option<::std::option::Option<PathBuf>> =
+                        ::core::option::Option::None;
+                    while let ::core::option::Option::Some(__key) =
+                        __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
+                    {
+                        match __key {
+                            __Identifier::__Identifier0 => {
+                                if ::core::option::Option::is_some(&__field0) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "enabled",
+                                        ),
+                                    );
+                                }
+                                __field0 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<
+                                        ::std::option::Option<bool>,
+                                    >(&mut __map)?,
+                                );
+                            }
+                            __Identifier::__Identifier1 => {
+                                if ::core::option::Option::is_some(&__field1) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "socket-path",
+                                        ),
+                                    );
+                                }
+                                __field1 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<
+                                        ::std::option::Option<PathBuf>,
+                                    >(&mut __map)?,
+                                );
+                            }
+                            _ => {
+                                __serde::de::MapAccess::next_value::<__serde::de::IgnoredAny>(
+                                    &mut __map,
+                                )?;
+                            }
+                        }
+                    }
+                    let __field0 = match __field0 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => ::core::option::Option::None,
+                    };
+                    let __field1 = match __field1 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => ::core::option::Option::None,
+                    };
+                    ::core::result::Result::Ok(LocalApiConfig {
+                        enabled: __field0,
+                        socket_path: __field1,
+                    })
+                }
+            }
+            #[doc(hidden)]
+            const __FIELDS: &'static [&'static str] = &["enabled", "socket-path"];
+            __serde::Deserializer::deserialize_struct(
+                __deserializer,
+                "LocalApiConfig",
                 __FIELDS,
                 __Visitor {
                     __phantom_vars: ::core::marker::PhantomData,

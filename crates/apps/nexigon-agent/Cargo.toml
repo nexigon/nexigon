@@ -18,6 +18,7 @@ path = "src/main.rs"
 anyhow.workspace = true
 clap.workspace = true
 futures.workspace = true
+nexigon-agent-api.workspace = true
 nexigon-api.workspace = true
 nexigon-cert.workspace = true
 nexigon-client.workspace = true

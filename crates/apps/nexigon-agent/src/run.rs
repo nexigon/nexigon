@@ -251,6 +251,49 @@ pub async fn run_with_connection(
             .ok();
     }
 
-    event_loop.await??;
+    #[cfg(unix)]
+    let local_api = spawn_local_api(&config, &connection_ref);
+
+    let result = event_loop.await?;
+
+    #[cfg(unix)]
+    if let Some((handle, shutdown_tx)) = local_api {
+        let _ = shutdown_tx.send(());
+        let _ = handle.await;
+    }
+
+    result?;
     Ok(())
+}
+
+#[cfg(unix)]
+fn spawn_local_api(
+    config: &Config,
+    connection_ref: &nexigon_multiplex::ConnectionRef,
+) -> Option<(tokio::task::JoinHandle<()>, oneshot::Sender<()>)> {
+    use crate::config::LocalApiConfig;
+
+    let local_api_config = config.local_api.clone();
+    let enabled = local_api_config
+        .as_ref()
+        .and_then(|cfg| cfg.enabled)
+        .unwrap_or(true);
+    if !enabled {
+        return None;
+    }
+    let local_api_config = local_api_config.unwrap_or(LocalApiConfig {
+        enabled: None,
+        socket_path: None,
+    });
+    let hub_ref = connection_ref.clone();
+    let (shutdown_tx, shutdown_rx) = oneshot::channel::<()>();
+    let handle = tokio::spawn(async move {
+        let shutdown = async move {
+            let _ = shutdown_rx.await;
+        };
+        if let Err(e) = crate::local_api::serve(&local_api_config, hub_ref, shutdown).await {
+            warn!("local API server error: {e:#}");
+        }
+    });
+    Some((handle, shutdown_tx))
 }
