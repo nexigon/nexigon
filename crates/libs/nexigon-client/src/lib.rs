@@ -1,5 +1,6 @@
 //! Nexigon Hub API client.
 
+use std::future::Future;
 use std::sync::Arc;
 
 use futures::Stream;
@@ -361,5 +362,27 @@ impl ClientExecutor {
     ) -> Result<Result<A::Output, ActionError>, ExecuteError> {
         let (tx, rx) = self.channel.split_mut();
         nexigon_rpc::execute(&action, rx, tx).await
+    }
+}
+
+/// Common interface for executors that can run Nexigon Hub actions.
+///
+/// Implemented by both [`ClientExecutor`] (direct hub link) and
+/// [`local::LocalExecutor`] (via the agent local API socket), so callers
+/// can be written generically against whichever transport is in use.
+pub trait Execute {
+    /// Execute the given [`Action`] and return its result.
+    fn execute<A: Action>(
+        &mut self,
+        action: A,
+    ) -> impl Future<Output = Result<Result<A::Output, ActionError>, ExecuteError>>;
+}
+
+impl Execute for ClientExecutor {
+    async fn execute<A: Action>(
+        &mut self,
+        action: A,
+    ) -> Result<Result<A::Output, ActionError>, ExecuteError> {
+        ClientExecutor::execute(self, action).await
     }
 }

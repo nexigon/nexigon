@@ -13,6 +13,7 @@ use std::os::unix::fs::PermissionsExt;
 use std::path::PathBuf;
 
 use anyhow::Context;
+use nexigon_agent_api::DEFAULT_SOCKET_PATH;
 use nexigon_agent_api::MAGIC;
 use nexigon_agent_api::MAX_HANDSHAKE_LEN;
 use nexigon_agent_api::VERSION;
@@ -31,9 +32,6 @@ use tracing::info;
 use tracing::warn;
 
 use crate::config::LocalApiConfig;
-
-/// Default path of the local API Unix socket.
-pub const DEFAULT_SOCKET_PATH: &str = "/run/nexigon/agent/control/socket.sock";
 
 /// File mode applied to the socket after binding.
 const SOCKET_MODE: u32 = 0o660;

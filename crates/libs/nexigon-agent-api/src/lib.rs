@@ -15,6 +15,9 @@ sidex::include_bundle!(
     pub nexigon_agent_api as types
 );
 
+#[cfg(unix)]
+pub mod client;
+
 /// Magic prefix identifying the agent local API protocol on the wire.
 ///
 /// Sent by both sides as the first four bytes of the connection. A
@@ -29,3 +32,6 @@ pub const MAX_HANDSHAKE_LEN: u32 = 64 * 1024;
 
 /// Current protocol version.
 pub const VERSION: u32 = 1;
+
+/// Default path of the agent's local API Unix socket.
+pub const DEFAULT_SOCKET_PATH: &str = "/run/nexigon/agent/control/socket.sock";

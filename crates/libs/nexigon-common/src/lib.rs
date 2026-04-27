@@ -27,7 +27,7 @@ use nexigon_api::types::repositories::ResolvePackageVersionByPathOutput;
 use nexigon_api::types::repositories::ResolveRepositoryNameAction;
 use nexigon_api::types::repositories::ResolveRepositoryNameOutput;
 use nexigon_api::types::repositories::TagPackageVersionAction;
-use nexigon_client::ClientExecutor;
+use nexigon_client::Execute;
 use nexigon_ids::ids::PackageId;
 use nexigon_ids::ids::PackageVersionId;
 use nexigon_ids::ids::RepositoryId;
@@ -119,7 +119,7 @@ pub fn parse_version_path(path: &str) -> anyhow::Result<VersionPath> {
 // ── Resolution helpers ───────────────────────────────────────────────
 
 pub async fn resolve_repository(
-    executor: &mut ClientExecutor,
+    executor: &mut impl Execute,
     repository: &str,
 ) -> anyhow::Result<RepositoryId> {
     if repository.starts_with("repo_") {
@@ -137,7 +137,7 @@ pub async fn resolve_repository(
 }
 
 pub async fn resolve_package(
-    executor: &mut ClientExecutor,
+    executor: &mut impl Execute,
     package: &str,
 ) -> anyhow::Result<PackageId> {
     if package.starts_with("pkg_") {
@@ -170,7 +170,7 @@ pub async fn resolve_package(
 }
 
 pub async fn resolve_asset(
-    executor: &mut ClientExecutor,
+    executor: &mut impl Execute,
     asset: &str,
 ) -> anyhow::Result<RepositoryAssetId> {
     if asset.starts_with("repo_a_") {
@@ -196,7 +196,7 @@ pub async fn resolve_asset(
 }
 
 pub async fn resolve_version(
-    executor: &mut ClientExecutor,
+    executor: &mut impl Execute,
     version: &str,
 ) -> anyhow::Result<PackageVersionId> {
     if version.starts_with("pkg_v") {
@@ -219,7 +219,7 @@ pub async fn resolve_version(
 }
 
 pub async fn get_version_details(
-    executor: &mut ClientExecutor,
+    executor: &mut impl Execute,
     version_id: PackageVersionId,
 ) -> anyhow::Result<GetPackageVersionDetailsOutput> {
     Ok(executor
@@ -379,7 +379,7 @@ pub enum AssetsCmd {
 /// Execute a [`RepositoriesCmd`].
 pub async fn execute_repositories_cmd(
     cmd: &RepositoriesCmd,
-    executor: &mut ClientExecutor,
+    executor: &mut impl Execute,
 ) -> anyhow::Result<()> {
     match cmd {
         RepositoriesCmd::IssueUrl { asset } => {
@@ -479,7 +479,7 @@ pub async fn execute_repositories_cmd(
 /// Execute a [`VersionsCmd`].
 pub async fn execute_versions_cmd(
     cmd: &VersionsCmd,
-    executor: &mut ClientExecutor,
+    executor: &mut impl Execute,
 ) -> anyhow::Result<()> {
     match cmd {
         VersionsCmd::Resolve { version } => {

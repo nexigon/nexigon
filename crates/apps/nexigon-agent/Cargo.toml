@@ -25,6 +25,7 @@ nexigon-client.workspace = true
 nexigon-common.workspace = true
 nexigon-ids.workspace = true
 nexigon-multiplex.workspace = true
+nexigon-rpc.workspace = true
 nexigon-version.workspace = true
 reportify.workspace = true
 serde.workspace = true

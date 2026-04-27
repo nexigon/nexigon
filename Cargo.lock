@@ -1126,6 +1126,7 @@ dependencies = [
  "nexigon-common",
  "nexigon-ids",
  "nexigon-multiplex",
+ "nexigon-rpc",
  "nexigon-version",
  "nix",
  "reportify",
@@ -1143,11 +1144,16 @@ dependencies = [
 name = "nexigon-agent-api"
 version = "0.1.0"
 dependencies = [
+ "nexigon-api",
+ "nexigon-client",
+ "nexigon-rpc",
  "serde",
  "serde_json",
  "sidex",
  "sidex-build-rs",
  "sidex-serde",
+ "thiserror 2.0.18",
+ "tokio",
 ]
 
 [[package]]
