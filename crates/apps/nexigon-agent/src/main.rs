@@ -36,6 +36,7 @@ use nexigon_ids::ids::DeviceEventId;
 use nexigon_rpc::ExecuteError;
 use tracing::debug;
 use tracing::info;
+use tracing::warn;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
@@ -102,7 +103,7 @@ impl OneShot {
                 })
             }
             Err(e) => {
-                debug!(
+                warn!(
                     ?socket_path,
                     "agent local API unavailable ({e}); falling back to direct hub connection",
                 );
