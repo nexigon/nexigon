@@ -1,0 +1,67 @@
+//! Agent local API handshake.
+//!
+//! Wire format on the Unix socket, both directions:
+//!
+//!     [ 4 bytes MAGIC ][ u32 BE length ][ JSON payload ]
+//!
+//! The client sends a `ClientHello`; the agent replies with a `ServerHello`.
+//! On success, the connection is then handed to the requested endpoint
+//! (e.g. for `endpoint = "executor"`, raw `nexigon-rpc` bytes flow through).
+
+/// JSON value.
+#[rust(type = "serde_json::Value")]
+#[json(type = "any")]
+opaque JsonValue
+
+/// Initial message sent by the client.
+record ClientHello {
+    /// Protocol version requested by the client. Current value: 1.
+    version: u32,
+    /// Endpoint to dispatch to.
+    ///
+    /// Known endpoints:
+    ///   - `"executor"`: splices to a hub-side executor channel; the
+    ///     stream then carries `nexigon-rpc` actions/results.
+    endpoint: string,
+    /// Endpoint-specific options. Interpretation depends on `endpoint`.
+    options?: JsonValue,
+}
+
+/// Reply sent by the agent.
+#[json(tag = "result")]
+variant ServerHello {
+    /// Handshake accepted; the connection is now owned by the endpoint.
+    Ok: ServerOk,
+    /// Handshake rejected; the agent will close the connection.
+    Error: ServerError,
+}
+
+/// Successful handshake payload.
+record ServerOk {
+    /// Protocol version the agent will speak on this connection.
+    version: u32,
+}
+
+/// Failed handshake payload.
+record ServerError {
+    /// Machine-readable error code.
+    code: ServerErrorCode,
+    /// Human-readable error message.
+    message: string,
+}
+
+/// Reason the handshake was rejected.
+#[rust(derive(Copy))]
+#[json(tagged = externally)]
+variant ServerErrorCode {
+    /// `version` is not supported by this agent.
+    UnsupportedVersion,
+    /// `endpoint` is not known to this agent.
+    UnknownEndpoint,
+    /// `endpoint` is known but disabled by configuration.
+    EndpointDisabled,
+    /// `ClientHello` was malformed or missing required fields.
+    InvalidRequest,
+    /// Internal agent error; retry is unlikely to help.
+    Internal,
+}

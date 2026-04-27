@@ -43,10 +43,13 @@ x509-cert = "0.2"
 reportify = { git = "https://github.com/silitics/si-rust-libs.git" }
 si-crypto-hashes = "0.1"
 si-observability = { version = "0.1", features = ["otlp", "clap4"] }
+sidex = { git = "https://github.com/silitics/sidex.git" }
+sidex-build-rs = { git = "https://github.com/silitics/sidex.git" }
 sidex-serde = { git = "https://github.com/silitics/sidex.git" }
 sidex-types-openapi = { git = "https://github.com/silitics/sidex.git" }
 
 # Local Crates
+nexigon-agent-api = { path = "crates/libs/nexigon-agent-api" }
 nexigon-api = { path = "crates/libs/nexigon-api" }
 nexigon-cert = { path = "crates/libs/nexigon-cert" }
 nexigon-client = { path = "crates/libs/nexigon-client" }
