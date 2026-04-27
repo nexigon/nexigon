@@ -33,10 +33,12 @@ use crate::websocket::WebSocketTransport;
 mod websocket;
 
 /// Install Rustls crypto provider.
+///
+/// Idempotent: subsequent calls after the first are no-ops, so libraries that
+/// embed the agent (e.g. an in-process test host) can call this without
+/// caring whether someone else already installed a provider.
 pub fn install_crypto_provider() {
-    rustls::crypto::aws_lc_rs::default_provider()
-        .install_default()
-        .unwrap();
+    let _ = rustls::crypto::aws_lc_rs::default_provider().install_default();
 }
 
 /// Client mTLS identity.
