@@ -19,8 +19,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Install Just
-        uses: taiki-e/install-action@just
       - name: Install Rust Toolchain
         uses: dtolnay/rust-toolchain@nightly
         with:
@@ -30,7 +28,11 @@ jobs:
       - name: Install Cargo Deny
         run: curl -s -L "$CARGO_DENY_URL" | tar xvzf - -C /usr/local/bin --strip-components=1 --wildcards --no-anchored 'cargo-deny'
       - name: Run Checks
-        run: just check
+        run: |
+          cargo deny check
+          cargo fmt --check
+          cargo clippy --all-targets --all-features -- -D warnings
+          taplo fmt --check
   test:
     name: Test
     needs: check
@@ -40,12 +42,10 @@ jobs:
         os: [ubuntu-latest, macos-latest, windows-latest]
     steps:
       - uses: actions/checkout@v4
-      - name: Install Just
-        uses: taiki-e/install-action@just
       - name: Install Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
       - name: Run Tests
-        run: just test
+        run: cargo test
   build:
     name: Build
     runs-on: ${{ matrix.os }}
@@ -87,8 +87,6 @@ jobs:
         with:
           fetch-tags: true
           fetch-depth: 0
-      - name: Install Just
-        uses: taiki-e/install-action@just
       - name: Install Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
         if: ${{ !matrix.cross }}
@@ -100,7 +98,19 @@ jobs:
       - name: Determine Version
         run: echo "NEXIGON_GIT_VERSION=$(git describe --tags --always)" >> "$GITHUB_ENV"
       - name: Run Build
-        run: just build ${{ matrix.target }} ${{ matrix.cross }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          TARGET="${{ matrix.target }}"
+          if [ "${{ matrix.cross }}" == "true" ]; then
+              cross build --locked --release --bins --target "$TARGET"
+          else
+              cargo build --locked --release --bins --target "$TARGET"
+          fi
+          mkdir -p build/binaries
+          shopt -s extglob
+          cd "target/$TARGET/release"
+          tar -czf "../../../build/binaries/$TARGET.tar.gz" nexigon-+([a-z])?(.exe)
       - name: Upload Binaries
         uses: actions/upload-artifact@v4
         with:
@@ -116,8 +126,6 @@ jobs:
         with:
           fetch-tags: true
           fetch-depth: 0
-      - name: Install Just
-        uses: taiki-e/install-action@just
       - name: Download Binaries
         uses: actions/download-artifact@v4
         with:

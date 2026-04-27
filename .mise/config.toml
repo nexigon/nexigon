@@ -1,0 +1,84 @@
+[tools]
+rust = { version = "nightly", profile = "default", components = "rustfmt,clippy" }
+taplo = "latest"
+python = "latest"
+uv = "latest"
+"github:silitics/sidex" = { version = "0.2.0", exe = "sidex" }
+"nix:cargo-deny" = "latest"
+
+[tasks.check]
+description = "Lint and check formatting."
+run = [
+  "cargo deny check",
+  "cargo fmt --check",
+  "cargo clippy --all-targets --all-features -- -D warnings",
+  "taplo fmt --check",
+]
+
+[tasks.fmt]
+description = "Format all files."
+run = [
+  "cargo fmt",
+  "taplo fmt",
+]
+
+[tasks.doc]
+description = "Generate Rust documentation."
+run = "cargo +nightly doc --all-features --document-private-items"
+
+[tasks.test]
+description = "Run tests."
+run = "cargo test"
+
+[tasks.generate]
+description = "Regenerate Sidex bindings, JSON schemas, OpenAPI spec, and Python SDK actions."
+run = [
+  "cd crates/libs/nexigon-api && sidex generate rust src/types/generated",
+  "cd crates/libs/nexigon-api && sidex generate json-schema ../../../build/api-json-schema",
+  "cd crates/libs/nexigon-api && sidex generate py ../../../sdks/python/src/nexigon_hub_sdk/api_types",
+  "cd crates/apps/nexigon-cli && sidex generate rust src/config/generated",
+  "cd crates/apps/nexigon-cli && sidex generate json-schema ../../../build/cli-json-schema",
+  "cd crates/apps/nexigon-agent && sidex generate rust src/config/generated",
+  "cd crates/apps/nexigon-agent && sidex generate json-schema ../../../build/agent-json-schema",
+  "mv build/api-json-schema/schema-defs.json crates/utils/nexigon-gen-openapi/schemas.json",
+  "mv build/cli-json-schema/nexigon_cli.config.Config.schema.json schemas/nexigon-cli.schema.json",
+  "mv build/agent-json-schema/nexigon_agent.config.Config.schema.json schemas/nexigon-agent.schema.json",
+  "cargo run --bin nexigon-gen-openapi >api/openapi.json",
+  "cargo run --bin nexigon-gen-py-bindings >sdks/python/src/nexigon_hub_sdk/_actions.py",
+  "cd sdks/python && uv run --group dev ruff check --fix src/ tests/",
+  "cd sdks/python && uv run --group dev ruff format src/ tests/",
+  "mise run fmt",
+]
+
+[tasks.build]
+description = "Build release binaries. Defaults to the host target."
+usage = '''
+arg "[target]" default="" help="Build target triple (defaults to host)"
+flag "--cross" help="Use cross instead of cargo (for cross-compilation)"
+'''
+run = '''
+#!/usr/bin/env bash
+set -euo pipefail
+TARGET="{{arg(name="target")}}"
+if [ -z "$TARGET" ]; then
+    TARGET=$(rustc --version --verbose | grep -o 'host:.*' | awk '{print $2}')
+fi
+export NEXIGON_GIT_VERSION="${NEXIGON_GIT_VERSION:-$(git describe --tags --always 2>/dev/null || echo unknown)}"
+if [ "{{flag(name="cross")}}" == "true" ]; then
+    cross build --locked --release --bins --target "$TARGET"
+else
+    cargo build --locked --release --bins --target "$TARGET"
+fi
+mkdir -p build/binaries
+shopt -s extglob
+cd "target/$TARGET/release"
+tar -czf "../../../build/binaries/$TARGET.tar.gz" nexigon-+([a-z])?(.exe)
+'''
+
+[tasks."run-cli"]
+description = "Run Nexigon CLI. Forward args after `--`."
+run = 'cargo run --bin nexigon-cli -- "$@"'
+
+[tasks."run-agent"]
+description = "Run Nexigon Agent. Forward args after `--`."
+run = 'cargo run --bin nexigon-agent -- "$@"'

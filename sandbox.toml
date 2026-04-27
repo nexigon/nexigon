@@ -1,0 +1,3 @@
+[[install]]
+name = "mise"
+run  = "mise install"
