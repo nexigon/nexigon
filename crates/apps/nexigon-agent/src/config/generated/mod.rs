@@ -409,8 +409,8 @@ pub mod config {
         pub ssl_key: ::std::option::Option<PathBuf>,
         #[doc = "Disable TLS.\n"]
         pub dangerous_disable_tls: ::std::option::Option<bool>,
-        #[doc = "Disable system info telemetry.\n"]
-        pub disable_system_info: ::std::option::Option<bool>,
+        #[doc = "Telemetry configuration.\n"]
+        pub telemetry: ::std::option::Option<TelemetryConfig>,
         #[doc = "Exported services.\n"]
         pub exports: ::std::option::Option<::std::vec::Vec<ExportConfig>>,
         #[doc = "Remote terminal configuration.\n"]
@@ -432,7 +432,7 @@ pub mod config {
                 ssl_cert: ::std::default::Default::default(),
                 ssl_key: ::std::default::Default::default(),
                 dangerous_disable_tls: ::std::default::Default::default(),
-                disable_system_info: ::std::default::Default::default(),
+                telemetry: ::std::default::Default::default(),
                 exports: ::std::default::Default::default(),
                 terminal: ::std::default::Default::default(),
                 commands: ::std::default::Default::default(),
@@ -504,20 +504,17 @@ pub mod config {
             self.dangerous_disable_tls = dangerous_disable_tls;
             self
         }
-        #[doc = "Sets the value of `disable_system_info`."]
-        pub fn set_disable_system_info(
+        #[doc = "Sets the value of `telemetry`."]
+        pub fn set_telemetry(
             &mut self,
-            disable_system_info: ::std::option::Option<bool>,
+            telemetry: ::std::option::Option<TelemetryConfig>,
         ) -> &mut Self {
-            self.disable_system_info = disable_system_info;
+            self.telemetry = telemetry;
             self
         }
-        #[doc = "Sets the value of `disable_system_info`."]
-        pub fn with_disable_system_info(
-            mut self,
-            disable_system_info: ::std::option::Option<bool>,
-        ) -> Self {
-            self.disable_system_info = disable_system_info;
+        #[doc = "Sets the value of `telemetry`."]
+        pub fn with_telemetry(mut self, telemetry: ::std::option::Option<TelemetryConfig>) -> Self {
+            self.telemetry = telemetry;
             self
         }
         #[doc = "Sets the value of `exports`."]
@@ -587,8 +584,8 @@ pub mod config {
                 ::core::option::Option::as_ref(&self.dangerous_disable_tls),
             )?;
             __record.serialize_optional_field(
-                "disable-system-info",
-                ::core::option::Option::as_ref(&self.disable_system_info),
+                "telemetry",
+                ::core::option::Option::as_ref(&self.telemetry),
             )?;
             __record.serialize_optional_field(
                 "exports",
@@ -712,7 +709,7 @@ pub mod config {
                         }
                     };
                     let __field6 = match __serde::de::SeqAccess::next_element::<
-                        ::std::option::Option<bool>,
+                        ::std::option::Option<TelemetryConfig>,
                     >(&mut __seq)?
                     {
                         ::core::option::Option::Some(__value) => __value,
@@ -774,7 +771,7 @@ pub mod config {
                         ssl_cert: __field3,
                         ssl_key: __field4,
                         dangerous_disable_tls: __field5,
-                        disable_system_info: __field6,
+                        telemetry: __field6,
                         exports: __field7,
                         terminal: __field8,
                         commands: __field9,
@@ -796,13 +793,13 @@ pub mod config {
                         "ssl-cert",
                         "ssl-key",
                         "dangerous-disable-tls",
-                        "disable-system-info",
+                        "telemetry",
                         "exports",
                         "terminal",
                         "commands",
                     ];
                     #[doc(hidden)]
-                    const __EXPECTING_IDENTIFIERS: &'static str = "an identifier in [\"hub-url\", \"token\", \"fingerprint-script\", \"ssl-cert\", \"ssl-key\", \"dangerous-disable-tls\", \"disable-system-info\", \"exports\", \"terminal\", \"commands\"]";
+                    const __EXPECTING_IDENTIFIERS: &'static str = "an identifier in [\"hub-url\", \"token\", \"fingerprint-script\", \"ssl-cert\", \"ssl-key\", \"dangerous-disable-tls\", \"telemetry\", \"exports\", \"terminal\", \"commands\"]";
                     #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
                     #[doc(hidden)]
                     enum __Identifier {
@@ -873,7 +870,7 @@ pub mod config {
                                 "dangerous-disable-tls" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier5)
                                 }
-                                "disable-system-info" => {
+                                "telemetry" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier6)
                                 }
                                 "exports" => {
@@ -912,7 +909,7 @@ pub mod config {
                                 b"dangerous-disable-tls" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier5)
                                 }
-                                b"disable-system-info" => {
+                                b"telemetry" => {
                                     ::core::result::Result::Ok(__Identifier::__Identifier6)
                                 }
                                 b"exports" => {
@@ -954,8 +951,9 @@ pub mod config {
                         ::core::option::Option::None;
                     let mut __field5: ::core::option::Option<::std::option::Option<bool>> =
                         ::core::option::Option::None;
-                    let mut __field6: ::core::option::Option<::std::option::Option<bool>> =
-                        ::core::option::Option::None;
+                    let mut __field6: ::core::option::Option<
+                        ::std::option::Option<TelemetryConfig>,
+                    > = ::core::option::Option::None;
                     let mut __field7: ::core::option::Option<
                         ::std::option::Option<::std::vec::Vec<ExportConfig>>,
                     > = ::core::option::Option::None;
@@ -1055,13 +1053,13 @@ pub mod config {
                                 if ::core::option::Option::is_some(&__field6) {
                                     return ::core::result::Result::Err(
                                         <__A::Error as __serde::de::Error>::duplicate_field(
-                                            "disable-system-info",
+                                            "telemetry",
                                         ),
                                     );
                                 }
                                 __field6 = ::core::option::Option::Some(
                                     __serde::de::MapAccess::next_value::<
-                                        ::std::option::Option<bool>,
+                                        ::std::option::Option<TelemetryConfig>,
                                     >(&mut __map)?,
                                 );
                             }
@@ -1175,7 +1173,7 @@ pub mod config {
                         ssl_cert: __field3,
                         ssl_key: __field4,
                         dangerous_disable_tls: __field5,
-                        disable_system_info: __field6,
+                        telemetry: __field6,
                         exports: __field7,
                         terminal: __field8,
                         commands: __field9,
@@ -1190,7 +1188,7 @@ pub mod config {
                 "ssl-cert",
                 "ssl-key",
                 "dangerous-disable-tls",
-                "disable-system-info",
+                "telemetry",
                 "exports",
                 "terminal",
                 "commands",
@@ -1198,6 +1196,222 @@ pub mod config {
             __serde::Deserializer::deserialize_struct(
                 __deserializer,
                 "Config",
+                __FIELDS,
+                __Visitor {
+                    __phantom_vars: ::core::marker::PhantomData,
+                },
+            )
+        }
+    }
+    #[doc = "Telemetry configuration.\n\nControls automatic data collection the agent performs in the background.\nEach toggle is opt-out: defaults preserve historical behavior. Disabling\nthese is primarily useful for tests and tightly controlled deployments\nwhere the operator pushes the equivalent data manually via the CLI.\n"]
+    #[derive(Clone, Debug)]
+    pub struct TelemetryConfig {
+        #[doc = "Whether to periodically publish `dev.nexigon.system.info` (defaults to true).\n"]
+        pub system_info: ::std::option::Option<bool>,
+    }
+    impl TelemetryConfig {
+        #[doc = "Creates a new [`TelemetryConfig`]."]
+        pub fn new() -> Self {
+            Self {
+                system_info: ::std::default::Default::default(),
+            }
+        }
+        #[doc = "Sets the value of `system_info`."]
+        pub fn set_system_info(&mut self, system_info: ::std::option::Option<bool>) -> &mut Self {
+            self.system_info = system_info;
+            self
+        }
+        #[doc = "Sets the value of `system_info`."]
+        pub fn with_system_info(mut self, system_info: ::std::option::Option<bool>) -> Self {
+            self.system_info = system_info;
+            self
+        }
+    }
+    impl ::std::default::Default for TelemetryConfig {
+        fn default() -> Self {
+            Self::new()
+        }
+    }
+    #[automatically_derived]
+    impl __serde::Serialize for TelemetryConfig {
+        fn serialize<__S: __serde::Serializer>(
+            &self,
+            __serializer: __S,
+        ) -> ::std::result::Result<__S::Ok, __S::Error> {
+            let mut __record =
+                __sidex_serde::ser::RecordSerializer::new(__serializer, "TelemetryConfig", 1usize)?;
+            __record.serialize_optional_field(
+                "system-info",
+                ::core::option::Option::as_ref(&self.system_info),
+            )?;
+            __record.end()
+        }
+    }
+    #[automatically_derived]
+    impl<'de> __serde::Deserialize<'de> for TelemetryConfig {
+        fn deserialize<__D: __serde::Deserializer<'de>>(
+            __deserializer: __D,
+        ) -> ::std::result::Result<Self, __D::Error> {
+            #[doc(hidden)]
+            struct __Visitor {
+                __phantom_vars: ::core::marker::PhantomData<fn(&())>,
+            }
+            impl<'de> __serde::de::Visitor<'de> for __Visitor {
+                type Value = TelemetryConfig;
+                fn expecting(
+                    &self,
+                    __formatter: &mut ::core::fmt::Formatter,
+                ) -> ::core::fmt::Result {
+                    ::core::fmt::Formatter::write_str(__formatter, "record TelemetryConfig")
+                }
+                #[inline]
+                fn visit_seq<__A>(
+                    self,
+                    mut __seq: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::SeqAccess<'de>,
+                {
+                    let __field0 = match __serde::de::SeqAccess::next_element::<
+                        ::std::option::Option<bool>,
+                    >(&mut __seq)?
+                    {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => {
+                            return ::core::result::Result::Err(
+                                __serde::de::Error::invalid_length(0usize, &"record with 1 fields"),
+                            );
+                        }
+                    };
+                    ::core::result::Result::Ok(TelemetryConfig {
+                        system_info: __field0,
+                    })
+                }
+                #[inline]
+                fn visit_map<__A>(
+                    self,
+                    mut __map: __A,
+                ) -> ::core::result::Result<Self::Value, __A::Error>
+                where
+                    __A: __serde::de::MapAccess<'de>,
+                {
+                    #[doc(hidden)]
+                    const __IDENTIFIERS: &'static [&'static str] = &["system-info"];
+                    #[doc(hidden)]
+                    const __EXPECTING_IDENTIFIERS: &'static str =
+                        "an identifier in [\"system-info\"]";
+                    #[derive(:: core :: clone :: Clone, :: core :: marker :: Copy)]
+                    #[doc(hidden)]
+                    enum __Identifier {
+                        __Identifier0,
+                        __Unknown,
+                    }
+                    #[doc(hidden)]
+                    struct __IdentifierVisitor;
+                    impl<'de> __serde::de::Visitor<'de> for __IdentifierVisitor {
+                        type Value = __Identifier;
+                        fn expecting(
+                            &self,
+                            __formatter: &mut ::core::fmt::Formatter,
+                        ) -> ::core::fmt::Result {
+                            ::core::fmt::Formatter::write_str(__formatter, __EXPECTING_IDENTIFIERS)
+                        }
+                        fn visit_u64<__E>(
+                            self,
+                            __value: u64,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                0u64 => ::core::result::Result::Ok(__Identifier::__Identifier0),
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_str<__E>(
+                            self,
+                            __value: &str,
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                "system-info" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
+                                }
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                        fn visit_bytes<__E>(
+                            self,
+                            __value: &[u8],
+                        ) -> ::core::result::Result<Self::Value, __E>
+                        where
+                            __E: __serde::de::Error,
+                        {
+                            match __value {
+                                b"system-info" => {
+                                    ::core::result::Result::Ok(__Identifier::__Identifier0)
+                                }
+                                _ => ::core::result::Result::Ok(__Identifier::__Unknown),
+                            }
+                        }
+                    }
+                    impl<'de> __serde::Deserialize<'de> for __Identifier {
+                        #[inline]
+                        fn deserialize<__D>(
+                            __deserializer: __D,
+                        ) -> ::core::result::Result<Self, __D::Error>
+                        where
+                            __D: __serde::Deserializer<'de>,
+                        {
+                            __serde::Deserializer::deserialize_identifier(
+                                __deserializer,
+                                __IdentifierVisitor,
+                            )
+                        }
+                    }
+                    let mut __field0: ::core::option::Option<::std::option::Option<bool>> =
+                        ::core::option::Option::None;
+                    while let ::core::option::Option::Some(__key) =
+                        __serde::de::MapAccess::next_key::<__Identifier>(&mut __map)?
+                    {
+                        match __key {
+                            __Identifier::__Identifier0 => {
+                                if ::core::option::Option::is_some(&__field0) {
+                                    return ::core::result::Result::Err(
+                                        <__A::Error as __serde::de::Error>::duplicate_field(
+                                            "system-info",
+                                        ),
+                                    );
+                                }
+                                __field0 = ::core::option::Option::Some(
+                                    __serde::de::MapAccess::next_value::<
+                                        ::std::option::Option<bool>,
+                                    >(&mut __map)?,
+                                );
+                            }
+                            _ => {
+                                __serde::de::MapAccess::next_value::<__serde::de::IgnoredAny>(
+                                    &mut __map,
+                                )?;
+                            }
+                        }
+                    }
+                    let __field0 = match __field0 {
+                        ::core::option::Option::Some(__value) => __value,
+                        ::core::option::Option::None => ::core::option::Option::None,
+                    };
+                    ::core::result::Result::Ok(TelemetryConfig {
+                        system_info: __field0,
+                    })
+                }
+            }
+            #[doc(hidden)]
+            const __FIELDS: &'static [&'static str] = &["system-info"];
+            __serde::Deserializer::deserialize_struct(
+                __deserializer,
+                "TelemetryConfig",
                 __FIELDS,
                 __Visitor {
                     __phantom_vars: ::core::marker::PhantomData,

@@ -24,14 +24,26 @@ record Config {
     ssl_key?: PathBuf,
     /// Disable TLS.
     dangerous_disable_tls?: bool,
-    /// Disable system info telemetry.
-    disable_system_info?: bool,
+    /// Telemetry configuration.
+    telemetry?: TelemetryConfig,
     /// Exported services.
     exports?: [ExportConfig],
     /// Remote terminal configuration.
     terminal?: TerminalConfig,
     /// On-demand command configuration.
     commands?: CommandsConfig,
+}
+
+/// Telemetry configuration.
+///
+/// Controls automatic data collection the agent performs in the background.
+/// Each toggle is opt-out: defaults preserve historical behavior. Disabling
+/// these is primarily useful for tests and tightly controlled deployments
+/// where the operator pushes the equivalent data manually via the CLI.
+#[json(rename_all = "kebab-case")]
+record TelemetryConfig {
+    /// Whether to periodically publish `dev.nexigon.system.info` (defaults to true).
+    system_info?: bool,
 }
 
 /// Service export configuration.

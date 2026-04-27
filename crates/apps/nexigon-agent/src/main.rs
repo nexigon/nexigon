@@ -257,7 +257,12 @@ async fn main() -> anyhow::Result<()> {
     };
     match &args.cmd {
         Cmd::Run => {
-            if !config.disable_system_info.unwrap_or(false) {
+            let system_info_enabled = config
+                .telemetry
+                .as_ref()
+                .and_then(|t| t.system_info)
+                .unwrap_or(true);
+            if system_info_enabled {
                 let sysinfo_config = config.clone();
                 let sysinfo_device_id = device_id.clone();
                 let mut sysinfo_executor = connect_executor(&mut connection_ref).await.unwrap();
@@ -342,8 +347,13 @@ async fn main() -> anyhow::Result<()> {
                 severity,
                 category,
                 attributes,
+                emitted_at,
                 body,
             } => {
+                let timestamp = match emitted_at {
+                    Some(raw) => raw.parse().context("unable to parse `--emitted-at`")?,
+                    None => Timestamp::now(),
+                };
                 let publish_events = PublishDeviceEventsAction::new(
                     actor.device_id.clone(),
                     vec![
@@ -361,7 +371,7 @@ async fn main() -> anyhow::Result<()> {
                                 }
                                 map
                             },
-                            Timestamp::now(),
+                            timestamp,
                         )
                         .with_category(category.clone()),
                     ],
@@ -461,6 +471,9 @@ enum EventsCmd {
         /// Event attribute.
         #[clap(long = "attribute")]
         attributes: Vec<String>,
+        /// Event timestamp (RFC 3339; defaults to now).
+        #[clap(long = "emitted-at")]
+        emitted_at: Option<String>,
         /// Event body.
         body: String,
     },
