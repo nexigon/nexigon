@@ -20,6 +20,7 @@ from . import projects  # noqa: F401
 from . import properties  # noqa: F401
 from . import repositories  # noqa: F401
 from . import users  # noqa: F401
+from . import vulnerabilities  # noqa: F401
 
 _schemas = {
     "actor": actor,
@@ -40,6 +41,7 @@ _schemas = {
     "properties": properties,
     "repositories": repositories,
     "users": users,
+    "vulnerabilities": vulnerabilities,
 }
 for _m in _schemas.values():
     for _name, _other in _schemas.items():

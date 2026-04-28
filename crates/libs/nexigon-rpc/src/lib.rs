@@ -146,7 +146,10 @@ pub enum ReadError {
 
 /// Write action result to the given transport.
 #[tracing::instrument(level = Level::DEBUG, skip_all)]
-pub async fn write_action_result<T: Serialize, W: AsyncWrite + Unpin>(
+pub async fn write_action_result<
+    T: Serialize + ::sidex_serde::adapter::SidexType,
+    W: AsyncWrite + Unpin,
+>(
     result: ActionResult<T>,
     mut tx: W,
 ) -> Result<(), WriteError> {

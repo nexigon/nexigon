@@ -1,0 +1,208 @@
+//! Actions and types for vulnerability data (CycloneDX SBOM, VDR, VEX).
+//!
+//! Vulnerability documents are stored as ordinary repository assets and
+//! linked from artifact assets through their per-asset metadata using
+//! the convention
+//!
+//! ```json
+//! {"relations": {"sbom": ["sbom.cdx.json"], "vdr": ["vdr.cdx.json"]}}
+//! ```
+//!
+//! Each entry references *another asset attached to the same package
+//! version*, by filename. The hub resolves the filename within the
+//! version, fetches the bytes from S3, parses the CycloneDX document,
+//! and indexes the result with the artifact asset as the BOM subject.
+//!
+//! Indexing is gated by the `vulnerability_management` subscription
+//! feature flag. Without it, documents still upload as regular assets
+//! and the `relations.*` metadata is preserved verbatim — only the
+//! component / finding index is empty.
+//!
+//! Package-level VEX (a triage statement that applies across every
+//! version of a package) attaches a regular asset to the package via
+//! `repositories_AddPackageAsset` and points at it from the package's
+//! own metadata under `relations.vex`. Indexing is then triggered by
+//! `vulnerabilities_IndexPackage`.
+
+import repositories::PackageId
+import repositories::PackageVersionId
+import repositories::RepositoryAssetId
+import repositories::RepositoryId
+
+/// Origin of a VEX statement, used by the effective-state precedence
+/// rule (operator > vendor > scanner).
+#[json(tagged = externally)]
+variant VexStatementOrigin {
+    /// Statement authored by the operator triaging in their own organization.
+    Operator,
+    /// Statement supplied by the upstream vendor of the affected component.
+    Vendor,
+    /// Default state assumed by a scanner (typically `in_triage`).
+    Scanner,
+}
+
+/// Trigger indexing of every CycloneDX document referenced by the
+/// version's artifact assets via `relations.{sbom,vdr,vex}`.
+///
+/// The hub fetches the referenced documents from the repository's S3
+/// storage and rebuilds the index for this version. The repository
+/// must have S3 configured.
+record IndexVersionDocumentsAction {
+    version_id: PackageVersionId,
+}
+
+/// Output of `IndexVersionDocumentsAction`.
+record IndexVersionDocumentsOutput {
+    /// Whether indexing actually ran (false when the feature flag is off
+    /// or the version has no artifacts with `relations.*` metadata).
+    indexed: bool,
+    /// Number of artifact assets whose documents were indexed.
+    artifact_count: u32,
+    /// Total number of documents (SBOM + VDR + VEX) ingested.
+    document_count: u32,
+}
+
+/// Trigger indexing of every CycloneDX document referenced by the
+/// package's metadata via `relations.{vex}` (typically just VEX).
+///
+/// Mirrors `IndexVersionDocumentsAction`. Used after attaching a new
+/// package-level VEX asset and pointing the package's metadata at it.
+record IndexPackageDocumentsAction {
+    package_id: PackageId,
+}
+
+record IndexPackageDocumentsOutput {
+    indexed: bool,
+    document_count: u32,
+}
+
+/// Get the vulnerability overview for a package version: artifact list,
+/// SBOM/VDR/VEX descriptors per artifact, package-level VEX, and
+/// (when indexing is enabled) the rolled-up severity summary.
+record GetVersionVulnerabilityOverviewAction {
+    version_id: PackageVersionId,
+}
+
+record GetVersionVulnerabilityOverviewOutput {
+    version_id: PackageVersionId,
+    /// Whether the indexing feature is enabled for this organization.
+    indexing_enabled: bool,
+    /// Per-artifact descriptors. Populated by walking each artifact's
+    /// `relations.{sbom,vdr,vex}` metadata.
+    artifacts: [ArtifactDescriptor],
+    /// VEX documents inherited from the parent package's `relations.vex`.
+    package_vex: [AttachedVexDocument],
+    /// Severity counts across the union of all artifact VDRs after VEX
+    /// is applied. Not set when indexing is disabled.
+    severity_summary?: SeveritySummary,
+    /// Total component count across all artifact SBOMs (including
+    /// duplicates if the same component is referenced from several
+    /// artifacts). Not set when indexing is disabled.
+    component_count?: u32,
+}
+
+/// Per-artifact view of attached vulnerability documents.
+record ArtifactDescriptor {
+    asset_id: RepositoryAssetId,
+    filename: string,
+    /// SBOM document (the first valid `relations.sbom` entry).
+    sbom?: AttachedDocument,
+    /// All VDR documents referenced from `relations.vdr`.
+    vdrs: [AttachedVdrDocument],
+    /// All VEX documents referenced from `relations.vex`.
+    vex: [AttachedVexDocument],
+    /// Severity rollup from this artifact's VDRs after VEX is applied.
+    severity_summary?: SeveritySummary,
+    /// Number of components extracted from this artifact's SBOM.
+    component_count?: u32,
+}
+
+record AttachedDocument {
+    asset_id: RepositoryAssetId,
+    repository_id: RepositoryId,
+    filename: string,
+    size: u64,
+}
+
+record AttachedVdrDocument {
+    document: AttachedDocument,
+    source_tool?: string,
+    severity_summary?: SeveritySummary,
+}
+
+record AttachedVexDocument {
+    document: AttachedDocument,
+    origin: VexStatementOrigin,
+    statement_count?: u32,
+}
+
+record SeveritySummary {
+    critical: u32,
+    high: u32,
+    medium: u32,
+    low: u32,
+    info: u32,
+    unknown: u32,
+}
+
+/// Query the components extracted from a package version's SBOMs.
+record QueryPackageVersionComponentsAction {
+    version_id: PackageVersionId,
+    /// Optional filter: only include components from this artifact's SBOM.
+    artifact_filename?: string,
+    /// Optional case-insensitive substring filter over name / purl / license.
+    search?: string,
+    /// Optional component-type filter (e.g. `library`, `application`).
+    component_type?: string,
+}
+
+record QueryPackageVersionComponentsOutput {
+    indexing_enabled: bool,
+    components: [PackageVersionComponent],
+}
+
+record PackageVersionComponent {
+    /// Filename of the artifact asset whose SBOM this component came from.
+    artifact_filename: string,
+    bom_ref: string,
+    purl?: string,
+    name: string,
+    version?: string,
+    #[json(name = "type")]
+    kind: string,
+    licenses: [string],
+    supplier?: string,
+    description?: string,
+    /// Vulnerability counts after VEX application.
+    vuln_summary?: SeveritySummary,
+}
+
+record QueryPackageVersionFindingsAction {
+    version_id: PackageVersionId,
+    /// Optional artifact-filename filter.
+    artifact_filename?: string,
+    /// Optional severity floor.
+    min_severity?: string,
+}
+
+record QueryPackageVersionFindingsOutput {
+    indexing_enabled: bool,
+    findings: [PackageVersionFinding],
+}
+
+record PackageVersionFinding {
+    artifact_filename: string,
+    component_purl: string,
+    component_name: string,
+    component_version?: string,
+    vulnerability_id: string,
+    severity: string,
+    cvss_score?: f64,
+    description?: string,
+    source_tool?: string,
+    /// Effective VEX state. Defaults to `in_triage` when no statement applies.
+    effective_state: string,
+    justification?: string,
+    detail?: string,
+    state_origin?: VexStatementOrigin,
+}

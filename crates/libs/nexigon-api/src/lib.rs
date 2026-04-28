@@ -8,9 +8,21 @@ use crate::types::jwt::Jwt;
 pub mod types;
 
 /// Represents an action that can be invoked within Nexigon Hub.
-pub trait Action: Any + Serialize + DeserializeOwned + Send + std::fmt::Debug {
+pub trait Action:
+    Any
+    + Serialize
+    + DeserializeOwned
+    + ::sidex_serde::adapter::SidexType
+    + Send
+    + std::fmt::Debug
+{
     /// Output type of the action.
-    type Output: Any + Serialize + DeserializeOwned + Send + std::fmt::Debug;
+    type Output: Any
+        + Serialize
+        + DeserializeOwned
+        + ::sidex_serde::adapter::SidexType
+        + Send
+        + std::fmt::Debug;
 
     /// Unique name of the action.
     const NAME: &'static str;
@@ -155,6 +167,9 @@ macro_rules! with_actions {
             ("repositories_SetPackageName", SetPackageName, repositories::SetPackageNameAction, repositories::SetPackageNameOutput),
             ("repositories_SetPackageKind", SetPackageKind, repositories::SetPackageKindAction, outputs::Empty),
             ("repositories_SetPackageMetadata", SetPackageMetadata, repositories::SetPackageMetadataAction, outputs::Empty),
+            ("repositories_AddPackageAsset", AddPackageAsset, repositories::AddPackageAssetAction, repositories::AddPackageAssetOutput),
+            ("repositories_RemovePackageAsset", RemovePackageAsset, repositories::RemovePackageAssetAction, outputs::Empty),
+            ("repositories_SetPackageAssetMetadata", SetPackageAssetMetadata, repositories::SetPackageAssetMetadataAction, outputs::Empty),
             ("repositories_QueryPackageVersions", QueryPackageVersions, repositories::QueryPackageVersionsAction, repositories::QueryPackageVersionsOutput),
             // ## Package Versions
             ("repositories_ResolveVersionByPath", ResolvePackageVersionByPath, repositories::ResolvePackageVersionByPathAction, repositories::ResolvePackageVersionByPathOutput),
@@ -180,6 +195,13 @@ macro_rules! with_actions {
             ("repositories_IssueAssetUploadUrl", IssueAssetUploadUrl, repositories::IssueAssetUploadUrlAction, repositories::IssueAssetUploadUrlOutput),
             // # Audit Log
             ("repositories_QueryAuditLog", QueryRepositoryAuditLogEvents, repositories::QueryAuditLogEventsAction, repositories::QueryAuditLogEventsOutput),
+
+            // # Vulnerabilities
+            ("vulnerabilities_IndexVersion", IndexVersionDocuments, vulnerabilities::IndexVersionDocumentsAction, vulnerabilities::IndexVersionDocumentsOutput),
+            ("vulnerabilities_IndexPackage", IndexPackageDocuments, vulnerabilities::IndexPackageDocumentsAction, vulnerabilities::IndexPackageDocumentsOutput),
+            ("vulnerabilities_GetVersionOverview", GetVersionVulnerabilityOverview, vulnerabilities::GetVersionVulnerabilityOverviewAction, vulnerabilities::GetVersionVulnerabilityOverviewOutput),
+            ("vulnerabilities_QueryComponents", QueryPackageVersionComponents, vulnerabilities::QueryPackageVersionComponentsAction, vulnerabilities::QueryPackageVersionComponentsOutput),
+            ("vulnerabilities_QueryFindings", QueryPackageVersionFindings, vulnerabilities::QueryPackageVersionFindingsAction, vulnerabilities::QueryPackageVersionFindingsOutput),
 
             // # Audit Log
             ("audit_QueryAuditLogEvents", QueryAuditLogEvents, audit::QueryAuditLogEventsAction, audit::QueryAuditLogEventsOutput),

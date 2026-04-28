@@ -18,6 +18,7 @@ from .api_types import outputs
 from .api_types import projects
 from .api_types import repositories
 from .api_types import users
+from .api_types import vulnerabilities
 
 
 _ACTION_REGISTRY: dict[type, tuple[str, pydantic.TypeAdapter]] = {  # type: ignore[type-arg]
@@ -419,6 +420,18 @@ _ACTION_REGISTRY: dict[type, tuple[str, pydantic.TypeAdapter]] = {  # type: igno
         "repositories_SetPackageMetadata",
         pydantic.TypeAdapter(outputs.Empty),
     ),
+    repositories.AddPackageAssetAction: (
+        "repositories_AddPackageAsset",
+        pydantic.TypeAdapter(repositories.AddPackageAssetOutput),
+    ),
+    repositories.RemovePackageAssetAction: (
+        "repositories_RemovePackageAsset",
+        pydantic.TypeAdapter(outputs.Empty),
+    ),
+    repositories.SetPackageAssetMetadataAction: (
+        "repositories_SetPackageAssetMetadata",
+        pydantic.TypeAdapter(outputs.Empty),
+    ),
     repositories.QueryPackageVersionsAction: (
         "repositories_QueryPackageVersions",
         pydantic.TypeAdapter(repositories.QueryPackageVersionsOutput),
@@ -502,6 +515,26 @@ _ACTION_REGISTRY: dict[type, tuple[str, pydantic.TypeAdapter]] = {  # type: igno
     repositories.QueryAuditLogEventsAction: (
         "repositories_QueryAuditLog",
         pydantic.TypeAdapter(repositories.QueryAuditLogEventsOutput),
+    ),
+    vulnerabilities.IndexVersionDocumentsAction: (
+        "vulnerabilities_IndexVersion",
+        pydantic.TypeAdapter(vulnerabilities.IndexVersionDocumentsOutput),
+    ),
+    vulnerabilities.IndexPackageDocumentsAction: (
+        "vulnerabilities_IndexPackage",
+        pydantic.TypeAdapter(vulnerabilities.IndexPackageDocumentsOutput),
+    ),
+    vulnerabilities.GetVersionVulnerabilityOverviewAction: (
+        "vulnerabilities_GetVersionOverview",
+        pydantic.TypeAdapter(vulnerabilities.GetVersionVulnerabilityOverviewOutput),
+    ),
+    vulnerabilities.QueryPackageVersionComponentsAction: (
+        "vulnerabilities_QueryComponents",
+        pydantic.TypeAdapter(vulnerabilities.QueryPackageVersionComponentsOutput),
+    ),
+    vulnerabilities.QueryPackageVersionFindingsAction: (
+        "vulnerabilities_QueryFindings",
+        pydantic.TypeAdapter(vulnerabilities.QueryPackageVersionFindingsOutput),
     ),
     audit.QueryAuditLogEventsAction: (
         "audit_QueryAuditLogEvents",
@@ -1206,6 +1239,21 @@ class _SyncExecuteMixin:
 
     @overload
     def execute(
+        self, action: repositories.AddPackageAssetAction
+    ) -> repositories.AddPackageAssetOutput: ...
+
+    @overload
+    def execute(
+        self, action: repositories.RemovePackageAssetAction
+    ) -> outputs.Empty: ...
+
+    @overload
+    def execute(
+        self, action: repositories.SetPackageAssetMetadataAction
+    ) -> outputs.Empty: ...
+
+    @overload
+    def execute(
         self, action: repositories.QueryPackageVersionsAction
     ) -> repositories.QueryPackageVersionsOutput:
         """Query the versions of a package."""
@@ -1342,6 +1390,31 @@ class _SyncExecuteMixin:
     ) -> repositories.QueryAuditLogEventsOutput:
         """Query the audit log of the repository."""
         ...
+
+    @overload
+    def execute(
+        self, action: vulnerabilities.IndexVersionDocumentsAction
+    ) -> vulnerabilities.IndexVersionDocumentsOutput: ...
+
+    @overload
+    def execute(
+        self, action: vulnerabilities.IndexPackageDocumentsAction
+    ) -> vulnerabilities.IndexPackageDocumentsOutput: ...
+
+    @overload
+    def execute(
+        self, action: vulnerabilities.GetVersionVulnerabilityOverviewAction
+    ) -> vulnerabilities.GetVersionVulnerabilityOverviewOutput: ...
+
+    @overload
+    def execute(
+        self, action: vulnerabilities.QueryPackageVersionComponentsAction
+    ) -> vulnerabilities.QueryPackageVersionComponentsOutput: ...
+
+    @overload
+    def execute(
+        self, action: vulnerabilities.QueryPackageVersionFindingsAction
+    ) -> vulnerabilities.QueryPackageVersionFindingsOutput: ...
 
     @overload
     def execute(
@@ -2118,6 +2191,21 @@ class _AsyncExecuteMixin:
 
     @overload
     async def execute(
+        self, action: repositories.AddPackageAssetAction
+    ) -> repositories.AddPackageAssetOutput: ...
+
+    @overload
+    async def execute(
+        self, action: repositories.RemovePackageAssetAction
+    ) -> outputs.Empty: ...
+
+    @overload
+    async def execute(
+        self, action: repositories.SetPackageAssetMetadataAction
+    ) -> outputs.Empty: ...
+
+    @overload
+    async def execute(
         self, action: repositories.QueryPackageVersionsAction
     ) -> repositories.QueryPackageVersionsOutput:
         """Query the versions of a package."""
@@ -2260,6 +2348,31 @@ class _AsyncExecuteMixin:
     ) -> repositories.QueryAuditLogEventsOutput:
         """Query the audit log of the repository."""
         ...
+
+    @overload
+    async def execute(
+        self, action: vulnerabilities.IndexVersionDocumentsAction
+    ) -> vulnerabilities.IndexVersionDocumentsOutput: ...
+
+    @overload
+    async def execute(
+        self, action: vulnerabilities.IndexPackageDocumentsAction
+    ) -> vulnerabilities.IndexPackageDocumentsOutput: ...
+
+    @overload
+    async def execute(
+        self, action: vulnerabilities.GetVersionVulnerabilityOverviewAction
+    ) -> vulnerabilities.GetVersionVulnerabilityOverviewOutput: ...
+
+    @overload
+    async def execute(
+        self, action: vulnerabilities.QueryPackageVersionComponentsAction
+    ) -> vulnerabilities.QueryPackageVersionComponentsOutput: ...
+
+    @overload
+    async def execute(
+        self, action: vulnerabilities.QueryPackageVersionFindingsAction
+    ) -> vulnerabilities.QueryPackageVersionFindingsOutput: ...
 
     @overload
     async def execute(

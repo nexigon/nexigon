@@ -408,6 +408,67 @@ class GetPackageDetailsOutput(pydantic.BaseModel):
     metadata: dict[str, _schema_json.JsonValue] = pydantic.Field(
         description="Package-level metadata."
     )
+    assets: list[PackageAsset] = pydantic.Field(
+        description="Assets attached to the package itself (independent of versions).\nUsed by the package-level VEX flow but generic — anything that\nwants to live on the package can be attached here."
+    )
+
+
+class PackageAsset(pydantic.BaseModel):
+    """One asset attached at the package level."""
+
+    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+
+    asset_id: RepositoryAssetId = pydantic.Field(
+        validation_alias="assetId", serialization_alias="assetId"
+    )
+    filename: str
+    size: int
+    digest: _schema_digest.Digest
+    status: RepositoryAssetStatus
+    metadata: dict[str, _schema_json.JsonValue]
+
+
+class AddPackageAssetAction(pydantic.BaseModel):
+    """Attach a repository asset to a package under the given filename.
+
+    Symmetric to `AddPackageVersionAssetAction` but for the package
+    itself rather than a specific version. The asset must already exist
+    in the same repository; the link carries an arbitrary metadata
+    dictionary."""
+
+    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+
+    package_id: PackageId = pydantic.Field(
+        validation_alias="packageId", serialization_alias="packageId"
+    )
+    asset_id: RepositoryAssetId = pydantic.Field(
+        validation_alias="assetId", serialization_alias="assetId"
+    )
+    filename: str
+    metadata: dict[str, _schema_json.JsonValue] | None = pydantic.Field(default=None)
+
+
+class RemovePackageAssetAction(pydantic.BaseModel):
+    """Remove a package asset by filename."""
+
+    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+
+    package_id: PackageId = pydantic.Field(
+        validation_alias="packageId", serialization_alias="packageId"
+    )
+    filename: str
+
+
+class SetPackageAssetMetadataAction(pydantic.BaseModel):
+    """Replace the metadata on a package asset."""
+
+    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+
+    package_id: PackageId = pydantic.Field(
+        validation_alias="packageId", serialization_alias="packageId"
+    )
+    filename: str
+    metadata: dict[str, _schema_json.JsonValue]
 
 
 class CreatePackageAction(pydantic.BaseModel):
@@ -1134,6 +1195,25 @@ class ResolvePackageByPathOutput_NotFound(pydantic.BaseModel):
 # Output of resolving a package by its path.
 type ResolvePackageByPathOutput = Annotated[
     ResolvePackageByPathOutput_Found | ResolvePackageByPathOutput_NotFound,
+    pydantic.Discriminator("result"),
+]
+
+
+class AddPackageAssetOutput_FilenameAlreadyExists(pydantic.BaseModel):
+    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+
+    result: Literal["FilenameAlreadyExists"] = "FilenameAlreadyExists"
+
+
+class AddPackageAssetOutput_Added(pydantic.BaseModel):
+    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+
+    result: Literal["Added"] = "Added"
+
+
+# Output of adding a package asset.
+type AddPackageAssetOutput = Annotated[
+    AddPackageAssetOutput_FilenameAlreadyExists | AddPackageAssetOutput_Added,
     pydantic.Discriminator("result"),
 ]
 

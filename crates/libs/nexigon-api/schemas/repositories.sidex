@@ -280,6 +280,55 @@ record GetPackageDetailsOutput {
     version_count: u64,
     /// Package-level metadata.
     metadata: [string: JsonValue],
+    /// Assets attached to the package itself (independent of versions).
+    /// Used by the package-level VEX flow but generic — anything that
+    /// wants to live on the package can be attached here.
+    assets: [PackageAsset],
+}
+
+/// One asset attached at the package level.
+record PackageAsset {
+    asset_id: RepositoryAssetId,
+    filename: string,
+    size: u64,
+    digest: Digest,
+    status: RepositoryAssetStatus,
+    metadata: [string: JsonValue],
+}
+
+/// Attach a repository asset to a package under the given filename.
+///
+/// Symmetric to `AddPackageVersionAssetAction` but for the package
+/// itself rather than a specific version. The asset must already exist
+/// in the same repository; the link carries an arbitrary metadata
+/// dictionary.
+record AddPackageAssetAction {
+    package_id: PackageId,
+    asset_id: RepositoryAssetId,
+    filename: string,
+    metadata?: [string: JsonValue],
+}
+
+/// Output of adding a package asset.
+#[json(tag = "result")]
+variant AddPackageAssetOutput {
+    /// An asset with the same filename already exists on this package.
+    FilenameAlreadyExists,
+    /// The asset has been added.
+    Added,
+}
+
+/// Remove a package asset by filename.
+record RemovePackageAssetAction {
+    package_id: PackageId,
+    filename: string,
+}
+
+/// Replace the metadata on a package asset.
+record SetPackageAssetMetadataAction {
+    package_id: PackageId,
+    filename: string,
+    metadata: [string: JsonValue],
 }
 
 /// Create a new package.
