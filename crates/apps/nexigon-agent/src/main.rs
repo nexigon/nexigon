@@ -12,8 +12,11 @@ use anyhow::Context;
 use anyhow::bail;
 use clap::Parser;
 use nexigon_agent::install_crypto_provider;
+#[cfg(unix)]
 use nexigon_agent_api::DEFAULT_SOCKET_PATH;
+#[cfg(unix)]
 use nexigon_agent_api::client::LocalExecutor;
+#[cfg(unix)]
 use nexigon_agent_api::client::connect_local_executor;
 use nexigon_api::Action;
 use nexigon_api::types::actor::Actor;
@@ -34,8 +37,10 @@ use nexigon_common::execute_repositories_cmd;
 use nexigon_ids::Generate;
 use nexigon_ids::ids::DeviceEventId;
 use nexigon_rpc::ExecuteError;
+#[cfg(unix)]
 use tracing::debug;
 use tracing::info;
+#[cfg(unix)]
 use tracing::warn;
 
 #[tokio::main]
@@ -89,6 +94,7 @@ struct OneShot {
 }
 
 impl OneShot {
+    #[cfg(unix)]
     async fn open(config_path: &Path) -> anyhow::Result<Self> {
         let socket_path = Path::new(DEFAULT_SOCKET_PATH);
         match connect_local_executor(socket_path).await {
@@ -112,6 +118,11 @@ impl OneShot {
         }
     }
 
+    #[cfg(not(unix))]
+    async fn open(config_path: &Path) -> anyhow::Result<Self> {
+        Self::open_remote(config_path).await
+    }
+
     async fn open_remote(config_path: &Path) -> anyhow::Result<Self> {
         let (config, config_dir) = nexigon_agent::load_config(config_path).await?;
         let connection = nexigon_agent::connect(&config, &config_dir, false).await?;
@@ -132,6 +143,7 @@ impl OneShot {
 
 /// Executor variants used by [`OneShot`].
 enum OneShotExecutor {
+    #[cfg(unix)]
     Local(LocalExecutor),
     Remote(ClientExecutor),
 }
@@ -142,6 +154,7 @@ impl Execute for OneShotExecutor {
         action: A,
     ) -> Result<Result<A::Output, ActionError>, ExecuteError> {
         match self {
+            #[cfg(unix)]
             OneShotExecutor::Local(executor) => executor.execute(action).await,
             OneShotExecutor::Remote(executor) => executor.execute(action).await,
         }
