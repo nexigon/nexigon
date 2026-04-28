@@ -1,5 +1,7 @@
 //! Nexigon CLI configuration.
 
-#[allow(warnings)]
-mod generated;
+sidex::include_bundle!(
+    #[allow(warnings)]
+    nexigon_cli as generated
+);
 pub use generated::config::*;

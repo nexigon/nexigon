@@ -3,7 +3,7 @@ rust = { version = "nightly", profile = "default", components = "rustfmt,clippy"
 taplo = "latest"
 python = "latest"
 uv = "latest"
-"github:silitics/sidex" = { version = "0.2.0", exe = "sidex" }
+"github:silitics/sidex" = { version = "0.2.1", exe = "sidex" }
 "nix:cargo-deny" = "latest"
 
 [tasks.check]
@@ -13,6 +13,10 @@ run = [
   "cargo fmt --check",
   "cargo clippy --all-targets --all-features -- -D warnings",
   "taplo fmt --check",
+  "cd crates/libs/nexigon-api && sidex fmt --check && sidex check",
+  "cd crates/libs/nexigon-agent-api && sidex fmt --check && sidex check",
+  "cd crates/apps/nexigon-cli && sidex fmt --check && sidex check",
+  "cd crates/apps/nexigon-agent && sidex fmt --check && sidex check",
 ]
 
 [tasks.fmt]
@@ -20,6 +24,21 @@ description = "Format all files."
 run = [
   "cargo fmt",
   "taplo fmt",
+  "cd crates/libs/nexigon-api && sidex fmt",
+  "cd crates/libs/nexigon-agent-api && sidex fmt",
+  "cd crates/apps/nexigon-cli && sidex fmt",
+  "cd crates/apps/nexigon-agent && sidex fmt",
+]
+
+[tasks.fix]
+description = "Auto-fix lint findings, then format."
+run = [
+  "cargo clippy --all-targets --all-features --fix --allow-dirty --allow-staged",
+  "cd crates/libs/nexigon-api && sidex check --fix",
+  "cd crates/libs/nexigon-agent-api && sidex check --fix",
+  "cd crates/apps/nexigon-cli && sidex check --fix",
+  "cd crates/apps/nexigon-agent && sidex check --fix",
+  "mise run fmt",
 ]
 
 [tasks.doc]
@@ -31,14 +50,11 @@ description = "Run tests."
 run = "cargo test"
 
 [tasks.generate]
-description = "Regenerate Sidex bindings, JSON schemas, OpenAPI spec, and Python SDK actions."
+description = "Regenerate JSON schemas, OpenAPI spec, and Python SDK actions."
 run = [
-  "cd crates/libs/nexigon-api && sidex generate rust src/types/generated",
   "cd crates/libs/nexigon-api && sidex generate json-schema ../../../build/api-json-schema",
   "cd crates/libs/nexigon-api && sidex generate py ../../../sdks/python/src/nexigon_hub_sdk/api_types",
-  "cd crates/apps/nexigon-cli && sidex generate rust src/config/generated",
   "cd crates/apps/nexigon-cli && sidex generate json-schema ../../../build/cli-json-schema",
-  "cd crates/apps/nexigon-agent && sidex generate rust src/config/generated",
   "cd crates/apps/nexigon-agent && sidex generate json-schema ../../../build/agent-json-schema",
   "mv build/api-json-schema/schema-defs.json crates/utils/nexigon-gen-openapi/schemas.json",
   "mv build/cli-json-schema/nexigon_cli.config.Config.schema.json schemas/nexigon-cli.schema.json",

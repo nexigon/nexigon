@@ -6,7 +6,6 @@ import devices::DeviceId
 import devices::DeviceStatus
 import organizations::OrganizationId
 import repositories::RepositoryId
-import users::UserId
 
 /// Unique ID of a project.
 #[rust(type = "nexigon_ids::ids::ProjectId")]
@@ -24,7 +23,7 @@ opaque DeploymentTokenId
 opaque DeploymentToken
 
 /// Query the projects of the instance.
-record QueryProjectsAction { }
+record QueryProjectsAction {}
 
 /// Output of querying the projects of the instance.
 record QueryProjectsOutput {
@@ -216,8 +215,8 @@ record QueryAuditLogEventsAction {
 
 /// Output of querying the audit log of the project.
 record QueryAuditLogEventsOutput {
-   /// List of audit log events.
-   events: [AuditLogEvent],
+    /// List of audit log events.
+    events: [AuditLogEvent],
 }
 
 /// Add a repository to the project.

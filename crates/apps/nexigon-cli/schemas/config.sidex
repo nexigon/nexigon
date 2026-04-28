@@ -1,4 +1,3 @@
-
 /// User token.
 #[rust(type = "nexigon_ids::ids::UserToken")]
 #[json(type = "string")]

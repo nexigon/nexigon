@@ -1,4 +1,3 @@
-
 /// Deployment token.
 #[rust(type = "nexigon_ids::ids::DeploymentToken")]
 #[json(type = "string")]
@@ -137,4 +136,3 @@ record CommandExec {
     /// Timeout in seconds (defaults to 30).
     timeout?: u64,
 }
-

@@ -9,7 +9,6 @@ import jwt::Jwt
 import projects::DeploymentToken
 import projects::DeploymentTokenId
 import projects::ProjectId
-import properties::DeviceCommandDescriptor
 import properties::DeviceCommandManifest
 
 /// Unique ID of a device.
@@ -48,7 +47,7 @@ opaque CertificateFingerprint
 opaque DeviceEventId
 
 /// Query the devices of the instance.
-record QueryDevicesAction { }
+record QueryDevicesAction {}
 
 /// Output of querying the devices of the instance.
 record QueryDevicesOutput {

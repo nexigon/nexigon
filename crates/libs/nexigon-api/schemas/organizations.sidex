@@ -26,7 +26,7 @@ record QueryOrganizationsAction {}
 /// Output of querying the organizations of the instance.
 record QueryOrganizationsOutput {
     /// List of organizations.
-    organizations: [QueryOrganizationsItem]
+    organizations: [QueryOrganizationsItem],
 }
 
 /// Organization item.

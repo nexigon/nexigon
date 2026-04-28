@@ -72,7 +72,7 @@ record RegisterClusterNodeOutput {
 }
 
 /// Report the heartbeat of a cluster node.
-record ReportClusterNodeHeartbeatAction { }
+record ReportClusterNodeHeartbeatAction {}
 
 /// Cleanup inactive cluster nodes.
-record CleanupInactiveClusterNodesAction { }
+record CleanupInactiveClusterNodesAction {}

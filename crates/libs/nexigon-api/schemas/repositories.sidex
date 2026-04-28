@@ -6,7 +6,6 @@ import digest::Digest
 import json::JsonValue
 import organizations::OrganizationId
 import projects::ProjectId
-import users::UserId
 
 /// Unique ID of a repository.
 #[rust(type = "nexigon_ids::ids::RepositoryId")]
@@ -708,6 +707,6 @@ record QueryAuditLogEventsAction {
 
 /// Output of querying the audit log of the repository.
 record QueryAuditLogEventsOutput {
-   /// List of audit log events.
-   events: [AuditLogEvent],
+    /// List of audit log events.
+    events: [AuditLogEvent],
 }

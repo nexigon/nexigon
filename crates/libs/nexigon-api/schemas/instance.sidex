@@ -3,7 +3,7 @@
 import json::JsonValue
 
 /// Get instance statistics.
-record GetInstanceStatisticsAction { }
+record GetInstanceStatisticsAction {}
 
 /// Instance statistics.
 record GetInstanceStatisticsOutput {
@@ -16,7 +16,7 @@ record GetInstanceStatisticsOutput {
 }
 
 /// Get the settings of the instance.
-record GetInstanceSettingsRawAction { }
+record GetInstanceSettingsRawAction {}
 
 /// Settings of the instance.
 record GetInstanceSettingsRawOutput {

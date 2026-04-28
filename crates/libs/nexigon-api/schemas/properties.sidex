@@ -1,5 +1,5 @@
 //! Types related to device properties.
- 
+
 import json::JsonValue
 
 /// System information.

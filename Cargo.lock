@@ -1133,6 +1133,8 @@ dependencies = [
  "serde",
  "serde_json",
  "si-observability",
+ "sidex",
+ "sidex-build-rs",
  "sidex-serde",
  "sysinfo",
  "tokio",
@@ -1166,6 +1168,8 @@ dependencies = [
  "serde",
  "serde_json",
  "si-crypto-hashes",
+ "sidex",
+ "sidex-build-rs",
  "sidex-serde",
 ]
 
@@ -1198,6 +1202,8 @@ dependencies = [
  "serde_json",
  "si-crypto-hashes",
  "si-observability",
+ "sidex",
+ "sidex-build-rs",
  "sidex-serde",
  "tokio",
  "toml 0.8.23",

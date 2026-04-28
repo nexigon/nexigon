@@ -22,7 +22,11 @@ serde.workspace = true
 serde_json.workspace = true
 si-crypto-hashes.workspace = true
 si-observability.workspace = true
+sidex.workspace = true
 sidex-serde.workspace = true
 tokio.workspace = true
 toml.workspace = true
 tracing.workspace = true
+
+[build-dependencies]
+sidex-build-rs.workspace = true

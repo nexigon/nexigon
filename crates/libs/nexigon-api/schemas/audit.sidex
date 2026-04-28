@@ -83,7 +83,7 @@ variant AuditLogActionStatus {
 /// Query the events recorded in the audit log.
 /// 
 /// Requires administrator permissions.
-record QueryAuditLogEventsAction { }
+record QueryAuditLogEventsAction {}
 
 /// Output of querying the events recorded in the audit log.
 record QueryAuditLogEventsOutput {
@@ -94,7 +94,7 @@ record QueryAuditLogEventsOutput {
 /// Query the actions recorded in the audit log.
 /// 
 /// Requires administrator permissions.
-record QueryAuditLogActionsAction { }
+record QueryAuditLogActionsAction {}
 
 /// Output of querying the actions recorded in the audit log.
 record QueryAuditLogActionsOutput {

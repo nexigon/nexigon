@@ -1,6 +1,8 @@
 //! Nexigon Agent configuration.
 
-#[allow(warnings)]
-mod generated;
+sidex::include_bundle!(
+    #[allow(warnings)]
+    nexigon_agent as generated
+);
 pub use generated::commands;
 pub use generated::config::*;

@@ -1,7 +1,9 @@
 //! API type definitions.
 
-#[allow(warnings)]
-mod generated;
+sidex::include_bundle!(
+    #[allow(warnings)]
+    nexigon_api as generated
+);
 pub use generated::*;
 use nexigon_ids::ids::UserId;
 

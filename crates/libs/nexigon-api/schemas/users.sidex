@@ -6,8 +6,6 @@ import devices::DeviceId
 import jwt::Jwt
 import organizations::OrganizationId
 import organizations::OrganizationInvitationId
-import projects::ProjectId
-import repositories::RepositoryId
 
 /// Unique ID of a user.
 #[rust(type = "nexigon_ids::ids::UserId")]
@@ -35,7 +33,7 @@ opaque UserSessionId
 opaque UserSessionToken
 
 /// Query the users of the instance.
-record QueryUsersAction { }
+record QueryUsersAction {}
 
 /// Output of querying the users of the instance.
 record QueryUsersOutput {
@@ -141,9 +139,9 @@ record ResetUserPasswordAction {
 /// Complete the password reset of a user.
 record CompleteUserPasswordResetAction {
     /// Token to use for password reset.
-   reset_token: Jwt,
-   /// New password of the user.
-   password: string,
+    reset_token: Jwt,
+    /// New password of the user.
+    password: string,
 }
 
 /// Output of completing the password reset of a user.
@@ -377,7 +375,7 @@ record TerminateUserSessionAction {
 }
 
 /// Cleanup expired user sessions.
-record CleanupExpiredUserSessionsAction { }
+record CleanupExpiredUserSessionsAction {}
 
 /// Register a new user with an email and password.
 record RegisterUserAction {

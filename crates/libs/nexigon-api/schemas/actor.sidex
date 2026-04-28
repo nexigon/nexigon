@@ -2,9 +2,11 @@
 
 import cluster::ClusterNodeId
 import devices::DeviceId
-import organizations::{OrganizationId, OrganizationApiTokenId}
+import organizations::OrganizationApiTokenId
+import organizations::OrganizationId
 import projects::DeploymentTokenId
-import users::{UserId, UserSessionId, UserTokenId}
+import users::UserId
+import users::UserTokenId
 
 /// Actor that may invoke actions in the system.
 #[json(tag = "actor")]
@@ -26,10 +28,10 @@ variant Actor {
 }
 
 /// Anonymous actor, typically used for unauthenticated actions.
-record AnonymousActor { }
+record AnonymousActor {}
 
 /// System actor, typically used for internal actions.
-record SystemActor { }
+record SystemActor {}
 
 /// Device authenticated via a specific deployment token.
 record DeviceActor {
@@ -70,7 +72,7 @@ record OrganizationApiTokenActor {
 /// Get the actor.
 /// 
 /// This action is used to get the actor that is used to invoke the action.
-record GetActorAction { }
+record GetActorAction {}
 
 /// Output of getting the actor.
 record GetActorOutput {
