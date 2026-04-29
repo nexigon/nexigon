@@ -51,6 +51,13 @@ record QueryUsersItem {
     display_name?: string,
     /// Whether the user is an instance admin.
     is_admin: bool,
+    /// Whether the user account has been activated.
+    ///
+    /// New registrations start out inactive and are activated when the
+    /// user confirms their email address.
+    is_active: bool,
+    /// Timestamp when the user was created.
+    created_at: Timestamp,
 }
 
 /// Get information about a user.
