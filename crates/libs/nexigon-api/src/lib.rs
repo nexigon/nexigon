@@ -51,12 +51,7 @@ macro_rules! with_actions {
             ("users_CreateToken", CreateUserToken, users::CreateUserTokenAction, users::CreateUserTokenOutput),
             ("users_DeleteToken", DeleteUserToken, users::DeleteUserTokenAction, outputs::Empty),
             // ## User Sessions
-            //
-            // Login and logout used to be exposed as actions but were moved to a
-            // dedicated AuthService primitive in nexigon-hub-primitives. The HTTP
-            // layer calls AuthService directly. CleanupExpiredSessions remains an
-            // action because it is invoked from the periodic-task scheduler, which
-            // already has an Executor in hand.
+            ("users_TerminateSession", TerminateUserSession, users::TerminateUserSessionAction, outputs::Empty),
             ("users_CleanupExpiredSessions", CleanupExpiredUserSessions, users::CleanupExpiredUserSessionsAction, outputs::Empty),
             // ## User Registrations
             ("users_Register", RegisterUser, users::RegisterUserAction, users::RegisterUserOutput),

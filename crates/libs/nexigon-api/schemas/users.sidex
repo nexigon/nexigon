@@ -294,6 +294,15 @@ record DeleteUserTokenAction {
     token_id: UserTokenId,
 }
 
+/// Terminate a user session.
+///
+/// The acting user must own the session; sessions belonging to other
+/// users are not affected.
+record TerminateUserSessionAction {
+    /// ID of the session.
+    session_id: UserSessionId,
+}
+
 /// Cleanup expired user sessions.
 record CleanupExpiredUserSessionsAction {}
 
