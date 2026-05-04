@@ -258,54 +258,6 @@ record UserSession {
     user_agent: string,
 }
 
-/// Authenticate a user with a token.
-record AuthenticateWithUserTokenAction {
-    /// Token.
-    token: UserToken,
-}
-
-/// Output of authenticating a user with a token.
-#[json(tag = "result")]
-variant AuthenticateWithUserTokenOutput {
-    /// Provided token is invalid.
-    Invalid,
-    /// Authentication has been successful.
-    Authenticated: AuthenticateWithUserTokenSuccess,
-}
-
-/// Authentication with user token has been successful.
-record AuthenticateWithUserTokenSuccess {
-    /// ID of the user.
-    user_id: UserId,
-    /// Resulting actor to use for further actions.
-    actor: Actor,
-}
-
-/// Authenticate a user with a session token.
-record AuthenticateWithSessionTokenAction {
-    /// Session token.
-    token: UserSessionToken,
-}
-
-/// Output of authenticating a user with a session token.
-#[json(tag = "result")]
-variant AuthenticateWithSessionTokenOutput {
-    /// Provided token is invalid.
-    Invalid,
-    /// Authentication has been successful.
-    Authenticated: AuthenticateWithSessionTokenSuccess,
-}
-
-/// Authentication with session token has been successful.
-record AuthenticateWithSessionTokenSuccess {
-    /// ID of the user.
-    user_id: UserId,
-    /// ID of the session.
-    session_id: UserSessionId,
-    /// Resulting actor to use for further actions.
-    actor: Actor,
-}
-
 /// Check the permissions of a user for a given device.
 record GetDevicePermissionsAction {
     /// ID of the user.
@@ -340,45 +292,6 @@ record CreateUserTokenOutput {
 record DeleteUserTokenAction {
     /// ID of the token.
     token_id: UserTokenId,
-}
-
-/// Initiate a user session.
-record InitiateUserSessionAction {
-    /// Email address of the user.
-    email: string,
-    /// Password of the user.
-    password: string,
-    /// User agent of the session.
-    user_agent: string,
-    /// Number of seconds the session should be valid for.
-    /// 
-    /// Defaults to 86400 (1 day).
-    valid_for_secs?: u32,
-}
-
-/// Output of initiating a user session.
-#[json(tag = "result")]
-variant InitiateUserSessionOutput {
-    /// Provided credentials are invalid.
-    InvalidCredentials,
-    /// Session was created successfully.
-    Created: InitiateUserSessionSuccess,
-}
-
-/// Session was created successfully.
-record InitiateUserSessionSuccess {
-    /// ID of the user.
-    user_id: UserId,
-    /// ID of the session.
-    session_id: UserSessionId,
-    /// Session token.
-    session_token: UserSessionToken,
-}
-
-/// Terminate a user session.
-record TerminateUserSessionAction {
-    /// ID of the session.
-    session_id: UserSessionId,
 }
 
 /// Cleanup expired user sessions.

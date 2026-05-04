@@ -19,7 +19,9 @@ class IndexVersionDocumentsAction(pydantic.BaseModel):
     storage and rebuilds the index for this version. The repository
     must have S3 configured."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     version_id: _schema_repositories.PackageVersionId = pydantic.Field(
         validation_alias="versionId", serialization_alias="versionId"
@@ -29,7 +31,9 @@ class IndexVersionDocumentsAction(pydantic.BaseModel):
 class IndexVersionDocumentsOutput(pydantic.BaseModel):
     """Output of `IndexVersionDocumentsAction`."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     indexed: bool = pydantic.Field(
         description="Whether indexing actually ran (false when the feature flag is off\nor the version has no artifacts with `relations.*` metadata)."
@@ -53,7 +57,9 @@ class IndexPackageDocumentsAction(pydantic.BaseModel):
     Mirrors `IndexVersionDocumentsAction`. Used after attaching a new
     package-level VEX asset and pointing the package's metadata at it."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     package_id: _schema_repositories.PackageId = pydantic.Field(
         validation_alias="packageId", serialization_alias="packageId"
@@ -61,7 +67,9 @@ class IndexPackageDocumentsAction(pydantic.BaseModel):
 
 
 class IndexPackageDocumentsOutput(pydantic.BaseModel):
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     indexed: bool
     document_count: int = pydantic.Field(
@@ -74,7 +82,9 @@ class GetVersionVulnerabilityOverviewAction(pydantic.BaseModel):
     SBOM/VDR/VEX descriptors per artifact, package-level VEX, and
     (when indexing is enabled) the rolled-up severity summary."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     version_id: _schema_repositories.PackageVersionId = pydantic.Field(
         validation_alias="versionId", serialization_alias="versionId"
@@ -82,7 +92,9 @@ class GetVersionVulnerabilityOverviewAction(pydantic.BaseModel):
 
 
 class GetVersionVulnerabilityOverviewOutput(pydantic.BaseModel):
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     version_id: _schema_repositories.PackageVersionId = pydantic.Field(
         validation_alias="versionId", serialization_alias="versionId"
@@ -117,7 +129,9 @@ class GetVersionVulnerabilityOverviewOutput(pydantic.BaseModel):
 class ArtifactDescriptor(pydantic.BaseModel):
     """Per-artifact view of attached vulnerability documents."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     asset_id: _schema_repositories.RepositoryAssetId = pydantic.Field(
         validation_alias="assetId", serialization_alias="assetId"
@@ -148,7 +162,9 @@ class ArtifactDescriptor(pydantic.BaseModel):
 
 
 class AttachedDocument(pydantic.BaseModel):
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     asset_id: _schema_repositories.RepositoryAssetId = pydantic.Field(
         validation_alias="assetId", serialization_alias="assetId"
@@ -161,7 +177,9 @@ class AttachedDocument(pydantic.BaseModel):
 
 
 class AttachedVdrDocument(pydantic.BaseModel):
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     document: AttachedDocument
     source_tool: str | None = pydantic.Field(
@@ -175,7 +193,9 @@ class AttachedVdrDocument(pydantic.BaseModel):
 
 
 class AttachedVexDocument(pydantic.BaseModel):
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     document: AttachedDocument
     origin: VexStatementOrigin
@@ -187,7 +207,9 @@ class AttachedVexDocument(pydantic.BaseModel):
 
 
 class SeveritySummary(pydantic.BaseModel):
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     critical: int
     high: int
@@ -200,7 +222,9 @@ class SeveritySummary(pydantic.BaseModel):
 class QueryPackageVersionComponentsAction(pydantic.BaseModel):
     """Query the components extracted from a package version's SBOMs."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     version_id: _schema_repositories.PackageVersionId = pydantic.Field(
         validation_alias="versionId", serialization_alias="versionId"
@@ -224,7 +248,9 @@ class QueryPackageVersionComponentsAction(pydantic.BaseModel):
 
 
 class QueryPackageVersionComponentsOutput(pydantic.BaseModel):
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     indexing_enabled: bool = pydantic.Field(
         validation_alias="indexingEnabled", serialization_alias="indexingEnabled"
@@ -233,7 +259,9 @@ class QueryPackageVersionComponentsOutput(pydantic.BaseModel):
 
 
 class PackageVersionComponent(pydantic.BaseModel):
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     artifact_filename: str = pydantic.Field(
         description="Filename of the artifact asset whose SBOM this component came from.",
@@ -259,7 +287,9 @@ class PackageVersionComponent(pydantic.BaseModel):
 
 
 class QueryPackageVersionFindingsAction(pydantic.BaseModel):
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     version_id: _schema_repositories.PackageVersionId = pydantic.Field(
         validation_alias="versionId", serialization_alias="versionId"
@@ -279,7 +309,9 @@ class QueryPackageVersionFindingsAction(pydantic.BaseModel):
 
 
 class QueryPackageVersionFindingsOutput(pydantic.BaseModel):
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     indexing_enabled: bool = pydantic.Field(
         validation_alias="indexingEnabled", serialization_alias="indexingEnabled"
@@ -288,7 +320,9 @@ class QueryPackageVersionFindingsOutput(pydantic.BaseModel):
 
 
 class PackageVersionFinding(pydantic.BaseModel):
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     artifact_filename: str = pydantic.Field(
         validation_alias="artifactFilename", serialization_alias="artifactFilename"

@@ -24,7 +24,9 @@ class JobId(str):
 class Job(pydantic.BaseModel):
     """Job."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     job_id: JobId = pydantic.Field(
         description="Job ID.", validation_alias="jobId", serialization_alias="jobId"
@@ -65,13 +67,17 @@ class Job(pydantic.BaseModel):
 class QueryJobsAction(pydantic.BaseModel):
     """Query the jobs of the instance."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
 
 class QueryJobsOutput(pydantic.BaseModel):
     """Output of querying the jobs of the instance."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     jobs: list[Job] = pydantic.Field(description="List of jobs.")
 

@@ -16,7 +16,9 @@ if TYPE_CHECKING:
 class SetFleetPropertyAction(pydantic.BaseModel):
     """Set a fleet property manually."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     project_id: _schema_projects.ProjectId = pydantic.Field(
         description="ID of the project.",
@@ -30,7 +32,9 @@ class SetFleetPropertyAction(pydantic.BaseModel):
 class GetFleetPropertyAction(pydantic.BaseModel):
     """Get a fleet property by name."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     project_id: _schema_projects.ProjectId = pydantic.Field(
         description="ID of the project.",
@@ -46,7 +50,9 @@ class RemoveFleetPropertyAction(pydantic.BaseModel):
     Handles both manual and computed properties. For computed properties, the
     associated definition is removed as well."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     project_id: _schema_projects.ProjectId = pydantic.Field(
         description="ID of the project.",
@@ -59,7 +65,9 @@ class RemoveFleetPropertyAction(pydantic.BaseModel):
 class QueryFleetPropertiesAction(pydantic.BaseModel):
     """Query all fleet properties of a project."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     project_id: _schema_projects.ProjectId = pydantic.Field(
         description="ID of the project.",
@@ -71,7 +79,9 @@ class QueryFleetPropertiesAction(pydantic.BaseModel):
 class QueryFleetPropertiesOutput(pydantic.BaseModel):
     """Output of querying fleet properties."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     properties: dict[str, FleetProperty] = pydantic.Field(
         description="Properties keyed by name."
@@ -81,7 +91,9 @@ class QueryFleetPropertiesOutput(pydantic.BaseModel):
 class FleetProperty(pydantic.BaseModel):
     """A fleet property."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     name: str = pydantic.Field(description="Name of the property.")
     value: _schema_json.JsonValue = pydantic.Field(description="Current value.")
@@ -104,7 +116,9 @@ class FleetProperty(pydantic.BaseModel):
 class DefineComputedFleetPropertyAction(pydantic.BaseModel):
     """Define a computed fleet property."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     project_id: _schema_projects.ProjectId = pydantic.Field(
         description="ID of the project.",
@@ -126,7 +140,9 @@ class DefineComputedFleetPropertyAction(pydantic.BaseModel):
 class QueryComputedFleetPropertyDefinitionsAction(pydantic.BaseModel):
     """Query computed fleet property definitions for a project."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     project_id: _schema_projects.ProjectId = pydantic.Field(
         description="ID of the project.",
@@ -138,7 +154,9 @@ class QueryComputedFleetPropertyDefinitionsAction(pydantic.BaseModel):
 class QueryComputedFleetPropertyDefinitionsOutput(pydantic.BaseModel):
     """Output of querying computed fleet property definitions."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     definitions: list[ComputedFleetPropertyDefinition] = pydantic.Field(
         description="List of definitions."
@@ -148,7 +166,9 @@ class QueryComputedFleetPropertyDefinitionsOutput(pydantic.BaseModel):
 class ComputedFleetPropertyDefinition(pydantic.BaseModel):
     """A computed fleet property definition."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     name: str = pydantic.Field(description="Name of the property.")
     input_properties: list[str] = pydantic.Field(
@@ -168,15 +188,45 @@ class ComputedFleetPropertyDefinition(pydantic.BaseModel):
 
 
 class GetFleetPropertyOutput_NotFound(pydantic.BaseModel):
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     result: Literal["NotFound"] = "NotFound"
 
 
-class GetFleetPropertyOutput_Found(FleetProperty):
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+class GetFleetPropertyOutput_Found(pydantic.BaseModel):
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     result: Literal["Found"] = "Found"
+    name: str = pydantic.Field(description="Name of the property.")
+    value: _schema_json.JsonValue = pydantic.Field(description="Current value.")
+    kind: FleetPropertyKind = pydantic.Field(
+        description="How this property is managed."
+    )
+    version: int = pydantic.Field(
+        description="Incremental version number, bumped on each update."
+    )
+    error: str | None = pydantic.Field(
+        default=None, description="Error from the last computation attempt, if any."
+    )
+    last_updated: _schema_datetime.Timestamp = pydantic.Field(
+        description="When the value was last updated.",
+        validation_alias="lastUpdated",
+        serialization_alias="lastUpdated",
+    )
+
+    def payload(self) -> "FleetProperty":
+        return FleetProperty(
+            name=self.name,
+            value=self.value,
+            kind=self.kind,
+            version=self.version,
+            error=self.error,
+            last_updated=self.last_updated,
+        )
 
 
 # Output of getting a fleet property.
@@ -187,13 +237,17 @@ type GetFleetPropertyOutput = Annotated[
 
 
 class RemoveFleetPropertyOutput_NotFound(pydantic.BaseModel):
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     result: Literal["NotFound"] = "NotFound"
 
 
 class RemoveFleetPropertyOutput_Removed(pydantic.BaseModel):
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     result: Literal["Removed"] = "Removed"
 
@@ -206,19 +260,25 @@ type RemoveFleetPropertyOutput = Annotated[
 
 
 class FleetPropertyKind_Manual(pydantic.BaseModel):
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     kind: Literal["Manual"] = "Manual"
 
 
 class FleetPropertyKind_Computed(pydantic.BaseModel):
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     kind: Literal["Computed"] = "Computed"
 
 
 class FleetPropertyKind_Builtin(pydantic.BaseModel):
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     kind: Literal["Builtin"] = "Builtin"
 

@@ -576,56 +576,6 @@
     ],
     "unevaluatedProperties": false
   },
-  "nexigon_api.devices.AuthenticateDeviceAction": {
-    "type": "object",
-    "description": "Authenticate a device.\n\n**Note: The certificate fingerprint must be externally verified (mutual TLS).**",
-    "properties": {
-      "fingerprint": {
-        "$ref": "#/components/schemas/nexigon_api.devices.DeviceFingerprint"
-      },
-      "token": {
-        "$ref": "#/components/schemas/nexigon_api.projects.DeploymentToken"
-      },
-      "certificate": {
-        "$ref": "#/components/schemas/nexigon_api.devices.CertificateFingerprint"
-      }
-    },
-    "required": [
-      "fingerprint",
-      "token",
-      "certificate"
-    ],
-    "unevaluatedProperties": false
-  },
-  "nexigon_api.devices.AuthenticateDeviceOutput": {
-    "type": "object",
-    "description": "Output of authenticating a device.",
-    "properties": {
-      "deviceId": {
-        "$ref": "#/components/schemas/nexigon_api.devices.DeviceId"
-      },
-      "tokenId": {
-        "$ref": "#/components/schemas/nexigon_api.projects.DeploymentTokenId"
-      },
-      "fingerprintId": {
-        "$ref": "#/components/schemas/nexigon_api.devices.DeviceFingerprintId"
-      },
-      "certificateId": {
-        "$ref": "#/components/schemas/nexigon_api.devices.DeviceCertificateId"
-      },
-      "actor": {
-        "$ref": "#/components/schemas/nexigon_api.actor.Actor"
-      }
-    },
-    "required": [
-      "deviceId",
-      "tokenId",
-      "fingerprintId",
-      "certificateId",
-      "actor"
-    ],
-    "unevaluatedProperties": false
-  },
   "nexigon_api.devices.CertificateFingerprint": {
     "type": [
       "string"
@@ -3877,6 +3827,44 @@
     ],
     "unevaluatedProperties": false
   },
+  "nexigon_api.repositories.AddPackageAssetAction": {
+    "type": "object",
+    "description": "Attach a repository asset to a package under the given filename.\n\nSymmetric to `AddPackageVersionAssetAction` but for the package\nitself rather than a specific version. The asset must already exist\nin the same repository; the link carries an arbitrary metadata\ndictionary.",
+    "properties": {
+      "packageId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.PackageId"
+      },
+      "assetId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryAssetId"
+      },
+      "filename": {
+        "type": "string"
+      },
+      "metadata": {
+        "type": "object",
+        "additionalProperties": {
+          "$ref": "#/components/schemas/nexigon_api.json.JsonValue"
+        }
+      }
+    },
+    "required": [
+      "packageId",
+      "assetId",
+      "filename"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.repositories.AddPackageAssetOutput": {
+    "enum": [
+      {
+        "result": "FilenameAlreadyExists"
+      },
+      {
+        "result": "Added"
+      }
+    ],
+    "description": "Output of adding a package asset."
+  },
   "nexigon_api.repositories.AddPackageVersionAssetAction": {
     "type": "object",
     "description": "Add an asset to a package version.",
@@ -4309,13 +4297,20 @@
         "additionalProperties": {
           "$ref": "#/components/schemas/nexigon_api.json.JsonValue"
         }
+      },
+      "assets": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.repositories.PackageAsset"
+        }
       }
     },
     "required": [
       "packageId",
       "name",
       "versionCount",
-      "metadata"
+      "metadata",
+      "assets"
     ],
     "unevaluatedProperties": false
   },
@@ -4502,6 +4497,43 @@
     },
     "required": [
       "url"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.repositories.PackageAsset": {
+    "type": "object",
+    "description": "One asset attached at the package level.",
+    "properties": {
+      "assetId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryAssetId"
+      },
+      "filename": {
+        "type": "string"
+      },
+      "size": {
+        "type": "integer",
+        "format": "uint64"
+      },
+      "digest": {
+        "$ref": "#/components/schemas/nexigon_api.digest.Digest"
+      },
+      "status": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryAssetStatus"
+      },
+      "metadata": {
+        "type": "object",
+        "additionalProperties": {
+          "$ref": "#/components/schemas/nexigon_api.json.JsonValue"
+        }
+      }
+    },
+    "required": [
+      "assetId",
+      "filename",
+      "size",
+      "digest",
+      "status",
+      "metadata"
     ],
     "unevaluatedProperties": false
   },
@@ -4803,6 +4835,23 @@
     },
     "required": [
       "projects"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.repositories.RemovePackageAssetAction": {
+    "type": "object",
+    "description": "Remove a package asset by filename.",
+    "properties": {
+      "packageId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.PackageId"
+      },
+      "filename": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "packageId",
+      "filename"
     ],
     "unevaluatedProperties": false
   },
@@ -5176,6 +5225,30 @@
       }
     ]
   },
+  "nexigon_api.repositories.SetPackageAssetMetadataAction": {
+    "type": "object",
+    "description": "Replace the metadata on a package asset.",
+    "properties": {
+      "packageId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.PackageId"
+      },
+      "filename": {
+        "type": "string"
+      },
+      "metadata": {
+        "type": "object",
+        "additionalProperties": {
+          "$ref": "#/components/schemas/nexigon_api.json.JsonValue"
+        }
+      }
+    },
+    "required": [
+      "packageId",
+      "filename",
+      "metadata"
+    ],
+    "unevaluatedProperties": false
+  },
   "nexigon_api.repositories.SetPackageKindAction": {
     "type": "object",
     "description": "Set the kind of a package.",
@@ -5431,144 +5504,6 @@
     ],
     "unevaluatedProperties": false
   },
-  "nexigon_api.users.AuthenticateWithSessionTokenAction": {
-    "type": "object",
-    "description": "Authenticate a user with a session token.",
-    "properties": {
-      "token": {
-        "$ref": "#/components/schemas/nexigon_api.users.UserSessionToken"
-      }
-    },
-    "required": [
-      "token"
-    ],
-    "unevaluatedProperties": false
-  },
-  "nexigon_api.users.AuthenticateWithSessionTokenOutput": {
-    "description": "Output of authenticating a user with a session token.",
-    "oneOf": [
-      {
-        "type": "object",
-        "properties": {
-          "result": {
-            "const": "Invalid"
-          }
-        },
-        "required": [
-          "result"
-        ]
-      },
-      {
-        "type": "object",
-        "properties": {
-          "result": {
-            "const": "Authenticated"
-          },
-          "userId": {
-            "$ref": "#/components/schemas/nexigon_api.users.UserId"
-          },
-          "sessionId": {
-            "$ref": "#/components/schemas/nexigon_api.users.UserSessionId"
-          },
-          "actor": {
-            "$ref": "#/components/schemas/nexigon_api.actor.Actor"
-          }
-        },
-        "required": [
-          "result",
-          "userId",
-          "sessionId",
-          "actor"
-        ]
-      }
-    ]
-  },
-  "nexigon_api.users.AuthenticateWithSessionTokenSuccess": {
-    "type": "object",
-    "description": "Authentication with session token has been successful.",
-    "properties": {
-      "userId": {
-        "$ref": "#/components/schemas/nexigon_api.users.UserId"
-      },
-      "sessionId": {
-        "$ref": "#/components/schemas/nexigon_api.users.UserSessionId"
-      },
-      "actor": {
-        "$ref": "#/components/schemas/nexigon_api.actor.Actor"
-      }
-    },
-    "required": [
-      "userId",
-      "sessionId",
-      "actor"
-    ],
-    "unevaluatedProperties": false
-  },
-  "nexigon_api.users.AuthenticateWithUserTokenAction": {
-    "type": "object",
-    "description": "Authenticate a user with a token.",
-    "properties": {
-      "token": {
-        "$ref": "#/components/schemas/nexigon_api.users.UserToken"
-      }
-    },
-    "required": [
-      "token"
-    ],
-    "unevaluatedProperties": false
-  },
-  "nexigon_api.users.AuthenticateWithUserTokenOutput": {
-    "description": "Output of authenticating a user with a token.",
-    "oneOf": [
-      {
-        "type": "object",
-        "properties": {
-          "result": {
-            "const": "Invalid"
-          }
-        },
-        "required": [
-          "result"
-        ]
-      },
-      {
-        "type": "object",
-        "properties": {
-          "result": {
-            "const": "Authenticated"
-          },
-          "userId": {
-            "$ref": "#/components/schemas/nexigon_api.users.UserId"
-          },
-          "actor": {
-            "$ref": "#/components/schemas/nexigon_api.actor.Actor"
-          }
-        },
-        "required": [
-          "result",
-          "userId",
-          "actor"
-        ]
-      }
-    ]
-  },
-  "nexigon_api.users.AuthenticateWithUserTokenSuccess": {
-    "type": "object",
-    "description": "Authentication with user token has been successful.",
-    "properties": {
-      "userId": {
-        "$ref": "#/components/schemas/nexigon_api.users.UserId"
-      },
-      "actor": {
-        "$ref": "#/components/schemas/nexigon_api.actor.Actor"
-      }
-    },
-    "required": [
-      "userId",
-      "actor"
-    ],
-    "unevaluatedProperties": false
-  },
   "nexigon_api.users.CleanupExpiredUserSessionsAction": {
     "type": "object",
     "description": "Cleanup expired user sessions.",
@@ -5820,91 +5755,6 @@
     ],
     "unevaluatedProperties": false
   },
-  "nexigon_api.users.InitiateUserSessionAction": {
-    "type": "object",
-    "description": "Initiate a user session.",
-    "properties": {
-      "email": {
-        "type": "string"
-      },
-      "password": {
-        "type": "string"
-      },
-      "userAgent": {
-        "type": "string"
-      },
-      "validForSecs": {
-        "type": "integer",
-        "format": "uint32"
-      }
-    },
-    "required": [
-      "email",
-      "password",
-      "userAgent"
-    ],
-    "unevaluatedProperties": false
-  },
-  "nexigon_api.users.InitiateUserSessionOutput": {
-    "description": "Output of initiating a user session.",
-    "oneOf": [
-      {
-        "type": "object",
-        "properties": {
-          "result": {
-            "const": "InvalidCredentials"
-          }
-        },
-        "required": [
-          "result"
-        ]
-      },
-      {
-        "type": "object",
-        "properties": {
-          "result": {
-            "const": "Created"
-          },
-          "userId": {
-            "$ref": "#/components/schemas/nexigon_api.users.UserId"
-          },
-          "sessionId": {
-            "$ref": "#/components/schemas/nexigon_api.users.UserSessionId"
-          },
-          "sessionToken": {
-            "$ref": "#/components/schemas/nexigon_api.users.UserSessionToken"
-          }
-        },
-        "required": [
-          "result",
-          "userId",
-          "sessionId",
-          "sessionToken"
-        ]
-      }
-    ]
-  },
-  "nexigon_api.users.InitiateUserSessionSuccess": {
-    "type": "object",
-    "description": "Session was created successfully.",
-    "properties": {
-      "userId": {
-        "$ref": "#/components/schemas/nexigon_api.users.UserId"
-      },
-      "sessionId": {
-        "$ref": "#/components/schemas/nexigon_api.users.UserSessionId"
-      },
-      "sessionToken": {
-        "$ref": "#/components/schemas/nexigon_api.users.UserSessionToken"
-      }
-    },
-    "required": [
-      "userId",
-      "sessionId",
-      "sessionToken"
-    ],
-    "unevaluatedProperties": false
-  },
   "nexigon_api.users.QueryUserOrganizationInvitationsAction": {
     "type": "object",
     "description": "Query the organization invitations of a user.",
@@ -6121,12 +5971,20 @@
       },
       "isAdmin": {
         "type": "boolean"
+      },
+      "isActive": {
+        "type": "boolean"
+      },
+      "createdAt": {
+        "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
       }
     },
     "required": [
       "userId",
       "email",
-      "isAdmin"
+      "isAdmin",
+      "isActive",
+      "createdAt"
     ],
     "unevaluatedProperties": false
   },
@@ -6235,7 +6093,6 @@
   },
   "nexigon_api.users.ResendRegistrationEmailAction": {
     "type": "object",
-    "description": "",
     "properties": {
       "email": {
         "type": "string"
@@ -6310,19 +6167,6 @@
     ],
     "unevaluatedProperties": false
   },
-  "nexigon_api.users.TerminateUserSessionAction": {
-    "type": "object",
-    "description": "Terminate a user session.",
-    "properties": {
-      "sessionId": {
-        "$ref": "#/components/schemas/nexigon_api.users.UserSessionId"
-      }
-    },
-    "required": [
-      "sessionId"
-    ],
-    "unevaluatedProperties": false
-  },
   "nexigon_api.users.UserId": {
     "type": [
       "string"
@@ -6363,8 +6207,7 @@
       {
         "tag": "Failed"
       }
-    ],
-    "description": ""
+    ]
   },
   "nexigon_api.users.UserSession": {
     "type": "object",
@@ -6414,5 +6257,448 @@
       "string"
     ],
     "description": "Unique ID of a user token."
+  },
+  "nexigon_api.vulnerabilities.ArtifactDescriptor": {
+    "type": "object",
+    "description": "Per-artifact view of attached vulnerability documents.",
+    "properties": {
+      "assetId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryAssetId"
+      },
+      "filename": {
+        "type": "string"
+      },
+      "sbom": {
+        "$ref": "#/components/schemas/nexigon_api.vulnerabilities.AttachedDocument"
+      },
+      "vdrs": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.vulnerabilities.AttachedVdrDocument"
+        }
+      },
+      "vex": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.vulnerabilities.AttachedVexDocument"
+        }
+      },
+      "severitySummary": {
+        "$ref": "#/components/schemas/nexigon_api.vulnerabilities.SeveritySummary"
+      },
+      "componentCount": {
+        "type": "integer",
+        "format": "uint32"
+      }
+    },
+    "required": [
+      "assetId",
+      "filename",
+      "vdrs",
+      "vex"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.vulnerabilities.AttachedDocument": {
+    "type": "object",
+    "properties": {
+      "assetId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryAssetId"
+      },
+      "repositoryId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryId"
+      },
+      "filename": {
+        "type": "string"
+      },
+      "size": {
+        "type": "integer",
+        "format": "uint64"
+      }
+    },
+    "required": [
+      "assetId",
+      "repositoryId",
+      "filename",
+      "size"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.vulnerabilities.AttachedVdrDocument": {
+    "type": "object",
+    "properties": {
+      "document": {
+        "$ref": "#/components/schemas/nexigon_api.vulnerabilities.AttachedDocument"
+      },
+      "sourceTool": {
+        "type": "string"
+      },
+      "severitySummary": {
+        "$ref": "#/components/schemas/nexigon_api.vulnerabilities.SeveritySummary"
+      }
+    },
+    "required": [
+      "document"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.vulnerabilities.AttachedVexDocument": {
+    "type": "object",
+    "properties": {
+      "document": {
+        "$ref": "#/components/schemas/nexigon_api.vulnerabilities.AttachedDocument"
+      },
+      "origin": {
+        "$ref": "#/components/schemas/nexigon_api.vulnerabilities.VexStatementOrigin"
+      },
+      "statementCount": {
+        "type": "integer",
+        "format": "uint32"
+      }
+    },
+    "required": [
+      "document",
+      "origin"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.vulnerabilities.GetVersionVulnerabilityOverviewAction": {
+    "type": "object",
+    "description": "Get the vulnerability overview for a package version: artifact list,\nSBOM/VDR/VEX descriptors per artifact, package-level VEX, and\n(when indexing is enabled) the rolled-up severity summary.",
+    "properties": {
+      "versionId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.PackageVersionId"
+      }
+    },
+    "required": [
+      "versionId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.vulnerabilities.GetVersionVulnerabilityOverviewOutput": {
+    "type": "object",
+    "properties": {
+      "versionId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.PackageVersionId"
+      },
+      "indexingEnabled": {
+        "type": "boolean"
+      },
+      "artifacts": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.vulnerabilities.ArtifactDescriptor"
+        }
+      },
+      "packageVex": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.vulnerabilities.AttachedVexDocument"
+        }
+      },
+      "severitySummary": {
+        "$ref": "#/components/schemas/nexigon_api.vulnerabilities.SeveritySummary"
+      },
+      "componentCount": {
+        "type": "integer",
+        "format": "uint32"
+      }
+    },
+    "required": [
+      "versionId",
+      "indexingEnabled",
+      "artifacts",
+      "packageVex"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.vulnerabilities.IndexPackageDocumentsAction": {
+    "type": "object",
+    "description": "Trigger indexing of every CycloneDX document referenced by the\npackage's metadata via `relations.{vex}` (typically just VEX).\n\nMirrors `IndexVersionDocumentsAction`. Used after attaching a new\npackage-level VEX asset and pointing the package's metadata at it.",
+    "properties": {
+      "packageId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.PackageId"
+      }
+    },
+    "required": [
+      "packageId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.vulnerabilities.IndexPackageDocumentsOutput": {
+    "type": "object",
+    "properties": {
+      "indexed": {
+        "type": "boolean"
+      },
+      "documentCount": {
+        "type": "integer",
+        "format": "uint32"
+      }
+    },
+    "required": [
+      "indexed",
+      "documentCount"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.vulnerabilities.IndexVersionDocumentsAction": {
+    "type": "object",
+    "description": "Trigger indexing of every CycloneDX document referenced by the\nversion's artifact assets via `relations.{sbom,vdr,vex}`.\n\nThe hub fetches the referenced documents from the repository's S3\nstorage and rebuilds the index for this version. The repository\nmust have S3 configured.",
+    "properties": {
+      "versionId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.PackageVersionId"
+      }
+    },
+    "required": [
+      "versionId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.vulnerabilities.IndexVersionDocumentsOutput": {
+    "type": "object",
+    "description": "Output of `IndexVersionDocumentsAction`.",
+    "properties": {
+      "indexed": {
+        "type": "boolean"
+      },
+      "artifactCount": {
+        "type": "integer",
+        "format": "uint32"
+      },
+      "documentCount": {
+        "type": "integer",
+        "format": "uint32"
+      }
+    },
+    "required": [
+      "indexed",
+      "artifactCount",
+      "documentCount"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.vulnerabilities.PackageVersionComponent": {
+    "type": "object",
+    "properties": {
+      "artifactFilename": {
+        "type": "string"
+      },
+      "bomRef": {
+        "type": "string"
+      },
+      "purl": {
+        "type": "string"
+      },
+      "name": {
+        "type": "string"
+      },
+      "version": {
+        "type": "string"
+      },
+      "type": {
+        "type": "string"
+      },
+      "licenses": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "supplier": {
+        "type": "string"
+      },
+      "description": {
+        "type": "string"
+      },
+      "vulnSummary": {
+        "$ref": "#/components/schemas/nexigon_api.vulnerabilities.SeveritySummary"
+      }
+    },
+    "required": [
+      "artifactFilename",
+      "bomRef",
+      "name",
+      "type",
+      "licenses"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.vulnerabilities.PackageVersionFinding": {
+    "type": "object",
+    "properties": {
+      "artifactFilename": {
+        "type": "string"
+      },
+      "componentPurl": {
+        "type": "string"
+      },
+      "componentName": {
+        "type": "string"
+      },
+      "componentVersion": {
+        "type": "string"
+      },
+      "vulnerabilityId": {
+        "type": "string"
+      },
+      "severity": {
+        "type": "string"
+      },
+      "cvssScore": {
+        "type": "number"
+      },
+      "description": {
+        "type": "string"
+      },
+      "sourceTool": {
+        "type": "string"
+      },
+      "effectiveState": {
+        "type": "string"
+      },
+      "justification": {
+        "type": "string"
+      },
+      "detail": {
+        "type": "string"
+      },
+      "stateOrigin": {
+        "$ref": "#/components/schemas/nexigon_api.vulnerabilities.VexStatementOrigin"
+      }
+    },
+    "required": [
+      "artifactFilename",
+      "componentPurl",
+      "componentName",
+      "vulnerabilityId",
+      "severity",
+      "effectiveState"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.vulnerabilities.QueryPackageVersionComponentsAction": {
+    "type": "object",
+    "description": "Query the components extracted from a package version's SBOMs.",
+    "properties": {
+      "versionId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.PackageVersionId"
+      },
+      "artifactFilename": {
+        "type": "string"
+      },
+      "search": {
+        "type": "string"
+      },
+      "componentType": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "versionId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.vulnerabilities.QueryPackageVersionComponentsOutput": {
+    "type": "object",
+    "properties": {
+      "indexingEnabled": {
+        "type": "boolean"
+      },
+      "components": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.vulnerabilities.PackageVersionComponent"
+        }
+      }
+    },
+    "required": [
+      "indexingEnabled",
+      "components"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.vulnerabilities.QueryPackageVersionFindingsAction": {
+    "type": "object",
+    "properties": {
+      "versionId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.PackageVersionId"
+      },
+      "artifactFilename": {
+        "type": "string"
+      },
+      "minSeverity": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "versionId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.vulnerabilities.QueryPackageVersionFindingsOutput": {
+    "type": "object",
+    "properties": {
+      "indexingEnabled": {
+        "type": "boolean"
+      },
+      "findings": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.vulnerabilities.PackageVersionFinding"
+        }
+      }
+    },
+    "required": [
+      "indexingEnabled",
+      "findings"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.vulnerabilities.SeveritySummary": {
+    "type": "object",
+    "properties": {
+      "critical": {
+        "type": "integer",
+        "format": "uint32"
+      },
+      "high": {
+        "type": "integer",
+        "format": "uint32"
+      },
+      "medium": {
+        "type": "integer",
+        "format": "uint32"
+      },
+      "low": {
+        "type": "integer",
+        "format": "uint32"
+      },
+      "info": {
+        "type": "integer",
+        "format": "uint32"
+      },
+      "unknown": {
+        "type": "integer",
+        "format": "uint32"
+      }
+    },
+    "required": [
+      "critical",
+      "high",
+      "medium",
+      "low",
+      "info",
+      "unknown"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.vulnerabilities.VexStatementOrigin": {
+    "enum": [
+      "Operator",
+      "Vendor",
+      "Scanner"
+    ],
+    "description": "Origin of a VEX statement, used by the effective-state precedence\nrule (operator > vendor > scanner)."
   }
 }

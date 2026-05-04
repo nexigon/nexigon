@@ -11,4 +11,6 @@ import pydantic_core  # noqa: F401
 class Empty(pydantic.BaseModel):
     """Empty output."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )

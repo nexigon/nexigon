@@ -71,14 +71,6 @@ _ACTION_REGISTRY: dict[type, tuple[str, pydantic.TypeAdapter]] = {  # type: igno
         "users_QuerySessions",
         pydantic.TypeAdapter(users.QueryUserSessionsOutput),
     ),
-    users.AuthenticateWithUserTokenAction: (
-        "users_AuthenticateWithToken",
-        pydantic.TypeAdapter(users.AuthenticateWithUserTokenOutput),
-    ),
-    users.AuthenticateWithSessionTokenAction: (
-        "users_AuthenticateWithSessionToken",
-        pydantic.TypeAdapter(users.AuthenticateWithSessionTokenOutput),
-    ),
     users.GetDevicePermissionsAction: (
         "users_GetDevicePermissions",
         pydantic.TypeAdapter(users.GetDevicePermissionsOutput),
@@ -89,14 +81,6 @@ _ACTION_REGISTRY: dict[type, tuple[str, pydantic.TypeAdapter]] = {  # type: igno
     ),
     users.DeleteUserTokenAction: (
         "users_DeleteToken",
-        pydantic.TypeAdapter(outputs.Empty),
-    ),
-    users.InitiateUserSessionAction: (
-        "users_InitiateSession",
-        pydantic.TypeAdapter(users.InitiateUserSessionOutput),
-    ),
-    users.TerminateUserSessionAction: (
-        "users_TerminateSession",
         pydantic.TypeAdapter(outputs.Empty),
     ),
     users.CleanupExpiredUserSessionsAction: (
@@ -259,10 +243,6 @@ _ACTION_REGISTRY: dict[type, tuple[str, pydantic.TypeAdapter]] = {  # type: igno
     devices.ValidateDeviceTokenAction: (
         "devices_ValidateDeviceToken",
         pydantic.TypeAdapter(devices.ValidateDeviceTokenOutput),
-    ),
-    devices.AuthenticateDeviceAction: (
-        "devices_Authenticate",
-        pydantic.TypeAdapter(devices.AuthenticateDeviceOutput),
     ),
     devices.AddDeviceCertificateAction: (
         "devices_AddCertificate",
@@ -662,20 +642,6 @@ class _SyncExecuteMixin:
 
     @overload
     def execute(
-        self, action: users.AuthenticateWithUserTokenAction
-    ) -> users.AuthenticateWithUserTokenOutput:
-        """Authenticate a user with a token."""
-        ...
-
-    @overload
-    def execute(
-        self, action: users.AuthenticateWithSessionTokenAction
-    ) -> users.AuthenticateWithSessionTokenOutput:
-        """Authenticate a user with a session token."""
-        ...
-
-    @overload
-    def execute(
         self, action: users.GetDevicePermissionsAction
     ) -> users.GetDevicePermissionsOutput:
         """Check the permissions of a user for a given device."""
@@ -694,18 +660,6 @@ class _SyncExecuteMixin:
         ...
 
     @overload
-    def execute(
-        self, action: users.InitiateUserSessionAction
-    ) -> users.InitiateUserSessionOutput:
-        """Initiate a user session."""
-        ...
-
-    @overload
-    def execute(self, action: users.TerminateUserSessionAction) -> outputs.Empty:
-        """Terminate a user session."""
-        ...
-
-    @overload
     def execute(self, action: users.CleanupExpiredUserSessionsAction) -> outputs.Empty:
         """Cleanup expired user sessions."""
         ...
@@ -716,9 +670,7 @@ class _SyncExecuteMixin:
         ...
 
     @overload
-    def execute(self, action: users.ResendRegistrationEmailAction) -> outputs.Empty:
-        """"""
-        ...
+    def execute(self, action: users.ResendRegistrationEmailAction) -> outputs.Empty: ...
 
     @overload
     def execute(
@@ -964,15 +916,6 @@ class _SyncExecuteMixin:
         """Validate a device JWT.
 
         **Note: Only use this action for integration with external systems.**"""
-        ...
-
-    @overload
-    def execute(
-        self, action: devices.AuthenticateDeviceAction
-    ) -> devices.AuthenticateDeviceOutput:
-        """Authenticate a device.
-
-        **Note: The certificate fingerprint must be externally verified (mutual TLS).**"""
         ...
 
     @overload
@@ -1240,17 +1183,26 @@ class _SyncExecuteMixin:
     @overload
     def execute(
         self, action: repositories.AddPackageAssetAction
-    ) -> repositories.AddPackageAssetOutput: ...
+    ) -> repositories.AddPackageAssetOutput:
+        """Attach a repository asset to a package under the given filename.
+
+        Symmetric to `AddPackageVersionAssetAction` but for the package
+        itself rather than a specific version. The asset must already exist
+        in the same repository; the link carries an arbitrary metadata
+        dictionary."""
+        ...
 
     @overload
-    def execute(
-        self, action: repositories.RemovePackageAssetAction
-    ) -> outputs.Empty: ...
+    def execute(self, action: repositories.RemovePackageAssetAction) -> outputs.Empty:
+        """Remove a package asset by filename."""
+        ...
 
     @overload
     def execute(
         self, action: repositories.SetPackageAssetMetadataAction
-    ) -> outputs.Empty: ...
+    ) -> outputs.Empty:
+        """Replace the metadata on a package asset."""
+        ...
 
     @overload
     def execute(
@@ -1394,22 +1346,41 @@ class _SyncExecuteMixin:
     @overload
     def execute(
         self, action: vulnerabilities.IndexVersionDocumentsAction
-    ) -> vulnerabilities.IndexVersionDocumentsOutput: ...
+    ) -> vulnerabilities.IndexVersionDocumentsOutput:
+        """Trigger indexing of every CycloneDX document referenced by the
+        version's artifact assets via `relations.{sbom,vdr,vex}`.
+
+        The hub fetches the referenced documents from the repository's S3
+        storage and rebuilds the index for this version. The repository
+        must have S3 configured."""
+        ...
 
     @overload
     def execute(
         self, action: vulnerabilities.IndexPackageDocumentsAction
-    ) -> vulnerabilities.IndexPackageDocumentsOutput: ...
+    ) -> vulnerabilities.IndexPackageDocumentsOutput:
+        """Trigger indexing of every CycloneDX document referenced by the
+        package's metadata via `relations.{vex}` (typically just VEX).
+
+        Mirrors `IndexVersionDocumentsAction`. Used after attaching a new
+        package-level VEX asset and pointing the package's metadata at it."""
+        ...
 
     @overload
     def execute(
         self, action: vulnerabilities.GetVersionVulnerabilityOverviewAction
-    ) -> vulnerabilities.GetVersionVulnerabilityOverviewOutput: ...
+    ) -> vulnerabilities.GetVersionVulnerabilityOverviewOutput:
+        """Get the vulnerability overview for a package version: artifact list,
+        SBOM/VDR/VEX descriptors per artifact, package-level VEX, and
+        (when indexing is enabled) the rolled-up severity summary."""
+        ...
 
     @overload
     def execute(
         self, action: vulnerabilities.QueryPackageVersionComponentsAction
-    ) -> vulnerabilities.QueryPackageVersionComponentsOutput: ...
+    ) -> vulnerabilities.QueryPackageVersionComponentsOutput:
+        """Query the components extracted from a package version's SBOMs."""
+        ...
 
     @overload
     def execute(
@@ -1584,20 +1555,6 @@ class _AsyncExecuteMixin:
 
     @overload
     async def execute(
-        self, action: users.AuthenticateWithUserTokenAction
-    ) -> users.AuthenticateWithUserTokenOutput:
-        """Authenticate a user with a token."""
-        ...
-
-    @overload
-    async def execute(
-        self, action: users.AuthenticateWithSessionTokenAction
-    ) -> users.AuthenticateWithSessionTokenOutput:
-        """Authenticate a user with a session token."""
-        ...
-
-    @overload
-    async def execute(
         self, action: users.GetDevicePermissionsAction
     ) -> users.GetDevicePermissionsOutput:
         """Check the permissions of a user for a given device."""
@@ -1617,18 +1574,6 @@ class _AsyncExecuteMixin:
 
     @overload
     async def execute(
-        self, action: users.InitiateUserSessionAction
-    ) -> users.InitiateUserSessionOutput:
-        """Initiate a user session."""
-        ...
-
-    @overload
-    async def execute(self, action: users.TerminateUserSessionAction) -> outputs.Empty:
-        """Terminate a user session."""
-        ...
-
-    @overload
-    async def execute(
         self, action: users.CleanupExpiredUserSessionsAction
     ) -> outputs.Empty:
         """Cleanup expired user sessions."""
@@ -1644,9 +1589,7 @@ class _AsyncExecuteMixin:
     @overload
     async def execute(
         self, action: users.ResendRegistrationEmailAction
-    ) -> outputs.Empty:
-        """"""
-        ...
+    ) -> outputs.Empty: ...
 
     @overload
     async def execute(
@@ -1908,15 +1851,6 @@ class _AsyncExecuteMixin:
         """Validate a device JWT.
 
         **Note: Only use this action for integration with external systems.**"""
-        ...
-
-    @overload
-    async def execute(
-        self, action: devices.AuthenticateDeviceAction
-    ) -> devices.AuthenticateDeviceOutput:
-        """Authenticate a device.
-
-        **Note: The certificate fingerprint must be externally verified (mutual TLS).**"""
         ...
 
     @overload
@@ -2192,17 +2126,28 @@ class _AsyncExecuteMixin:
     @overload
     async def execute(
         self, action: repositories.AddPackageAssetAction
-    ) -> repositories.AddPackageAssetOutput: ...
+    ) -> repositories.AddPackageAssetOutput:
+        """Attach a repository asset to a package under the given filename.
+
+        Symmetric to `AddPackageVersionAssetAction` but for the package
+        itself rather than a specific version. The asset must already exist
+        in the same repository; the link carries an arbitrary metadata
+        dictionary."""
+        ...
 
     @overload
     async def execute(
         self, action: repositories.RemovePackageAssetAction
-    ) -> outputs.Empty: ...
+    ) -> outputs.Empty:
+        """Remove a package asset by filename."""
+        ...
 
     @overload
     async def execute(
         self, action: repositories.SetPackageAssetMetadataAction
-    ) -> outputs.Empty: ...
+    ) -> outputs.Empty:
+        """Replace the metadata on a package asset."""
+        ...
 
     @overload
     async def execute(
@@ -2352,22 +2297,41 @@ class _AsyncExecuteMixin:
     @overload
     async def execute(
         self, action: vulnerabilities.IndexVersionDocumentsAction
-    ) -> vulnerabilities.IndexVersionDocumentsOutput: ...
+    ) -> vulnerabilities.IndexVersionDocumentsOutput:
+        """Trigger indexing of every CycloneDX document referenced by the
+        version's artifact assets via `relations.{sbom,vdr,vex}`.
+
+        The hub fetches the referenced documents from the repository's S3
+        storage and rebuilds the index for this version. The repository
+        must have S3 configured."""
+        ...
 
     @overload
     async def execute(
         self, action: vulnerabilities.IndexPackageDocumentsAction
-    ) -> vulnerabilities.IndexPackageDocumentsOutput: ...
+    ) -> vulnerabilities.IndexPackageDocumentsOutput:
+        """Trigger indexing of every CycloneDX document referenced by the
+        package's metadata via `relations.{vex}` (typically just VEX).
+
+        Mirrors `IndexVersionDocumentsAction`. Used after attaching a new
+        package-level VEX asset and pointing the package's metadata at it."""
+        ...
 
     @overload
     async def execute(
         self, action: vulnerabilities.GetVersionVulnerabilityOverviewAction
-    ) -> vulnerabilities.GetVersionVulnerabilityOverviewOutput: ...
+    ) -> vulnerabilities.GetVersionVulnerabilityOverviewOutput:
+        """Get the vulnerability overview for a package version: artifact list,
+        SBOM/VDR/VEX descriptors per artifact, package-level VEX, and
+        (when indexing is enabled) the rolled-up severity summary."""
+        ...
 
     @overload
     async def execute(
         self, action: vulnerabilities.QueryPackageVersionComponentsAction
-    ) -> vulnerabilities.QueryPackageVersionComponentsOutput: ...
+    ) -> vulnerabilities.QueryPackageVersionComponentsOutput:
+        """Query the components extracted from a package version's SBOMs."""
+        ...
 
     @overload
     async def execute(

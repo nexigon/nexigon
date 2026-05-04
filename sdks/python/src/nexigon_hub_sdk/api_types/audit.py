@@ -39,7 +39,9 @@ class AuditLogEvent(pydantic.BaseModel):
 
     Audit data is guaranteed to not contain any secret information."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     event_id: AuditLogEventId = pydantic.Field(
         description="ID of the audit log event.",
@@ -67,7 +69,9 @@ class AuditLogEvent(pydantic.BaseModel):
 class AuditLogEventAction(pydantic.BaseModel):
     """Action that caused an event."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     action_id: AuditLogActionId = pydantic.Field(
         description="ID of the action.",
@@ -79,7 +83,9 @@ class AuditLogEventAction(pydantic.BaseModel):
 class AuditLogEventJob(pydantic.BaseModel):
     """Job that caused an event."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     job_id: _schema_jobs.JobId = pydantic.Field(
         description="ID of the job.",
@@ -93,7 +99,9 @@ class AuditLogAction(pydantic.BaseModel):
 
     Audit data is guaranteed to not contain any secret information."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     action_id: AuditLogActionId = pydantic.Field(
         description="ID of the audit log action.",
@@ -122,13 +130,17 @@ class QueryAuditLogEventsAction(pydantic.BaseModel):
 
     Requires administrator permissions."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
 
 class QueryAuditLogEventsOutput(pydantic.BaseModel):
     """Output of querying the events recorded in the audit log."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     events: list[AuditLogEvent] = pydantic.Field(description="List of audit events.")
 
@@ -138,13 +150,17 @@ class QueryAuditLogActionsAction(pydantic.BaseModel):
 
     Requires administrator permissions."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
 
 class QueryAuditLogActionsOutput(pydantic.BaseModel):
     """Output of querying the actions recorded in the audit log."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     actions: list[AuditLogAction] = pydantic.Field(description="List of actions.")
 

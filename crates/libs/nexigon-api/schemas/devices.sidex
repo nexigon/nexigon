@@ -245,32 +245,6 @@ record ValidateDeviceTokenSuccess {
     claims: JsonValue,
 }
 
-/// Authenticate a device.
-/// 
-/// **Note: The certificate fingerprint must be externally verified (mutual TLS).**
-record AuthenticateDeviceAction {
-    /// Fingerprint of the device.
-    fingerprint: DeviceFingerprint,
-    /// Deployment token used for authentication.
-    token: DeploymentToken,
-    /// Certificate fingerprint.
-    certificate: CertificateFingerprint,
-}
-
-/// Output of authenticating a device.
-record AuthenticateDeviceOutput {
-    /// ID of the device.
-    device_id: DeviceId,
-    /// ID of the deployment token.
-    token_id: DeploymentTokenId,
-    /// ID of the fingerprint.
-    fingerprint_id: DeviceFingerprintId,
-    /// ID of the certificate.
-    certificate_id: DeviceCertificateId,
-    /// Actor to use for further actions.
-    actor: Actor,
-}
-
 /// Add a device certificate.
 record AddDeviceCertificateAction {
     /// ID of the device.

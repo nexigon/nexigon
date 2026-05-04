@@ -59,7 +59,9 @@ class PackageVersionId(str):
 class RepositoryS3Config(pydantic.BaseModel):
     """Repository S3 config."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     endpoint: str = pydantic.Field(
         description="S3 endpoint (e.g., https://s3.amazonaws.com or https://minio.local:9000)."
@@ -89,7 +91,9 @@ class RepositoryS3Config(pydantic.BaseModel):
 class ResolveRepositoryNameAction(pydantic.BaseModel):
     """Resolve a repository by its name."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     repository: str = pydantic.Field(description="Name of the repository.")
 
@@ -97,7 +101,9 @@ class ResolveRepositoryNameAction(pydantic.BaseModel):
 class GetRepositoryDetailsAction(pydantic.BaseModel):
     """Get information about a repository."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     repository_id: RepositoryId = pydantic.Field(
         description="ID of the repository.",
@@ -109,7 +115,9 @@ class GetRepositoryDetailsAction(pydantic.BaseModel):
 class GetRepositoryDetailsOutput(pydantic.BaseModel):
     """Output of getting information about a repository."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     repository_id: RepositoryId = pydantic.Field(
         description="ID of the repository.",
@@ -145,7 +153,9 @@ class GetRepositoryDetailsOutput(pydantic.BaseModel):
 class CreateRepositoryAction(pydantic.BaseModel):
     """Create a new repository."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     organization_id: _schema_organizations.OrganizationId = pydantic.Field(
         description="Organization to create the repository in.",
@@ -161,7 +171,9 @@ class CreateRepositoryAction(pydantic.BaseModel):
 class CreateRepositorySuccess(pydantic.BaseModel):
     """Successfully created a repository."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     repository_id: RepositoryId = pydantic.Field(
         description="ID of the repository.",
@@ -173,7 +185,9 @@ class CreateRepositorySuccess(pydantic.BaseModel):
 class DeleteRepositoryAction(pydantic.BaseModel):
     """Delete a repository."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     repository_id: RepositoryId = pydantic.Field(
         description="ID of the repository.",
@@ -185,7 +199,9 @@ class DeleteRepositoryAction(pydantic.BaseModel):
 class SetRepositoryVisibilityAction(pydantic.BaseModel):
     """Set the visibility of a repository."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     repository_id: RepositoryId = pydantic.Field(
         description="ID of the repository.",
@@ -200,7 +216,9 @@ class SetRepositoryVisibilityAction(pydantic.BaseModel):
 class SetRepositoryDisplayNameAction(pydantic.BaseModel):
     """Set the display name of a repository."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     repository_id: RepositoryId = pydantic.Field(
         description="ID of the repository.",
@@ -220,7 +238,9 @@ class SetRepositoryPublicNameAction(pydantic.BaseModel):
 
     Note: Setting the public name requires the `public_repositories` subscription feature."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     repository_id: RepositoryId = pydantic.Field(
         description="ID of the repository.",
@@ -237,7 +257,9 @@ class SetRepositoryPublicNameAction(pydantic.BaseModel):
 class QueryRepositoryPackagesAction(pydantic.BaseModel):
     """Query the packages of a repository."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     repository_id: RepositoryId = pydantic.Field(
         description="ID of the repository.",
@@ -249,7 +271,9 @@ class QueryRepositoryPackagesAction(pydantic.BaseModel):
 class QueryRepositoryPackagesOutput(pydantic.BaseModel):
     """Output of querying the packages of a repository."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     packages: list[QueryRepositoryPackagesItem] = pydantic.Field(
         description="List of packages."
@@ -259,7 +283,9 @@ class QueryRepositoryPackagesOutput(pydantic.BaseModel):
 class QueryRepositoryPackagesItem(pydantic.BaseModel):
     """Package query item."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     package_id: PackageId = pydantic.Field(
         description="ID of the package.",
@@ -280,7 +306,9 @@ class QueryRepositoryPackagesItem(pydantic.BaseModel):
 class QueryRepositoryAssetsAction(pydantic.BaseModel):
     """Query the assets of a repository."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     repository_id: RepositoryId = pydantic.Field(
         description="ID of the repository.",
@@ -292,7 +320,9 @@ class QueryRepositoryAssetsAction(pydantic.BaseModel):
 class QueryRepositoryAssetsOutput(pydantic.BaseModel):
     """Output of querying the assets of a repository."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     assets: list[QueryRepositoryAssetsItem] = pydantic.Field(
         description="List of assets."
@@ -302,7 +332,9 @@ class QueryRepositoryAssetsOutput(pydantic.BaseModel):
 class QueryRepositoryAssetsItem(pydantic.BaseModel):
     """Asset query item."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     asset_id: RepositoryAssetId = pydantic.Field(
         description="ID of the asset.",
@@ -316,7 +348,9 @@ class QueryRepositoryAssetsItem(pydantic.BaseModel):
 class QueryRepositoryProjectsAction(pydantic.BaseModel):
     """Query repository projects."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     repository_id: RepositoryId = pydantic.Field(
         description="ID of the repository.",
@@ -328,7 +362,9 @@ class QueryRepositoryProjectsAction(pydantic.BaseModel):
 class QueryRepositoryProjectsOutput(pydantic.BaseModel):
     """Output of querying the projects of a repository."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     projects: list[QueryRepositoryProjectsItem] = pydantic.Field(
         description="List of projects."
@@ -338,7 +374,9 @@ class QueryRepositoryProjectsOutput(pydantic.BaseModel):
 class QueryRepositoryProjectsItem(pydantic.BaseModel):
     """Project item."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     project_id: _schema_projects.ProjectId = pydantic.Field(
         description="ID of the project.",
@@ -351,7 +389,9 @@ class QueryRepositoryProjectsItem(pydantic.BaseModel):
 class ResolvePackageByPathAction(pydantic.BaseModel):
     """Resolve a package by its path."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     repository: str = pydantic.Field(description="Name of the repository.")
     package: str = pydantic.Field(description="Name of the package.")
@@ -360,7 +400,9 @@ class ResolvePackageByPathAction(pydantic.BaseModel):
 class ResolvePackageByPathSuccess(pydantic.BaseModel):
     """Successfully resolved package by path."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     repository_id: RepositoryId = pydantic.Field(
         description="ID of the repository.",
@@ -377,7 +419,9 @@ class ResolvePackageByPathSuccess(pydantic.BaseModel):
 class GetPackageDetailsAction(pydantic.BaseModel):
     """Get information about a package."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     package_id: PackageId = pydantic.Field(
         description="ID of the package.",
@@ -389,7 +433,9 @@ class GetPackageDetailsAction(pydantic.BaseModel):
 class GetPackageDetailsOutput(pydantic.BaseModel):
     """Output of getting information about a package."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     package_id: PackageId = pydantic.Field(
         description="ID of the package.",
@@ -416,7 +462,9 @@ class GetPackageDetailsOutput(pydantic.BaseModel):
 class PackageAsset(pydantic.BaseModel):
     """One asset attached at the package level."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     asset_id: RepositoryAssetId = pydantic.Field(
         validation_alias="assetId", serialization_alias="assetId"
@@ -436,7 +484,9 @@ class AddPackageAssetAction(pydantic.BaseModel):
     in the same repository; the link carries an arbitrary metadata
     dictionary."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     package_id: PackageId = pydantic.Field(
         validation_alias="packageId", serialization_alias="packageId"
@@ -451,7 +501,9 @@ class AddPackageAssetAction(pydantic.BaseModel):
 class RemovePackageAssetAction(pydantic.BaseModel):
     """Remove a package asset by filename."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     package_id: PackageId = pydantic.Field(
         validation_alias="packageId", serialization_alias="packageId"
@@ -462,7 +514,9 @@ class RemovePackageAssetAction(pydantic.BaseModel):
 class SetPackageAssetMetadataAction(pydantic.BaseModel):
     """Replace the metadata on a package asset."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     package_id: PackageId = pydantic.Field(
         validation_alias="packageId", serialization_alias="packageId"
@@ -474,7 +528,9 @@ class SetPackageAssetMetadataAction(pydantic.BaseModel):
 class CreatePackageAction(pydantic.BaseModel):
     """Create a new package."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     repository_id: RepositoryId = pydantic.Field(
         description="ID of the repository.",
@@ -493,7 +549,9 @@ class CreatePackageAction(pydantic.BaseModel):
 class CreatePackageSuccess(pydantic.BaseModel):
     """Successfully created a package."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     package_id: PackageId = pydantic.Field(
         description="ID of the package.",
@@ -505,7 +563,9 @@ class CreatePackageSuccess(pydantic.BaseModel):
 class DeletePackageAction(pydantic.BaseModel):
     """Delete a package."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     package_id: PackageId = pydantic.Field(
         description="ID of the package.",
@@ -517,7 +577,9 @@ class DeletePackageAction(pydantic.BaseModel):
 class SetPackageMetadataAction(pydantic.BaseModel):
     """Set metadata on a package."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     package_id: PackageId = pydantic.Field(
         description="ID of the package.",
@@ -532,7 +594,9 @@ class SetPackageMetadataAction(pydantic.BaseModel):
 class SetPackageKindAction(pydantic.BaseModel):
     """Set the kind of a package."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     package_id: PackageId = pydantic.Field(
         description="ID of the package.",
@@ -548,7 +612,9 @@ class SetPackageKindAction(pydantic.BaseModel):
 class SetPackageNameAction(pydantic.BaseModel):
     """Set the name of a package."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     package_id: PackageId = pydantic.Field(
         description="ID of the package.",
@@ -561,7 +627,9 @@ class SetPackageNameAction(pydantic.BaseModel):
 class QueryPackageVersionsAction(pydantic.BaseModel):
     """Query the versions of a package."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     package_id: PackageId = pydantic.Field(
         description="ID of the package.",
@@ -573,7 +641,9 @@ class QueryPackageVersionsAction(pydantic.BaseModel):
 class QueryPackageVersionsOutput(pydantic.BaseModel):
     """Output of querying the versions of a package."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     versions: list[QueryPackageVersionsItem] = pydantic.Field(
         description="List of package versions."
@@ -583,7 +653,9 @@ class QueryPackageVersionsOutput(pydantic.BaseModel):
 class QueryPackageVersionsItem(pydantic.BaseModel):
     """Package version query item."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     version_id: PackageVersionId = pydantic.Field(
         description="ID of the package version.",
@@ -606,7 +678,9 @@ class QueryPackageVersionsItem(pydantic.BaseModel):
 class PackageVersionTag(pydantic.BaseModel):
     """Package version tag."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     tag: str = pydantic.Field(description="Tag of the package version.")
     locked: bool = pydantic.Field(description="Indicates whether the tag is locked.")
@@ -615,7 +689,9 @@ class PackageVersionTag(pydantic.BaseModel):
 class AddTagItem(pydantic.BaseModel):
     """Add tag item."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     tag: str = pydantic.Field(description="Tag to add.")
     locked: bool | None = pydantic.Field(
@@ -631,7 +707,9 @@ class AddTagItem(pydantic.BaseModel):
 class RemoveTagItem(pydantic.BaseModel):
     """Remove tag item."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     tag: str = pydantic.Field(description="Tag to remove.")
 
@@ -639,7 +717,9 @@ class RemoveTagItem(pydantic.BaseModel):
 class PackageVersionAsset(pydantic.BaseModel):
     """Package version asset."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     filename: str = pydantic.Field(description="Filename of the asset.")
     asset_id: RepositoryAssetId = pydantic.Field(
@@ -658,7 +738,9 @@ class PackageVersionAsset(pydantic.BaseModel):
 class ResolvePackageVersionByPathAction(pydantic.BaseModel):
     """Resolve a package version by its path."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     repository: str = pydantic.Field(description="Name of the repository.")
     package: str = pydantic.Field(description="Name of the package.")
@@ -668,7 +750,9 @@ class ResolvePackageVersionByPathAction(pydantic.BaseModel):
 class ResolvePackageVersionByPathSuccess(pydantic.BaseModel):
     """Successfully resolved package version by path."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     repository_id: RepositoryId = pydantic.Field(
         description="ID of the repository.",
@@ -690,7 +774,9 @@ class ResolvePackageVersionByPathSuccess(pydantic.BaseModel):
 class GetPackageVersionDetailsAction(pydantic.BaseModel):
     """Get information about a package version."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     version_id: PackageVersionId = pydantic.Field(
         description="ID of the package version.",
@@ -702,7 +788,9 @@ class GetPackageVersionDetailsAction(pydantic.BaseModel):
 class GetPackageVersionDetailsOutput(pydantic.BaseModel):
     """Output of getting information about a package version."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     version_id: PackageVersionId = pydantic.Field(
         description="ID of the package version.",
@@ -734,7 +822,9 @@ class GetPackageVersionDetailsOutput(pydantic.BaseModel):
 class CreatePackageVersionAction(pydantic.BaseModel):
     """Create a new package version."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     package_id: PackageId = pydantic.Field(
         description="ID of the package.",
@@ -755,7 +845,9 @@ class CreatePackageVersionAction(pydantic.BaseModel):
 class CreatePackageVersionSuccess(pydantic.BaseModel):
     """Package version creation has been successful."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     version_id: PackageVersionId = pydantic.Field(
         description="ID of the package version.",
@@ -767,7 +859,9 @@ class CreatePackageVersionSuccess(pydantic.BaseModel):
 class DeletePackageVersionAction(pydantic.BaseModel):
     """Delete a package version."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     version_id: PackageVersionId = pydantic.Field(
         description="ID of the package version.",
@@ -779,7 +873,9 @@ class DeletePackageVersionAction(pydantic.BaseModel):
 class SetPackageVersionNameAction(pydantic.BaseModel):
     """Set the name of a package version."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     version_id: PackageVersionId = pydantic.Field(
         description="ID of the package version.",
@@ -794,7 +890,9 @@ class SetPackageVersionNameAction(pydantic.BaseModel):
 class SetPackageVersionMetadataAction(pydantic.BaseModel):
     """Set metadata on a package version."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     version_id: PackageVersionId = pydantic.Field(
         description="ID of the package version.",
@@ -809,7 +907,9 @@ class SetPackageVersionMetadataAction(pydantic.BaseModel):
 class AddPackageVersionAssetAction(pydantic.BaseModel):
     """Add an asset to a package version."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     version_id: PackageVersionId = pydantic.Field(
         description="ID of the package version.",
@@ -831,7 +931,9 @@ class AddPackageVersionAssetAction(pydantic.BaseModel):
 class RemovePackageVersionAssetAction(pydantic.BaseModel):
     """Remove an asset from a package version."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     version_id: PackageVersionId = pydantic.Field(
         description="ID of the package version.",
@@ -844,7 +946,9 @@ class RemovePackageVersionAssetAction(pydantic.BaseModel):
 class SetPackageVersionAssetMetadataAction(pydantic.BaseModel):
     """Set metadata on a package version asset."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     version_id: PackageVersionId = pydantic.Field(
         description="ID of the package version.",
@@ -860,7 +964,9 @@ class SetPackageVersionAssetMetadataAction(pydantic.BaseModel):
 class TagPackageVersionAction(pydantic.BaseModel):
     """Add tags to a version."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     version_id: PackageVersionId = pydantic.Field(
         description="ID of the package version.",
@@ -873,7 +979,9 @@ class TagPackageVersionAction(pydantic.BaseModel):
 class UntagPackageVersionAction(pydantic.BaseModel):
     """Remove tags from a version."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     version_id: PackageVersionId = pydantic.Field(
         description="ID of the package version.",
@@ -886,7 +994,9 @@ class UntagPackageVersionAction(pydantic.BaseModel):
 class ResolvePackageVersionAssetByPathAction(pydantic.BaseModel):
     """Resolve a version asset by its path."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     repository: str = pydantic.Field(description="Name of the repository.")
     package: str = pydantic.Field(description="Name of the package.")
@@ -897,7 +1007,9 @@ class ResolvePackageVersionAssetByPathAction(pydantic.BaseModel):
 class ResolvePackageVersionAssetByPathSuccess(pydantic.BaseModel):
     """Successfully resolved version asset by path."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     repository_id: RepositoryId = pydantic.Field(
         description="ID of the repository.",
@@ -924,7 +1036,9 @@ class ResolvePackageVersionAssetByPathSuccess(pydantic.BaseModel):
 class SetRepositoryS3ConfigAction(pydantic.BaseModel):
     """Set the S3 configuration for the repository."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     repository_id: RepositoryId = pydantic.Field(
         description="ID of the repository.",
@@ -941,7 +1055,9 @@ class SetRepositoryS3ConfigAction(pydantic.BaseModel):
 class GetRepositoryS3ConfigAction(pydantic.BaseModel):
     """Get the S3 configuration for the repository."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     repository_id: RepositoryId = pydantic.Field(
         description="ID of the repository.",
@@ -955,7 +1071,9 @@ class GetRepositoryS3ConfigOutput(pydantic.BaseModel):
 
     This intentionally does not include the secret access key."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     s_3_config: RepositoryS3Config = pydantic.Field(
         description="S3 config for the repository.",
@@ -967,7 +1085,9 @@ class GetRepositoryS3ConfigOutput(pydantic.BaseModel):
 class GetAssetDetailsAction(pydantic.BaseModel):
     """Get information about an asset."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     asset_id: RepositoryAssetId = pydantic.Field(
         description="ID of the asset.",
@@ -979,7 +1099,9 @@ class GetAssetDetailsAction(pydantic.BaseModel):
 class GetAssetDetailsOutput(pydantic.BaseModel):
     """Output of getting information about an asset."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     asset_id: RepositoryAssetId = pydantic.Field(
         description="ID of the asset.",
@@ -999,7 +1121,9 @@ class GetAssetDetailsOutput(pydantic.BaseModel):
 class CreateAssetAction(pydantic.BaseModel):
     """Create an asset."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     repository_id: RepositoryId = pydantic.Field(
         description="ID of the repository.",
@@ -1013,7 +1137,9 @@ class CreateAssetAction(pydantic.BaseModel):
 class DeleteAssetAction(pydantic.BaseModel):
     """Delete an asset."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     asset_id: RepositoryAssetId = pydantic.Field(
         description="ID of the asset.",
@@ -1025,7 +1151,9 @@ class DeleteAssetAction(pydantic.BaseModel):
 class IssueAssetDownloadUrlAction(pydantic.BaseModel):
     """Issue a URL for downloading an asset."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     asset_id: RepositoryAssetId = pydantic.Field(
         description="ID of the asset to issue the URL for.",
@@ -1040,7 +1168,9 @@ class IssueAssetDownloadUrlAction(pydantic.BaseModel):
 class IssueAssetDownloadUrlOutput(pydantic.BaseModel):
     """Output of issuing a URL for downloading an asset."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     url: str = pydantic.Field(description="URL for downloading the asset.")
 
@@ -1048,7 +1178,9 @@ class IssueAssetDownloadUrlOutput(pydantic.BaseModel):
 class IssueAssetUploadUrlAction(pydantic.BaseModel):
     """Issue a URL for uploading an asset."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     asset_id: RepositoryAssetId = pydantic.Field(
         description="ID of the asset to issue the URL for.",
@@ -1060,7 +1192,9 @@ class IssueAssetUploadUrlAction(pydantic.BaseModel):
 class IssueAssetUploadUrlOutput(pydantic.BaseModel):
     """Output of issuing a URL for uploading an asset."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     url: str = pydantic.Field(description="URL for uploading the asset.")
 
@@ -1068,7 +1202,9 @@ class IssueAssetUploadUrlOutput(pydantic.BaseModel):
 class QueryAuditLogEventsAction(pydantic.BaseModel):
     """Query the audit log of the repository."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     repository_id: RepositoryId = pydantic.Field(
         description="ID of the repository.",
@@ -1080,7 +1216,9 @@ class QueryAuditLogEventsAction(pydantic.BaseModel):
 class QueryAuditLogEventsOutput(pydantic.BaseModel):
     """Output of querying the audit log of the repository."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     events: list[_schema_audit.AuditLogEvent] = pydantic.Field(
         description="List of audit log events."
@@ -1120,16 +1258,23 @@ type RepositoryVisibility = RepositoryVisibility_Public | RepositoryVisibility_P
 
 
 class ResolveRepositoryNameOutput_Found(pydantic.BaseModel):
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     result: Literal["Found"] = "Found"
     repository_id: RepositoryId = pydantic.Field(
         validation_alias="repositoryId", serialization_alias="repositoryId"
     )
 
+    def payload(self) -> "RepositoryId":
+        return self.repository_id
+
 
 class ResolveRepositoryNameOutput_NotFound(pydantic.BaseModel):
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     result: Literal["NotFound"] = "NotFound"
 
@@ -1142,15 +1287,27 @@ type ResolveRepositoryNameOutput = Annotated[
 
 
 class CreateRepositoryOutput_NameAlreadyExists(pydantic.BaseModel):
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     result: Literal["NameAlreadyExists"] = "NameAlreadyExists"
 
 
-class CreateRepositoryOutput_Created(CreateRepositorySuccess):
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+class CreateRepositoryOutput_Created(pydantic.BaseModel):
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     result: Literal["Created"] = "Created"
+    repository_id: RepositoryId = pydantic.Field(
+        description="ID of the repository.",
+        validation_alias="repositoryId",
+        serialization_alias="repositoryId",
+    )
+
+    def payload(self) -> "CreateRepositorySuccess":
+        return CreateRepositorySuccess(repository_id=self.repository_id)
 
 
 # Output of creating a repository.
@@ -1161,13 +1318,17 @@ type CreateRepositoryOutput = Annotated[
 
 
 class SetRepositoryPublicNameOutput_NameAlreadyExists(pydantic.BaseModel):
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     result: Literal["NameAlreadyExists"] = "NameAlreadyExists"
 
 
 class SetRepositoryPublicNameOutput_Success(pydantic.BaseModel):
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     result: Literal["Success"] = "Success"
 
@@ -1180,14 +1341,33 @@ type SetRepositoryPublicNameOutput = Annotated[
 ]
 
 
-class ResolvePackageByPathOutput_Found(ResolvePackageByPathSuccess):
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+class ResolvePackageByPathOutput_Found(pydantic.BaseModel):
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     result: Literal["Found"] = "Found"
+    repository_id: RepositoryId = pydantic.Field(
+        description="ID of the repository.",
+        validation_alias="repositoryId",
+        serialization_alias="repositoryId",
+    )
+    package_id: PackageId = pydantic.Field(
+        description="ID of the package.",
+        validation_alias="packageId",
+        serialization_alias="packageId",
+    )
+
+    def payload(self) -> "ResolvePackageByPathSuccess":
+        return ResolvePackageByPathSuccess(
+            repository_id=self.repository_id, package_id=self.package_id
+        )
 
 
 class ResolvePackageByPathOutput_NotFound(pydantic.BaseModel):
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     result: Literal["NotFound"] = "NotFound"
 
@@ -1200,13 +1380,17 @@ type ResolvePackageByPathOutput = Annotated[
 
 
 class AddPackageAssetOutput_FilenameAlreadyExists(pydantic.BaseModel):
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     result: Literal["FilenameAlreadyExists"] = "FilenameAlreadyExists"
 
 
 class AddPackageAssetOutput_Added(pydantic.BaseModel):
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     result: Literal["Added"] = "Added"
 
@@ -1219,15 +1403,27 @@ type AddPackageAssetOutput = Annotated[
 
 
 class CreatePackageOutput_NameAlreadyExists(pydantic.BaseModel):
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     result: Literal["NameAlreadyExists"] = "NameAlreadyExists"
 
 
-class CreatePackageOutput_Created(CreatePackageSuccess):
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+class CreatePackageOutput_Created(pydantic.BaseModel):
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     result: Literal["Created"] = "Created"
+    package_id: PackageId = pydantic.Field(
+        description="ID of the package.",
+        validation_alias="packageId",
+        serialization_alias="packageId",
+    )
+
+    def payload(self) -> "CreatePackageSuccess":
+        return CreatePackageSuccess(package_id=self.package_id)
 
 
 # Output of creating a package.
@@ -1238,13 +1434,17 @@ type CreatePackageOutput = Annotated[
 
 
 class SetPackageNameOutput_NameAlreadyExists(pydantic.BaseModel):
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     result: Literal["NameAlreadyExists"] = "NameAlreadyExists"
 
 
 class SetPackageNameOutput_Success(pydantic.BaseModel):
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     result: Literal["Success"] = "Success"
 
@@ -1256,14 +1456,40 @@ type SetPackageNameOutput = Annotated[
 ]
 
 
-class ResolvePackageVersionByPathOutput_Found(ResolvePackageVersionByPathSuccess):
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+class ResolvePackageVersionByPathOutput_Found(pydantic.BaseModel):
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     result: Literal["Found"] = "Found"
+    repository_id: RepositoryId = pydantic.Field(
+        description="ID of the repository.",
+        validation_alias="repositoryId",
+        serialization_alias="repositoryId",
+    )
+    package_id: PackageId = pydantic.Field(
+        description="ID of the package.",
+        validation_alias="packageId",
+        serialization_alias="packageId",
+    )
+    version_id: PackageVersionId = pydantic.Field(
+        description="ID of the package version.",
+        validation_alias="versionId",
+        serialization_alias="versionId",
+    )
+
+    def payload(self) -> "ResolvePackageVersionByPathSuccess":
+        return ResolvePackageVersionByPathSuccess(
+            repository_id=self.repository_id,
+            package_id=self.package_id,
+            version_id=self.version_id,
+        )
 
 
 class ResolvePackageVersionByPathOutput_NotFound(pydantic.BaseModel):
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     result: Literal["NotFound"] = "NotFound"
 
@@ -1276,10 +1502,20 @@ type ResolvePackageVersionByPathOutput = Annotated[
 ]
 
 
-class CreatePackageVersionOutput_Created(CreatePackageVersionSuccess):
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+class CreatePackageVersionOutput_Created(pydantic.BaseModel):
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     result: Literal["Created"] = "Created"
+    version_id: PackageVersionId = pydantic.Field(
+        description="ID of the package version.",
+        validation_alias="versionId",
+        serialization_alias="versionId",
+    )
+
+    def payload(self) -> "CreatePackageVersionSuccess":
+        return CreatePackageVersionSuccess(version_id=self.version_id)
 
 
 # Output of creating a package version.
@@ -1287,13 +1523,17 @@ type CreatePackageVersionOutput = CreatePackageVersionOutput_Created
 
 
 class AddPackageVersionAssetOutput_FilenameAlreadyExists(pydantic.BaseModel):
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     result: Literal["FilenameAlreadyExists"] = "FilenameAlreadyExists"
 
 
 class AddPackageVersionAssetOutput_Added(pydantic.BaseModel):
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     result: Literal["Added"] = "Added"
 
@@ -1306,16 +1546,46 @@ type AddPackageVersionAssetOutput = Annotated[
 ]
 
 
-class ResolvePackageVersionAssetByPathOutput_Found(
-    ResolvePackageVersionAssetByPathSuccess
-):
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+class ResolvePackageVersionAssetByPathOutput_Found(pydantic.BaseModel):
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     result: Literal["Found"] = "Found"
+    repository_id: RepositoryId = pydantic.Field(
+        description="ID of the repository.",
+        validation_alias="repositoryId",
+        serialization_alias="repositoryId",
+    )
+    package_id: PackageId = pydantic.Field(
+        description="ID of the package.",
+        validation_alias="packageId",
+        serialization_alias="packageId",
+    )
+    version_id: PackageVersionId = pydantic.Field(
+        description="ID of the package version.",
+        validation_alias="versionId",
+        serialization_alias="versionId",
+    )
+    asset_id: RepositoryAssetId = pydantic.Field(
+        description="ID of the asset.",
+        validation_alias="assetId",
+        serialization_alias="assetId",
+    )
+
+    def payload(self) -> "ResolvePackageVersionAssetByPathSuccess":
+        return ResolvePackageVersionAssetByPathSuccess(
+            repository_id=self.repository_id,
+            package_id=self.package_id,
+            version_id=self.version_id,
+            asset_id=self.asset_id,
+        )
 
 
 class ResolvePackageVersionAssetByPathOutput_NotFound(pydantic.BaseModel):
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     result: Literal["NotFound"] = "NotFound"
 
@@ -1329,21 +1599,31 @@ type ResolvePackageVersionAssetByPathOutput = Annotated[
 
 
 class CreateAssetOutput_AssetAlreadyExists(pydantic.BaseModel):
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     result: Literal["AssetAlreadyExists"] = "AssetAlreadyExists"
     asset_id: RepositoryAssetId = pydantic.Field(
         validation_alias="assetId", serialization_alias="assetId"
     )
 
+    def payload(self) -> "RepositoryAssetId":
+        return self.asset_id
+
 
 class CreateAssetOutput_Created(pydantic.BaseModel):
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     result: Literal["Created"] = "Created"
     asset_id: RepositoryAssetId = pydantic.Field(
         validation_alias="assetId", serialization_alias="assetId"
     )
+
+    def payload(self) -> "RepositoryAssetId":
+        return self.asset_id
 
 
 # Output of creating an asset.

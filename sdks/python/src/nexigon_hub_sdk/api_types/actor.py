@@ -18,19 +18,25 @@ if TYPE_CHECKING:
 class AnonymousActor(pydantic.BaseModel):
     """Anonymous actor, typically used for unauthenticated actions."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
 
 class SystemActor(pydantic.BaseModel):
     """System actor, typically used for internal actions."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
 
 class DeviceActor(pydantic.BaseModel):
     """Device authenticated via a specific deployment token."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     device_id: _schema_devices.DeviceId = pydantic.Field(
         description="ID of the device.",
@@ -47,7 +53,9 @@ class DeviceActor(pydantic.BaseModel):
 class UserActor(pydantic.BaseModel):
     """User authenticated via a user session."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     user_id: _schema_users.UserId = pydantic.Field(
         description="ID of the user.",
@@ -59,7 +67,9 @@ class UserActor(pydantic.BaseModel):
 class UserTokenActor(pydantic.BaseModel):
     """User authenticated via a specific token."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     user_id: _schema_users.UserId = pydantic.Field(
         description="ID of the user.",
@@ -76,7 +86,9 @@ class UserTokenActor(pydantic.BaseModel):
 class ClusterNodeActor(pydantic.BaseModel):
     """Cluster node."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     node_id: _schema_cluster.ClusterNodeId = pydantic.Field(
         description="ID of the cluster node.",
@@ -88,7 +100,9 @@ class ClusterNodeActor(pydantic.BaseModel):
 class OrganizationApiTokenActor(pydantic.BaseModel):
     """Organization API token actor."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     organization_id: _schema_organizations.OrganizationId = pydantic.Field(
         description="ID of the organization.",
@@ -107,57 +121,138 @@ class GetActorAction(pydantic.BaseModel):
 
     This action is used to get the actor that is used to invoke the action."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
 
 class GetActorOutput(pydantic.BaseModel):
     """Output of getting the actor."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     actor: Actor = pydantic.Field(description="The actor.")
 
 
-class Actor_Anonymous(AnonymousActor):
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+class Actor_Anonymous(pydantic.BaseModel):
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     actor: Literal["Anonymous"] = "Anonymous"
 
+    def payload(self) -> "AnonymousActor":
+        return AnonymousActor()
 
-class Actor_System(SystemActor):
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+
+class Actor_System(pydantic.BaseModel):
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     actor: Literal["System"] = "System"
 
+    def payload(self) -> "SystemActor":
+        return SystemActor()
 
-class Actor_Device(DeviceActor):
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+
+class Actor_Device(pydantic.BaseModel):
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     actor: Literal["Device"] = "Device"
+    device_id: _schema_devices.DeviceId = pydantic.Field(
+        description="ID of the device.",
+        validation_alias="deviceId",
+        serialization_alias="deviceId",
+    )
+    token_id: _schema_projects.DeploymentTokenId = pydantic.Field(
+        description="ID of the deployment token used for authentication.",
+        validation_alias="tokenId",
+        serialization_alias="tokenId",
+    )
+
+    def payload(self) -> "DeviceActor":
+        return DeviceActor(device_id=self.device_id, token_id=self.token_id)
 
 
-class Actor_User(UserActor):
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+class Actor_User(pydantic.BaseModel):
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     actor: Literal["User"] = "User"
+    user_id: _schema_users.UserId = pydantic.Field(
+        description="ID of the user.",
+        validation_alias="userId",
+        serialization_alias="userId",
+    )
+
+    def payload(self) -> "UserActor":
+        return UserActor(user_id=self.user_id)
 
 
-class Actor_UserToken(UserTokenActor):
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+class Actor_UserToken(pydantic.BaseModel):
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     actor: Literal["UserToken"] = "UserToken"
+    user_id: _schema_users.UserId = pydantic.Field(
+        description="ID of the user.",
+        validation_alias="userId",
+        serialization_alias="userId",
+    )
+    token_id: _schema_users.UserTokenId = pydantic.Field(
+        description="ID of the user token used for authentication.",
+        validation_alias="tokenId",
+        serialization_alias="tokenId",
+    )
+
+    def payload(self) -> "UserTokenActor":
+        return UserTokenActor(user_id=self.user_id, token_id=self.token_id)
 
 
-class Actor_ClusterNode(ClusterNodeActor):
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+class Actor_ClusterNode(pydantic.BaseModel):
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     actor: Literal["ClusterNode"] = "ClusterNode"
+    node_id: _schema_cluster.ClusterNodeId = pydantic.Field(
+        description="ID of the cluster node.",
+        validation_alias="nodeId",
+        serialization_alias="nodeId",
+    )
+
+    def payload(self) -> "ClusterNodeActor":
+        return ClusterNodeActor(node_id=self.node_id)
 
 
-class Actor_OrganizationApiToken(OrganizationApiTokenActor):
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+class Actor_OrganizationApiToken(pydantic.BaseModel):
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     actor: Literal["OrganizationApiToken"] = "OrganizationApiToken"
+    organization_id: _schema_organizations.OrganizationId = pydantic.Field(
+        description="ID of the organization.",
+        validation_alias="organizationId",
+        serialization_alias="organizationId",
+    )
+    token_id: _schema_organizations.OrganizationApiTokenId = pydantic.Field(
+        description="ID of the API token.",
+        validation_alias="tokenId",
+        serialization_alias="tokenId",
+    )
+
+    def payload(self) -> "OrganizationApiTokenActor":
+        return OrganizationApiTokenActor(
+            organization_id=self.organization_id, token_id=self.token_id
+        )
 
 
 # Actor that may invoke actions in the system.

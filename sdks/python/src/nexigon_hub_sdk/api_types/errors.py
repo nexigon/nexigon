@@ -13,7 +13,9 @@ T = TypeVar("T")
 class ActionError(pydantic.BaseModel):
     """Action error."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     kind: ActionErrorKind = pydantic.Field(description="Kind of the error.")
     message: str = pydantic.Field(description="Message of the error.")
@@ -45,17 +47,27 @@ type ActionErrorKind = (
 
 
 class ActionResult_Ok(pydantic.BaseModel, Generic[T]):
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     result: Literal["Ok"] = "Ok"
     value: T
 
+    def payload(self) -> "T":
+        return self.value
+
 
 class ActionResult_Error(pydantic.BaseModel):
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     result: Literal["Error"] = "Error"
     error: ActionError
+
+    def payload(self) -> "ActionError":
+        return self.error
 
 
 # Action result.

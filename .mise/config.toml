@@ -3,7 +3,7 @@ rust = { version = "nightly", profile = "default", components = "rustfmt,clippy"
 taplo = "latest"
 python = "latest"
 uv = "latest"
-"github:silitics/sidex" = { version = "0.2.1", exe = "sidex" }
+"github:silitics/sidex" = { version = "0.2.2", exe = "sidex" }
 "nix:cargo-deny" = "latest"
 
 [tasks.check]
@@ -28,6 +28,8 @@ run = [
   "cd crates/libs/nexigon-agent-api && sidex fmt",
   "cd crates/apps/nexigon-cli && sidex fmt",
   "cd crates/apps/nexigon-agent && sidex fmt",
+  "cd sdks/python && uv run --group dev ruff check --fix src/ tests/",
+  "cd sdks/python && uv run --group dev ruff format src/ tests/",
 ]
 
 [tasks.fix]

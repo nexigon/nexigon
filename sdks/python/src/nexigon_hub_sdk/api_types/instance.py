@@ -14,13 +14,17 @@ if TYPE_CHECKING:
 class GetInstanceStatisticsAction(pydantic.BaseModel):
     """Get instance statistics."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
 
 class GetInstanceStatisticsOutput(pydantic.BaseModel):
     """Instance statistics."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     users: int = pydantic.Field(description="Number of users.")
     projects: int = pydantic.Field(description="Number of projects.")
@@ -30,13 +34,17 @@ class GetInstanceStatisticsOutput(pydantic.BaseModel):
 class GetInstanceSettingsRawAction(pydantic.BaseModel):
     """Get the settings of the instance."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
 
 class GetInstanceSettingsRawOutput(pydantic.BaseModel):
     """Settings of the instance."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     settings: dict[str, _schema_json.JsonValue] = pydantic.Field(
         description="Settings of the instance."
@@ -46,7 +54,9 @@ class GetInstanceSettingsRawOutput(pydantic.BaseModel):
 class SetInstanceSettingRawAction(pydantic.BaseModel):
     """Set a setting of the instance."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     key: str = pydantic.Field(description="Name of the setting.")
     value: _schema_json.JsonValue = pydantic.Field(description="Value of the setting.")

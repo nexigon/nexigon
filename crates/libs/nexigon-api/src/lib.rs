@@ -9,12 +9,7 @@ pub mod types;
 
 /// Represents an action that can be invoked within Nexigon Hub.
 pub trait Action:
-    Any
-    + Serialize
-    + DeserializeOwned
-    + ::sidex_serde::adapter::SidexType
-    + Send
-    + std::fmt::Debug
+    Any + Serialize + DeserializeOwned + ::sidex_serde::adapter::SidexType + Send + std::fmt::Debug
 {
     /// Output type of the action.
     type Output: Any
@@ -50,16 +45,18 @@ macro_rules! with_actions {
             ("users_QueryOrganizations", QueryUserOrganizations, users::QueryUserOrganizationsAction, users::QueryUserOrganizationsOutput),
             ("users_QueryOrganizationInvitations", QueryUserOrganizationInvitations, users::QueryUserOrganizationInvitationsAction, users::QueryUserOrganizationInvitationsOutput),
             ("users_QuerySessions", QueryUserSessions, users::QueryUserSessionsAction, users::QueryUserSessionsOutput),
-            ("users_AuthenticateWithToken", AuthenticateWithUserToken, users::AuthenticateWithUserTokenAction, users::AuthenticateWithUserTokenOutput),
-            ("users_AuthenticateWithSessionToken", AuthenticateWithSessionToken, users::AuthenticateWithSessionTokenAction, users::AuthenticateWithSessionTokenOutput),
             // # User Permissions
             ("users_GetDevicePermissions", GetDevicePermissions, users::GetDevicePermissionsAction, users::GetDevicePermissionsOutput),
             // ## User Tokens
             ("users_CreateToken", CreateUserToken, users::CreateUserTokenAction, users::CreateUserTokenOutput),
             ("users_DeleteToken", DeleteUserToken, users::DeleteUserTokenAction, outputs::Empty),
             // ## User Sessions
-            ("users_InitiateSession", InitiateUserSession, users::InitiateUserSessionAction, users::InitiateUserSessionOutput),
-            ("users_TerminateSession", TerminateUserSession, users::TerminateUserSessionAction, outputs::Empty),
+            //
+            // Login and logout used to be exposed as actions but were moved to a
+            // dedicated AuthService primitive in nexigon-hub-primitives. The HTTP
+            // layer calls AuthService directly. CleanupExpiredSessions remains an
+            // action because it is invoked from the periodic-task scheduler, which
+            // already has an Executor in hand.
             ("users_CleanupExpiredSessions", CleanupExpiredUserSessions, users::CleanupExpiredUserSessionsAction, outputs::Empty),
             // ## User Registrations
             ("users_Register", RegisterUser, users::RegisterUserAction, users::RegisterUserOutput),
@@ -115,7 +112,8 @@ macro_rules! with_actions {
             ("devices_SetName", SetDeviceName, devices::SetDeviceNameAction, outputs::Empty),
             ("devices_IssueDeviceToken", IssueDeviceToken, devices::IssueDeviceTokenAction, devices::IssueDeviceTokenOutput),
             ("devices_ValidateDeviceToken", ValidateDeviceToken, devices::ValidateDeviceTokenAction, devices::ValidateDeviceTokenOutput),
-            ("devices_Authenticate", AuthenticateDevice, devices::AuthenticateDeviceAction, devices::AuthenticateDeviceOutput),
+            // Device authentication moved to AuthService::authenticate_device in
+            // nexigon-hub-primitives; the HTTP middleware calls it directly.
             // ## Device Certificates
             ("devices_AddCertificate", AddDeviceCertificate, devices::AddDeviceCertificateAction, devices::AddDeviceCertificateOutput),
             ("devices_DeleteCertificate", DeleteDeviceCertificate, devices::DeleteDeviceCertificateAction, outputs::Empty),

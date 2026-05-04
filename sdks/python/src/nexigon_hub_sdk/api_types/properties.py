@@ -14,7 +14,9 @@ if TYPE_CHECKING:
 class SystemInfo(pydantic.BaseModel):
     """System information."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     name: str | None = pydantic.Field(default=None, description="System name.")
     version: str | None = pydantic.Field(default=None, description="System version.")
@@ -43,7 +45,9 @@ class SystemInfo(pydantic.BaseModel):
 class MemoryInfo(pydantic.BaseModel):
     """Memory information."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     total: int = pydantic.Field(description="Total memory in bytes.")
 
@@ -51,7 +55,9 @@ class MemoryInfo(pydantic.BaseModel):
 class NetworkInterfaceInfo(pydantic.BaseModel):
     """Network interface information."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     name: str = pydantic.Field(description="Name of the network interface.")
     mac_address: str = pydantic.Field(
@@ -69,7 +75,9 @@ class NetworkInterfaceInfo(pydantic.BaseModel):
 class DiskInfo(pydantic.BaseModel):
     """Disk information."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     name: str = pydantic.Field(description="Name of the disk.")
     filesystem: str = pydantic.Field(description="Filesystem type.")
@@ -96,7 +104,9 @@ class OtaUpdateStatus(pydantic.BaseModel):
     Published by the device agent to report the effective OTA configuration
     and the current state of the update process."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     config: OtaUpdateConfig | None = pydantic.Field(
         default=None,
@@ -138,7 +148,9 @@ class OtaUpdateConfig(pydantic.BaseModel):
     `dev.nexigon.ota.config` device property. The device property is
     merged on top of the file-based defaults."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     path: str | None = pydantic.Field(
         default=None,
@@ -149,7 +161,9 @@ class OtaUpdateConfig(pydantic.BaseModel):
 class DeviceHealth(pydantic.BaseModel):
     """Device health information (`dev.nexigon.system.health`)."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     status: DeviceHealthStatus = pydantic.Field(
         description="Health status of the device."
@@ -159,7 +173,9 @@ class DeviceHealth(pydantic.BaseModel):
 class HttpExportInfo(pydantic.BaseModel):
     """HTTP export information."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     name: str = pydantic.Field(description="Name of the export.")
     port: int = pydantic.Field(description="Port the service listens on.")
@@ -169,7 +185,9 @@ class HttpExportInfo(pydantic.BaseModel):
 class RugixSystemInfo(pydantic.BaseModel):
     """Rugix-specific system information."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     slots: dict[str, RugixSlotInfo] = pydantic.Field(
         description="Information about the update slots."
@@ -189,7 +207,9 @@ class RugixSystemInfo(pydantic.BaseModel):
 class RugixSlotInfo(pydantic.BaseModel):
     """Information about a Rugix update slot."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     active: bool | None = pydantic.Field(
         default=None, description="Indicates whether the slot is active, i.e., in use."
@@ -213,7 +233,9 @@ class RugixSlotInfo(pydantic.BaseModel):
 class RugixBootInfo(pydantic.BaseModel):
     """Rugix-specific boot information."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     boot_flow: str = pydantic.Field(
         description="Name of the boot flow.",
@@ -240,13 +262,17 @@ class RugixBootInfo(pydantic.BaseModel):
 class RugixBootGroupInfo(pydantic.BaseModel):
     """Information about a Rugix boot group."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
 
 class RugixActiveStateManagementInfo(pydantic.BaseModel):
     """Information about the state management mechanism, if state management is active."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     data_partition: str | None = pydantic.Field(
         default=None,
@@ -259,7 +285,9 @@ class RugixActiveStateManagementInfo(pydantic.BaseModel):
 class RugixBakeryBuildInfo(pydantic.BaseModel):
     """Rugix Bakery build information."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     name: str = pydantic.Field(description="System name.")
     release: RugixBakeryReleaseInfo = pydantic.Field(
@@ -270,7 +298,9 @@ class RugixBakeryBuildInfo(pydantic.BaseModel):
 class RugixBakeryReleaseInfo(pydantic.BaseModel):
     """Rugix Bakery build release information."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     id: str = pydantic.Field(description="Release ID.")
     version: str = pydantic.Field(description="Release version.")
@@ -279,7 +309,9 @@ class RugixBakeryReleaseInfo(pydantic.BaseModel):
 class YoctoSystemInfo(pydantic.BaseModel):
     """Yocto-specific system information."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     build_info: dict[str, str] = pydantic.Field(
         description="Build information key-value pairs read from `/etc/buildinfo`.",
@@ -291,7 +323,9 @@ class YoctoSystemInfo(pydantic.BaseModel):
 class AgentInfo(pydantic.BaseModel):
     """Agent information."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     version: str = pydantic.Field(description="Agent version.")
     config: AgentConfig = pydantic.Field(description="Agent feature configuration.")
@@ -300,7 +334,9 @@ class AgentInfo(pydantic.BaseModel):
 class AgentConfig(pydantic.BaseModel):
     """Agent feature configuration."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     terminal: AgentTerminalConfig | None = pydantic.Field(
         default=None, description="Terminal feature configuration."
@@ -313,7 +349,9 @@ class AgentConfig(pydantic.BaseModel):
 class AgentTerminalConfig(pydantic.BaseModel):
     """Agent terminal feature configuration."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     enabled: bool | None = pydantic.Field(
         default=None, description="Whether the remote terminal is enabled."
@@ -326,7 +364,9 @@ class AgentTerminalConfig(pydantic.BaseModel):
 class AgentCommandsConfig(pydantic.BaseModel):
     """Agent commands feature configuration."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     enabled: bool | None = pydantic.Field(
         default=None, description="Whether on-demand commands are enabled."
@@ -336,7 +376,9 @@ class AgentCommandsConfig(pydantic.BaseModel):
 class DeviceCommandManifest(pydantic.BaseModel):
     """Command manifest (`dev.nexigon.commands` property)."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     commands: list[DeviceCommandDescriptor] = pydantic.Field(
         description="Available commands."
@@ -346,7 +388,9 @@ class DeviceCommandManifest(pydantic.BaseModel):
 class DeviceCommandDescriptor(pydantic.BaseModel):
     """Descriptor for an on-demand command."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     name: str = pydantic.Field(description="Command name.")
     description: str | None = pydantic.Field(
@@ -432,10 +476,18 @@ type DeviceHealthStatus = (
 )
 
 
-class ExportInfo_Http(HttpExportInfo):
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+class ExportInfo_Http(pydantic.BaseModel):
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     protocol: Literal["http"] = "http"
+    name: str = pydantic.Field(description="Name of the export.")
+    port: int = pydantic.Field(description="Port the service listens on.")
+    path: str | None = pydantic.Field(default=None, description="URL path prefix.")
+
+    def payload(self) -> "HttpExportInfo":
+        return HttpExportInfo(name=self.name, port=self.port, path=self.path)
 
 
 # Service export information.
@@ -443,19 +495,34 @@ type ExportInfo = ExportInfo_Http
 
 
 class RugixStateManagementInfo_Disabled(pydantic.BaseModel):
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     status: Literal["Disabled"] = "Disabled"
 
 
-class RugixStateManagementInfo_Active(RugixActiveStateManagementInfo):
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+class RugixStateManagementInfo_Active(pydantic.BaseModel):
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     status: Literal["Active"] = "Active"
+    data_partition: str | None = pydantic.Field(
+        default=None,
+        description="Device backing the data partition, if any.",
+        validation_alias="dataPartition",
+        serialization_alias="dataPartition",
+    )
+
+    def payload(self) -> "RugixActiveStateManagementInfo":
+        return RugixActiveStateManagementInfo(data_partition=self.data_partition)
 
 
 class RugixStateManagementInfo_Error(pydantic.BaseModel):
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     status: Literal["Error"] = "Error"
 

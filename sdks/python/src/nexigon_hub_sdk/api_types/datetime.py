@@ -33,7 +33,9 @@ class DateSpan(pydantic.BaseModel):
 
     **The end date itself is not included in the span.**"""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     start: Date = pydantic.Field(description="Start date of the span.")
     end: Date = pydantic.Field(

@@ -24,7 +24,9 @@ class ClusterNodeId(str):
 class GetClusterDetailsAction(pydantic.BaseModel):
     """Get information about the cluster."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     include_terminated: bool | None = pydantic.Field(
         default=None,
@@ -37,7 +39,9 @@ class GetClusterDetailsAction(pydantic.BaseModel):
 class GetClusterDetailsOutput(pydantic.BaseModel):
     """Information about the cluster."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     nodes: list[ClusterNode] = pydantic.Field(description="Nodes of the cluster.")
 
@@ -45,7 +49,9 @@ class GetClusterDetailsOutput(pydantic.BaseModel):
 class ClusterNode(pydantic.BaseModel):
     """Cluster node."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     node_id: ClusterNodeId = pydantic.Field(
         description="ID of the cluster node.",
@@ -90,7 +96,9 @@ class ClusterNode(pydantic.BaseModel):
 class RegisterClusterNodeAction(pydantic.BaseModel):
     """Register a new cluster node."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     name: str | None = pydantic.Field(
         default=None, description="Name of the cluster node."
@@ -100,7 +108,9 @@ class RegisterClusterNodeAction(pydantic.BaseModel):
 class RegisterClusterNodeOutput(pydantic.BaseModel):
     """Output of registering a new cluster node."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
     node_id: ClusterNodeId = pydantic.Field(
         description="ID of the cluster node.",
@@ -112,13 +122,17 @@ class RegisterClusterNodeOutput(pydantic.BaseModel):
 class ReportClusterNodeHeartbeatAction(pydantic.BaseModel):
     """Report the heartbeat of a cluster node."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
 
 class CleanupInactiveClusterNodesAction(pydantic.BaseModel):
     """Cleanup inactive cluster nodes."""
 
-    model_config = pydantic.ConfigDict(populate_by_name=True, serialize_by_alias=True)
+    model_config = pydantic.ConfigDict(
+        populate_by_name=True, serialize_by_alias=True, defer_build=True
+    )
 
 
 class ClusterNodeStatus_Active(pydantic.RootModel[Literal["Active"]]):
