@@ -144,3 +144,96 @@ jobs:
             token = "$NEXIGON_USER_TOKEN"
           EOF
           ./scripts/upload-binaries.sh
+  build_debs:
+    name: Build Debian Packages (${{ matrix.target }})
+    needs: build
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        target:
+          - x86_64-unknown-linux-musl
+          - x86_64-unknown-linux-gnu
+          - aarch64-unknown-linux-musl
+          - aarch64-unknown-linux-gnu
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-tags: true
+          fetch-depth: 0
+      - name: Download Binaries
+        uses: actions/download-artifact@v4
+        with:
+          name: binaries-${{ matrix.target }}
+          path: build/binaries
+      - name: Extract Binaries
+        run: |
+          set -euo pipefail
+          cd build/binaries
+          mkdir -p ${{ matrix.target }}
+          tar -xzf ${{ matrix.target }}.tar.gz -C ${{ matrix.target }}
+          rm -f ${{ matrix.target }}.tar.gz
+      - name: Build Debian Packages
+        run: ./scripts/build-debs.sh ${{ matrix.target }}
+      - name: Upload Debian Packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: debs-${{ matrix.target }}
+          path: build/debs/*.deb
+          if-no-files-found: error
+  build_source_package:
+    name: Build Debian Source Package
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-tags: true
+          fetch-depth: 0
+      - name: Build Source Package
+        run: ./scripts/build-source-package.sh
+      - name: Upload Source Package
+        uses: actions/upload-artifact@v4
+        with:
+          name: source-package
+          path: build/source/*
+          if-no-files-found: error
+  release_assets:
+    name: Upload Release Assets
+    needs:
+      - build
+      - build_debs
+      - build_source_package
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download Binaries
+        uses: actions/download-artifact@v4
+        with:
+          pattern: binaries-*
+          path: build/binaries
+          merge-multiple: true
+      - name: Download Debian Packages
+        uses: actions/download-artifact@v4
+        with:
+          pattern: debs-*
+          path: build/debs
+          merge-multiple: true
+      - name: Download Source Package
+        uses: actions/download-artifact@v4
+        with:
+          name: source-package
+          path: build/source
+      - name: List Assets
+        run: |
+          find build/binaries
+          find build/debs
+          find build/source
+      - name: Upload Release Assets
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release upload "${{ github.ref_name }}" \
+            build/binaries/* build/debs/* build/source/* --clobber

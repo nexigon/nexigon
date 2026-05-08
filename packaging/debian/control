@@ -1,0 +1,58 @@
+Source: nexigon-debian
+Section: net
+Priority: optional
+Maintainer: Silitics GmbH <info@silitics.com>
+Build-Depends: debhelper-compat (= 13)
+Standards-Version: 4.6.2
+Homepage: https://nexigon.dev/
+Vcs-Browser: https://github.com/nexigon/nexigon
+Vcs-Git: https://github.com/nexigon/nexigon.git
+Rules-Requires-Root: no
+
+Package: nexigon-agent-gnu
+Architecture: any
+Conflicts: nexigon-agent-musl
+Description: Nexigon device agent (glibc build)
+ Nexigon is a remote device management platform. The agent runs on
+ managed devices and connects them to a Nexigon Hub for fleet
+ management, deployment, and remote access. This package provides
+ nexigon-agent linked against glibc.
+ .
+ This source package is metadata-only; see /usr/share/doc/nexigon-agent-gnu
+ and the upstream repository for the buildable source.
+
+Package: nexigon-agent-musl
+Architecture: any
+Conflicts: nexigon-agent-gnu
+Description: Nexigon device agent (musl build)
+ Nexigon is a remote device management platform. The agent runs on
+ managed devices and connects them to a Nexigon Hub for fleet
+ management, deployment, and remote access. This package provides
+ nexigon-agent statically linked against musl libc.
+ .
+ This source package is metadata-only; see /usr/share/doc/nexigon-agent-musl
+ and the upstream repository for the buildable source.
+
+Package: nexigon-cli-gnu
+Architecture: any
+Conflicts: nexigon-cli-musl
+Description: Nexigon command-line interface (glibc build)
+ Nexigon is a remote device management platform. The CLI is used to
+ administer Nexigon Hubs, manage repositories, and orchestrate device
+ fleets from a workstation or CI environment. This package provides
+ nexigon-cli linked against glibc.
+ .
+ This source package is metadata-only; see /usr/share/doc/nexigon-cli-gnu
+ and the upstream repository for the buildable source.
+
+Package: nexigon-cli-musl
+Architecture: any
+Conflicts: nexigon-cli-gnu
+Description: Nexigon command-line interface (musl build)
+ Nexigon is a remote device management platform. The CLI is used to
+ administer Nexigon Hubs, manage repositories, and orchestrate device
+ fleets from a workstation or CI environment. This package provides
+ nexigon-cli statically linked against musl libc.
+ .
+ This source package is metadata-only; see /usr/share/doc/nexigon-cli-musl
+ and the upstream repository for the buildable source.

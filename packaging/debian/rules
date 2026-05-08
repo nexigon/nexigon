@@ -1,0 +1,9 @@
+#!/usr/bin/make -f
+# This is a metadata-only source package. Binaries are cross-compiled
+# by the upstream release pipeline and shipped as separate .deb files.
+# Attempting to build from this source package is unsupported.
+
+%:
+	@echo "nexigon is a metadata-only Debian source package." >&2
+	@echo "See README.source and https://github.com/nexigon/nexigon for the buildable upstream source." >&2
+	@exit 1
