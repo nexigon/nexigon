@@ -83,6 +83,10 @@ variant AuditLogActionStatus {
 /// Query the events recorded in the audit log.
 /// 
 /// Requires administrator permissions.
+#[request(
+    name = "audit_QueryAuditLogEvents",
+    response = QueryAuditLogEventsOutput
+)]
 record QueryAuditLogEventsAction {}
 
 /// Output of querying the events recorded in the audit log.
@@ -94,6 +98,10 @@ record QueryAuditLogEventsOutput {
 /// Query the actions recorded in the audit log.
 /// 
 /// Requires administrator permissions.
+#[request(
+    name = "audit_QueryAuditLogActions",
+    response = QueryAuditLogActionsOutput
+)]
 record QueryAuditLogActionsAction {}
 
 /// Output of querying the actions recorded in the audit log.

@@ -72,6 +72,7 @@ record OrganizationApiTokenActor {
 /// Get the actor.
 /// 
 /// This action is used to get the actor that is used to invoke the action.
+#[request(name = "actor_GetActor", response = GetActorOutput)]
 record GetActorAction {}
 
 /// Output of getting the actor.

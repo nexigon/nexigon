@@ -5,6 +5,7 @@ import datetime::Timestamp
 import devices::DeviceId
 import devices::DeviceStatus
 import organizations::OrganizationId
+import outputs::Empty
 import repositories::RepositoryId
 
 /// Unique ID of a project.
@@ -23,6 +24,7 @@ opaque DeploymentTokenId
 opaque DeploymentToken
 
 /// Query the projects of the instance.
+#[request(name = "projects_Query", response = QueryProjectsOutput)]
 record QueryProjectsAction {}
 
 /// Output of querying the projects of the instance.
@@ -40,6 +42,7 @@ record QueryProjectsItem {
 }
 
 /// Get information about a project.
+#[request(name = "projects_GetDetails", response = GetProjectDetailsOutput)]
 record GetProjectDetailsAction {
     /// ID of the project.
     project_id: ProjectId,
@@ -56,6 +59,7 @@ record GetProjectDetailsOutput {
 }
 
 /// Set the name of a project.
+#[request(name = "projects_SetName", response = Empty)]
 record SetProjectNameAction {
     /// ID of the project.
     project_id: ProjectId,
@@ -64,6 +68,7 @@ record SetProjectNameAction {
 }
 
 /// Create a new project.
+#[request(name = "projects_Create", response = CreateProjectOutput)]
 record CreateProjectAction {
     /// Organization to create the project in.
     organization_id: OrganizationId,
@@ -84,12 +89,14 @@ record CreateProjectSuccess {
 }
 
 /// Delete a project.
+#[request(name = "projects_Delete", response = Empty)]
 record DeleteProjectAction {
     /// ID of the project.
     project_id: ProjectId,
 }
 
 /// Query the devices of a project.
+#[request(name = "projects_QueryDevices", response = QueryProjectDevicesOutput)]
 record QueryProjectDevicesAction {
     /// ID of the project.
     project_id: ProjectId,
@@ -124,6 +131,10 @@ record QueryProjectDevicesItem {
 }
 
 /// Query the deployment tokens of a project.
+#[request(
+    name = "projects_QueryDeploymentTokens",
+    response = QueryProjectDeploymentTokensOutput
+)]
 record QueryProjectDeploymentTokensAction {
     /// ID of the project.
     project_id: ProjectId,
@@ -148,6 +159,10 @@ record QueryProjectDeploymentTokensItem {
 }
 
 /// Query repositories of a project.
+#[request(
+    name = "projects_QueryLinkedRepositories",
+    response = QueryProjectRepositoriesOutput
+)]
 record QueryProjectRepositoriesAction {
     /// ID of the project.
     project_id: ProjectId,
@@ -176,6 +191,10 @@ record DeploymentTokenFlags {
 }
 
 /// Create a deployment token.
+#[request(
+    name = "projects_CreateDeploymentToken",
+    response = CreateDeploymentTokenOutput
+)]
 record CreateDeploymentTokenAction {
     /// ID of the project.
     project_id: ProjectId,
@@ -194,12 +213,14 @@ record CreateDeploymentTokenOutput {
 }
 
 /// Delete a deployment token.
+#[request(name = "projects_DeleteDeploymentToken", response = Empty)]
 record DeleteDeploymentTokenAction {
     /// ID of the token.
     token_id: DeploymentTokenId,
 }
 
 /// Set the flags of a deployment token.
+#[request(name = "projects_SetDeploymentTokenFlags", response = Empty)]
 record SetDeploymentTokenFlagsAction {
     /// ID of the token.
     token_id: DeploymentTokenId,
@@ -208,6 +229,7 @@ record SetDeploymentTokenFlagsAction {
 }
 
 /// Query the audit log of the project.
+#[request(name = "projects_QueryAuditLog", response = QueryAuditLogEventsOutput)]
 record QueryAuditLogEventsAction {
     /// ID of the project.
     project_id: ProjectId,
@@ -220,6 +242,7 @@ record QueryAuditLogEventsOutput {
 }
 
 /// Add a repository to the project.
+#[request(name = "projects_LinkRepository", response = Empty)]
 record AddProjectRepositoryAction {
     /// ID of the project.
     project_id: ProjectId,
@@ -228,6 +251,7 @@ record AddProjectRepositoryAction {
 }
 
 /// Remove a repository from the project.
+#[request(name = "projects_UnlinkRepository", response = Empty)]
 record RemoveProjectRepositoryAction {
     /// ID of the project.
     project_id: ProjectId,
@@ -247,6 +271,7 @@ record ProjectOtlpConfig {
 }
 
 /// Get the OTLP event forwarding configuration for a project.
+#[request(name = "projects_GetOtlpConfig", response = GetProjectOtlpConfigOutput)]
 record GetProjectOtlpConfigAction {
     /// ID of the project.
     project_id: ProjectId,
@@ -259,6 +284,7 @@ record GetProjectOtlpConfigOutput {
 }
 
 /// Set the OTLP event forwarding configuration for a project.
+#[request(name = "projects_SetOtlpConfig", response = Empty)]
 record SetProjectOtlpConfigAction {
     /// ID of the project.
     project_id: ProjectId,

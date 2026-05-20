@@ -47,6 +47,7 @@ variant JobStatus {
 }
 
 /// Query the jobs of the instance.
+#[request(name = "jobs_Query", response = QueryJobsOutput)]
 record QueryJobsAction {}
 
 /// Output of querying the jobs of the instance.

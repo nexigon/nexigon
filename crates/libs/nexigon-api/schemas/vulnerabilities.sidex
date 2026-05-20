@@ -47,6 +47,10 @@ variant VexStatementOrigin {
 /// The hub fetches the referenced documents from the repository's S3
 /// storage and rebuilds the index for this version. The repository
 /// must have S3 configured.
+#[request(
+    name = "vulnerabilities_IndexVersion",
+    response = IndexVersionDocumentsOutput
+)]
 record IndexVersionDocumentsAction {
     version_id: PackageVersionId,
 }
@@ -67,6 +71,10 @@ record IndexVersionDocumentsOutput {
 ///
 /// Mirrors `IndexVersionDocumentsAction`. Used after attaching a new
 /// package-level VEX asset and pointing the package's metadata at it.
+#[request(
+    name = "vulnerabilities_IndexPackage",
+    response = IndexPackageDocumentsOutput
+)]
 record IndexPackageDocumentsAction {
     package_id: PackageId,
 }
@@ -79,6 +87,10 @@ record IndexPackageDocumentsOutput {
 /// Get the vulnerability overview for a package version: artifact list,
 /// SBOM/VDR/VEX descriptors per artifact, package-level VEX, and
 /// (when indexing is enabled) the rolled-up severity summary.
+#[request(
+    name = "vulnerabilities_GetVersionOverview",
+    response = GetVersionVulnerabilityOverviewOutput
+)]
 record GetVersionVulnerabilityOverviewAction {
     version_id: PackageVersionId,
 }
@@ -146,6 +158,10 @@ record SeveritySummary {
 }
 
 /// Query the components extracted from a package version's SBOMs.
+#[request(
+    name = "vulnerabilities_QueryComponents",
+    response = QueryPackageVersionComponentsOutput
+)]
 record QueryPackageVersionComponentsAction {
     version_id: PackageVersionId,
     /// Optional filter: only include components from this artifact's SBOM.
@@ -177,6 +193,10 @@ record PackageVersionComponent {
     vuln_summary?: SeveritySummary,
 }
 
+#[request(
+    name = "vulnerabilities_QueryFindings",
+    response = QueryPackageVersionFindingsOutput
+)]
 record QueryPackageVersionFindingsAction {
     version_id: PackageVersionId,
     /// Optional artifact-filename filter.

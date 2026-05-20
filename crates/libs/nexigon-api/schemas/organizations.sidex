@@ -1,6 +1,7 @@
 //! Actions and types related to organizations.
 
 import audit::AuditLogEvent
+import outputs::Empty
 import projects::ProjectId
 import repositories::RepositoryId
 import users::UserId
@@ -21,6 +22,7 @@ opaque OrganizationInvitationId
 opaque OrganizationApiTokenId
 
 /// Query the organizations of the instance.
+#[request(name = "organizations_Query", response = QueryOrganizationsOutput)]
 record QueryOrganizationsAction {}
 
 /// Output of querying the organizations of the instance.
@@ -38,6 +40,10 @@ record QueryOrganizationsItem {
 }
 
 /// Query the members of an organization.
+#[request(
+    name = "organizations_QueryMembers",
+    response = QueryOrganizationMembersOutput
+)]
 record QueryOrganizationMembersAction {
     /// ID of the organization.
     organization_id: OrganizationId,
@@ -62,6 +68,10 @@ record QueryOrganizationMembersItem {
 }
 
 /// Query the projects of an organization.
+#[request(
+    name = "organizations_QueryProjects",
+    response = QueryOrganizationProjectsOutput
+)]
 record QueryOrganizationProjectsAction {
     /// ID of the organization.
     organization_id: OrganizationId,
@@ -82,6 +92,10 @@ record QueryOrganizationProjectsItem {
 }
 
 /// Query the repositories of an organization.
+#[request(
+    name = "organizations_QueryRepositories",
+    response = QueryOrganizationRepositoriesOutput
+)]
 record QueryOrganizationRepositoriesAction {
     /// ID of the organization.
     organization_id: OrganizationId,
@@ -104,6 +118,10 @@ record QueryOrganizationRepositoriesItem {
 }
 
 /// Query the invitations of an organization.
+#[request(
+    name = "organizations_QueryInvitations",
+    response = QueryOrganizationInvitationsOutput
+)]
 record QueryOrganizationInvitationsAction {
     /// ID of the organization.
     organization_id: OrganizationId,
@@ -126,6 +144,7 @@ record QueryOrganizationInvitationsItem {
 }
 
 /// Create an organization.
+#[request(name = "organizations_Create", response = CreateOrganizationOutput)]
 record CreateOrganizationAction {
     /// Name of the organization.
     name: string,
@@ -142,12 +161,14 @@ record CreateOrganizationOutput {
 }
 
 /// Delete an organization.
+#[request(name = "organizations_Delete", response = Empty)]
 record DeleteOrganizationAction {
     /// ID of the organization.
     organization_id: OrganizationId,
 }
 
 /// Add a user to an organization.
+#[request(name = "organizations_AddMember", response = Empty)]
 record AddOrganizationMemberAction {
     /// ID of the organization.
     organization_id: OrganizationId,
@@ -158,6 +179,7 @@ record AddOrganizationMemberAction {
 }
 
 /// Remove a user from an organization.
+#[request(name = "organizations_RemoveMember", response = Empty)]
 record RemoveOrganizationMemberAction {
     /// ID of the organization.
     organization_id: OrganizationId,
@@ -166,6 +188,7 @@ record RemoveOrganizationMemberAction {
 }
 
 /// Set whether the user is an administrator of the organization.
+#[request(name = "organizations_SetMemberIsAdmin", response = Empty)]
 record SetOrganizationMemberIsAdminAction {
     /// ID of the organization.
     organization_id: OrganizationId,
@@ -176,6 +199,10 @@ record SetOrganizationMemberIsAdminAction {
 }
 
 /// Invite a user to an organization.
+#[request(
+    name = "organizations_InviteMember",
+    response = InviteOrganizationMemberOutput
+)]
 record InviteOrganizationMemberAction {
     /// ID of the organization.
     organization_id: OrganizationId,
@@ -190,12 +217,17 @@ record InviteOrganizationMemberOutput {
 }
 
 /// Delete an invitation to an organization.
+#[request(name = "organizations_DeleteInvitation", response = Empty)]
 record DeleteOrganizationInvitationAction {
     /// ID of the invitation.
     invitation_id: OrganizationInvitationId,
 }
 
 /// Query the audit log of an organization.
+#[request(
+    name = "organizations_QueryAuditLog",
+    response = QueryOrganizationAuditLogOutput
+)]
 record QueryOrganizationAuditLogAction {
     /// ID of the organization.
     organization_id: OrganizationId,

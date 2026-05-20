@@ -6,6 +6,7 @@ import cluster::ClusterNodeId
 import datetime::Timestamp
 import json::JsonValue
 import jwt::Jwt
+import outputs::Empty
 import projects::DeploymentToken
 import projects::DeploymentTokenId
 import projects::ProjectId
@@ -47,6 +48,7 @@ opaque CertificateFingerprint
 opaque DeviceEventId
 
 /// Query the devices of the instance.
+#[request(name = "devices_Query", response = QueryDevicesOutput)]
 record QueryDevicesAction {}
 
 /// Output of querying the devices of the instance.
@@ -70,6 +72,7 @@ record QueryDevicesItem {
 }
 
 /// Get information about a device.
+#[request(name = "devices_GetDetails", response = GetDeviceDetailsOutput)]
 record GetDeviceDetailsAction {
     /// ID of the device.
     device_id: DeviceId,
@@ -175,6 +178,7 @@ record DeviceConnectionLog {
 }
 
 /// Create a new device.
+#[request(name = "devices_Create", response = CreateDeviceOutput)]
 record CreateDeviceAction {
     /// ID of the project.
     project_id: ProjectId,
@@ -189,12 +193,14 @@ record CreateDeviceOutput {
 }
 
 /// Delete a device.
+#[request(name = "devices_Delete", response = Empty)]
 record DeleteDeviceAction {
     /// ID of the device.
     device_id: DeviceId,
 }
 
 /// Set the name of a device.
+#[request(name = "devices_SetName", response = Empty)]
 record SetDeviceNameAction {
     /// ID of the device.
     device_id: DeviceId,
@@ -205,6 +211,7 @@ record SetDeviceNameAction {
 /// Issue a JWT for a device with user-defined claims.
 /// 
 /// **Note: Only use this action for integration with external systems.**
+#[request(name = "devices_IssueDeviceToken", response = IssueDeviceTokenOutput)]
 record IssueDeviceTokenAction {
     /// ID of the device.
     device_id: DeviceId,
@@ -223,6 +230,10 @@ record IssueDeviceTokenOutput {
 /// Validate a device JWT.
 /// 
 /// **Note: Only use this action for integration with external systems.**
+#[request(
+    name = "devices_ValidateDeviceToken",
+    response = ValidateDeviceTokenOutput
+)]
 record ValidateDeviceTokenAction {
     /// JWT to validate.
     jwt: Jwt,
@@ -246,6 +257,7 @@ record ValidateDeviceTokenSuccess {
 }
 
 /// Add a device certificate.
+#[request(name = "devices_AddCertificate", response = AddDeviceCertificateOutput)]
 record AddDeviceCertificateAction {
     /// ID of the device.
     device_id: DeviceId,
@@ -264,12 +276,14 @@ record AddDeviceCertificateOutput {
 }
 
 /// Delete a device certificate.
+#[request(name = "devices_DeleteCertificate", response = Empty)]
 record DeleteDeviceCertificateAction {
     /// ID of the certificate.
     certificate_id: DeviceCertificateId,
 }
 
 /// Set the status of a device certificate.
+#[request(name = "devices_SetCertificateStatus", response = Empty)]
 record SetDeviceCertificateStatusAction {
     /// ID of the certificate.
     certificate_id: DeviceCertificateId,
@@ -278,6 +292,10 @@ record SetDeviceCertificateStatusAction {
 }
 
 /// Register a connection of a device to a cluster node.
+#[request(
+    name = "devices_RegisterConnection",
+    response = RegisterDeviceConnectionOutput
+)]
 record RegisterDeviceConnectionAction {
     /// ID of the device.
     device_id: DeviceId,
@@ -294,6 +312,7 @@ record RegisterDeviceConnectionOutput {
 }
 
 /// Unregister a connection of a device to a cluster node.
+#[request(name = "devices_UnregisterConnection", response = Empty)]
 record UnregisterDeviceConnectionAction {
     /// ID of the connection.
     connection_id: DeviceConnectionId,
@@ -302,6 +321,10 @@ record UnregisterDeviceConnectionAction {
 }
 
 /// Query the connection history of a device.
+#[request(
+    name = "devices_QueryConnections",
+    response = QueryDeviceConnectionsOutput
+)]
 record QueryDeviceConnectionsAction {
     /// ID of the device.
     device_id: DeviceId,
@@ -318,6 +341,10 @@ record QueryDeviceConnectionsOutput {
 }
 
 /// Issue a HTTP proxy JWT.
+#[request(
+    name = "devices_IssueHttpProxyToken",
+    response = IssueDeviceHttpProxyTokenOutput
+)]
 record IssueDeviceHttpProxyTokenAction {
     /// ID of the device.
     device_id: DeviceId,
@@ -344,6 +371,10 @@ record IssueDeviceHttpProxyTokenOutput {
 }
 
 /// Validate a HTTP proxy JWT.
+#[request(
+    name = "devices_ValidateHttpProxyToken",
+    response = ValidateDeviceHttpProxyTokenOutput
+)]
 record ValidateDeviceHttpProxyTokenAction {
     /// JWT to validate.
     jwt: Jwt,
@@ -375,6 +406,7 @@ record ValidateDeviceHttpProxyTokenSuccess {
 }
 
 /// Publish device events.
+#[request(name = "devices_PublishEvents", response = Empty)]
 record PublishDeviceEventsAction {
     /// ID of the device.
     device_id: DeviceId,
@@ -383,6 +415,7 @@ record PublishDeviceEventsAction {
 }
 
 /// Query device events.
+#[request(name = "devices_QueryEvents", response = QueryDeviceEventsOutput)]
 record QueryDeviceEventsAction {
     /// ID of the device.
     device_id: DeviceId,
@@ -434,6 +467,7 @@ variant DeviceEventSeverity {
 }
 
 /// Set a property of a device.
+#[request(name = "devices_SetProperty", response = SetDevicePropertyOutput)]
 record SetDevicePropertyAction {
     /// ID of the device.
     device_id: DeviceId,
@@ -469,6 +503,7 @@ record SetDevicePropertyVersionConflict {
 }
 
 /// Get a property of a device.
+#[request(name = "devices_GetProperty", response = GetDevicePropertyOutput)]
 record GetDevicePropertyAction {
     /// ID of the device.
     device_id: DeviceId,
@@ -486,6 +521,7 @@ variant GetDevicePropertyOutput {
 }
 
 /// Remove a property from a device.
+#[request(name = "devices_RemoveProperty", response = RemoveDevicePropertyOutput)]
 record RemoveDevicePropertyAction {
     /// ID of the device.
     device_id: DeviceId,
@@ -503,6 +539,10 @@ variant RemoveDevicePropertyOutput {
 }
 
 /// Query the properties of a device.
+#[request(
+    name = "devices_QueryProperties",
+    response = QueryDevicePropertiesOutput
+)]
 record QueryDevicePropertiesAction {
     /// ID of the device.
     device_id: DeviceId,
@@ -529,6 +569,7 @@ record DeviceProperty {
 }
 
 /// Query the audit log of a device.
+#[request(name = "devices_QueryAuditLog", response = QueryDeviceAuditLogOutput)]
 record QueryDeviceAuditLogAction {
     /// ID of the device.
     device_id: DeviceId,
@@ -541,6 +582,7 @@ record QueryDeviceAuditLogOutput {
 }
 
 /// Query the on-demand commands supported by a device.
+#[request(name = "devices_QueryCommands", response = QueryDeviceCommandsOutput)]
 record QueryDeviceCommandsAction {
     /// ID of the device.
     device_id: DeviceId,

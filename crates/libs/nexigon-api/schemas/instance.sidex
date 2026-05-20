@@ -1,8 +1,13 @@
 //! Actions and types related to the instance.
 
 import json::JsonValue
+import outputs::Empty
 
 /// Get instance statistics.
+#[request(
+    name = "instance_GetStatistics",
+    response = GetInstanceStatisticsOutput
+)]
 record GetInstanceStatisticsAction {}
 
 /// Instance statistics.
@@ -16,6 +21,10 @@ record GetInstanceStatisticsOutput {
 }
 
 /// Get the settings of the instance.
+#[request(
+    name = "instance_GetSettingsRaw",
+    response = GetInstanceSettingsRawOutput
+)]
 record GetInstanceSettingsRawAction {}
 
 /// Settings of the instance.
@@ -25,6 +34,7 @@ record GetInstanceSettingsRawOutput {
 }
 
 /// Set a setting of the instance.
+#[request(name = "instance_SetSettingRaw", response = Empty)]
 record SetInstanceSettingRawAction {
     /// Name of the setting.
     key: string,

@@ -5,6 +5,7 @@ import datetime::Timestamp
 import digest::Digest
 import json::JsonValue
 import organizations::OrganizationId
+import outputs::Empty
 import projects::ProjectId
 
 /// Unique ID of a repository.
@@ -64,6 +65,10 @@ record RepositoryS3Config {
 }
 
 /// Resolve a repository by its name.
+#[request(
+    name = "repositories_ResolveName",
+    response = ResolveRepositoryNameOutput
+)]
 record ResolveRepositoryNameAction {
     /// Name of the repository.
     repository: string,
@@ -82,6 +87,10 @@ variant ResolveRepositoryNameOutput {
 }
 
 /// Get information about a repository.
+#[request(
+    name = "repositories_GetDetails",
+    response = GetRepositoryDetailsOutput
+)]
 record GetRepositoryDetailsAction {
     /// ID of the repository.
     repository_id: RepositoryId,
@@ -104,6 +113,7 @@ record GetRepositoryDetailsOutput {
 }
 
 /// Create a new repository.
+#[request(name = "repositories_Create", response = CreateRepositoryOutput)]
 record CreateRepositoryAction {
     /// Organization to create the repository in.
     organization_id: OrganizationId,
@@ -131,12 +141,14 @@ record CreateRepositorySuccess {
 }
 
 /// Delete a repository.
+#[request(name = "repositories_Delete", response = Empty)]
 record DeleteRepositoryAction {
     /// ID of the repository.
     repository_id: RepositoryId,
 }
 
 /// Set the visibility of a repository.
+#[request(name = "repositories_SetVisibility", response = Empty)]
 record SetRepositoryVisibilityAction {
     /// ID of the repository.
     repository_id: RepositoryId,
@@ -145,6 +157,7 @@ record SetRepositoryVisibilityAction {
 }
 
 /// Set the display name of a repository.
+#[request(name = "repositories_SetDisplayName", response = Empty)]
 record SetRepositoryDisplayNameAction {
     /// ID of the repository.
     repository_id: RepositoryId,
@@ -155,6 +168,10 @@ record SetRepositoryDisplayNameAction {
 /// Set the public name of a repository.
 /// 
 /// Note: Setting the public name requires the `public_repositories` subscription feature.
+#[request(
+    name = "repositories_SetPublicName",
+    response = SetRepositoryPublicNameOutput
+)]
 record SetRepositoryPublicNameAction {
     /// ID of the repository.
     repository_id: RepositoryId,
@@ -172,6 +189,10 @@ variant SetRepositoryPublicNameOutput {
 }
 
 /// Query the packages of a repository.
+#[request(
+    name = "repositories_QueryPackages",
+    response = QueryRepositoryPackagesOutput
+)]
 record QueryRepositoryPackagesAction {
     /// ID of the repository.
     repository_id: RepositoryId,
@@ -196,6 +217,10 @@ record QueryRepositoryPackagesItem {
 }
 
 /// Query the assets of a repository.
+#[request(
+    name = "repositories_QueryAssets",
+    response = QueryRepositoryAssetsOutput
+)]
 record QueryRepositoryAssetsAction {
     /// ID of the repository.
     repository_id: RepositoryId,
@@ -218,6 +243,10 @@ record QueryRepositoryAssetsItem {
 }
 
 /// Query repository projects.
+#[request(
+    name = "repositories_QueryLinkedProjects",
+    response = QueryRepositoryProjectsOutput
+)]
 record QueryRepositoryProjectsAction {
     /// ID of the repository.
     repository_id: RepositoryId,
@@ -238,6 +267,10 @@ record QueryRepositoryProjectsItem {
 }
 
 /// Resolve a package by its path.
+#[request(
+    name = "repositories_ResolvePackageByPath",
+    response = ResolvePackageByPathOutput
+)]
 record ResolvePackageByPathAction {
     /// Name of the repository.
     repository: string,
@@ -263,6 +296,10 @@ record ResolvePackageByPathSuccess {
 }
 
 /// Get information about a package.
+#[request(
+    name = "repositories_GetPackageDetails",
+    response = GetPackageDetailsOutput
+)]
 record GetPackageDetailsAction {
     /// ID of the package.
     package_id: PackageId,
@@ -302,6 +339,10 @@ record PackageAsset {
 /// itself rather than a specific version. The asset must already exist
 /// in the same repository; the link carries an arbitrary metadata
 /// dictionary.
+#[request(
+    name = "repositories_AddPackageAsset",
+    response = AddPackageAssetOutput
+)]
 record AddPackageAssetAction {
     package_id: PackageId,
     asset_id: RepositoryAssetId,
@@ -319,12 +360,14 @@ variant AddPackageAssetOutput {
 }
 
 /// Remove a package asset by filename.
+#[request(name = "repositories_RemovePackageAsset", response = Empty)]
 record RemovePackageAssetAction {
     package_id: PackageId,
     filename: string,
 }
 
 /// Replace the metadata on a package asset.
+#[request(name = "repositories_SetPackageAssetMetadata", response = Empty)]
 record SetPackageAssetMetadataAction {
     package_id: PackageId,
     filename: string,
@@ -332,6 +375,7 @@ record SetPackageAssetMetadataAction {
 }
 
 /// Create a new package.
+#[request(name = "repositories_CreatePackage", response = CreatePackageOutput)]
 record CreatePackageAction {
     /// ID of the repository.
     repository_id: RepositoryId,
@@ -359,12 +403,14 @@ record CreatePackageSuccess {
 }
 
 /// Delete a package.
+#[request(name = "repositories_DeletePackage", response = Empty)]
 record DeletePackageAction {
     /// ID of the package.
     package_id: PackageId,
 }
 
 /// Set metadata on a package.
+#[request(name = "repositories_SetPackageMetadata", response = Empty)]
 record SetPackageMetadataAction {
     /// ID of the package.
     package_id: PackageId,
@@ -373,6 +419,7 @@ record SetPackageMetadataAction {
 }
 
 /// Set the kind of a package.
+#[request(name = "repositories_SetPackageKind", response = Empty)]
 record SetPackageKindAction {
     /// ID of the package.
     package_id: PackageId,
@@ -381,6 +428,7 @@ record SetPackageKindAction {
 }
 
 /// Set the name of a package.
+#[request(name = "repositories_SetPackageName", response = SetPackageNameOutput)]
 record SetPackageNameAction {
     /// ID of the package.
     package_id: PackageId,
@@ -398,6 +446,10 @@ variant SetPackageNameOutput {
 }
 
 /// Query the versions of a package.
+#[request(
+    name = "repositories_QueryPackageVersions",
+    response = QueryPackageVersionsOutput
+)]
 record QueryPackageVersionsAction {
     /// ID of the package.
     package_id: PackageId,
@@ -466,6 +518,10 @@ record PackageVersionAsset {
 }
 
 /// Resolve a package version by its path.
+#[request(
+    name = "repositories_ResolveVersionByPath",
+    response = ResolvePackageVersionByPathOutput
+)]
 record ResolvePackageVersionByPathAction {
     /// Name of the repository.
     repository: string,
@@ -495,6 +551,10 @@ record ResolvePackageVersionByPathSuccess {
 }
 
 /// Get information about a package version.
+#[request(
+    name = "repositories_GetVersionDetails",
+    response = GetPackageVersionDetailsOutput
+)]
 record GetPackageVersionDetailsAction {
     /// ID of the package version.
     version_id: PackageVersionId,
@@ -519,6 +579,10 @@ record GetPackageVersionDetailsOutput {
 }
 
 /// Create a new package version.
+#[request(
+    name = "repositories_CreateVersion",
+    response = CreatePackageVersionOutput
+)]
 record CreatePackageVersionAction {
     /// ID of the package.
     package_id: PackageId,
@@ -544,12 +608,14 @@ record CreatePackageVersionSuccess {
 }
 
 /// Delete a package version.
+#[request(name = "repositories_DeleteVersion", response = Empty)]
 record DeletePackageVersionAction {
     /// ID of the package version.
     version_id: PackageVersionId,
 }
 
 /// Set the name of a package version.
+#[request(name = "repositories_SetVersionName", response = Empty)]
 record SetPackageVersionNameAction {
     /// ID of the package version.
     version_id: PackageVersionId,
@@ -558,6 +624,7 @@ record SetPackageVersionNameAction {
 }
 
 /// Set metadata on a package version.
+#[request(name = "repositories_SetVersionMetadata", response = Empty)]
 record SetPackageVersionMetadataAction {
     /// ID of the package version.
     version_id: PackageVersionId,
@@ -566,6 +633,10 @@ record SetPackageVersionMetadataAction {
 }
 
 /// Add an asset to a package version.
+#[request(
+    name = "repositories_AddVersionAsset",
+    response = AddPackageVersionAssetOutput
+)]
 record AddPackageVersionAssetAction {
     /// ID of the package version.
     version_id: PackageVersionId,
@@ -587,6 +658,7 @@ variant AddPackageVersionAssetOutput {
 }
 
 /// Remove an asset from a package version.
+#[request(name = "repositories_RemoveVersionAsset", response = Empty)]
 record RemovePackageVersionAssetAction {
     /// ID of the package version.
     version_id: PackageVersionId,
@@ -595,6 +667,7 @@ record RemovePackageVersionAssetAction {
 }
 
 /// Set metadata on a package version asset.
+#[request(name = "repositories_SetVersionAssetMetadata", response = Empty)]
 record SetPackageVersionAssetMetadataAction {
     /// ID of the package version.
     version_id: PackageVersionId,
@@ -605,6 +678,7 @@ record SetPackageVersionAssetMetadataAction {
 }
 
 /// Add tags to a version.
+#[request(name = "repositories_TagVersion", response = Empty)]
 record TagPackageVersionAction {
     /// ID of the package version.
     version_id: PackageVersionId,
@@ -613,6 +687,7 @@ record TagPackageVersionAction {
 }
 
 /// Remove tags from a version.
+#[request(name = "repositories_UntagVersion", response = Empty)]
 record UntagPackageVersionAction {
     /// ID of the package version.
     version_id: PackageVersionId,
@@ -621,6 +696,10 @@ record UntagPackageVersionAction {
 }
 
 /// Resolve a version asset by its path.
+#[request(
+    name = "repositories_ResolveVersionAssetByPath",
+    response = ResolvePackageVersionAssetByPathOutput
+)]
 record ResolvePackageVersionAssetByPathAction {
     /// Name of the repository.
     repository: string,
@@ -654,6 +733,7 @@ record ResolvePackageVersionAssetByPathSuccess {
 }
 
 /// Set the S3 configuration for the repository.
+#[request(name = "repositories_SetS3Config", response = Empty)]
 record SetRepositoryS3ConfigAction {
     /// ID of the repository.
     repository_id: RepositoryId,
@@ -662,6 +742,10 @@ record SetRepositoryS3ConfigAction {
 }
 
 /// Get the S3 configuration for the repository.
+#[request(
+    name = "repositories_GetS3Config",
+    response = GetRepositoryS3ConfigOutput
+)]
 record GetRepositoryS3ConfigAction {
     /// ID of the repository.
     repository_id: RepositoryId,
@@ -676,6 +760,10 @@ record GetRepositoryS3ConfigOutput {
 }
 
 /// Get information about an asset.
+#[request(
+    name = "repositories_GetAssetDetails",
+    response = GetAssetDetailsOutput
+)]
 record GetAssetDetailsAction {
     /// ID of the asset.
     asset_id: RepositoryAssetId,
@@ -696,6 +784,7 @@ record GetAssetDetailsOutput {
 }
 
 /// Create an asset.
+#[request(name = "repositories_CreateAsset", response = CreateAssetOutput)]
 record CreateAssetAction {
     /// ID of the repository.
     repository_id: RepositoryId,
@@ -717,12 +806,17 @@ variant CreateAssetOutput {
 }
 
 /// Delete an asset.
+#[request(name = "repositories_DeleteAsset", response = Empty)]
 record DeleteAssetAction {
     /// ID of the asset.
     asset_id: RepositoryAssetId,
 }
 
 /// Issue a URL for downloading an asset.
+#[request(
+    name = "repositories_IssueAssetDownloadUrl",
+    response = IssueAssetDownloadUrlOutput
+)]
 record IssueAssetDownloadUrlAction {
     /// ID of the asset to issue the URL for.
     asset_id: RepositoryAssetId,
@@ -737,6 +831,10 @@ record IssueAssetDownloadUrlOutput {
 }
 
 /// Issue a URL for uploading an asset.
+#[request(
+    name = "repositories_IssueAssetUploadUrl",
+    response = IssueAssetUploadUrlOutput
+)]
 record IssueAssetUploadUrlAction {
     /// ID of the asset to issue the URL for.
     asset_id: RepositoryAssetId,
@@ -749,6 +847,10 @@ record IssueAssetUploadUrlOutput {
 }
 
 /// Query the audit log of the repository.
+#[request(
+    name = "repositories_QueryAuditLog",
+    response = QueryAuditLogEventsOutput
+)]
 record QueryAuditLogEventsAction {
     /// ID of the repository.
     repository_id: RepositoryId,

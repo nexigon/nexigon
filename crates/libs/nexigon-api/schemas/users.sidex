@@ -6,6 +6,7 @@ import devices::DeviceId
 import jwt::Jwt
 import organizations::OrganizationId
 import organizations::OrganizationInvitationId
+import outputs::Empty
 
 /// Unique ID of a user.
 #[rust(type = "nexigon_ids::ids::UserId")]
@@ -33,6 +34,7 @@ opaque UserSessionId
 opaque UserSessionToken
 
 /// Query the users of the instance.
+#[request(name = "users_Query", response = QueryUsersOutput)]
 record QueryUsersAction {}
 
 /// Output of querying the users of the instance.
@@ -61,6 +63,7 @@ record QueryUsersItem {
 }
 
 /// Get information about a user.
+#[request(name = "users_GetDetails", response = GetUserDetailsOutput)]
 record GetUserDetailsAction {
     /// ID of the user.
     user_id: UserId,
@@ -79,6 +82,7 @@ record GetUserDetailsOutput {
 }
 
 /// Create a new user.
+#[request(name = "users_Create", response = CreateUserOutput)]
 record CreateUserAction {
     /// Email of the user.
     email: string,
@@ -106,12 +110,14 @@ record CreateUserSuccess {
 }
 
 /// Delete a user.
+#[request(name = "users_Delete", response = Empty)]
 record DeleteUserAction {
     /// ID of the user to delete.
     user_id: UserId,
 }
 
 /// Set the display name of a user.
+#[request(name = "users_SetDisplayName", response = Empty)]
 record SetUserDisplayNameAction {
     /// ID of the user to update.
     user_id: UserId,
@@ -120,6 +126,7 @@ record SetUserDisplayNameAction {
 }
 
 /// Set the password of a user.
+#[request(name = "users_SetPassword", response = Empty)]
 record SetUserPasswordAction {
     /// ID of the user.
     user_id: UserId,
@@ -128,6 +135,7 @@ record SetUserPasswordAction {
 }
 
 /// Set whether the user is an instance administrator.
+#[request(name = "users_SetIsAdmin", response = Empty)]
 record SetUserIsAdminAction {
     /// ID of the user.
     user_id: UserId,
@@ -138,12 +146,17 @@ record SetUserIsAdminAction {
 /// Reset the password of a user.
 /// 
 /// This will send an email to the user with a link to reset their password.
+#[request(name = "users_ResetPassword", response = Empty)]
 record ResetUserPasswordAction {
     /// Email of the user.
     email: string,
 }
 
 /// Complete the password reset of a user.
+#[request(
+    name = "users_CompletePasswordReset",
+    response = CompleteUserPasswordResetOutput
+)]
 record CompleteUserPasswordResetAction {
     /// Token to use for password reset.
     reset_token: Jwt,
@@ -161,6 +174,7 @@ variant CompleteUserPasswordResetOutput {
 }
 
 /// Query the tokens of a user.
+#[request(name = "users_QueryTokens", response = QueryUserTokensOutput)]
 record QueryUserTokensAction {
     /// ID of the user.
     user_id: UserId,
@@ -183,6 +197,10 @@ record QueryUserTokensItem {
 }
 
 /// Query the organizations of a user.
+#[request(
+    name = "users_QueryOrganizations",
+    response = QueryUserOrganizationsOutput
+)]
 record QueryUserOrganizationsAction {
     /// ID of the user.
     user_id: UserId,
@@ -207,6 +225,10 @@ record QueryUserOrganizationsItem {
 }
 
 /// Query the organization invitations of a user.
+#[request(
+    name = "users_QueryOrganizationInvitations",
+    response = QueryUserOrganizationInvitationsOutput
+)]
 record QueryUserOrganizationInvitationsAction {
     /// ID of the user.
     user_id: UserId,
@@ -235,6 +257,7 @@ record QueryUserOrganizationInvitationsItemOrganization {
 }
 
 /// Query the sessions of a user.
+#[request(name = "users_QuerySessions", response = QueryUserSessionsOutput)]
 record QueryUserSessionsAction {
     /// ID of the user.
     user_id: UserId,
@@ -259,6 +282,10 @@ record UserSession {
 }
 
 /// Check the permissions of a user for a given device.
+#[request(
+    name = "users_GetDevicePermissions",
+    response = GetDevicePermissionsOutput
+)]
 record GetDevicePermissionsAction {
     /// ID of the user.
     user_id: UserId,
@@ -273,6 +300,7 @@ record GetDevicePermissionsOutput {
 }
 
 /// Create a user token.
+#[request(name = "users_CreateToken", response = CreateUserTokenOutput)]
 record CreateUserTokenAction {
     /// ID of the user.
     user_id: UserId,
@@ -289,6 +317,7 @@ record CreateUserTokenOutput {
 }
 
 /// Delete a user token.
+#[request(name = "users_DeleteToken", response = Empty)]
 record DeleteUserTokenAction {
     /// ID of the token.
     token_id: UserTokenId,
@@ -298,15 +327,18 @@ record DeleteUserTokenAction {
 ///
 /// The acting user must own the session; sessions belonging to other
 /// users are not affected.
+#[request(name = "users_TerminateSession", response = Empty)]
 record TerminateUserSessionAction {
     /// ID of the session.
     session_id: UserSessionId,
 }
 
 /// Cleanup expired user sessions.
+#[request(name = "users_CleanupExpiredSessions", response = Empty)]
 record CleanupExpiredUserSessionsAction {}
 
 /// Register a new user with an email and password.
+#[request(name = "users_Register", response = RegisterUserOutput)]
 record RegisterUserAction {
     /// Name of the user.
     display_name?: string,
@@ -354,12 +386,17 @@ variant UserRegistrationStatus {
     Failed,
 }
 
+#[request(name = "users_ResendRegistrationEmail", response = Empty)]
 record ResendRegistrationEmailAction {
     /// Email address of the user.
     email: string,
 }
 
 /// Complete the registration of a user.
+#[request(
+    name = "users_CompleteRegistration",
+    response = CompleteRegistrationOutput
+)]
 record CompleteRegistrationAction {
     /// Token to use for account activation.
     activation_token: Jwt,
@@ -375,6 +412,7 @@ variant CompleteRegistrationOutput {
 }
 
 /// Accept a organization invitation.
+#[request(name = "users_AcceptOrganizationInvitation", response = Empty)]
 record AcceptOrganizationInvitationAction {
     /// ID of the invitation.
     invitation_id: OrganizationInvitationId,

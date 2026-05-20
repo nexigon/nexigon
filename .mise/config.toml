@@ -3,7 +3,7 @@ rust = { version = "nightly", profile = "default", components = "rustfmt,clippy"
 taplo = "latest"
 python = "latest"
 uv = "latest"
-"github:silitics/sidex" = { version = "0.2.2", exe = "sidex" }
+"github:silitics/sidex" = { version = "0.2.6", exe = "sidex" }
 "nix:cargo-deny" = "latest"
 
 [tasks.check]

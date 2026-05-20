@@ -2,9 +2,11 @@
 
 import datetime::Timestamp
 import json::JsonValue
+import outputs::Empty
 import projects::ProjectId
 
 /// Set a fleet property manually.
+#[request(name = "fleet_SetProperty", response = Empty)]
 record SetFleetPropertyAction {
     /// ID of the project.
     project_id: ProjectId,
@@ -15,6 +17,7 @@ record SetFleetPropertyAction {
 }
 
 /// Get a fleet property by name.
+#[request(name = "fleet_GetProperty", response = GetFleetPropertyOutput)]
 record GetFleetPropertyAction {
     /// ID of the project.
     project_id: ProjectId,
@@ -35,6 +38,7 @@ variant GetFleetPropertyOutput {
 ///
 /// Handles both manual and computed properties. For computed properties, the
 /// associated definition is removed as well.
+#[request(name = "fleet_RemoveProperty", response = RemoveFleetPropertyOutput)]
 record RemoveFleetPropertyAction {
     /// ID of the project.
     project_id: ProjectId,
@@ -52,6 +56,7 @@ variant RemoveFleetPropertyOutput {
 }
 
 /// Query all fleet properties of a project.
+#[request(name = "fleet_QueryProperties", response = QueryFleetPropertiesOutput)]
 record QueryFleetPropertiesAction {
     /// ID of the project.
     project_id: ProjectId,
@@ -91,6 +96,7 @@ record FleetProperty {
 }
 
 /// Define a computed fleet property.
+#[request(name = "fleet_DefineComputedProperty", response = Empty)]
 record DefineComputedFleetPropertyAction {
     /// ID of the project.
     project_id: ProjectId,
@@ -105,6 +111,10 @@ record DefineComputedFleetPropertyAction {
 }
 
 /// Query computed fleet property definitions for a project.
+#[request(
+    name = "fleet_QueryComputedPropertyDefinitions",
+    response = QueryComputedFleetPropertyDefinitionsOutput
+)]
 record QueryComputedFleetPropertyDefinitionsAction {
     /// ID of the project.
     project_id: ProjectId,

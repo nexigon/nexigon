@@ -1,6 +1,7 @@
 //! Actions and types related to the cluster.
 
 import datetime::Timestamp
+import outputs::Empty
 
 /// Unique ID of a cluster node.
 #[rust(type = "nexigon_ids::ids::ClusterNodeId")]
@@ -28,6 +29,7 @@ variant ClusterNodeTerminationReason {
 }
 
 /// Get information about the cluster.
+#[request(name = "cluster_GetDetails", response = GetClusterDetailsOutput)]
 record GetClusterDetailsAction {
     /// Include terminated nodes in the response.
     include_terminated?: bool,
@@ -60,6 +62,7 @@ record ClusterNode {
 }
 
 /// Register a new cluster node.
+#[request(name = "cluster_RegisterNode", response = RegisterClusterNodeOutput)]
 record RegisterClusterNodeAction {
     /// Name of the cluster node.
     name?: string,
@@ -72,7 +75,9 @@ record RegisterClusterNodeOutput {
 }
 
 /// Report the heartbeat of a cluster node.
+#[request(name = "cluster_ReportNodeHeartbeat", response = Empty)]
 record ReportClusterNodeHeartbeatAction {}
 
 /// Cleanup inactive cluster nodes.
+#[request(name = "cluster_CleanupInactiveNodes", response = Empty)]
 record CleanupInactiveClusterNodesAction {}
