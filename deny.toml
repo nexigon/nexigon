@@ -2,16 +2,16 @@
 
 [graph]
 targets = [
-    # Linux
-    { triple = "x86_64-unknown-linux-musl" },
-    { triple = "arm-unknown-linux-musleabihf" },
-    { triple = "aarch64-unknown-linux-musl" },
-    # Windows
-    { triple = "x86_64-pc-windows-msvc" },
-    { triple = "aarch64-pc-windows-msvc" },
-    # MacOS
-    { triple = "x86_64-apple-darwin" },
-    { triple = "aarch64-apple-darwin" }
+  # Linux
+  { triple = "x86_64-unknown-linux-musl" },
+  { triple = "arm-unknown-linux-musleabihf" },
+  { triple = "aarch64-unknown-linux-musl" },
+  # Windows
+  { triple = "x86_64-pc-windows-msvc" },
+  { triple = "aarch64-pc-windows-msvc" },
+  # MacOS
+  { triple = "x86_64-apple-darwin" },
+  { triple = "aarch64-apple-darwin" },
 ]
 all-features = true
 no-default-features = false
@@ -21,30 +21,30 @@ version = 2
 db-path = "~/.cargo/advisory-db"
 db-urls = ["https://github.com/rustsec/advisory-db"]
 ignore = [
-    # The `paste` crate is no longer maintained. It is merely a build-time dependency for
-    # generating code through macros. As it does not interact at all with runtime data,
-    # we do not need to worry about security vulnerabilities in it. We will migrate to
-    # something else, when we have time or there is a need for it.
-    "RUSTSEC-2024-0436",
+  # The `paste` crate is no longer maintained. It is merely a build-time dependency for
+  # generating code through macros. As it does not interact at all with runtime data,
+  # we do not need to worry about security vulnerabilities in it. We will migrate to
+  # something else, when we have time or there is a need for it.
+  "RUSTSEC-2024-0436",
 ]
 
 [licenses]
 version = 2
 allow = [
-    "Apache-2.0",
-    "BSD-3-Clause",
-    "CC0-1.0",
-    "CDLA-Permissive-2.0",
-    "ISC",
-    "MIT",
-    "Unicode-3.0",
+  "Apache-2.0",
+  "BSD-3-Clause",
+  "CC0-1.0",
+  "CDLA-Permissive-2.0",
+  "ISC",
+  "MIT",
+  "Unicode-3.0",
 ]
 confidence-threshold = 0.96
 
 [sources]
 allow-git = [
-    "git+https://github.com/silitics/si-rust-libs.git",
-    "git+https://github.com/silitics/sidex.git",
+  "git+https://github.com/silitics/si-rust-libs.git",
+  "git+https://github.com/silitics/sidex.git",
 ]
 
 [bans]

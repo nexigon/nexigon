@@ -16,7 +16,7 @@ opaque AuditLogActionId
 opaque AuditLogEventId
 
 /// Event recorded in the audit log.
-/// 
+///
 /// Audit data is guaranteed to not contain any secret information.
 record AuditLogEvent {
     /// ID of the audit log event.
@@ -48,7 +48,7 @@ record AuditLogEventJob {
 }
 
 /// Action recorded in the audit log.
-/// 
+///
 /// Audit data is guaranteed to not contain any secret information.
 record AuditLogAction {
     /// ID of the audit log action.

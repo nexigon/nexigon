@@ -37,10 +37,14 @@ macro_rules! with_actions {
             ("users_Create", CreateUser, users::CreateUserAction, users::CreateUserOutput),
             ("users_Delete", DeleteUser, users::DeleteUserAction, outputs::Empty),
             ("users_SetDisplayName", SetUserDisplayName, users::SetUserDisplayNameAction, outputs::Empty),
-            ("users_SetPassword", SetUserPassword, users::SetUserPasswordAction, outputs::Empty),
             ("users_SetIsAdmin", SetUserIsAdmin, users::SetUserIsAdminAction, outputs::Empty),
+            ("users_SetPassword", SetUserPassword, users::SetUserPasswordAction, outputs::Empty),
+            ("users_SetEmail", SetUserEmail, users::SetUserEmailAction, users::SetUserEmailOutput),
+            ("users_ChangePassword", ChangeUserPassword, users::ChangeUserPasswordAction, users::ChangeUserPasswordOutput),
             ("users_ResetPassword", ResetUserPassword, users::ResetUserPasswordAction, outputs::Empty),
             ("users_CompletePasswordReset", CompleteUserPasswordReset, users::CompleteUserPasswordResetAction, users::CompleteUserPasswordResetOutput),
+            ("users_InitiateEmailChange", InitiateUserEmailChange, users::InitiateUserEmailChangeAction, users::InitiateUserEmailChangeOutput),
+            ("users_CompleteEmailChange", CompleteUserEmailChange, users::CompleteUserEmailChangeAction, users::CompleteUserEmailChangeOutput),
             ("users_QueryTokens", QueryUserTokens, users::QueryUserTokensAction, users::QueryUserTokensOutput),
             ("users_QueryOrganizations", QueryUserOrganizations, users::QueryUserOrganizationsAction, users::QueryUserOrganizationsOutput),
             ("users_QueryOrganizationInvitations", QueryUserOrganizationInvitations, users::QueryUserOrganizationInvitationsAction, users::QueryUserOrganizationInvitationsOutput),
@@ -52,7 +56,6 @@ macro_rules! with_actions {
             ("users_DeleteToken", DeleteUserToken, users::DeleteUserTokenAction, outputs::Empty),
             // ## User Sessions
             ("users_TerminateSession", TerminateUserSession, users::TerminateUserSessionAction, outputs::Empty),
-            ("users_CleanupExpiredSessions", CleanupExpiredUserSessions, users::CleanupExpiredUserSessionsAction, outputs::Empty),
             // ## User Registrations
             ("users_Register", RegisterUser, users::RegisterUserAction, users::RegisterUserOutput),
             ("users_ResendRegistrationEmail", ResendRegistrationEmail, users::ResendRegistrationEmailAction, outputs::Empty),
@@ -148,7 +151,7 @@ macro_rules! with_actions {
             ("repositories_Delete", DeleteRepository, repositories::DeleteRepositoryAction, outputs::Empty),
             ("repositories_SetVisibility", SetRepositoryVisibility, repositories::SetRepositoryVisibilityAction, outputs::Empty),
             ("repositories_SetDisplayName", SetRepositoryDisplayName, repositories::SetRepositoryDisplayNameAction, outputs::Empty),
-            ("repositories_SetPublicName", SetRepositoryPublicName, repositories::SetRepositoryPublicNameAction, repositories::SetRepositoryPublicNameOutput),
+            ("repositories_SetSlug", SetRepositorySlug, repositories::SetRepositorySlugAction, repositories::SetRepositorySlugOutput),
             ("repositories_QueryPackages", QueryRepositoryPackages, repositories::QueryRepositoryPackagesAction, repositories::QueryRepositoryPackagesOutput),
             ("repositories_QueryAssets", QueryRepositoryAssets, repositories::QueryRepositoryAssetsAction, repositories::QueryRepositoryAssetsOutput),
             ("repositories_QueryLinkedProjects", QueryRepositoryProjects, repositories::QueryRepositoryProjectsAction, repositories::QueryRepositoryProjectsOutput),
@@ -207,13 +210,6 @@ macro_rules! with_actions {
             ("instance_GetStatistics", GetInstanceStatistics, instance::GetInstanceStatisticsAction, instance::GetInstanceStatisticsOutput),
             ("instance_GetSettingsRaw", GetInstanceSettingsRaw, instance::GetInstanceSettingsRawAction, instance::GetInstanceSettingsRawOutput),
             ("instance_SetSettingRaw", SetInstanceSettingRaw, instance::SetInstanceSettingRawAction, outputs::Empty),
-
-            // # Cluster
-            ("cluster_GetDetails", GetClusterDetails, cluster::GetClusterDetailsAction, cluster::GetClusterDetailsOutput),
-            // ## Cluster Nodes
-            ("cluster_RegisterNode", RegisterClusterNode, cluster::RegisterClusterNodeAction, cluster::RegisterClusterNodeOutput),
-            ("cluster_ReportNodeHeartbeat", ReportClusterNodeHeartbeat, cluster::ReportClusterNodeHeartbeatAction, outputs::Empty),
-            ("cluster_CleanupInactiveNodes", CleanupInactiveClusterNodes, cluster::CleanupInactiveClusterNodesAction, outputs::Empty),
 
             // # Actors
             ("actor_GetActor", GetActor, actor::GetActorAction, actor::GetActorOutput),

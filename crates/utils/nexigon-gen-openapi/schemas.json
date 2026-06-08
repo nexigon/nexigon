@@ -389,130 +389,11 @@
     ],
     "unevaluatedProperties": false
   },
-  "nexigon_api.cluster.CleanupInactiveClusterNodesAction": {
-    "type": "object",
-    "description": "Cleanup inactive cluster nodes.",
-    "properties": {},
-    "required": [],
-    "unevaluatedProperties": false
-  },
-  "nexigon_api.cluster.ClusterNode": {
-    "type": "object",
-    "description": "Cluster node.",
-    "properties": {
-      "nodeId": {
-        "$ref": "#/components/schemas/nexigon_api.cluster.ClusterNodeId"
-      },
-      "name": {
-        "type": "string"
-      },
-      "status": {
-        "$ref": "#/components/schemas/nexigon_api.cluster.ClusterNodeStatus"
-      },
-      "joinedAt": {
-        "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
-      },
-      "uptimeSecs": {
-        "type": "integer",
-        "format": "uint32"
-      },
-      "lastHeartbeat": {
-        "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
-      },
-      "terminatedAt": {
-        "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
-      },
-      "terminationReason": {
-        "$ref": "#/components/schemas/nexigon_api.cluster.ClusterNodeTerminationReason"
-      }
-    },
-    "required": [
-      "nodeId",
-      "status",
-      "joinedAt",
-      "uptimeSecs",
-      "lastHeartbeat"
-    ],
-    "unevaluatedProperties": false
-  },
   "nexigon_api.cluster.ClusterNodeId": {
     "type": [
       "string"
     ],
     "description": "Unique ID of a cluster node."
-  },
-  "nexigon_api.cluster.ClusterNodeStatus": {
-    "enum": [
-      "Active",
-      "Terminated"
-    ],
-    "description": "Status of a cluster node."
-  },
-  "nexigon_api.cluster.ClusterNodeTerminationReason": {
-    "enum": [
-      "Unknown",
-      "HeartbeatTimeout",
-      "Shutdown"
-    ],
-    "description": "Reason why a cluster node was terminated."
-  },
-  "nexigon_api.cluster.GetClusterDetailsAction": {
-    "type": "object",
-    "description": "Get information about the cluster.",
-    "properties": {
-      "includeTerminated": {
-        "type": "boolean"
-      }
-    },
-    "required": [],
-    "unevaluatedProperties": false
-  },
-  "nexigon_api.cluster.GetClusterDetailsOutput": {
-    "type": "object",
-    "description": "Information about the cluster.",
-    "properties": {
-      "nodes": {
-        "type": "array",
-        "items": {
-          "$ref": "#/components/schemas/nexigon_api.cluster.ClusterNode"
-        }
-      }
-    },
-    "required": [
-      "nodes"
-    ],
-    "unevaluatedProperties": false
-  },
-  "nexigon_api.cluster.RegisterClusterNodeAction": {
-    "type": "object",
-    "description": "Register a new cluster node.",
-    "properties": {
-      "name": {
-        "type": "string"
-      }
-    },
-    "required": [],
-    "unevaluatedProperties": false
-  },
-  "nexigon_api.cluster.RegisterClusterNodeOutput": {
-    "type": "object",
-    "description": "Output of registering a new cluster node.",
-    "properties": {
-      "nodeId": {
-        "$ref": "#/components/schemas/nexigon_api.cluster.ClusterNodeId"
-      }
-    },
-    "required": [
-      "nodeId"
-    ],
-    "unevaluatedProperties": false
-  },
-  "nexigon_api.cluster.ReportClusterNodeHeartbeatAction": {
-    "type": "object",
-    "description": "Report the heartbeat of a cluster node.",
-    "properties": {},
-    "required": [],
-    "unevaluatedProperties": false
   },
   "nexigon_api.datetime.Date": {
     "type": [
@@ -5504,13 +5385,6 @@
     ],
     "unevaluatedProperties": false
   },
-  "nexigon_api.users.CleanupExpiredUserSessionsAction": {
-    "type": "object",
-    "description": "Cleanup expired user sessions.",
-    "properties": {},
-    "required": [],
-    "unevaluatedProperties": false
-  },
   "nexigon_api.users.CompleteRegistrationAction": {
     "type": "object",
     "description": "Complete the registration of a user.",
@@ -6164,6 +6038,19 @@
     "required": [
       "userId",
       "password"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.users.TerminateUserSessionAction": {
+    "type": "object",
+    "description": "Terminate a user session.\n\nThe acting user must own the session; sessions belonging to other\nusers are not affected.",
+    "properties": {
+      "sessionId": {
+        "$ref": "#/components/schemas/nexigon_api.users.UserSessionId"
+      }
+    },
+    "required": [
+      "sessionId"
     ],
     "unevaluatedProperties": false
   },

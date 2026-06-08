@@ -47,6 +47,7 @@ variant VexStatementOrigin {
 /// The hub fetches the referenced documents from the repository's S3
 /// storage and rebuilds the index for this version. The repository
 /// must have S3 configured.
+#[unstable(feature = "vulnerability_management")]
 #[request(
     name = "vulnerabilities_IndexVersion",
     response = IndexVersionDocumentsOutput
@@ -71,6 +72,7 @@ record IndexVersionDocumentsOutput {
 ///
 /// Mirrors `IndexVersionDocumentsAction`. Used after attaching a new
 /// package-level VEX asset and pointing the package's metadata at it.
+#[unstable(feature = "vulnerability_management")]
 #[request(
     name = "vulnerabilities_IndexPackage",
     response = IndexPackageDocumentsOutput
@@ -87,6 +89,7 @@ record IndexPackageDocumentsOutput {
 /// Get the vulnerability overview for a package version: artifact list,
 /// SBOM/VDR/VEX descriptors per artifact, package-level VEX, and
 /// (when indexing is enabled) the rolled-up severity summary.
+#[unstable(feature = "vulnerability_management")]
 #[request(
     name = "vulnerabilities_GetVersionOverview",
     response = GetVersionVulnerabilityOverviewOutput
@@ -158,6 +161,7 @@ record SeveritySummary {
 }
 
 /// Query the components extracted from a package version's SBOMs.
+#[unstable(feature = "vulnerability_management")]
 #[request(
     name = "vulnerabilities_QueryComponents",
     response = QueryPackageVersionComponentsOutput
@@ -165,10 +169,22 @@ record SeveritySummary {
 record QueryPackageVersionComponentsAction {
     version_id: PackageVersionId,
     /// Optional filter: only include components from this artifact's SBOM.
+    #[validate(
+        { 1 <= _.size <= 256 },
+        message = "Filename must be between 1 and 256 characters."
+    )]
     artifact_filename?: string,
     /// Optional case-insensitive substring filter over name / purl / license.
+    #[validate(
+        { 1 <= _.size <= 256 },
+        message = "Search filter must be between 1 and 256 characters."
+    )]
     search?: string,
     /// Optional component-type filter (e.g. `library`, `application`).
+    #[validate(
+        { 1 <= _.size <= 64 },
+        message = "Component type must be between 1 and 64 characters."
+    )]
     component_type?: string,
 }
 
@@ -193,6 +209,7 @@ record PackageVersionComponent {
     vuln_summary?: SeveritySummary,
 }
 
+#[unstable(feature = "vulnerability_management")]
 #[request(
     name = "vulnerabilities_QueryFindings",
     response = QueryPackageVersionFindingsOutput
@@ -200,8 +217,16 @@ record PackageVersionComponent {
 record QueryPackageVersionFindingsAction {
     version_id: PackageVersionId,
     /// Optional artifact-filename filter.
+    #[validate(
+        { 1 <= _.size <= 256 },
+        message = "Filename must be between 1 and 256 characters."
+    )]
     artifact_filename?: string,
     /// Optional severity floor.
+    #[validate(
+        { 1 <= _.size <= 32 },
+        message = "Severity must be between 1 and 32 characters."
+    )]
     min_severity?: string,
 }
 
@@ -224,5 +249,9 @@ record PackageVersionFinding {
     effective_state: string,
     justification?: string,
     detail?: string,
+    /// Responses recorded on the winning VEX statement (e.g.
+    /// `will_not_fix`, `update`, `workaround_available`). Empty when
+    /// no statement applies or the statement records no responses.
+    responses: [string],
     state_origin?: VexStatementOrigin,
 }

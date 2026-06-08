@@ -11,6 +11,15 @@ record SetFleetPropertyAction {
     /// ID of the project.
     project_id: ProjectId,
     /// Name of the property.
+    #[validate(
+        { 1 <= _.size <= 256 },
+        message = "Property name must be between 1 and 256 characters."
+    )]
+    #[validate(
+        { matches(_, "^[a-zA-Z0-9][a-zA-Z0-9._-]*$") },
+        message = "Property name must start with a letter or digit and contain only letters, digits, dots, underscores, or hyphens.",
+        code = "format:property_name"
+    )]
     name: string,
     /// Value of the property.
     value: JsonValue,
@@ -22,6 +31,15 @@ record GetFleetPropertyAction {
     /// ID of the project.
     project_id: ProjectId,
     /// Name of the property.
+    #[validate(
+        { 1 <= _.size <= 256 },
+        message = "Property name must be between 1 and 256 characters."
+    )]
+    #[validate(
+        { matches(_, "^[a-zA-Z0-9][a-zA-Z0-9._-]*$") },
+        message = "Property name must start with a letter or digit and contain only letters, digits, dots, underscores, or hyphens.",
+        code = "format:property_name"
+    )]
     name: string,
 }
 
@@ -43,6 +61,15 @@ record RemoveFleetPropertyAction {
     /// ID of the project.
     project_id: ProjectId,
     /// Name of the property.
+    #[validate(
+        { 1 <= _.size <= 256 },
+        message = "Property name must be between 1 and 256 characters."
+    )]
+    #[validate(
+        { matches(_, "^[a-zA-Z0-9][a-zA-Z0-9._-]*$") },
+        message = "Property name must start with a letter or digit and contain only letters, digits, dots, underscores, or hyphens.",
+        code = "format:property_name"
+    )]
     name: string,
 }
 
@@ -74,8 +101,10 @@ variant FleetPropertyKind {
     /// Set manually via the API.
     Manual,
     /// Computed from device properties via a user-defined strategy.
+    #[unstable(feature = "fleet_computed_properties")]
     Computed,
     /// Computed from device properties via a built-in strategy.
+    #[unstable(feature = "fleet_computed_properties")]
     Builtin,
 }
 
@@ -96,21 +125,36 @@ record FleetProperty {
 }
 
 /// Define a computed fleet property.
+#[unstable(feature = "fleet_computed_properties")]
 #[request(name = "fleet_DefineComputedProperty", response = Empty)]
 record DefineComputedFleetPropertyAction {
     /// ID of the project.
     project_id: ProjectId,
     /// Name of the property.
+    #[validate(
+        { 1 <= _.size <= 256 },
+        message = "Property name must be between 1 and 256 characters."
+    )]
+    #[validate(
+        { matches(_, "^[a-zA-Z0-9][a-zA-Z0-9._-]*$") },
+        message = "Property name must start with a letter or digit and contain only letters, digits, dots, underscores, or hyphens.",
+        code = "format:property_name"
+    )]
     name: string,
     /// Device property names fed into the strategy's map function.
     input_properties: [string],
     /// Name of the computation strategy.
+    #[validate(
+        { 1 <= _.size <= 128 },
+        message = "Strategy name must be between 1 and 128 characters."
+    )]
     strategy: string,
     /// Strategy-specific configuration.
     config?: JsonValue,
 }
 
 /// Query computed fleet property definitions for a project.
+#[unstable(feature = "fleet_computed_properties")]
 #[request(
     name = "fleet_QueryComputedPropertyDefinitions",
     response = QueryComputedFleetPropertyDefinitionsOutput
@@ -121,12 +165,14 @@ record QueryComputedFleetPropertyDefinitionsAction {
 }
 
 /// Output of querying computed fleet property definitions.
+#[unstable(feature = "fleet_computed_properties")]
 record QueryComputedFleetPropertyDefinitionsOutput {
     /// List of definitions.
     definitions: [ComputedFleetPropertyDefinition],
 }
 
 /// A computed fleet property definition.
+#[unstable(feature = "fleet_computed_properties")]
 record ComputedFleetPropertyDefinition {
     /// Name of the property.
     name: string,

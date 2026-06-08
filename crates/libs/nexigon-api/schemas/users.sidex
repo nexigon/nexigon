@@ -85,10 +85,27 @@ record GetUserDetailsOutput {
 #[request(name = "users_Create", response = CreateUserOutput)]
 record CreateUserAction {
     /// Email of the user.
+    #[validate(
+        { 3 <= _.size <= 254 },
+        message = "Email must be between 3 and 254 characters."
+    )]
+    #[validate(
+        { matches(_, "^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$") },
+        message = "Email must be a valid email address.",
+        code = "format:email"
+    )]
     email: string,
     /// Name of the user.
+    #[validate(
+        { 1 <= _.size <= 128 },
+        message = "Display name must be between 1 and 128 characters."
+    )]
     display_name?: string,
     /// Password of the user.
+    #[validate(
+        { 8 <= _.size <= 256 },
+        message = "Password must be between 8 and 256 characters."
+    )]
     password?: string,
     /// Whether the user is an instance admin.
     is_admin?: bool,
@@ -122,16 +139,11 @@ record SetUserDisplayNameAction {
     /// ID of the user to update.
     user_id: UserId,
     /// New name of the user.
+    #[validate(
+        { 1 <= _.size <= 128 },
+        message = "Display name must be between 1 and 128 characters."
+    )]
     display_name: string,
-}
-
-/// Set the password of a user.
-#[request(name = "users_SetPassword", response = Empty)]
-record SetUserPasswordAction {
-    /// ID of the user.
-    user_id: UserId,
-    /// New password of the user.
-    password: string,
 }
 
 /// Set whether the user is an instance administrator.
@@ -143,12 +155,149 @@ record SetUserIsAdminAction {
     is_admin: bool,
 }
 
+/// Set the password of a user.
+///
+/// Admin-only operation that sets the password without requiring the current
+/// one. All existing sessions of the user are invalidated.
+#[request(name = "users_SetPassword", response = Empty)]
+record SetUserPasswordAction {
+    /// ID of the user.
+    user_id: UserId,
+    /// New password to set.
+    #[validate(
+        { 8 <= _.size <= 256 },
+        message = "Password must be between 8 and 256 characters."
+    )]
+    password: string,
+}
+
+/// Set the email address of a user.
+///
+/// Admin-only operation that updates the address without verification.
+#[request(name = "users_SetEmail", response = SetUserEmailOutput)]
+record SetUserEmailAction {
+    /// ID of the user.
+    user_id: UserId,
+    /// New email address.
+    #[validate(
+        { 3 <= _.size <= 254 },
+        message = "Email must be between 3 and 254 characters."
+    )]
+    #[validate(
+        { matches(_, "^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$") },
+        message = "Email must be a valid email address.",
+        code = "format:email"
+    )]
+    email: string,
+}
+
+/// Output of [`SetUserEmailAction`].
+#[json(tag = "result")]
+variant SetUserEmailOutput {
+    /// Email address has been updated.
+    Updated,
+    /// Another user already has the requested email address.
+    EmailAlreadyExists,
+}
+
+/// Change the password of the current user.
+///
+/// Requires the user to provide their current password to re-verify their
+/// identity, even if they are already authenticated.
+#[request(name = "users_ChangePassword", response = ChangeUserPasswordOutput)]
+record ChangeUserPasswordAction {
+    /// ID of the user.
+    user_id: UserId,
+    /// Current password of the user.
+    current_password: string,
+    /// New password to set.
+    #[validate(
+        { 8 <= _.size <= 256 },
+        message = "Password must be between 8 and 256 characters."
+    )]
+    new_password: string,
+}
+
+/// Output of [`ChangeUserPasswordAction`].
+#[json(tag = "result")]
+variant ChangeUserPasswordOutput {
+    /// Password was changed successfully.
+    Completed,
+    /// Provided current password is incorrect.
+    InvalidCurrentPassword,
+}
+
+/// Initiate an email-address change for the current user.
+///
+/// Requires the user to provide their current password to re-verify their
+/// identity. On success, a verification link is sent to the new address and
+/// a notification is sent to the current address.
+#[request(
+    name = "users_InitiateEmailChange",
+    response = InitiateUserEmailChangeOutput
+)]
+record InitiateUserEmailChangeAction {
+    /// ID of the user.
+    user_id: UserId,
+    /// Current password of the user.
+    current_password: string,
+    /// New email address to switch to.
+    #[validate(
+        { 3 <= _.size <= 254 },
+        message = "Email must be between 3 and 254 characters."
+    )]
+    #[validate(
+        { matches(_, "^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$") },
+        message = "Email must be a valid email address.",
+        code = "format:email"
+    )]
+    new_email: string,
+}
+
+/// Output of [`InitiateUserEmailChangeAction`].
+#[json(tag = "result")]
+variant InitiateUserEmailChangeOutput {
+    /// Verification email has been scheduled.
+    Pending,
+    /// Provided current password is incorrect.
+    InvalidCurrentPassword,
+    /// New email address is the same as the current one.
+    SameEmail,
+    /// Another user already has the requested email address.
+    EmailAlreadyExists,
+}
+
+/// Complete an email-address change using a verification token.
+#[request(
+    name = "users_CompleteEmailChange",
+    response = CompleteUserEmailChangeOutput
+)]
+record CompleteUserEmailChangeAction {
+    /// Token issued via [`InitiateUserEmailChangeAction`].
+    token: Jwt,
+}
+
+/// Output of [`CompleteUserEmailChangeAction`].
+#[json(tag = "result")]
+variant CompleteUserEmailChangeOutput {
+    /// Email address has been updated.
+    Completed,
+    /// Provided token is invalid or has expired.
+    InvalidToken,
+    /// Another user already has the requested email address.
+    EmailAlreadyExists,
+}
+
 /// Reset the password of a user.
-/// 
+///
 /// This will send an email to the user with a link to reset their password.
 #[request(name = "users_ResetPassword", response = Empty)]
 record ResetUserPasswordAction {
     /// Email of the user.
+    #[validate(
+        { 3 <= _.size <= 254 },
+        message = "Email must be between 3 and 254 characters."
+    )]
     email: string,
 }
 
@@ -161,6 +310,10 @@ record CompleteUserPasswordResetAction {
     /// Token to use for password reset.
     reset_token: Jwt,
     /// New password of the user.
+    #[validate(
+        { 8 <= _.size <= 256 },
+        message = "Password must be between 8 and 256 characters."
+    )]
     password: string,
 }
 
@@ -305,6 +458,10 @@ record CreateUserTokenAction {
     /// ID of the user.
     user_id: UserId,
     /// Name of the token.
+    #[validate(
+        { 1 <= _.size <= 128 },
+        message = "Token name must be between 1 and 128 characters."
+    )]
     name?: string,
 }
 
@@ -333,21 +490,34 @@ record TerminateUserSessionAction {
     session_id: UserSessionId,
 }
 
-/// Cleanup expired user sessions.
-#[request(name = "users_CleanupExpiredSessions", response = Empty)]
-record CleanupExpiredUserSessionsAction {}
-
 /// Register a new user with an email and password.
 #[request(name = "users_Register", response = RegisterUserOutput)]
 record RegisterUserAction {
     /// Name of the user.
+    #[validate(
+        { 1 <= _.size <= 128 },
+        message = "Display name must be between 1 and 128 characters."
+    )]
     display_name?: string,
     /// Email address of the user.
+    #[validate(
+        { 3 <= _.size <= 254 },
+        message = "Email must be between 3 and 254 characters."
+    )]
+    #[validate(
+        { matches(_, "^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$") },
+        message = "Email must be a valid email address.",
+        code = "format:email"
+    )]
     email: string,
     /// Password of the user.
+    #[validate(
+        { 8 <= _.size <= 256 },
+        message = "Password must be between 8 and 256 characters."
+    )]
     password: string,
     /// Indicates whether the user has consented to the terms and conditions.
-    /// 
+    ///
     /// This must be `true` to register a user.
     consented_to_terms: bool,
     /// Indicates whether the user has consented to marketing communications.
@@ -389,6 +559,10 @@ variant UserRegistrationStatus {
 #[request(name = "users_ResendRegistrationEmail", response = Empty)]
 record ResendRegistrationEmailAction {
     /// Email address of the user.
+    #[validate(
+        { 3 <= _.size <= 254 },
+        message = "Email must be between 3 and 254 characters."
+    )]
     email: string,
 }
 

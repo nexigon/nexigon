@@ -64,6 +64,7 @@ record DiskInfo {
 ///
 /// Published by the device agent to report the effective OTA configuration
 /// and the current state of the update process.
+#[unstable(feature = "ota_updates")]
 record OtaUpdateStatus {
     /// Effective OTA configuration (TOML defaults merged with device overrides).
     config?: OtaUpdateConfig,
@@ -85,6 +86,7 @@ record OtaUpdateStatus {
 /// Used as the shape of `/etc/nexigon-rugix-ota.json` and the
 /// `dev.nexigon.ota.config` device property. The device property is
 /// merged on top of the file-based defaults.
+#[unstable(feature = "ota_updates")]
 record OtaUpdateConfig {
     /// Repository path prefix for locating update artifacts.
     path?: string,
@@ -97,6 +99,7 @@ record OtaUpdateConfig {
 /// or the blocking condition clears. `idle` means no update has been
 /// attempted yet; `completed` and `failed` retain the outcome of the
 /// last cycle; `blocked` indicates an update is available but deferred.
+#[unstable(feature = "ota_updates")]
 #[json(tagged = externally, rename_all = "lowercase")]
 variant OtaUpdateState {
     /// No update has been attempted yet.
@@ -199,7 +202,7 @@ variant RugixStateManagementInfo {
     /// State management is active.
     Active: RugixActiveStateManagementInfo,
     /// State management is inactive due to an error.
-    /// 
+    ///
     /// State is stored in memory and will fail to persist even if declared.
     Error,
 }
@@ -263,12 +266,14 @@ record AgentCommandsConfig {
 }
 
 /// Command manifest (`dev.nexigon.commands` property).
+#[unstable(feature = "device_commands")]
 record DeviceCommandManifest {
     /// Available commands.
     commands: [DeviceCommandDescriptor],
 }
 
 /// Descriptor for an on-demand command.
+#[unstable(feature = "device_commands")]
 record DeviceCommandDescriptor {
     /// Command name.
     name: string,

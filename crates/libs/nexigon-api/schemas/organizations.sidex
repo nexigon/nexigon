@@ -111,10 +111,18 @@ record QueryOrganizationRepositoriesOutput {
 record QueryOrganizationRepositoriesItem {
     /// ID of the repository.
     repository_id: RepositoryId,
+    /// Display name of the repository.
+    display_name: string,
+    /// URL-safe slug of the repository, if one has been set.
+    slug?: string,
     /// Public name of the repository.
+    ///
+    /// Falls back to the repository ID when no slug is set.
+    #[deprecated(
+        note = "Use `slug`, which is absent when no slug is set.",
+        remove_in = "2029.2"
+    )]
     public_name: string,
-    /// Display name of the repository (if any).
-    display_name?: string,
 }
 
 /// Query the invitations of an organization.
@@ -147,6 +155,10 @@ record QueryOrganizationInvitationsItem {
 #[request(name = "organizations_Create", response = CreateOrganizationOutput)]
 record CreateOrganizationAction {
     /// Name of the organization.
+    #[validate(
+        { 1 <= _.size <= 128 },
+        message = "Organization name must be between 1 and 128 characters."
+    )]
     name: string,
     /// Admins of the organization.
     admins?: [UserId],
@@ -207,6 +219,15 @@ record InviteOrganizationMemberAction {
     /// ID of the organization.
     organization_id: OrganizationId,
     /// Email address of the user to invite.
+    #[validate(
+        { 3 <= _.size <= 254 },
+        message = "Email must be between 3 and 254 characters."
+    )]
+    #[validate(
+        { matches(_, "^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$") },
+        message = "Email must be a valid email address.",
+        code = "format:email"
+    )]
     email: string,
 }
 

@@ -502,19 +502,19 @@
         }
       }
     },
-    "/api/v1/actions/invoke/users_CleanupExpiredSessions": {
+    "/api/v1/actions/invoke/users_TerminateSession": {
       "post": {
         "tags": [
           "users"
         ],
-        "summary": "CleanupExpiredSessions",
-        "description": "Cleanup expired user sessions.",
-        "operationId": "users_CleanupExpiredSessions",
+        "summary": "TerminateSession",
+        "description": "Terminate a user session.\n\nThe acting user must own the session; sessions belonging to other\nusers are not affected.",
+        "operationId": "users_TerminateSession",
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/nexigon_api.users.CleanupExpiredUserSessionsAction"
+                "$ref": "#/components/schemas/nexigon_api.users.TerminateUserSessionAction"
               }
             }
           }
@@ -4067,130 +4067,6 @@
         }
       }
     },
-    "/api/v1/actions/invoke/cluster_GetDetails": {
-      "post": {
-        "tags": [
-          "cluster"
-        ],
-        "summary": "GetDetails",
-        "description": "Get information about the cluster.",
-        "operationId": "cluster_GetDetails",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/nexigon_api.cluster.GetClusterDetailsAction"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/nexigon_api.cluster.GetClusterDetailsOutput"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v1/actions/invoke/cluster_RegisterNode": {
-      "post": {
-        "tags": [
-          "cluster"
-        ],
-        "summary": "RegisterNode",
-        "description": "Register a new cluster node.",
-        "operationId": "cluster_RegisterNode",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/nexigon_api.cluster.RegisterClusterNodeAction"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/nexigon_api.cluster.RegisterClusterNodeOutput"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v1/actions/invoke/cluster_ReportNodeHeartbeat": {
-      "post": {
-        "tags": [
-          "cluster"
-        ],
-        "summary": "ReportNodeHeartbeat",
-        "description": "Report the heartbeat of a cluster node.",
-        "operationId": "cluster_ReportNodeHeartbeat",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/nexigon_api.cluster.ReportClusterNodeHeartbeatAction"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/nexigon_api.outputs.Empty"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v1/actions/invoke/cluster_CleanupInactiveNodes": {
-      "post": {
-        "tags": [
-          "cluster"
-        ],
-        "summary": "CleanupInactiveNodes",
-        "description": "Cleanup inactive cluster nodes.",
-        "operationId": "cluster_CleanupInactiveNodes",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/nexigon_api.cluster.CleanupInactiveClusterNodesAction"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/nexigon_api.outputs.Empty"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/api/v1/actions/invoke/actor_GetActor": {
       "post": {
         "tags": [
@@ -4608,124 +4484,9 @@
         ],
         "unevaluatedProperties": false
       },
-      "nexigon_api.cluster.CleanupInactiveClusterNodesAction": {
-        "type": "object",
-        "properties": {},
-        "required": [],
-        "unevaluatedProperties": false
-      },
-      "nexigon_api.cluster.ClusterNode": {
-        "type": "object",
-        "description": "Cluster node.",
-        "properties": {
-          "nodeId": {
-            "$ref": "#/components/schemas/nexigon_api.cluster.ClusterNodeId"
-          },
-          "name": {
-            "type": "string"
-          },
-          "status": {
-            "$ref": "#/components/schemas/nexigon_api.cluster.ClusterNodeStatus"
-          },
-          "joinedAt": {
-            "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
-          },
-          "uptimeSecs": {
-            "type": "integer",
-            "format": "uint32"
-          },
-          "lastHeartbeat": {
-            "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
-          },
-          "terminatedAt": {
-            "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
-          },
-          "terminationReason": {
-            "$ref": "#/components/schemas/nexigon_api.cluster.ClusterNodeTerminationReason"
-          }
-        },
-        "required": [
-          "nodeId",
-          "status",
-          "joinedAt",
-          "uptimeSecs",
-          "lastHeartbeat"
-        ],
-        "unevaluatedProperties": false
-      },
       "nexigon_api.cluster.ClusterNodeId": {
         "type": "string",
         "description": "Unique ID of a cluster node."
-      },
-      "nexigon_api.cluster.ClusterNodeStatus": {
-        "enum": [
-          "Active",
-          "Terminated"
-        ],
-        "description": "Status of a cluster node."
-      },
-      "nexigon_api.cluster.ClusterNodeTerminationReason": {
-        "enum": [
-          "Unknown",
-          "HeartbeatTimeout",
-          "Shutdown"
-        ],
-        "description": "Reason why a cluster node was terminated."
-      },
-      "nexigon_api.cluster.GetClusterDetailsAction": {
-        "type": "object",
-        "properties": {
-          "includeTerminated": {
-            "type": "boolean"
-          }
-        },
-        "required": [],
-        "unevaluatedProperties": false
-      },
-      "nexigon_api.cluster.GetClusterDetailsOutput": {
-        "type": "object",
-        "description": "Information about the cluster.",
-        "properties": {
-          "nodes": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/nexigon_api.cluster.ClusterNode"
-            }
-          }
-        },
-        "required": [
-          "nodes"
-        ],
-        "unevaluatedProperties": false
-      },
-      "nexigon_api.cluster.RegisterClusterNodeAction": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string"
-          }
-        },
-        "required": [],
-        "unevaluatedProperties": false
-      },
-      "nexigon_api.cluster.RegisterClusterNodeOutput": {
-        "type": "object",
-        "description": "Output of registering a new cluster node.",
-        "properties": {
-          "nodeId": {
-            "$ref": "#/components/schemas/nexigon_api.cluster.ClusterNodeId"
-          }
-        },
-        "required": [
-          "nodeId"
-        ],
-        "unevaluatedProperties": false
-      },
-      "nexigon_api.cluster.ReportClusterNodeHeartbeatAction": {
-        "type": "object",
-        "properties": {},
-        "required": [],
-        "unevaluatedProperties": false
       },
       "nexigon_api.datetime.Date": {
         "type": "string",
@@ -9571,12 +9332,6 @@
         ],
         "unevaluatedProperties": false
       },
-      "nexigon_api.users.CleanupExpiredUserSessionsAction": {
-        "type": "object",
-        "properties": {},
-        "required": [],
-        "unevaluatedProperties": false
-      },
       "nexigon_api.users.CompleteRegistrationAction": {
         "type": "object",
         "properties": {
@@ -10212,6 +9967,18 @@
         "required": [
           "userId",
           "password"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.users.TerminateUserSessionAction": {
+        "type": "object",
+        "properties": {
+          "sessionId": {
+            "$ref": "#/components/schemas/nexigon_api.users.UserSessionId"
+          }
+        },
+        "required": [
+          "sessionId"
         ],
         "unevaluatedProperties": false
       },

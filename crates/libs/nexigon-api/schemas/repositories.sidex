@@ -51,16 +51,50 @@ variant RepositoryVisibility {
 /// Repository S3 config.
 record RepositoryS3Config {
     /// S3 endpoint (e.g., https://s3.amazonaws.com or https://minio.local:9000).
+    #[validate(
+        { 1 <= _.size <= 2048 },
+        message = "S3 endpoint must be between 1 and 2048 characters."
+    )]
+    #[validate(
+        { matches(_, "^https?://") },
+        message = "S3 endpoint must be an HTTP(S) URL.",
+        code = "format:url"
+    )]
     endpoint: string,
     /// S3 bucket name.
+    #[validate(
+        { 3 <= _.size <= 63 },
+        message = "S3 bucket name must be between 3 and 63 characters."
+    )]
+    #[validate(
+        { matches(_, "^[a-z0-9][a-z0-9.-]*[a-z0-9]$") },
+        message = "S3 bucket name must use only lowercase letters, digits, dots, and hyphens, and start and end with a letter or digit.",
+        code = "format:s3_bucket"
+    )]
     bucket: string,
     /// AWS region (required by AWS, may be NULL for MinIO/other providers).
+    #[validate(
+        { 1 <= _.size <= 64 },
+        message = "AWS region must be between 1 and 64 characters."
+    )]
     region?: string,
     /// Optional prefix inside the bucket to scope this repository.
+    #[validate(
+        { _.size <= 1024 },
+        message = "Bucket prefix must be at most 1024 characters."
+    )]
     prefix?: string,
     /// S3 access key ID (not sensitive, can be plain text).
+    #[validate(
+        { 1 <= _.size <= 256 },
+        message = "Access key ID must be between 1 and 256 characters."
+    )]
     access_key_id: string,
     /// S3 secret access key (sensitive, will be stored encrypted).
+    #[validate(
+        { 1 <= _.size <= 256 },
+        message = "Secret access key must be between 1 and 256 characters."
+    )]
     secret_access_key?: string,
 }
 
@@ -71,6 +105,15 @@ record RepositoryS3Config {
 )]
 record ResolveRepositoryNameAction {
     /// Name of the repository.
+    #[validate(
+        { 1 <= _.size <= 128 },
+        message = "Repository name must be between 1 and 128 characters."
+    )]
+    #[validate(
+        { matches(_, "^[a-zA-Z0-9][a-zA-Z0-9._-]*$") },
+        message = "Repository name must start with a letter or digit and contain only letters, digits, dots, underscores, or hyphens.",
+        code = "format:repository_name"
+    )]
     repository: string,
 }
 
@@ -102,8 +145,16 @@ record GetRepositoryDetailsOutput {
     repository_id: RepositoryId,
     /// Display name of the repository.
     display_name: string,
-    /// Name of the repository.
-    public_name?: string,
+    /// URL-safe slug of the repository, if one has been set.
+    slug?: string,
+    /// Public name of the repository.
+    ///
+    /// Falls back to the repository ID when no slug is set.
+    #[deprecated(
+        note = "Use `slug`, which is absent when no slug is set.",
+        remove_in = "2029.2"
+    )]
+    public_name: string,
     /// Visibility of the repository.
     visibility: RepositoryVisibility,
     /// Number of packages in the repository.
@@ -117,10 +168,17 @@ record GetRepositoryDetailsOutput {
 record CreateRepositoryAction {
     /// Organization to create the repository in.
     organization_id: OrganizationId,
-    /// Name of the repository.
-    name: string,
+    /// Display name of the repository.
+    ///
+    /// Free-form, human-facing name. To give the repository a public URL
+    /// handle for path-based resolution, set a public name afterwards.
+    #[validate(
+        { 1 <= _.size <= 128 },
+        message = "Display name must be between 1 and 128 characters."
+    )]
+    display_name: string,
     /// Visibility of the repository.
-    /// 
+    ///
     /// Default to private.
     visibility?: RepositoryVisibility,
 }
@@ -162,29 +220,39 @@ record SetRepositoryDisplayNameAction {
     /// ID of the repository.
     repository_id: RepositoryId,
     /// New display name of the repository.
-    display_name?: string,
+    #[validate(
+        { 1 <= _.size <= 128 },
+        message = "Display name must be between 1 and 128 characters."
+    )]
+    display_name: string,
 }
 
-/// Set the public name of a repository.
-/// 
-/// Note: Setting the public name requires the `public_repositories` subscription feature.
-#[request(
-    name = "repositories_SetPublicName",
-    response = SetRepositoryPublicNameOutput
-)]
-record SetRepositoryPublicNameAction {
+/// Set the slug of a repository.
+///
+/// Note: Setting the slug requires the `public_repositories` subscription feature.
+#[request(name = "repositories_SetSlug", response = SetRepositorySlugOutput)]
+record SetRepositorySlugAction {
     /// ID of the repository.
     repository_id: RepositoryId,
-    /// New public name of the repository.
-    public_name: string,
+    /// New slug of the repository.
+    #[validate(
+        { 1 <= _.size <= 128 },
+        message = "Repository slug must be between 1 and 128 characters."
+    )]
+    #[validate(
+        { matches(_, "^[a-zA-Z0-9][a-zA-Z0-9._-]*$") },
+        message = "Repository slug must start with a letter or digit and contain only letters, digits, dots, underscores, or hyphens.",
+        code = "format:repository_slug"
+    )]
+    slug: string,
 }
 
-/// Output of setting the public name of a repository.
+/// Output of setting the slug of a repository.
 #[json(tag = "result")]
-variant SetRepositoryPublicNameOutput {
-    /// A repository with the same public name already exists.
-    NameAlreadyExists,
-    /// The public name has been set.
+variant SetRepositorySlugOutput {
+    /// A repository with the same slug already exists.
+    SlugAlreadyExists,
+    /// The slug has been set.
     Success,
 }
 
@@ -272,9 +340,27 @@ record QueryRepositoryProjectsItem {
     response = ResolvePackageByPathOutput
 )]
 record ResolvePackageByPathAction {
-    /// Name of the repository.
+    /// Name or ID of the repository.
+    #[validate(
+        { 1 <= _.size <= 128 },
+        message = "Repository name must be between 1 and 128 characters."
+    )]
+    #[validate(
+        { matches(_, "^[a-zA-Z0-9][a-zA-Z0-9._-]*$") },
+        message = "Repository name must start with a letter or digit and contain only letters, digits, dots, underscores, or hyphens.",
+        code = "format:repository_name"
+    )]
     repository: string,
-    /// Name of the package.
+    /// Name or ID of the package.
+    #[validate(
+        { 1 <= _.size <= 128 },
+        message = "Package name must be between 1 and 128 characters."
+    )]
+    #[validate(
+        { matches(_, "^[a-zA-Z0-9][a-zA-Z0-9._-]*$") },
+        message = "Package name must start with a letter or digit and contain only letters, digits, dots, underscores, or hyphens.",
+        code = "format:package_name"
+    )]
     package: string,
 }
 
@@ -346,6 +432,10 @@ record PackageAsset {
 record AddPackageAssetAction {
     package_id: PackageId,
     asset_id: RepositoryAssetId,
+    #[validate(
+        { 1 <= _.size <= 256 },
+        message = "Filename must be between 1 and 256 characters."
+    )]
     filename: string,
     metadata?: [string: JsonValue],
 }
@@ -363,6 +453,10 @@ variant AddPackageAssetOutput {
 #[request(name = "repositories_RemovePackageAsset", response = Empty)]
 record RemovePackageAssetAction {
     package_id: PackageId,
+    #[validate(
+        { 1 <= _.size <= 256 },
+        message = "Filename must be between 1 and 256 characters."
+    )]
     filename: string,
 }
 
@@ -370,6 +464,10 @@ record RemovePackageAssetAction {
 #[request(name = "repositories_SetPackageAssetMetadata", response = Empty)]
 record SetPackageAssetMetadataAction {
     package_id: PackageId,
+    #[validate(
+        { 1 <= _.size <= 256 },
+        message = "Filename must be between 1 and 256 characters."
+    )]
     filename: string,
     metadata: [string: JsonValue],
 }
@@ -380,8 +478,21 @@ record CreatePackageAction {
     /// ID of the repository.
     repository_id: RepositoryId,
     /// Name of the package.
+    #[validate(
+        { 1 <= _.size <= 128 },
+        message = "Package name must be between 1 and 128 characters."
+    )]
+    #[validate(
+        { matches(_, "^[a-zA-Z0-9][a-zA-Z0-9._-]*$") },
+        message = "Package name must start with a letter or digit and contain only letters, digits, dots, underscores, or hyphens.",
+        code = "format:package_name"
+    )]
     name: string,
     /// Free-form kind of the package (e.g., "rugix-app").
+    #[validate(
+        { 1 <= _.size <= 64 },
+        message = "Package kind must be between 1 and 64 characters."
+    )]
     kind?: string,
     /// Optional initial metadata.
     metadata?: [string: JsonValue],
@@ -424,6 +535,10 @@ record SetPackageKindAction {
     /// ID of the package.
     package_id: PackageId,
     /// New kind of the package (e.g., "rugix-app"), or null to clear.
+    #[validate(
+        { 1 <= _.size <= 64 },
+        message = "Package kind must be between 1 and 64 characters."
+    )]
     kind?: string,
 }
 
@@ -433,6 +548,15 @@ record SetPackageNameAction {
     /// ID of the package.
     package_id: PackageId,
     /// New name of the package.
+    #[validate(
+        { 1 <= _.size <= 128 },
+        message = "Package name must be between 1 and 128 characters."
+    )]
+    #[validate(
+        { matches(_, "^[a-zA-Z0-9][a-zA-Z0-9._-]*$") },
+        message = "Package name must start with a letter or digit and contain only letters, digits, dots, underscores, or hyphens.",
+        code = "format:package_name"
+    )]
     name: string,
 }
 
@@ -484,13 +608,22 @@ record PackageVersionTag {
 /// Add tag item.
 record AddTagItem {
     /// Tag to add.
+    #[validate(
+        { 1 <= _.size <= 128 },
+        message = "Tag must be between 1 and 128 characters."
+    )]
+    #[validate(
+        { matches(_, "^[a-zA-Z0-9][a-zA-Z0-9._-]*$") },
+        message = "Tag must start with a letter or digit and contain only letters, digits, dots, underscores, or hyphens.",
+        code = "format:tag"
+    )]
     tag: string,
     /// Indicates whether the tag should be locked.
-    /// 
+    ///
     /// Default to false.
     locked?: bool,
     /// Indicates whether the tag should be reassigned, if it already exists.
-    /// 
+    ///
     /// Defaults to true.
     reassign?: bool,
 }
@@ -498,6 +631,15 @@ record AddTagItem {
 /// Remove tag item.
 record RemoveTagItem {
     /// Tag to remove.
+    #[validate(
+        { 1 <= _.size <= 128 },
+        message = "Tag must be between 1 and 128 characters."
+    )]
+    #[validate(
+        { matches(_, "^[a-zA-Z0-9][a-zA-Z0-9._-]*$") },
+        message = "Tag must start with a letter or digit and contain only letters, digits, dots, underscores, or hyphens.",
+        code = "format:tag"
+    )]
     tag: string,
 }
 
@@ -523,11 +665,38 @@ record PackageVersionAsset {
     response = ResolvePackageVersionByPathOutput
 )]
 record ResolvePackageVersionByPathAction {
-    /// Name of the repository.
+    /// Name or ID of the repository.
+    #[validate(
+        { 1 <= _.size <= 128 },
+        message = "Repository name must be between 1 and 128 characters."
+    )]
+    #[validate(
+        { matches(_, "^[a-zA-Z0-9][a-zA-Z0-9._-]*$") },
+        message = "Repository name must start with a letter or digit and contain only letters, digits, dots, underscores, or hyphens.",
+        code = "format:repository_name"
+    )]
     repository: string,
-    /// Name of the package.
+    /// Name or ID of the package.
+    #[validate(
+        { 1 <= _.size <= 128 },
+        message = "Package name must be between 1 and 128 characters."
+    )]
+    #[validate(
+        { matches(_, "^[a-zA-Z0-9][a-zA-Z0-9._-]*$") },
+        message = "Package name must start with a letter or digit and contain only letters, digits, dots, underscores, or hyphens.",
+        code = "format:package_name"
+    )]
     package: string,
-    /// Tag of the version.
+    /// Tag or ID of the version.
+    #[validate(
+        { 1 <= _.size <= 128 },
+        message = "Tag must be between 1 and 128 characters."
+    )]
+    #[validate(
+        { matches(_, "^[a-zA-Z0-9][a-zA-Z0-9._-]*$") },
+        message = "Tag must start with a letter or digit and contain only letters, digits, dots, underscores, or hyphens.",
+        code = "format:tag"
+    )]
     tag: string,
 }
 
@@ -587,6 +756,10 @@ record CreatePackageVersionAction {
     /// ID of the package.
     package_id: PackageId,
     /// Optional name of the version.
+    #[validate(
+        { 1 <= _.size <= 128 },
+        message = "Version name must be between 1 and 128 characters."
+    )]
     name?: string,
     /// Tags to add to the package version.
     tags?: [AddTagItem],
@@ -620,6 +793,10 @@ record SetPackageVersionNameAction {
     /// ID of the package version.
     version_id: PackageVersionId,
     /// New name of the package version.
+    #[validate(
+        { 1 <= _.size <= 128 },
+        message = "Version name must be between 1 and 128 characters."
+    )]
     name?: string,
 }
 
@@ -643,6 +820,10 @@ record AddPackageVersionAssetAction {
     /// ID of the asset.
     asset_id: RepositoryAssetId,
     /// Filename of the asset.
+    #[validate(
+        { 1 <= _.size <= 256 },
+        message = "Filename must be between 1 and 256 characters."
+    )]
     filename: string,
     /// Optional metadata to associate with this asset in the version.
     metadata?: [string: JsonValue],
@@ -663,6 +844,10 @@ record RemovePackageVersionAssetAction {
     /// ID of the package version.
     version_id: PackageVersionId,
     /// Filename of the asset.
+    #[validate(
+        { 1 <= _.size <= 256 },
+        message = "Filename must be between 1 and 256 characters."
+    )]
     filename: string,
 }
 
@@ -672,6 +857,10 @@ record SetPackageVersionAssetMetadataAction {
     /// ID of the package version.
     version_id: PackageVersionId,
     /// Filename of the asset.
+    #[validate(
+        { 1 <= _.size <= 256 },
+        message = "Filename must be between 1 and 256 characters."
+    )]
     filename: string,
     /// Metadata to set (replaces existing metadata).
     metadata: [string: JsonValue],
@@ -701,13 +890,44 @@ record UntagPackageVersionAction {
     response = ResolvePackageVersionAssetByPathOutput
 )]
 record ResolvePackageVersionAssetByPathAction {
-    /// Name of the repository.
+    /// Name or ID of the repository.
+    #[validate(
+        { 1 <= _.size <= 128 },
+        message = "Repository name must be between 1 and 128 characters."
+    )]
+    #[validate(
+        { matches(_, "^[a-zA-Z0-9][a-zA-Z0-9._-]*$") },
+        message = "Repository name must start with a letter or digit and contain only letters, digits, dots, underscores, or hyphens.",
+        code = "format:repository_name"
+    )]
     repository: string,
-    /// Name of the package.
+    /// Name or ID of the package.
+    #[validate(
+        { 1 <= _.size <= 128 },
+        message = "Package name must be between 1 and 128 characters."
+    )]
+    #[validate(
+        { matches(_, "^[a-zA-Z0-9][a-zA-Z0-9._-]*$") },
+        message = "Package name must start with a letter or digit and contain only letters, digits, dots, underscores, or hyphens.",
+        code = "format:package_name"
+    )]
     package: string,
-    /// Tag of the version.
+    /// Tag or ID of the version.
+    #[validate(
+        { 1 <= _.size <= 128 },
+        message = "Tag must be between 1 and 128 characters."
+    )]
+    #[validate(
+        { matches(_, "^[a-zA-Z0-9][a-zA-Z0-9._-]*$") },
+        message = "Tag must start with a letter or digit and contain only letters, digits, dots, underscores, or hyphens.",
+        code = "format:tag"
+    )]
     tag: string,
-    /// Filename of the asset.
+    /// Filename or ID of the asset.
+    #[validate(
+        { 1 <= _.size <= 256 },
+        message = "Filename must be between 1 and 256 characters."
+    )]
     filename: string,
 }
 
@@ -821,6 +1041,10 @@ record IssueAssetDownloadUrlAction {
     /// ID of the asset to issue the URL for.
     asset_id: RepositoryAssetId,
     /// Optional filename for the asset.
+    #[validate(
+        { 1 <= _.size <= 256 },
+        message = "Filename must be between 1 and 256 characters."
+    )]
     filename?: string,
 }
 
@@ -848,7 +1072,7 @@ record IssueAssetUploadUrlOutput {
 
 /// Query the audit log of the repository.
 #[request(
-    name = "repositories_QueryAuditLog",
+    name = "audit_QueryAuditLogEvents",
     response = QueryAuditLogEventsOutput
 )]
 record QueryAuditLogEventsAction {

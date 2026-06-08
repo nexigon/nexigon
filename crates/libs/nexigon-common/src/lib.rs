@@ -7,27 +7,56 @@ use anyhow::anyhow;
 use anyhow::bail;
 use clap::Subcommand;
 
+use nexigon_api::types::repositories::AddPackageAssetAction;
 use nexigon_api::types::repositories::AddPackageVersionAssetAction;
 use nexigon_api::types::repositories::AddTagItem;
 use nexigon_api::types::repositories::CreateAssetAction;
 use nexigon_api::types::repositories::CreatePackageAction;
 use nexigon_api::types::repositories::CreatePackageVersionAction;
+use nexigon_api::types::repositories::CreateRepositoryAction;
+use nexigon_api::types::repositories::DeleteAssetAction;
 use nexigon_api::types::repositories::DeletePackageAction;
 use nexigon_api::types::repositories::DeletePackageVersionAction;
+use nexigon_api::types::repositories::DeleteRepositoryAction;
+use nexigon_api::types::repositories::GetAssetDetailsAction;
+use nexigon_api::types::repositories::GetPackageDetailsAction;
 use nexigon_api::types::repositories::GetPackageVersionDetailsAction;
 use nexigon_api::types::repositories::GetPackageVersionDetailsOutput;
+use nexigon_api::types::repositories::GetRepositoryDetailsAction;
+use nexigon_api::types::repositories::GetRepositoryS3ConfigAction;
 use nexigon_api::types::repositories::IssueAssetDownloadUrlAction;
 use nexigon_api::types::repositories::IssueAssetUploadUrlAction;
+use nexigon_api::types::repositories::QueryPackageVersionsAction;
+use nexigon_api::types::repositories::QueryRepositoryAssetsAction;
+use nexigon_api::types::repositories::QueryRepositoryPackagesAction;
+use nexigon_api::types::repositories::QueryRepositoryProjectsAction;
+use nexigon_api::types::repositories::RemovePackageAssetAction;
 use nexigon_api::types::repositories::RemovePackageVersionAssetAction;
+use nexigon_api::types::repositories::RemoveTagItem;
 use nexigon_api::types::repositories::RepositoryAssetId;
+use nexigon_api::types::repositories::RepositoryS3Config;
+use nexigon_api::types::repositories::RepositoryVisibility;
 use nexigon_api::types::repositories::ResolvePackageByPathAction;
 use nexigon_api::types::repositories::ResolvePackageVersionAssetByPathAction;
 use nexigon_api::types::repositories::ResolvePackageVersionByPathAction;
 use nexigon_api::types::repositories::ResolvePackageVersionByPathOutput;
 use nexigon_api::types::repositories::ResolveRepositoryNameAction;
 use nexigon_api::types::repositories::ResolveRepositoryNameOutput;
+use nexigon_api::types::repositories::SetPackageAssetMetadataAction;
+use nexigon_api::types::repositories::SetPackageKindAction;
+use nexigon_api::types::repositories::SetPackageMetadataAction;
+use nexigon_api::types::repositories::SetPackageNameAction;
+use nexigon_api::types::repositories::SetPackageVersionAssetMetadataAction;
+use nexigon_api::types::repositories::SetPackageVersionMetadataAction;
+use nexigon_api::types::repositories::SetPackageVersionNameAction;
+use nexigon_api::types::repositories::SetRepositoryDisplayNameAction;
+use nexigon_api::types::repositories::SetRepositoryS3ConfigAction;
+use nexigon_api::types::repositories::SetRepositorySlugAction;
+use nexigon_api::types::repositories::SetRepositoryVisibilityAction;
 use nexigon_api::types::repositories::TagPackageVersionAction;
+use nexigon_api::types::repositories::UntagPackageVersionAction;
 use nexigon_client::Execute;
+use nexigon_ids::ids::OrganizationId;
 use nexigon_ids::ids::PackageId;
 use nexigon_ids::ids::PackageVersionId;
 use nexigon_ids::ids::RepositoryId;
@@ -262,37 +291,205 @@ impl FromStr for AddTagArg {
 /// Repository subcommand.
 #[derive(Debug, Subcommand)]
 pub enum RepositoriesCmd {
+    /// Resolve a repository by name.
+    Resolve {
+        /// Repository name or ID.
+        repository: String,
+    },
+    /// Get repository details.
+    Info {
+        /// Repository name or ID.
+        repository: String,
+    },
+    /// Create a new repository.
+    Create {
+        /// Organization ID.
+        organization: OrganizationId,
+        /// Display name.
+        display_name: String,
+        /// Repository visibility.
+        #[clap(long, value_parser = parse_repository_visibility)]
+        visibility: Option<RepositoryVisibility>,
+    },
+    /// Delete a repository.
+    Delete {
+        /// Repository name or ID.
+        repository: String,
+    },
+    /// Rename a repository.
+    Rename {
+        /// Repository name or ID.
+        repository: String,
+        /// New display name.
+        display_name: String,
+    },
+    /// Set repository visibility.
+    SetVisibility {
+        /// Repository name or ID.
+        repository: String,
+        /// New visibility.
+        #[clap(value_parser = parse_repository_visibility)]
+        visibility: RepositoryVisibility,
+    },
+    /// Set repository slug.
+    SetSlug {
+        /// Repository name or ID.
+        repository: String,
+        /// New slug.
+        slug: String,
+    },
     /// Request a pre-signed URL for downloading an asset.
     IssueUrl {
         /// Asset ID or path (repository/package/tag/filename).
         asset: String,
+        /// Optional filename for the download URL.
+        #[clap(long)]
+        filename: Option<String>,
     },
+    /// Manage linked projects.
+    #[clap(subcommand)]
+    Projects(RepositoryProjectsCmd),
+    /// Manage S3 configuration.
+    #[clap(subcommand)]
+    S3(RepositoryS3Cmd),
+    /// Manage repository assets.
+    #[clap(subcommand)]
+    Assets(AssetsCmd),
     /// Manage packages.
     #[clap(subcommand)]
     Packages(PackagesCmd),
     /// Manage package versions.
     #[clap(subcommand)]
     Versions(VersionsCmd),
-    /// Manage assets.
-    #[clap(subcommand)]
-    Assets(AssetsCmd),
+}
+
+/// Repository projects subcommand.
+#[derive(Debug, Subcommand)]
+pub enum RepositoryProjectsCmd {
+    /// List projects linked to a repository.
+    List {
+        /// Repository name or ID.
+        repository: String,
+    },
+}
+
+/// Repository S3 subcommand.
+#[derive(Debug, Subcommand)]
+pub enum RepositoryS3Cmd {
+    /// Get S3 configuration.
+    Get {
+        /// Repository name or ID.
+        repository: String,
+    },
+    /// Set S3 configuration from a JSON object.
+    Set {
+        /// Repository name or ID.
+        repository: String,
+        /// S3 config JSON.
+        config: String,
+    },
 }
 
 /// Packages subcommand.
 #[derive(Debug, Subcommand)]
 pub enum PackagesCmd {
+    /// List packages in a repository.
+    List {
+        /// Repository name or ID.
+        repository: String,
+    },
+    /// Get package details.
+    Info {
+        /// Package path or ID.
+        package: String,
+    },
     /// Create a new package.
     Create {
         /// Repository name or ID.
         repository: String,
         /// Package name.
         name: String,
+        /// Optional package kind.
+        #[clap(long)]
+        kind: Option<String>,
         /// Optional JSON metadata.
         #[clap(long, value_parser = parse_json_object)]
         metadata: Option<serde_json::Value>,
     },
     /// Delete a package.
     Delete {
+        /// Package path or ID.
+        package: String,
+    },
+    /// Rename a package.
+    Rename {
+        /// Package path or ID.
+        package: String,
+        /// New package name.
+        name: String,
+    },
+    /// Set package kind.
+    SetKind {
+        /// Package path or ID.
+        package: String,
+        /// New package kind. Omit to clear.
+        kind: Option<String>,
+    },
+    /// Set package metadata from a JSON object.
+    SetMetadata {
+        /// Package path or ID.
+        package: String,
+        /// Metadata JSON object.
+        #[clap(value_parser = parse_json_object)]
+        metadata: serde_json::Value,
+    },
+    /// Manage package assets.
+    #[clap(subcommand)]
+    Assets(PackageAssetsCmd),
+    /// Manage package versions.
+    #[clap(subcommand)]
+    Versions(PackageVersionsCmd),
+}
+
+/// Package assets subcommand.
+#[derive(Debug, Subcommand)]
+pub enum PackageAssetsCmd {
+    /// Add an asset to a package.
+    Add {
+        /// Package path or ID.
+        package: String,
+        /// Asset ID.
+        asset_id: RepositoryAssetId,
+        /// Asset filename.
+        filename: String,
+        /// Optional JSON metadata.
+        #[clap(long, value_parser = parse_json_object)]
+        metadata: Option<serde_json::Value>,
+    },
+    /// Remove an asset from a package.
+    Remove {
+        /// Package path or ID.
+        package: String,
+        /// Asset filename.
+        filename: String,
+    },
+    /// Set package asset metadata from a JSON object.
+    SetMetadata {
+        /// Package path or ID.
+        package: String,
+        /// Asset filename.
+        filename: String,
+        /// Metadata JSON object.
+        #[clap(value_parser = parse_json_object)]
+        metadata: serde_json::Value,
+    },
+}
+
+/// Package versions nested under packages.
+#[derive(Debug, Subcommand)]
+pub enum PackageVersionsCmd {
+    /// List package versions.
+    List {
         /// Package path or ID.
         package: String,
     },
@@ -315,6 +512,9 @@ pub enum VersionsCmd {
     Create {
         /// Package path or ID.
         package: String,
+        /// Optional version name.
+        #[clap(long)]
+        name: Option<String>,
         /// Tags to add.
         #[clap(long = "tag")]
         tags: Vec<AddTagArg>,
@@ -327,6 +527,21 @@ pub enum VersionsCmd {
         /// Package version path or ID.
         version: String,
     },
+    /// Rename a package version.
+    Rename {
+        /// Package version path or ID.
+        version: String,
+        /// New version name. Omit to clear.
+        name: Option<String>,
+    },
+    /// Set package version metadata from a JSON object.
+    SetMetadata {
+        /// Package version path or ID.
+        version: String,
+        /// Metadata JSON object.
+        #[clap(value_parser = parse_json_object)]
+        metadata: serde_json::Value,
+    },
     /// Add tags to a version.
     Tag {
         /// Package version path or ID.
@@ -334,6 +549,14 @@ pub enum VersionsCmd {
         /// Tags to add.
         #[clap(long = "tag")]
         tags: Vec<AddTagArg>,
+    },
+    /// Remove tags from a version.
+    Untag {
+        /// Package version path or ID.
+        version: String,
+        /// Tags to remove.
+        #[clap(long = "tag")]
+        tags: Vec<String>,
     },
     /// Manage the assets of a package version.
     #[clap(subcommand)]
@@ -362,17 +585,47 @@ pub enum VersionAssetsCmd {
         /// Asset filename.
         filename: String,
     },
+    /// Set version asset metadata from a JSON object.
+    SetMetadata {
+        /// Package version path or ID.
+        version: String,
+        /// Asset filename.
+        filename: String,
+        /// Metadata JSON object.
+        #[clap(value_parser = parse_json_object)]
+        metadata: serde_json::Value,
+    },
 }
 
 /// Assets subcommand.
 #[derive(Debug, Subcommand)]
 pub enum AssetsCmd {
+    /// List assets in a repository.
+    List {
+        /// Repository name or ID.
+        repository: String,
+    },
+    /// Get asset details.
+    Info {
+        /// Asset ID or path (repository/package/tag/filename).
+        asset: String,
+    },
     /// Upload an asset to the repository.
     Upload {
         /// Repository name or ID.
         repository: String,
         /// Path to the asset.
         path: PathBuf,
+    },
+    /// Delete an asset.
+    Delete {
+        /// Asset ID or path (repository/package/tag/filename).
+        asset: String,
+    },
+    /// Request a pre-signed URL for uploading an asset.
+    IssueUploadUrl {
+        /// Asset ID or path (repository/package/tag/filename).
+        asset: String,
     },
 }
 
@@ -382,18 +635,138 @@ pub async fn execute_repositories_cmd(
     executor: &mut impl Execute,
 ) -> anyhow::Result<()> {
     match cmd {
-        RepositoriesCmd::IssueUrl { asset } => {
+        RepositoriesCmd::Resolve { repository } => {
+            let output = executor
+                .execute(ResolveRepositoryNameAction::new(repository.clone()))
+                .await
+                .context("resolving repository")??;
+            write_json(&output);
+        }
+        RepositoriesCmd::Info { repository } => {
+            let repository_id = resolve_repository(executor, repository).await?;
+            let output = executor
+                .execute(GetRepositoryDetailsAction::new(repository_id))
+                .await
+                .context("getting repository details")??;
+            write_json(&output);
+        }
+        RepositoriesCmd::Create {
+            organization,
+            display_name,
+            visibility,
+        } => {
+            let output = executor
+                .execute(
+                    CreateRepositoryAction::new(organization.clone(), display_name.clone())
+                        .with_visibility(visibility.clone()),
+                )
+                .await
+                .context("creating repository")??;
+            write_json(&output);
+        }
+        RepositoriesCmd::Delete { repository } => {
+            let repository_id = resolve_repository(executor, repository).await?;
+            let output = executor
+                .execute(DeleteRepositoryAction::new(repository_id))
+                .await
+                .context("deleting repository")??;
+            write_json(&output);
+        }
+        RepositoriesCmd::Rename {
+            repository,
+            display_name,
+        } => {
+            let repository_id = resolve_repository(executor, repository).await?;
+            let output = executor
+                .execute(SetRepositoryDisplayNameAction::new(
+                    repository_id,
+                    display_name.clone(),
+                ))
+                .await
+                .context("renaming repository")??;
+            write_json(&output);
+        }
+        RepositoriesCmd::SetVisibility {
+            repository,
+            visibility,
+        } => {
+            let repository_id = resolve_repository(executor, repository).await?;
+            let output = executor
+                .execute(SetRepositoryVisibilityAction::new(
+                    repository_id,
+                    visibility.clone(),
+                ))
+                .await
+                .context("setting repository visibility")??;
+            write_json(&output);
+        }
+        RepositoriesCmd::SetSlug { repository, slug } => {
+            let repository_id = resolve_repository(executor, repository).await?;
+            let output = executor
+                .execute(SetRepositorySlugAction::new(repository_id, slug.clone()))
+                .await
+                .context("setting repository slug")??;
+            write_json(&output);
+        }
+        RepositoriesCmd::IssueUrl { asset, filename } => {
             let asset_id = resolve_asset(executor, asset).await?;
             let output = executor
-                .execute(IssueAssetDownloadUrlAction::new(asset_id))
+                .execute(IssueAssetDownloadUrlAction::new(asset_id).with_filename(filename.clone()))
                 .await
                 .context("unable to issue asset download URL")??;
-            println!("{}", serde_json::to_string(&output).unwrap());
+            write_json(&output);
         }
+        RepositoriesCmd::Projects(cmd) => match cmd {
+            RepositoryProjectsCmd::List { repository } => {
+                let repository_id = resolve_repository(executor, repository).await?;
+                let output = executor
+                    .execute(QueryRepositoryProjectsAction::new(repository_id))
+                    .await
+                    .context("querying repository projects")??;
+                write_json(&output);
+            }
+        },
+        RepositoriesCmd::S3(cmd) => match cmd {
+            RepositoryS3Cmd::Get { repository } => {
+                let repository_id = resolve_repository(executor, repository).await?;
+                let output = executor
+                    .execute(GetRepositoryS3ConfigAction::new(repository_id))
+                    .await
+                    .context("getting repository S3 config")??;
+                write_json(&output);
+            }
+            RepositoryS3Cmd::Set { repository, config } => {
+                let repository_id = resolve_repository(executor, repository).await?;
+                let config = serde_json::from_str::<RepositoryS3Config>(config)
+                    .context("repository S3 config must be valid JSON")?;
+                let output = executor
+                    .execute(SetRepositoryS3ConfigAction::new(repository_id, config))
+                    .await
+                    .context("setting repository S3 config")??;
+                write_json(&output);
+            }
+        },
         RepositoriesCmd::Packages(cmd) => match cmd {
+            PackagesCmd::List { repository } => {
+                let repository_id = resolve_repository(executor, repository).await?;
+                let output = executor
+                    .execute(QueryRepositoryPackagesAction::new(repository_id))
+                    .await
+                    .context("querying repository packages")??;
+                write_json(&output);
+            }
+            PackagesCmd::Info { package } => {
+                let package_id = resolve_package(executor, package).await?;
+                let output = executor
+                    .execute(GetPackageDetailsAction::new(package_id))
+                    .await
+                    .context("getting package details")??;
+                write_json(&output);
+            }
             PackagesCmd::Create {
                 repository,
                 name,
+                kind,
                 metadata,
             } => {
                 let repository_id = resolve_repository(executor, repository).await?;
@@ -401,11 +774,12 @@ pub async fn execute_repositories_cmd(
                 let output = executor
                     .execute(
                         CreatePackageAction::new(repository_id.clone(), name.to_owned())
+                            .with_kind(kind.clone())
                             .with_metadata(metadata),
                     )
                     .await
                     .context("creating package")??;
-                serde_json::to_writer_pretty(std::io::stdout(), &output).unwrap();
+                write_json(&output);
             }
             PackagesCmd::Delete { package } => {
                 let package_id = resolve_package(executor, package).await?;
@@ -413,11 +787,111 @@ pub async fn execute_repositories_cmd(
                     .execute(DeletePackageAction::new(package_id.clone()))
                     .await
                     .context("deleting package")??;
-                serde_json::to_writer_pretty(std::io::stdout(), &output).unwrap();
+                write_json(&output);
             }
+            PackagesCmd::Rename { package, name } => {
+                let package_id = resolve_package(executor, package).await?;
+                let output = executor
+                    .execute(SetPackageNameAction::new(package_id, name.clone()))
+                    .await
+                    .context("renaming package")??;
+                write_json(&output);
+            }
+            PackagesCmd::SetKind { package, kind } => {
+                let package_id = resolve_package(executor, package).await?;
+                let output = executor
+                    .execute(SetPackageKindAction::new(package_id).with_kind(kind.clone()))
+                    .await
+                    .context("setting package kind")??;
+                write_json(&output);
+            }
+            PackagesCmd::SetMetadata { package, metadata } => {
+                let package_id = resolve_package(executor, package).await?;
+                let output = executor
+                    .execute(SetPackageMetadataAction::new(
+                        package_id,
+                        json_value_to_map(metadata),
+                    ))
+                    .await
+                    .context("setting package metadata")??;
+                write_json(&output);
+            }
+            PackagesCmd::Assets(cmd) => match cmd {
+                PackageAssetsCmd::Add {
+                    package,
+                    asset_id,
+                    filename,
+                    metadata,
+                } => {
+                    let package_id = resolve_package(executor, package).await?;
+                    let metadata = metadata.as_ref().map(json_value_to_map);
+                    let output = executor
+                        .execute(
+                            AddPackageAssetAction::new(
+                                package_id,
+                                asset_id.clone(),
+                                filename.clone(),
+                            )
+                            .with_metadata(metadata),
+                        )
+                        .await
+                        .context("adding package asset")??;
+                    write_json(&output);
+                }
+                PackageAssetsCmd::Remove { package, filename } => {
+                    let package_id = resolve_package(executor, package).await?;
+                    let output = executor
+                        .execute(RemovePackageAssetAction::new(package_id, filename.clone()))
+                        .await
+                        .context("removing package asset")??;
+                    write_json(&output);
+                }
+                PackageAssetsCmd::SetMetadata {
+                    package,
+                    filename,
+                    metadata,
+                } => {
+                    let package_id = resolve_package(executor, package).await?;
+                    let output = executor
+                        .execute(SetPackageAssetMetadataAction::new(
+                            package_id,
+                            filename.clone(),
+                            json_value_to_map(metadata),
+                        ))
+                        .await
+                        .context("setting package asset metadata")??;
+                    write_json(&output);
+                }
+            },
+            PackagesCmd::Versions(cmd) => match cmd {
+                PackageVersionsCmd::List { package } => {
+                    let package_id = resolve_package(executor, package).await?;
+                    let output = executor
+                        .execute(QueryPackageVersionsAction::new(package_id))
+                        .await
+                        .context("querying package versions")??;
+                    write_json(&output);
+                }
+            },
         },
         RepositoriesCmd::Versions(cmd) => execute_versions_cmd(cmd, executor).await?,
         RepositoriesCmd::Assets(cmd) => match cmd {
+            AssetsCmd::List { repository } => {
+                let repository_id = resolve_repository(executor, repository).await?;
+                let output = executor
+                    .execute(QueryRepositoryAssetsAction::new(repository_id))
+                    .await
+                    .context("querying repository assets")??;
+                write_json(&output);
+            }
+            AssetsCmd::Info { asset } => {
+                let asset_id = resolve_asset(executor, asset).await?;
+                let output = executor
+                    .execute(GetAssetDetailsAction::new(asset_id))
+                    .await
+                    .context("getting asset details")??;
+                write_json(&output);
+            }
             AssetsCmd::Upload { repository, path } => {
                 let repository_id = resolve_repository(executor, repository).await?;
                 let size = tokio::fs::metadata(path)
@@ -469,7 +943,23 @@ pub async fn execute_repositories_cmd(
                     .await
                     .context("uploading asset")?
                     .error_for_status()?;
-                serde_json::to_writer_pretty(std::io::stdout(), &output).unwrap();
+                write_json(&output);
+            }
+            AssetsCmd::Delete { asset } => {
+                let asset_id = resolve_asset(executor, asset).await?;
+                let output = executor
+                    .execute(DeleteAssetAction::new(asset_id))
+                    .await
+                    .context("deleting asset")??;
+                write_json(&output);
+            }
+            AssetsCmd::IssueUploadUrl { asset } => {
+                let asset_id = resolve_asset(executor, asset).await?;
+                let output = executor
+                    .execute(IssueAssetUploadUrlAction::new(asset_id))
+                    .await
+                    .context("issuing asset upload URL")??;
+                write_json(&output);
             }
         },
     }
@@ -492,15 +982,16 @@ pub async fn execute_versions_cmd(
                 ))
                 .await
                 .context("resolving package version")??;
-            serde_json::to_writer_pretty(std::io::stdout(), &output).unwrap();
+            write_json(&output);
         }
         VersionsCmd::Info { version } => {
             let version_id = resolve_version(executor, version).await?;
             let output = get_version_details(executor, version_id).await?;
-            serde_json::to_writer_pretty(std::io::stdout(), &output).unwrap();
+            write_json(&output);
         }
         VersionsCmd::Create {
             package,
+            name,
             tags,
             metadata,
         } => {
@@ -509,12 +1000,13 @@ pub async fn execute_versions_cmd(
             let output = executor
                 .execute(
                     CreatePackageVersionAction::new(package_id.clone())
+                        .with_name(name.clone())
                         .with_tags(Some(tags.iter().map(|tag| tag.0.clone()).collect()))
                         .with_metadata(metadata),
                 )
                 .await
                 .context("creating package version")??;
-            serde_json::to_writer_pretty(std::io::stdout(), &output).unwrap();
+            write_json(&output);
         }
         VersionsCmd::Delete { version } => {
             let version_id = resolve_version(executor, version).await?;
@@ -522,7 +1014,28 @@ pub async fn execute_versions_cmd(
                 .execute(DeletePackageVersionAction::new(version_id.clone()))
                 .await
                 .context("deleting package version")??;
-            serde_json::to_writer_pretty(std::io::stdout(), &output).unwrap();
+            write_json(&output);
+        }
+        VersionsCmd::Rename { version, name } => {
+            let version_id = resolve_version(executor, version).await?;
+            let output = executor
+                .execute(
+                    SetPackageVersionNameAction::new(version_id.clone()).with_name(name.clone()),
+                )
+                .await
+                .context("renaming package version")??;
+            write_json(&output);
+        }
+        VersionsCmd::SetMetadata { version, metadata } => {
+            let version_id = resolve_version(executor, version).await?;
+            let output = executor
+                .execute(SetPackageVersionMetadataAction::new(
+                    version_id.clone(),
+                    json_value_to_map(metadata),
+                ))
+                .await
+                .context("setting package version metadata")??;
+            write_json(&output);
         }
         VersionsCmd::Tag { version, tags } => {
             let version_id = resolve_version(executor, version).await?;
@@ -533,7 +1046,18 @@ pub async fn execute_versions_cmd(
                 ))
                 .await
                 .context("adding package version tags")??;
-            serde_json::to_writer_pretty(std::io::stdout(), &output).unwrap();
+            write_json(&output);
+        }
+        VersionsCmd::Untag { version, tags } => {
+            let version_id = resolve_version(executor, version).await?;
+            let output = executor
+                .execute(UntagPackageVersionAction::new(
+                    version_id.clone(),
+                    tags.iter().cloned().map(RemoveTagItem::new).collect(),
+                ))
+                .await
+                .context("removing package version tags")??;
+            write_json(&output);
         }
         VersionsCmd::Assets(cmd) => match cmd {
             VersionAssetsCmd::Add {
@@ -554,7 +1078,7 @@ pub async fn execute_versions_cmd(
                         .with_metadata(metadata),
                     )
                     .await??;
-                serde_json::to_writer_pretty(std::io::stdout(), &output).unwrap();
+                write_json(&output);
             }
             VersionAssetsCmd::Remove { version, filename } => {
                 let version_id = resolve_version(executor, version).await?;
@@ -564,9 +1088,37 @@ pub async fn execute_versions_cmd(
                         filename.clone(),
                     ))
                     .await??;
-                serde_json::to_writer_pretty(std::io::stdout(), &output).unwrap();
+                write_json(&output);
+            }
+            VersionAssetsCmd::SetMetadata {
+                version,
+                filename,
+                metadata,
+            } => {
+                let version_id = resolve_version(executor, version).await?;
+                let output = executor
+                    .execute(SetPackageVersionAssetMetadataAction::new(
+                        version_id.clone(),
+                        filename.clone(),
+                        json_value_to_map(metadata),
+                    ))
+                    .await
+                    .context("setting package version asset metadata")??;
+                write_json(&output);
             }
         },
     }
     Ok(())
+}
+
+fn parse_repository_visibility(visibility: &str) -> Result<RepositoryVisibility, String> {
+    match visibility {
+        "public" => Ok(RepositoryVisibility::Public),
+        "private" => Ok(RepositoryVisibility::Private),
+        _ => Err("expected one of public, private".to_owned()),
+    }
+}
+
+fn write_json<T: serde::Serialize>(output: &T) {
+    serde_json::to_writer_pretty(std::io::stdout(), output).unwrap();
 }

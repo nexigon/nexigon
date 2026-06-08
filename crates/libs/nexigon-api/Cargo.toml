@@ -16,6 +16,7 @@ serde_json.workspace = true
 si-crypto-hashes.workspace = true
 sidex.workspace = true
 sidex-serde.workspace = true
+sidex-validate.workspace = true
 
 [build-dependencies]
 sidex-build-rs.workspace = true

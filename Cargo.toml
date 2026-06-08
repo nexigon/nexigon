@@ -47,6 +47,7 @@ sidex = { git = "https://github.com/silitics/sidex.git" }
 sidex-build-rs = { git = "https://github.com/silitics/sidex.git" }
 sidex-serde = { git = "https://github.com/silitics/sidex.git" }
 sidex-types-openapi = { git = "https://github.com/silitics/sidex.git" }
+sidex-validate = { git = "https://github.com/silitics/sidex.git" }
 
 # Local Crates
 nexigon-agent-api = { path = "crates/libs/nexigon-agent-api" }

@@ -205,17 +205,25 @@ record SetDeviceNameAction {
     /// ID of the device.
     device_id: DeviceId,
     /// New name of the device.
+    #[validate(
+        { 1 <= _.size <= 128 },
+        message = "Device name must be between 1 and 128 characters."
+    )]
     name?: string,
 }
 
 /// Issue a JWT for a device with user-defined claims.
-/// 
+///
 /// **Note: Only use this action for integration with external systems.**
 #[request(name = "devices_IssueDeviceToken", response = IssueDeviceTokenOutput)]
 record IssueDeviceTokenAction {
     /// ID of the device.
     device_id: DeviceId,
     /// Token validity duration in seconds.
+    #[validate(
+        { 1 <= _ <= 31536000 },
+        message = "Token validity must be between 1 second and 1 year."
+    )]
     valid_for_secs?: u32,
     /// Additional user-defined claims.
     claims?: JsonValue,
@@ -329,6 +337,7 @@ record QueryDeviceConnectionsAction {
     /// ID of the device.
     device_id: DeviceId,
     /// Limit results (default 100).
+    #[validate({ 1 <= _ <= 1000 }, message = "Limit must be between 1 and 1000.")]
     limit?: u32,
     /// Include only active connections.
     active_only?: bool,
@@ -349,16 +358,37 @@ record IssueDeviceHttpProxyTokenAction {
     /// ID of the device.
     device_id: DeviceId,
     /// Token validity duration in seconds.
+    #[validate(
+        { 1 <= _ <= 31536000 },
+        message = "Token validity must be between 1 second and 1 year."
+    )]
     valid_for_secs?: u32,
     /// Hostname to accept requests for.
-    /// 
+    ///
     /// Defaults to a device-specific pseudo-random subdomain of the instance domain.
+    #[validate(
+        { 1 <= _.size <= 253 },
+        message = "Hostname must be between 1 and 253 characters."
+    )]
+    #[validate(
+        { matches(_, "^[A-Za-z0-9][A-Za-z0-9.-]*$") },
+        message = "Hostname must be a valid DNS hostname.",
+        code = "format:hostname"
+    )]
     hostname?: string,
     /// Device port to proxy to.
-    /// 
+    ///
     /// Defaults to `80`.
+    #[validate(
+        { 1 <= _ <= 65535 },
+        message = "Port must be between 1 and 65535."
+    )]
     port?: u16,
     /// Redirect URL in case the token is expired or invalid.
+    #[validate(
+        { 1 <= _.size <= 2048 },
+        message = "Redirect URL must be between 1 and 2048 characters."
+    )]
     redirect?: string,
 }
 
@@ -420,8 +450,9 @@ record QueryDeviceEventsAction {
     /// ID of the device.
     device_id: DeviceId,
     /// Limit the number of events to return.
-    /// 
+    ///
     /// Default to `100`.
+    #[validate({ 1 <= _ <= 1000 }, message = "Limit must be between 1 and 1000.")]
     limit?: u32,
 }
 
@@ -436,6 +467,10 @@ record DeviceEvent {
     /// ID of the event.
     event_id: DeviceEventId,
     /// Event category (optional, low-cardinality category of the event).
+    #[validate(
+        { 1 <= _.size <= 128 },
+        message = "Event category must be between 1 and 128 characters."
+    )]
     category?: string,
     /// Severity of the event.
     severity: DeviceEventSeverity,
@@ -472,6 +507,15 @@ record SetDevicePropertyAction {
     /// ID of the device.
     device_id: DeviceId,
     /// Name of the property.
+    #[validate(
+        { 1 <= _.size <= 256 },
+        message = "Property name must be between 1 and 256 characters."
+    )]
+    #[validate(
+        { matches(_, "^[a-zA-Z0-9][a-zA-Z0-9._-]*$") },
+        message = "Property name must start with a letter or digit and contain only letters, digits, dots, underscores, or hyphens.",
+        code = "format:property_name"
+    )]
     name: string,
     /// Value of the property.
     value: JsonValue,
@@ -508,6 +552,15 @@ record GetDevicePropertyAction {
     /// ID of the device.
     device_id: DeviceId,
     /// Name of the property.
+    #[validate(
+        { 1 <= _.size <= 256 },
+        message = "Property name must be between 1 and 256 characters."
+    )]
+    #[validate(
+        { matches(_, "^[a-zA-Z0-9][a-zA-Z0-9._-]*$") },
+        message = "Property name must start with a letter or digit and contain only letters, digits, dots, underscores, or hyphens.",
+        code = "format:property_name"
+    )]
     name: string,
 }
 
@@ -526,6 +579,15 @@ record RemoveDevicePropertyAction {
     /// ID of the device.
     device_id: DeviceId,
     /// Name of the property.
+    #[validate(
+        { 1 <= _.size <= 256 },
+        message = "Property name must be between 1 and 256 characters."
+    )]
+    #[validate(
+        { matches(_, "^[a-zA-Z0-9][a-zA-Z0-9._-]*$") },
+        message = "Property name must start with a letter or digit and contain only letters, digits, dots, underscores, or hyphens.",
+        code = "format:property_name"
+    )]
     name: string,
 }
 
@@ -582,6 +644,7 @@ record QueryDeviceAuditLogOutput {
 }
 
 /// Query the on-demand commands supported by a device.
+#[unstable(feature = "device_commands")]
 #[request(name = "devices_QueryCommands", response = QueryDeviceCommandsOutput)]
 record QueryDeviceCommandsAction {
     /// ID of the device.
@@ -589,12 +652,14 @@ record QueryDeviceCommandsAction {
 }
 
 /// Output of querying device commands.
+#[unstable(feature = "device_commands")]
 record QueryDeviceCommandsOutput {
     /// Command manifest.
     manifest: DeviceCommandManifest,
 }
 
 /// Status of a device command invocation.
+#[unstable(feature = "device_commands")]
 #[json(tagged = externally)]
 variant DeviceCommandStatus {
     /// Command completed successfully.
@@ -604,6 +669,7 @@ variant DeviceCommandStatus {
 }
 
 /// Hub-to-device frame.
+#[unstable(feature = "device_commands")]
 #[json(tag = "type")]
 variant DeviceCommandHubFrame {
     /// Invoke a command.
@@ -611,6 +677,7 @@ variant DeviceCommandHubFrame {
 }
 
 /// Command invocation parameters.
+#[unstable(feature = "device_commands")]
 record DeviceCommandInvokeData {
     /// Command name.
     command: string,
@@ -623,6 +690,7 @@ record DeviceCommandInvokeData {
 }
 
 /// Device-to-hub frame.
+#[unstable(feature = "device_commands")]
 #[json(tag = "type")]
 variant DeviceCommandDeviceFrame {
     /// Diagnostic log lines from the command.
@@ -632,18 +700,24 @@ variant DeviceCommandDeviceFrame {
 }
 
 /// Log data.
+#[unstable(feature = "device_commands")]
 record DeviceCommandLogData {
     /// Lines of diagnostic output from the command.
     lines: [string],
 }
 
 /// Command completion.
+#[unstable(feature = "device_commands")]
 record DeviceCommandDoneData {
     /// Completion status.
     status: DeviceCommandStatus,
     /// Command output.
     output?: JsonValue,
     /// Error message (present on failure).
+    #[validate(
+        { _.size <= 4096 },
+        message = "Error message must be at most 4096 characters."
+    )]
     error?: string,
     /// Last lines of the command's diagnostic log output.
     log_tail: [string],

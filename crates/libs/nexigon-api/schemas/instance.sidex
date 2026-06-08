@@ -37,6 +37,10 @@ record GetInstanceSettingsRawOutput {
 #[request(name = "instance_SetSettingRaw", response = Empty)]
 record SetInstanceSettingRawAction {
     /// Name of the setting.
+    #[validate(
+        { 1 <= _.size <= 256 },
+        message = "Setting key must be between 1 and 256 characters."
+    )]
     key: string,
     /// Value of the setting.
     value: JsonValue,

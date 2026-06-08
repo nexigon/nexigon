@@ -28,8 +28,6 @@ run = [
   "cd crates/libs/nexigon-agent-api && sidex fmt",
   "cd crates/apps/nexigon-cli && sidex fmt",
   "cd crates/apps/nexigon-agent && sidex fmt",
-  "cd sdks/python && uv run --group dev ruff check --fix src/ tests/",
-  "cd sdks/python && uv run --group dev ruff format src/ tests/",
 ]
 
 [tasks.fix]
@@ -52,19 +50,15 @@ description = "Run tests."
 run = "cargo test"
 
 [tasks.generate]
-description = "Regenerate JSON schemas, OpenAPI spec, and Python SDK actions."
+description = "Regenerate JSON schemas and OpenAPI spec."
 run = [
   "cd crates/libs/nexigon-api && sidex generate json-schema ../../../build/api-json-schema",
-  "cd crates/libs/nexigon-api && sidex generate py ../../../sdks/python/src/nexigon_hub_sdk/api_types",
   "cd crates/apps/nexigon-cli && sidex generate json-schema ../../../build/cli-json-schema",
   "cd crates/apps/nexigon-agent && sidex generate json-schema ../../../build/agent-json-schema",
   "mv build/api-json-schema/schema-defs.json crates/utils/nexigon-gen-openapi/schemas.json",
   "mv build/cli-json-schema/nexigon_cli.config.Config.schema.json schemas/nexigon-cli.schema.json",
   "mv build/agent-json-schema/nexigon_agent.config.Config.schema.json schemas/nexigon-agent.schema.json",
   "cargo run --bin nexigon-gen-openapi >api/openapi.json",
-  "cargo run --bin nexigon-gen-py-bindings >sdks/python/src/nexigon_hub_sdk/_actions.py",
-  "cd sdks/python && uv run --group dev ruff check --fix src/ tests/",
-  "cd sdks/python && uv run --group dev ruff format src/ tests/",
   "mise run fmt",
 ]
 

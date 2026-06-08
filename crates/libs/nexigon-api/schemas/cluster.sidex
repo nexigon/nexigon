@@ -1,83 +1,11 @@
-//! Actions and types related to the cluster.
-
-import datetime::Timestamp
-import outputs::Empty
+//! Cluster identifier types.
+//!
+//! Cluster bookkeeping (registration, heartbeats, sweep) is internal and
+//! lives in the internal API. Only the opaque [`ClusterNodeId`] is part of
+//! the public surface, because [`actor::ClusterNodeActor`] and
+//! [`devices`] connection records reference it.
 
 /// Unique ID of a cluster node.
 #[rust(type = "nexigon_ids::ids::ClusterNodeId")]
 #[json(type = "string")]
 opaque ClusterNodeId
-
-/// Status of a cluster node.
-#[json(tagged = externally)]
-variant ClusterNodeStatus {
-    /// Node is active and running.
-    Active,
-    /// Node has been terminated.
-    Terminated,
-}
-
-/// Reason why a cluster node was terminated.
-#[json(tagged = externally)]
-variant ClusterNodeTerminationReason {
-    /// Unknown reason (fallback).
-    Unknown,
-    /// Node was terminated due to heartbeat timeout.
-    HeartbeatTimeout,
-    /// Node was terminated due to graceful shutdown.
-    Shutdown,
-}
-
-/// Get information about the cluster.
-#[request(name = "cluster_GetDetails", response = GetClusterDetailsOutput)]
-record GetClusterDetailsAction {
-    /// Include terminated nodes in the response.
-    include_terminated?: bool,
-}
-
-/// Information about the cluster.
-record GetClusterDetailsOutput {
-    /// Nodes of the cluster.
-    nodes: [ClusterNode],
-}
-
-/// Cluster node.
-record ClusterNode {
-    /// ID of the cluster node.
-    node_id: ClusterNodeId,
-    /// Name of the cluster node.
-    name?: string,
-    /// Status of the cluster node.
-    status: ClusterNodeStatus,
-    /// Timestamp when the node joined the cluster.
-    joined_at: Timestamp,
-    /// Uptime of the node in seconds.
-    uptime_secs: u32,
-    /// Timestamp when the node last reported a heartbeat.
-    last_heartbeat: Timestamp,
-    /// Timestamp when the node was terminated.
-    terminated_at?: Timestamp,
-    /// Reason why the node was terminated.
-    termination_reason?: ClusterNodeTerminationReason,
-}
-
-/// Register a new cluster node.
-#[request(name = "cluster_RegisterNode", response = RegisterClusterNodeOutput)]
-record RegisterClusterNodeAction {
-    /// Name of the cluster node.
-    name?: string,
-}
-
-/// Output of registering a new cluster node.
-record RegisterClusterNodeOutput {
-    /// ID of the cluster node.
-    node_id: ClusterNodeId,
-}
-
-/// Report the heartbeat of a cluster node.
-#[request(name = "cluster_ReportNodeHeartbeat", response = Empty)]
-record ReportClusterNodeHeartbeatAction {}
-
-/// Cleanup inactive cluster nodes.
-#[request(name = "cluster_CleanupInactiveNodes", response = Empty)]
-record CleanupInactiveClusterNodesAction {}

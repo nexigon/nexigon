@@ -64,6 +64,10 @@ record SetProjectNameAction {
     /// ID of the project.
     project_id: ProjectId,
     /// New name of the project.
+    #[validate(
+        { 1 <= _.size <= 128 },
+        message = "Project name must be between 1 and 128 characters."
+    )]
     name: string,
 }
 
@@ -73,6 +77,10 @@ record CreateProjectAction {
     /// Organization to create the project in.
     organization_id: OrganizationId,
     /// Name of the project.
+    #[validate(
+        { 1 <= _.size <= 128 },
+        message = "Project name must be between 1 and 128 characters."
+    )]
     name: string,
 }
 
@@ -178,10 +186,18 @@ record QueryProjectRepositoriesOutput {
 record QueryProjectRepositoriesItem {
     /// ID of the repository.
     repository_id: RepositoryId,
+    /// Display name of the repository.
+    display_name: string,
+    /// URL-safe slug of the repository, if one has been set.
+    slug?: string,
     /// Public name of the repository.
+    ///
+    /// Falls back to the repository ID when no slug is set.
+    #[deprecated(
+        note = "Use `slug`, which is absent when no slug is set.",
+        remove_in = "2029.2"
+    )]
     public_name: string,
-    /// Display name of the repository (if any).
-    display_name?: string,
 }
 
 /// Flags for deployment tokens.
@@ -199,6 +215,10 @@ record CreateDeploymentTokenAction {
     /// ID of the project.
     project_id: ProjectId,
     /// Name of the token.
+    #[validate(
+        { 1 <= _.size <= 128 },
+        message = "Token name must be between 1 and 128 characters."
+    )]
     name: string,
     /// Flags.
     flags?: DeploymentTokenFlags,
@@ -229,7 +249,10 @@ record SetDeploymentTokenFlagsAction {
 }
 
 /// Query the audit log of the project.
-#[request(name = "projects_QueryAuditLog", response = QueryAuditLogEventsOutput)]
+#[request(
+    name = "audit_QueryAuditLogEvents",
+    response = QueryAuditLogEventsOutput
+)]
 record QueryAuditLogEventsAction {
     /// ID of the project.
     project_id: ProjectId,
@@ -260,10 +283,20 @@ record RemoveProjectRepositoryAction {
 }
 
 /// OTLP event forwarding configuration for a project.
+#[unstable(feature = "otlp_export")]
 record ProjectOtlpConfig {
     /// Whether OTLP forwarding is enabled.
     enabled: bool,
     /// OTLP endpoint URL (e.g., https://otel-collector.example.com/v1/logs).
+    #[validate(
+        { 1 <= _.size <= 2048 },
+        message = "OTLP endpoint must be between 1 and 2048 characters."
+    )]
+    #[validate(
+        { matches(_, "^https?://") },
+        message = "OTLP endpoint must be an HTTP(S) URL.",
+        code = "format:url"
+    )]
     endpoint?: string,
     /// HTTP headers to include with OTLP requests (e.g., for authentication).
     /// Values are masked when read back.
@@ -271,6 +304,7 @@ record ProjectOtlpConfig {
 }
 
 /// Get the OTLP event forwarding configuration for a project.
+#[unstable(feature = "otlp_export")]
 #[request(name = "projects_GetOtlpConfig", response = GetProjectOtlpConfigOutput)]
 record GetProjectOtlpConfigAction {
     /// ID of the project.
@@ -278,12 +312,14 @@ record GetProjectOtlpConfigAction {
 }
 
 /// Output of getting the OTLP configuration for a project.
+#[unstable(feature = "otlp_export")]
 record GetProjectOtlpConfigOutput {
     /// OTLP configuration.
     config: ProjectOtlpConfig,
 }
 
 /// Set the OTLP event forwarding configuration for a project.
+#[unstable(feature = "otlp_export")]
 #[request(name = "projects_SetOtlpConfig", response = Empty)]
 record SetProjectOtlpConfigAction {
     /// ID of the project.
