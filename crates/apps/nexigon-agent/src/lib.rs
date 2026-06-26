@@ -247,15 +247,13 @@ fn provisioning_enabled(config: &Config) -> bool {
         .unwrap_or(false)
 }
 
-fn shutdown_signal(mut rx: watch::Receiver<bool>) -> impl Future<Output = ()> + Send + 'static {
-    async move {
+async fn shutdown_signal(mut rx: watch::Receiver<bool>) {
+    if *rx.borrow() {
+        return;
+    }
+    while rx.changed().await.is_ok() {
         if *rx.borrow() {
             return;
-        }
-        while rx.changed().await.is_ok() {
-            if *rx.borrow() {
-                return;
-            }
         }
     }
 }

@@ -264,10 +264,10 @@ pub enum ClientError {
     Tls(#[from] rustls::Error),
     /// Websocket error.
     #[error(transparent)]
-    Ws(#[from] tokio_tungstenite::tungstenite::Error),
+    Ws(Box<tokio_tungstenite::tungstenite::Error>),
     /// Connection error.
     #[error(transparent)]
-    Connection(#[from] ConnectionError<WebSocketTransport<MaybeTlsStream<TcpStream>>>),
+    Connection(Box<ConnectionError<WebSocketTransport<MaybeTlsStream<TcpStream>>>>),
     /// IO error.
     #[error(transparent)]
     Io(#[from] std::io::Error),
@@ -283,6 +283,18 @@ pub enum ClientError {
     /// Action error.
     #[error("action error: {}", _0.message)]
     ActionError(ActionError),
+}
+
+impl From<tokio_tungstenite::tungstenite::Error> for ClientError {
+    fn from(error: tokio_tungstenite::tungstenite::Error) -> Self {
+        Self::Ws(Box::new(error))
+    }
+}
+
+impl From<ConnectionError<WebSocketTransport<MaybeTlsStream<TcpStream>>>> for ClientError {
+    fn from(error: ConnectionError<WebSocketTransport<MaybeTlsStream<TcpStream>>>) -> Self {
+        Self::Connection(Box::new(error))
+    }
 }
 
 /// Websocket connection to a Nexigon Hub server.
