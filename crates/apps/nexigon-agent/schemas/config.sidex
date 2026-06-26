@@ -12,11 +12,22 @@ opaque PathBuf
 #[json(rename_all = "kebab-case")]
 record Config {
     /// URL of the Nexigon Hub server.
-    hub_url: string,
+    ///
+    /// Required for static deployments. If omitted, the agent reads
+    /// provisioned credentials from `credentials.json` in `data-path`.
+    hub_url?: string,
     /// Deployment token.
-    token: DeploymentToken,
+    ///
+    /// Required for static deployments. If omitted, the agent reads
+    /// provisioned credentials from `credentials.json` in `data-path`.
+    token?: DeploymentToken,
     /// Fingerprint script.
     fingerprint_script: PathBuf,
+    /// Persistent agent data directory.
+    ///
+    /// Provisioned credentials are stored as `credentials.json` below this
+    /// path. Defaults to `/var/lib/nexigon/agent`.
+    data_path?: PathBuf,
     /// Path to the device certificate.
     ssl_cert?: PathBuf,
     /// Path to the device private key.
@@ -33,6 +44,28 @@ record Config {
     commands?: CommandsConfig,
     /// Local API configuration.
     local_api?: LocalApiConfig,
+    /// Pairing-key provisioning configuration.
+    provisioning?: ProvisioningConfig,
+}
+
+/// Pairing-key provisioning configuration.
+///
+/// When static credentials and provisioned credentials are both absent,
+/// the agent can expose a minimal local HTTP endpoint to accept a one-time
+/// pairing key and redeem it into device credentials.
+#[json(rename_all = "kebab-case")]
+record ProvisioningConfig {
+    /// Whether pairing-key provisioning is enabled (defaults to false).
+    enabled?: bool,
+    /// Local bind address for the provisioning endpoint
+    /// (defaults to `0.0.0.0:51337`).
+    bind?: string,
+    /// Hub endpoints to try when redeeming a pairing key.
+    ///
+    /// Defaults to `https://eu.nexigon.cloud` and `https://us.nexigon.cloud`.
+    endpoints?: [string],
+    /// Optional display name for the device created during pairing.
+    device_name?: string,
 }
 
 /// Local API configuration.

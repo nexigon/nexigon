@@ -1,5 +1,7 @@
 //! Nexigon Agent library.
 
+use std::future::Future;
+use std::io::ErrorKind;
 use std::path::Path;
 use std::path::PathBuf;
 use std::process::Stdio;
@@ -7,12 +9,17 @@ use std::sync::Arc;
 
 use anyhow::Context;
 use anyhow::bail;
+use jiff::Timestamp;
 use nexigon_client::ClientIdentity;
 use nexigon_client::ClientToken;
 use nexigon_client::WebsocketConnection;
+use nexigon_ids::ids::DeploymentToken;
 use nexigon_ids::ids::DeviceFingerprint;
 use nexigon_ids::ids::DeviceId;
+use serde::Deserialize;
+use serde::Serialize;
 use tokio::sync::oneshot;
+use tokio::sync::watch;
 use tracing::info;
 
 pub use nexigon_client::install_crypto_provider;
@@ -21,6 +28,7 @@ pub mod config;
 pub mod handlers;
 #[cfg(unix)]
 pub mod local_api;
+pub mod provisioning;
 pub mod system_info;
 #[cfg(target_os = "linux")]
 pub mod terminal;
@@ -31,6 +39,44 @@ pub use run::run;
 pub use run::run_with_connection;
 
 use crate::config::Config;
+
+/// Default directory for persistent agent data.
+pub const DEFAULT_DATA_PATH: &str = "/var/lib/nexigon/agent";
+
+const CREDENTIALS_FILE_NAME: &str = "credentials.json";
+
+/// Credentials persisted after successful pairing-key provisioning.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct AgentCredentials {
+    /// Hub URL selected during pairing.
+    pub hub_url: String,
+    /// Device-bound deployment token issued by the hub.
+    pub deployment_token: DeploymentToken,
+    /// Timestamp at which the credentials were written.
+    pub paired_at: Timestamp,
+}
+
+impl AgentCredentials {
+    fn resolved(&self) -> ResolvedCredentials {
+        ResolvedCredentials {
+            hub_url: self.hub_url.clone(),
+            token: self.deployment_token.clone(),
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+struct ResolvedCredentials {
+    hub_url: String,
+    token: DeploymentToken,
+}
+
+#[derive(Debug)]
+pub(crate) struct DeviceIdentity {
+    client_identity: ClientIdentity,
+    pub(crate) fingerprint: DeviceFingerprint,
+}
 
 /// Load and parse the agent configuration from the given path.
 ///
@@ -53,6 +99,21 @@ pub async fn load_config(config_path: &Path) -> anyhow::Result<(Arc<Config>, Pat
     Ok((Arc::new(config), config_dir.to_path_buf()))
 }
 
+/// Return the configured persistent data directory.
+pub fn data_path(config: &Config, config_dir: &Path) -> PathBuf {
+    config_dir.join(
+        config
+            .data_path
+            .as_deref()
+            .unwrap_or(Path::new(DEFAULT_DATA_PATH)),
+    )
+}
+
+/// Return the provisioned-credentials path.
+pub fn credentials_path(config: &Config, config_dir: &Path) -> PathBuf {
+    data_path(config, config_dir).join(CREDENTIALS_FILE_NAME)
+}
+
 /// Establish a hub connection using the agent's configuration.
 ///
 /// Generates a self-signed client certificate if one does not yet exist at
@@ -64,6 +125,43 @@ pub async fn connect(
     config_dir: &Path,
     register_connection: bool,
 ) -> anyhow::Result<WebsocketConnection> {
+    let Some(credentials) = resolve_credentials(config, config_dir).await? else {
+        bail!(
+            "agent credentials are missing; configure hub-url/token or provision {}",
+            credentials_path(config, config_dir).display(),
+        );
+    };
+    connect_with_credentials(config, config_dir, &credentials, register_connection).await
+}
+
+async fn connect_with_credentials(
+    config: &Config,
+    config_dir: &Path,
+    credentials: &ResolvedCredentials,
+    register_connection: bool,
+) -> anyhow::Result<WebsocketConnection> {
+    let identity = load_device_identity(config, config_dir).await?;
+    let connection = nexigon_client::ClientBuilder::new(
+        credentials
+            .hub_url
+            .parse()
+            .context("cannot parse hub URL")?,
+        ClientToken::DeploymentToken(credentials.token.clone()),
+    )
+    .with_identity(Some(identity.client_identity))
+    .with_device_fingerprint(Some(identity.fingerprint))
+    .with_register_connection(register_connection)
+    .dangerous_with_disable_tls(config.dangerous_disable_tls.unwrap_or(false))
+    .connect()
+    .await
+    .context("cannot connect to Nexigon Hub")?;
+    Ok(connection)
+}
+
+pub(crate) async fn load_device_identity(
+    config: &Config,
+    config_dir: &Path,
+) -> anyhow::Result<DeviceIdentity> {
     let cert_path = config_dir.join(
         config
             .ssl_cert
@@ -107,18 +205,102 @@ pub async fn connect(
         .await
         .context("cannot read private key")?;
     let identity = ClientIdentity::from_pem(&cert, &key).context("cannot parse identity")?;
-    let connection = nexigon_client::ClientBuilder::new(
-        config.hub_url.parse().context("cannot parse hub URL")?,
-        ClientToken::DeploymentToken(config.token.clone()),
+    Ok(DeviceIdentity {
+        client_identity: identity,
+        fingerprint,
+    })
+}
+
+async fn resolve_credentials(
+    config: &Config,
+    config_dir: &Path,
+) -> anyhow::Result<Option<ResolvedCredentials>> {
+    match (&config.hub_url, &config.token) {
+        (Some(hub_url), Some(token)) => {
+            return Ok(Some(ResolvedCredentials {
+                hub_url: hub_url.clone(),
+                token: token.clone(),
+            }));
+        }
+        (Some(_), None) | (None, Some(_)) => {
+            bail!("agent config must set both hub-url and token, or neither");
+        }
+        (None, None) => {}
+    }
+
+    let path = credentials_path(config, config_dir);
+    let raw = match tokio::fs::read_to_string(&path).await {
+        Ok(raw) => raw,
+        Err(e) if e.kind() == ErrorKind::NotFound => return Ok(None),
+        Err(e) => return Err(e).with_context(|| format!("cannot read {}", path.display())),
+    };
+    let credentials: AgentCredentials =
+        serde_json::from_str(&raw).with_context(|| format!("cannot parse {}", path.display()))?;
+    Ok(Some(credentials.resolved()))
+}
+
+fn provisioning_enabled(config: &Config) -> bool {
+    config
+        .provisioning
+        .as_ref()
+        .and_then(|p| p.enabled)
+        .unwrap_or(false)
+}
+
+fn shutdown_signal(mut rx: watch::Receiver<bool>) -> impl Future<Output = ()> + Send + 'static {
+    async move {
+        if *rx.borrow() {
+            return;
+        }
+        while rx.changed().await.is_ok() {
+            if *rx.borrow() {
+                return;
+            }
+        }
+    }
+}
+
+pub(crate) async fn run_agent(
+    config_path: PathBuf,
+    shutdown: impl Future<Output = ()> + Send + 'static,
+    ready: Option<oneshot::Sender<DeviceId>>,
+) -> anyhow::Result<()> {
+    let (shutdown_tx, shutdown_rx) = watch::channel(false);
+    tokio::spawn(async move {
+        shutdown.await;
+        let _ = shutdown_tx.send(true);
+    });
+
+    let (config, config_dir) = load_config(&config_path).await?;
+    let credentials = match resolve_credentials(&config, &config_dir).await? {
+        Some(credentials) => credentials,
+        None => {
+            if !provisioning_enabled(&config) {
+                bail!(
+                    "agent credentials are missing and provisioning is disabled; expected {}",
+                    credentials_path(&config, &config_dir).display(),
+                );
+            }
+            let identity = load_device_identity(&config, &config_dir).await?;
+            let credentials = provisioning::serve_until_paired(
+                &config,
+                &config_dir,
+                &identity.fingerprint,
+                shutdown_rx.clone(),
+            )
+            .await?;
+            credentials.resolved()
+        }
+    };
+    let connection = connect_with_credentials(&config, &config_dir, &credentials, true).await?;
+    run_with_connection(
+        config,
+        &config_dir,
+        connection,
+        shutdown_signal(shutdown_rx),
+        ready,
     )
-    .with_identity(Some(identity))
-    .with_device_fingerprint(Some(fingerprint))
-    .with_register_connection(register_connection)
-    .dangerous_with_disable_tls(config.dangerous_disable_tls.unwrap_or(false))
-    .connect()
     .await
-    .context("cannot connect to Nexigon Hub")?;
-    Ok(connection)
 }
 
 /// Handle for an agent running in the background.
@@ -151,12 +333,10 @@ pub fn spawn(config_path: PathBuf) -> AgentHandle {
     let (shutdown_tx, shutdown_rx) = oneshot::channel::<()>();
     let (ready_tx, ready_rx) = oneshot::channel::<DeviceId>();
     let join = tokio::spawn(async move {
-        let (config, config_dir) = load_config(&config_path).await?;
-        let connection = connect(&config, &config_dir, true).await?;
         let shutdown = async move {
             let _ = shutdown_rx.await;
         };
-        run_with_connection(config, &config_dir, connection, shutdown, Some(ready_tx)).await
+        run_agent(config_path, shutdown, Some(ready_tx)).await
     });
     AgentHandle {
         ready: ready_rx,

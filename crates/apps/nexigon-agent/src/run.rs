@@ -44,9 +44,7 @@ pub async fn run(
     config_path: &Path,
     shutdown: impl Future<Output = ()> + Send + 'static,
 ) -> anyhow::Result<()> {
-    let (config, config_dir) = crate::load_config(config_path).await?;
-    let connection = crate::connect(&config, &config_dir, true).await?;
-    run_with_connection(config, &config_dir, connection, shutdown, None).await
+    crate::run_agent(config_path.to_path_buf(), shutdown, None).await
 }
 
 /// Run the agent loop on an already-established connection.

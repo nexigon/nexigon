@@ -447,6 +447,8 @@ define_types! {
     ///
     /// The first 22 characters of the respective deployment token.
     DeploymentTokenId => (FlatRawId, "deployment_id", 22, secret = false),
+    /// Device pairing key id (globally unique).
+    DevicePairingKeyId => (FlatRawId, "d_pairing", 22, secret = false),
 
     /// Device id (globally unique).
     ///

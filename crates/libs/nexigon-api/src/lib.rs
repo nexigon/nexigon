@@ -93,6 +93,11 @@ macro_rules! with_actions {
             ("projects_CreateDeploymentToken", CreateDeploymentToken, projects::CreateDeploymentTokenAction, projects::CreateDeploymentTokenOutput),
             ("projects_DeleteDeploymentToken", DeleteDeploymentToken, projects::DeleteDeploymentTokenAction, outputs::Empty),
             ("projects_SetDeploymentTokenFlags", SetDeploymentTokenFlags, projects::SetDeploymentTokenFlagsAction, outputs::Empty),
+            // ## Device Pairing Keys
+            ("projects_QueryDevicePairingKeys", QueryDevicePairingKeys, projects::QueryDevicePairingKeysAction, projects::QueryDevicePairingKeysOutput),
+            ("projects_CreateDevicePairingKey", CreateDevicePairingKey, projects::CreateDevicePairingKeyAction, projects::CreateDevicePairingKeyOutput),
+            ("projects_RevokeDevicePairingKey", RevokeDevicePairingKey, projects::RevokeDevicePairingKeyAction, outputs::Empty),
+            ("projects_RedeemDevicePairingKey", RedeemDevicePairingKey, projects::RedeemDevicePairingKeyAction, projects::RedeemDevicePairingKeyOutput),
             // ## Audit Log
             ("projects_QueryAuditLog", QueryProjectAuditLog, projects::QueryAuditLogEventsAction, projects::QueryAuditLogEventsOutput),
             // ## Repositories
