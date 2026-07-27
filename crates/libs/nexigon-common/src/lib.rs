@@ -1,4 +1,3 @@
-use std::io::BufRead;
 use std::path::PathBuf;
 use std::str::FromStr;
 
@@ -10,7 +9,6 @@ use clap::Subcommand;
 use nexigon_api::types::repositories::AddPackageAssetAction;
 use nexigon_api::types::repositories::AddPackageVersionAssetAction;
 use nexigon_api::types::repositories::AddTagItem;
-use nexigon_api::types::repositories::CreateAssetAction;
 use nexigon_api::types::repositories::CreatePackageAction;
 use nexigon_api::types::repositories::CreatePackageVersionAction;
 use nexigon_api::types::repositories::CreateRepositoryAction;
@@ -61,6 +59,9 @@ use nexigon_ids::ids::PackageId;
 use nexigon_ids::ids::PackageVersionId;
 use nexigon_ids::ids::RepositoryId;
 
+mod repository_upload;
+pub mod secure_file;
+
 // ── Value parsing helpers ────────────────────────────────────────────
 
 fn parse_json_object(s: &str) -> Result<serde_json::Value, String> {
@@ -85,6 +86,7 @@ fn json_value_to_map(
 
 // ── Path parsing ─────────────────────────────────────────────────────
 
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct AssetPath {
     pub repository: String,
     pub package: String,
@@ -92,21 +94,21 @@ pub struct AssetPath {
     pub filename: String,
 }
 
+/// Parse `repository/package/tag/filename`, preserving non-empty nested filename
+/// components.
 pub fn parse_asset_path(path: &str) -> anyhow::Result<AssetPath> {
     let mut parts_iter = path.split('/');
-    let repository = parts_iter
-        .next()
-        .ok_or_else(|| anyhow!("missing repository"))?
-        .to_owned();
-    let package = parts_iter
-        .next()
-        .ok_or_else(|| anyhow!("missing package"))?
-        .to_owned();
-    let tag = parts_iter
-        .next()
-        .ok_or_else(|| anyhow!("missing version tag"))?
-        .to_owned();
-    let filename = parts_iter.collect::<Vec<_>>().join("/");
+    let repository = next_path_component(&mut parts_iter, "repository")?.to_owned();
+    let package = next_path_component(&mut parts_iter, "package")?.to_owned();
+    let tag = next_path_component(&mut parts_iter, "version tag")?.to_owned();
+    let filename_parts = parts_iter.collect::<Vec<_>>();
+    if filename_parts.is_empty() {
+        bail!("missing filename");
+    }
+    if filename_parts.iter().any(|part| part.is_empty()) {
+        bail!("filename components must not be empty");
+    }
+    let filename = filename_parts.join("/");
     Ok(AssetPath {
         repository,
         package,
@@ -115,26 +117,29 @@ pub fn parse_asset_path(path: &str) -> anyhow::Result<AssetPath> {
     })
 }
 
+impl std::fmt::Display for AssetPath {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}/{}/{}/{}",
+            self.repository, self.package, self.tag, self.filename
+        )
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct VersionPath {
     pub repository: String,
     pub package: String,
     pub tag: String,
 }
 
+/// Parse `repository/package/tag`.
 pub fn parse_version_path(path: &str) -> anyhow::Result<VersionPath> {
     let mut parts_iter = path.split('/');
-    let repository = parts_iter
-        .next()
-        .ok_or_else(|| anyhow!("missing repository"))?
-        .to_owned();
-    let package = parts_iter
-        .next()
-        .ok_or_else(|| anyhow!("missing package"))?
-        .to_owned();
-    let tag = parts_iter
-        .next()
-        .ok_or_else(|| anyhow!("missing version tag"))?
-        .to_owned();
+    let repository = next_path_component(&mut parts_iter, "repository")?.to_owned();
+    let package = next_path_component(&mut parts_iter, "package")?.to_owned();
+    let tag = next_path_component(&mut parts_iter, "version tag")?.to_owned();
     if parts_iter.next().is_some() {
         bail!("too many parts in version path");
     }
@@ -145,14 +150,61 @@ pub fn parse_version_path(path: &str) -> anyhow::Result<VersionPath> {
     })
 }
 
+impl std::fmt::Display for VersionPath {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}/{}/{}", self.repository, self.package, self.tag)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PackagePath {
+    pub repository: String,
+    pub package: String,
+}
+
+/// Parse `repository/package`.
+pub fn parse_package_path(path: &str) -> anyhow::Result<PackagePath> {
+    let mut parts_iter = path.split('/');
+    let repository = next_path_component(&mut parts_iter, "repository")?.to_owned();
+    let package = next_path_component(&mut parts_iter, "package")?.to_owned();
+    if parts_iter.next().is_some() {
+        bail!("too many parts in package path");
+    }
+    Ok(PackagePath {
+        repository,
+        package,
+    })
+}
+
+impl std::fmt::Display for PackagePath {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}/{}", self.repository, self.package)
+    }
+}
+
+fn next_path_component<'a>(
+    parts: &mut impl Iterator<Item = &'a str>,
+    name: &str,
+) -> anyhow::Result<&'a str> {
+    let part = parts.next().ok_or_else(|| anyhow!("missing {name}"))?;
+    if part.is_empty() {
+        bail!("{name} must not be empty");
+    }
+    Ok(part)
+}
+
+fn parse_complete_id<T: FromStr>(value: &str) -> Option<T> {
+    value.parse().ok()
+}
+
 // ── Resolution helpers ───────────────────────────────────────────────
 
 pub async fn resolve_repository(
     executor: &mut impl Execute,
     repository: &str,
 ) -> anyhow::Result<RepositoryId> {
-    if repository.starts_with("repo_") {
-        return Ok(repository.parse()?);
+    if let Some(repository_id) = parse_complete_id::<RepositoryId>(repository) {
+        return Ok(repository_id);
     }
     let output = executor
         .execute(ResolveRepositoryNameAction::new(repository.to_owned()))
@@ -169,23 +221,14 @@ pub async fn resolve_package(
     executor: &mut impl Execute,
     package: &str,
 ) -> anyhow::Result<PackageId> {
-    if package.starts_with("pkg_") {
-        return Ok(package.parse()?);
+    if let Some(package_id) = parse_complete_id::<PackageId>(package) {
+        return Ok(package_id);
     }
-    let mut parts_iter = package.split('/');
-    let repository = parts_iter
-        .next()
-        .ok_or_else(|| anyhow!("missing repository"))?;
-    let package = parts_iter
-        .next()
-        .ok_or_else(|| anyhow!("missing package"))?;
-    if parts_iter.next().is_some() {
-        bail!("too many parts in package name");
-    }
+    let path = parse_package_path(package)?;
     let output = executor
         .execute(ResolvePackageByPathAction::new(
-            repository.to_owned(),
-            package.to_owned(),
+            path.repository.clone(),
+            path.package.clone(),
         ))
         .await??;
     match output {
@@ -193,7 +236,11 @@ pub async fn resolve_package(
             Ok(output.package_id)
         }
         nexigon_api::types::repositories::ResolvePackageByPathOutput::NotFound => {
-            bail!("package {package} not found in repository {repository}")
+            bail!(
+                "package {} not found in repository {}",
+                path.package,
+                path.repository
+            )
         }
     }
 }
@@ -202,8 +249,8 @@ pub async fn resolve_asset(
     executor: &mut impl Execute,
     asset: &str,
 ) -> anyhow::Result<RepositoryAssetId> {
-    if asset.starts_with("repo_a_") {
-        return Ok(asset.parse()?);
+    if let Some(asset_id) = parse_complete_id::<RepositoryAssetId>(asset) {
+        return Ok(asset_id);
     }
     let path = parse_asset_path(asset)?;
     let output = executor
@@ -228,8 +275,8 @@ pub async fn resolve_version(
     executor: &mut impl Execute,
     version: &str,
 ) -> anyhow::Result<PackageVersionId> {
-    if version.starts_with("pkg_v") {
-        return Ok(version.parse()?);
+    if let Some(version_id) = parse_complete_id::<PackageVersionId>(version) {
+        return Ok(version_id);
     }
     let path = parse_version_path(version)?;
     let output = executor
@@ -894,55 +941,9 @@ pub async fn execute_repositories_cmd(
             }
             AssetsCmd::Upload { repository, path } => {
                 let repository_id = resolve_repository(executor, repository).await?;
-                let size = tokio::fs::metadata(path)
-                    .await
-                    .context("getting asset size")?
-                    .len();
-                let digest = tokio::task::spawn_blocking({
-                    let path = path.to_owned();
-                    move || -> Result<si_crypto_hashes::HashDigest, std::io::Error> {
-                        let mut hasher = si_crypto_hashes::HashAlgorithm::Sha256.hasher();
-                        let mut file = std::io::BufReader::new(std::fs::File::open(&path)?);
-                        loop {
-                            let buffer = file.fill_buf()?;
-                            if buffer.is_empty() {
-                                break;
-                            }
-                            hasher.update(buffer);
-                            let consumed = buffer.len();
-                            file.consume(consumed);
-                        }
-                        Ok(hasher.finalize())
-                    }
-                })
-                .await
-                .unwrap()
-                .unwrap();
-                let output = executor
-                    .execute(CreateAssetAction::new(repository_id.clone(), size, digest))
-                    .await??;
-                let asset_id = match &output {
-                    nexigon_api::types::repositories::CreateAssetOutput::AssetAlreadyExists(
-                        asset_id,
-                    ) => asset_id,
-                    nexigon_api::types::repositories::CreateAssetOutput::Created(asset_id) => {
-                        asset_id
-                    }
-                };
-                let upload_url = executor
-                    .execute(IssueAssetUploadUrlAction::new(asset_id.clone()))
-                    .await
-                    .context("issuing upload URL")?
-                    .context("issuing upload URL")?
-                    .url;
-                reqwest::Client::new()
-                    .put(upload_url)
-                    .header("Content-Length", size)
-                    .body(tokio::fs::read(path).await?)
-                    .send()
-                    .await
-                    .context("uploading asset")?
-                    .error_for_status()?;
+                let output =
+                    repository_upload::upload_repository_asset(executor, repository_id, path)
+                        .await?;
                 write_json(&output);
             }
             AssetsCmd::Delete { asset } => {
@@ -1121,4 +1122,147 @@ fn parse_repository_visibility(visibility: &str) -> Result<RepositoryVisibility,
 
 fn write_json<T: serde::Serialize>(output: &T) {
     serde_json::to_writer_pretty(std::io::stdout(), output).unwrap();
+}
+
+#[cfg(test)]
+mod path_tests {
+    use nexigon_ids::Generate;
+    use nexigon_ids::ids::PackageId;
+    use nexigon_ids::ids::PackageVersionId;
+    use nexigon_ids::ids::RepositoryAssetId;
+    use nexigon_ids::ids::RepositoryId;
+    use proptest::prelude::*;
+
+    use super::parse_asset_path;
+    use super::parse_complete_id;
+    use super::parse_package_path;
+    use super::parse_version_path;
+
+    #[test]
+    fn rejects_empty_or_ambiguous_package_components() {
+        for path in [
+            "",
+            "repository",
+            "/package",
+            "repository/",
+            "repository//package",
+            "repository/package/",
+            "repository/package/extra",
+        ] {
+            assert!(parse_package_path(path).is_err(), "accepted {path:?}");
+        }
+    }
+
+    #[test]
+    fn rejects_empty_or_ambiguous_version_components() {
+        for path in [
+            "",
+            "repository",
+            "repository/package",
+            "/package/tag",
+            "repository//tag",
+            "repository/package/",
+            "repository/package/tag/",
+            "repository/package/tag/extra",
+        ] {
+            assert!(parse_version_path(path).is_err(), "accepted {path:?}");
+        }
+    }
+
+    #[test]
+    fn rejects_empty_or_ambiguous_asset_components() {
+        for path in [
+            "",
+            "repository",
+            "repository/package",
+            "repository/package/tag",
+            "/package/tag/file",
+            "repository//tag/file",
+            "repository/package//file",
+            "repository/package/tag/",
+            "repository/package/tag//file",
+            "repository/package/tag/file/",
+            "repository/package/tag/nested//file",
+        ] {
+            assert!(parse_asset_path(path).is_err(), "accepted {path:?}");
+        }
+    }
+
+    #[test]
+    fn id_prefixes_are_names_until_the_complete_value_is_a_valid_id() {
+        assert!(parse_complete_id::<RepositoryId>("repo_not-an-id").is_none());
+        assert!(parse_complete_id::<PackageId>("pkg_not-an-id/package").is_none());
+        assert!(
+            parse_complete_id::<RepositoryAssetId>("repo_a_not-an-id/package/tag/file").is_none()
+        );
+        assert!(parse_complete_id::<PackageVersionId>("pkg_v_not-an-id/package/tag").is_none());
+
+        assert_eq!(
+            parse_package_path("pkg_not-an-id/package")
+                .expect("reserved-prefix repository slug must remain a path")
+                .to_string(),
+            "pkg_not-an-id/package"
+        );
+        assert_eq!(
+            parse_asset_path("repo_a_not-an-id/package/tag/nested/file")
+                .expect("reserved-prefix repository slug must remain a path")
+                .to_string(),
+            "repo_a_not-an-id/package/tag/nested/file"
+        );
+        assert_eq!(
+            parse_version_path("pkg_v_not-an-id/package/tag")
+                .expect("reserved-prefix repository slug must remain a path")
+                .to_string(),
+            "pkg_v_not-an-id/package/tag"
+        );
+    }
+
+    #[test]
+    fn complete_valid_ids_are_still_recognized() {
+        assert!(parse_complete_id::<RepositoryId>(&RepositoryId::generate().to_string()).is_some());
+        assert!(parse_complete_id::<PackageId>(&PackageId::generate().to_string()).is_some());
+        assert!(
+            parse_complete_id::<RepositoryAssetId>(&RepositoryAssetId::generate().to_string())
+                .is_some()
+        );
+        assert!(
+            parse_complete_id::<PackageVersionId>(&PackageVersionId::generate().to_string())
+                .is_some()
+        );
+    }
+
+    proptest! {
+        #[test]
+        fn package_paths_round_trip(
+            repository in "[a-z][a-z0-9_.-]{0,15}",
+            package in "[a-z][a-z0-9_.-]{0,15}",
+        ) {
+            let input = format!("{repository}/{package}");
+            let parsed = parse_package_path(&input).expect("generated path is valid");
+            prop_assert_eq!(parsed.to_string(), input);
+        }
+
+        #[test]
+        fn version_paths_round_trip(
+            repository in "[a-z][a-z0-9_.-]{0,15}",
+            package in "[a-z][a-z0-9_.-]{0,15}",
+            tag in "[a-z][a-z0-9_.-]{0,15}",
+        ) {
+            let input = format!("{repository}/{package}/{tag}");
+            let parsed = parse_version_path(&input).expect("generated path is valid");
+            prop_assert_eq!(parsed.to_string(), input);
+        }
+
+        #[test]
+        fn nested_asset_paths_round_trip(
+            repository in "[a-z][a-z0-9_.-]{0,15}",
+            package in "[a-z][a-z0-9_.-]{0,15}",
+            tag in "[a-z][a-z0-9_.-]{0,15}",
+            filename in prop::collection::vec("[a-z][a-z0-9_.-]{0,15}", 1..5),
+        ) {
+            let input = format!("{repository}/{package}/{tag}/{}", filename.join("/"));
+            let parsed = parse_asset_path(&input).expect("generated path is valid");
+            prop_assert_eq!(parsed.to_string(), input);
+        }
+    }
 }

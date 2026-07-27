@@ -6,7 +6,6 @@
 //! returns a short JSON status response, and exits.
 
 use std::collections::HashMap;
-use std::io::ErrorKind;
 use std::path::Path;
 use std::path::PathBuf;
 use std::time::Duration;
@@ -45,7 +44,8 @@ struct ProvisioningRuntime {
     endpoints: Vec<String>,
     device_name: Option<String>,
     credentials_path: PathBuf,
-    dangerous_disable_tls: bool,
+    dangerous_allow_plaintext: bool,
+    dangerous_accept_invalid_certificates: bool,
 }
 
 impl ProvisioningRuntime {
@@ -62,7 +62,10 @@ impl ProvisioningRuntime {
             endpoints,
             device_name: provisioning.and_then(|p| p.device_name.clone()),
             credentials_path: credentials_path(config, config_dir),
-            dangerous_disable_tls: config.dangerous_disable_tls.unwrap_or(false),
+            dangerous_allow_plaintext: config.dangerous_allow_plaintext.unwrap_or(false),
+            dangerous_accept_invalid_certificates: config
+                .dangerous_accept_invalid_certificates
+                .unwrap_or(false),
         }
     }
 }
@@ -213,6 +216,10 @@ async fn redeem_pairing_key_at(
     fingerprint: &DeviceFingerprint,
 ) -> anyhow::Result<nexigon_api::types::projects::RedeemDevicePairingKeyOutput> {
     let mut url: reqwest::Url = endpoint.parse().context("cannot parse hub URL")?;
+    validate_endpoint_transport(&url, runtime.dangerous_allow_plaintext)?;
+    if url.scheme() == "http" {
+        warn!(%url, "sending a pairing key over explicitly allowed plaintext HTTP");
+    }
     let action_path = format!(
         "{}/api/v1/actions/invoke/projects_RedeemDevicePairingKey",
         url.path().trim_end_matches('/')
@@ -226,7 +233,7 @@ async fn redeem_pairing_key_at(
     let body = serde_json::to_vec(&action).context("serializing pairing redemption request")?;
     let client = reqwest::Client::builder()
         .use_rustls_tls()
-        .danger_accept_invalid_certs(runtime.dangerous_disable_tls)
+        .danger_accept_invalid_certs(runtime.dangerous_accept_invalid_certificates)
         .timeout(REQUEST_TIMEOUT)
         .build()
         .context("building provisioning HTTP client")?;
@@ -254,49 +261,23 @@ async fn redeem_pairing_key_at(
     serde_json::from_slice(&body).context("cannot parse pairing redemption response")
 }
 
-async fn store_credentials(path: &Path, credentials: &AgentCredentials) -> anyhow::Result<()> {
-    if let Some(parent) = path.parent() {
-        tokio::fs::create_dir_all(parent)
-            .await
-            .with_context(|| format!("creating {}", parent.display()))?;
+fn validate_endpoint_transport(url: &reqwest::Url, allow_plaintext: bool) -> anyhow::Result<()> {
+    match url.scheme() {
+        "https" => Ok(()),
+        "http" if allow_plaintext => Ok(()),
+        "http" => bail!(
+            "refusing to send a pairing key over plaintext HTTP; enable dangerous-allow-plaintext only for a trusted development network"
+        ),
+        scheme => bail!("unsupported provisioning Hub URL scheme `{scheme}`; expected https"),
     }
-    let tmp_path = path.with_extension("json.tmp");
+}
+
+async fn store_credentials(path: &Path, credentials: &AgentCredentials) -> anyhow::Result<()> {
     let mut data = serde_json::to_vec_pretty(credentials).context("serializing credentials")?;
     data.push(b'\n');
-    if let Err(error) = tokio::fs::remove_file(&tmp_path).await
-        && error.kind() != ErrorKind::NotFound
-    {
-        return Err(error).with_context(|| format!("removing {}", tmp_path.display()));
-    }
-
-    #[cfg(unix)]
-    {
-        let mut file = tokio::fs::OpenOptions::new()
-            .create(true)
-            .truncate(true)
-            .write(true)
-            .mode(0o600)
-            .open(&tmp_path)
-            .await
-            .with_context(|| format!("opening {}", tmp_path.display()))?;
-        file.write_all(&data)
-            .await
-            .with_context(|| format!("writing {}", tmp_path.display()))?;
-        file.sync_all()
-            .await
-            .with_context(|| format!("syncing {}", tmp_path.display()))?;
-    }
-    #[cfg(not(unix))]
-    {
-        tokio::fs::write(&tmp_path, &data)
-            .await
-            .with_context(|| format!("writing {}", tmp_path.display()))?;
-    }
-
-    if let Err(error) = tokio::fs::rename(&tmp_path, path).await {
-        let _ = tokio::fs::remove_file(&tmp_path).await;
-        return Err(error).with_context(|| format!("renaming {}", path.display()));
-    }
+    nexigon_common::secure_file::write_private(path, data, true)
+        .await
+        .with_context(|| format!("writing {}", path.display()))?;
     info!(path = %path.display(), "stored provisioned agent credentials");
     Ok(())
 }
@@ -485,6 +466,7 @@ fn reason_phrase(status: u16) -> &'static str {
 #[cfg(test)]
 mod tests {
     use super::parse_pairing_key;
+    use super::validate_endpoint_transport;
 
     #[test]
     fn parses_plain_pairing_key() {
@@ -497,5 +479,18 @@ mod tests {
             parse_pairing_key(br#"{"pairingKey":"ABCD-123456"}"#).unwrap(),
             "ABCD-123456",
         );
+    }
+
+    #[test]
+    fn provisioning_requires_secure_transport_by_default() {
+        let https = reqwest::Url::parse("https://hub.example").unwrap();
+        assert!(validate_endpoint_transport(&https, false).is_ok());
+
+        let http = reqwest::Url::parse("http://hub.example").unwrap();
+        assert!(validate_endpoint_transport(&http, false).is_err());
+        assert!(validate_endpoint_transport(&http, true).is_ok());
+
+        let ftp = reqwest::Url::parse("ftp://hub.example").unwrap();
+        assert!(validate_endpoint_transport(&ftp, true).is_err());
     }
 }

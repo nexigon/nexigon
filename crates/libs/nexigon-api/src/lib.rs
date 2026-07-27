@@ -57,7 +57,7 @@ macro_rules! with_actions {
             // ## User Sessions
             ("users_TerminateSession", TerminateUserSession, users::TerminateUserSessionAction, outputs::Empty),
             // ## User Registrations
-            ("users_Register", RegisterUser, users::RegisterUserAction, users::RegisterUserOutput),
+            ("users_Register", RegisterUser, users::RegisterUserAction, outputs::Empty),
             ("users_ResendRegistrationEmail", ResendRegistrationEmail, users::ResendRegistrationEmailAction, outputs::Empty),
             ("users_CompleteRegistration", CompleteRegistration, users::CompleteRegistrationAction, users::CompleteRegistrationOutput),
             // ## User Invitations
@@ -149,6 +149,26 @@ macro_rules! with_actions {
             ("fleet_DefineComputedProperty", DefineComputedFleetProperty, fleet::DefineComputedFleetPropertyAction, outputs::Empty),
             ("fleet_QueryComputedPropertyDefinitions", QueryComputedFleetPropertyDefinitions, fleet::QueryComputedFleetPropertyDefinitionsAction, fleet::QueryComputedFleetPropertyDefinitionsOutput),
 
+            // # Fleet Operations
+            ("fleet_QueryOperations", QueryFleetOperations, fleet::QueryFleetOperationsAction, fleet::QueryFleetOperationsOutput),
+            ("fleet_GetOperation", GetFleetOperation, fleet::GetFleetOperationAction, fleet::GetFleetOperationOutput),
+            ("fleet_CreateOperation", CreateFleetOperation, fleet::CreateFleetOperationAction, fleet::CreateFleetOperationOutput),
+            ("fleet_StartOperation", StartFleetOperation, fleet::StartFleetOperationAction, outputs::Empty),
+            ("fleet_AdvanceOperationStage", AdvanceFleetOperationStage, fleet::AdvanceFleetOperationStageAction, fleet::AdvanceFleetOperationStageOutput),
+            ("fleet_QueryOperationTargets", QueryFleetOperationTargets, fleet::QueryFleetOperationTargetsAction, fleet::QueryFleetOperationTargetsOutput),
+            ("fleet_QueryOperationSelectionErrors", QueryFleetOperationSelectionErrors, fleet::QueryFleetOperationSelectionErrorsAction, fleet::QueryFleetOperationSelectionErrorsOutput),
+            ("fleet_PauseOperation", PauseFleetOperation, fleet::PauseFleetOperationAction, outputs::Empty),
+            ("fleet_CancelOperation", CancelFleetOperation, fleet::CancelFleetOperationAction, outputs::Empty),
+
+            // # Device Operations
+            ("devices_QueryOperations", QueryDeviceOperations, devices::QueryDeviceOperationsAction, devices::QueryDeviceOperationsOutput),
+            ("devices_GetOperation", GetDeviceOperation, devices::GetDeviceOperationAction, devices::GetDeviceOperationOutput),
+            ("devices_CreateOperation", CreateDeviceOperation, devices::CreateDeviceOperationAction, devices::CreateDeviceOperationOutput),
+            ("devices_StartOperation", StartDeviceOperation, devices::StartDeviceOperationAction, outputs::Empty),
+            ("devices_CancelOperation", CancelDeviceOperation, devices::CancelDeviceOperationAction, outputs::Empty),
+            ("devices_ClaimOperationWork", ClaimDeviceOperationWork, devices::ClaimDeviceOperationWorkAction, devices::ClaimDeviceOperationWorkOutput),
+            ("devices_ReportOperationStep", ReportDeviceOperationStep, devices::ReportDeviceOperationStepAction, outputs::Empty),
+
             // # Repositories
             ("repositories_ResolveName", ResolveRepositoryName, repositories::ResolveRepositoryNameAction, repositories::ResolveRepositoryNameOutput),
             ("repositories_GetDetails", GetRepositoryDetails, repositories::GetRepositoryDetailsAction, repositories::GetRepositoryDetailsOutput),
@@ -194,6 +214,7 @@ macro_rules! with_actions {
             ("repositories_DeleteAsset", DeleteAsset, repositories::DeleteAssetAction, outputs::Empty),
             ("repositories_IssueAssetDownloadUrl", IssueAssetDownloadUrl, repositories::IssueAssetDownloadUrlAction, repositories::IssueAssetDownloadUrlOutput),
             ("repositories_IssueAssetUploadUrl", IssueAssetUploadUrl, repositories::IssueAssetUploadUrlAction, repositories::IssueAssetUploadUrlOutput),
+            ("repositories_FinalizeAssetUpload", FinalizeAssetUpload, repositories::FinalizeAssetUploadAction, outputs::Empty),
             // # Audit Log
             ("repositories_QueryAuditLog", QueryRepositoryAuditLogEvents, repositories::QueryAuditLogEventsAction, repositories::QueryAuditLogEventsOutput),
 

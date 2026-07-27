@@ -1,6 +1,221 @@
-//! JSON types.
+//! JSON value types and generic JSON value evaluation/mutation model.
 
 /// JSON value.
 #[rust(type = "serde_json::Value")]
 #[json(type = "any")]
 opaque JsonValue
+
+// =============================================================================
+// Expressions
+// =============================================================================
+
+
+/// JSON expression evaluated against a context of named JSON values.
+///
+/// Every expression returns a `JsonValue`; boolean expressions are not a
+/// separate language. A consumer that uses an expression as a condition
+/// requires its result to be a JSON boolean.
+///
+/// `NamedValue` reads are supplied by the consumer. In device and fleet
+/// operations, each name is an exact device-property name and its value is the
+/// property's JSON value. A missing name is distinct from a name whose value is
+/// JSON `null`.
+#[json(tag = "kind")]
+variant JsonExpr {
+    /// Constant JSON value.
+    #[json(content = "value")]
+    Literal: JsonValue,
+    /// The current value being mutated.
+    ///
+    /// Only valid inside a `JsonMutation`. Evaluating it anywhere else is an
+    /// error. In an operation property update, this is the exact value read
+    /// while holding the property row lock. When an update creates a previously
+    /// absent property, its current value is JSON `null`.
+    Current,
+    /// Read a named value from the evaluation context.
+    NamedValue: JsonNamedValueExpr,
+    /// Get a nested value inside another expression result.
+    Get: JsonGetExpr,
+    /// Recursive JSON equality. Numbers compare by mathematical value, so `1`
+    /// equals `1.0`.
+    Equals: JsonBinaryExpr,
+    /// Negation of recursive JSON equality.
+    NotEquals: JsonBinaryExpr,
+    /// Exact ordered comparison over two JSON numbers or two strings.
+    LessThan: JsonBinaryExpr,
+    /// Exact ordered comparison over two JSON numbers or two strings.
+    LessThanOrEquals: JsonBinaryExpr,
+    /// Exact ordered comparison over two JSON numbers or two strings.
+    GreaterThan: JsonBinaryExpr,
+    /// Exact ordered comparison over two JSON numbers or two strings.
+    GreaterThanOrEquals: JsonBinaryExpr,
+    /// Membership test. The right-hand side must evaluate to a JSON array.
+    In: JsonBinaryExpr,
+    /// Short-circuiting boolean conjunction over one or more expressions that
+    /// must evaluate to booleans.
+    And: JsonVariadicExpr,
+    /// Short-circuiting boolean disjunction over one or more expressions that
+    /// must evaluate to booleans.
+    Or: JsonVariadicExpr,
+    /// Boolean negation over an expression that must evaluate to a boolean.
+    Not: JsonUnaryExpr,
+    /// Returns whether a path resolves against an expression result.
+    Exists: JsonExistsExpr,
+    /// Compare a version string against a version requirement. Supports
+    /// SemVer, CalVer, serial, and date-plus-revision version schemes.
+    VersionRequirement: JsonVersionRequirementExpr,
+}
+
+/// Read a named JSON value from the evaluation context.
+record JsonNamedValueExpr {
+    /// Named value identifier.
+    #[validate(
+        { 1 <= _.size <= 256 },
+        message = "Named value identifier must be between 1 and 256 characters."
+    )]
+    #[validate(
+        { matches(_, "^[a-zA-Z0-9][a-zA-Z0-9._-]*$") },
+        message = "Named value identifier must start with a letter or digit and contain only letters, digits, dots, underscores, or hyphens.",
+        code = "format:named_value"
+    )]
+    name: string,
+    /// Fallback expression for a missing named value.
+    ///
+    /// If set, a missing named value evaluates this expression instead of
+    /// raising an evaluation error.
+    #[rust(box)]
+    default?: JsonExpr,
+}
+
+/// Get a nested value inside another expression result.
+record JsonGetExpr {
+    /// Expression that evaluates to the value to read from.
+    #[rust(box)]
+    expr: JsonExpr,
+    /// Path to read inside the expression result. An empty path reads the
+    /// expression result itself.
+    path: JsonPath,
+    /// Fallback expression for a missing expression or path.
+    ///
+    /// If set, missing named values and missing paths evaluate this expression
+    /// instead of raising an evaluation error. Other errors still propagate.
+    #[rust(box)]
+    default?: JsonExpr,
+}
+
+/// Structured path into a JSON value.
+///
+/// A JSON array of path segments. String segments address object members;
+/// unsigned integer segments address array elements. The empty path addresses
+/// the expression or mutation root. Operation definitions accept at most 32
+/// segments per path.
+wrapper JsonPath: [JsonPathSegment]
+
+/// One segment in a structured JSON path.
+#[json(tagged = implicitly)]
+variant JsonPathSegment {
+    /// Object member key.
+    #[validate(
+        { _.size <= 256 },
+        message = "JSON path key segment must be at most 256 characters."
+    )]
+    Key: string,
+    /// Array element index.
+    Index: u32,
+}
+
+/// Unary expression payload.
+record JsonUnaryExpr {
+    /// Operand expression.
+    #[rust(box)]
+    expr: JsonExpr,
+}
+
+/// Binary expression payload.
+record JsonBinaryExpr {
+    /// Left operand.
+    #[rust(box)]
+    left: JsonExpr,
+    /// Right operand.
+    #[rust(box)]
+    right: JsonExpr,
+}
+
+/// Variadic expression payload.
+record JsonVariadicExpr {
+    /// Operand expressions. At least one is required in an operation
+    /// definition.
+    exprs: [JsonExpr],
+}
+
+/// Path existence expression payload.
+record JsonExistsExpr {
+    /// Expression to test.
+    #[rust(box)]
+    expr: JsonExpr,
+    /// Path to resolve against the expression result. The empty path tests
+    /// whether the expression itself resolves.
+    path: JsonPath,
+}
+
+/// Version requirement expression payload.
+record JsonVersionRequirementExpr {
+    /// Expression that must evaluate to a version string.
+    #[rust(box)]
+    expr: JsonExpr,
+    /// Version requirement, for example `>=1.2.0, <2.0.0`.
+    #[validate(
+        { 1 <= _.size <= 256 },
+        message = "Version requirement must be between 1 and 256 characters."
+    )]
+    requirement: string,
+}
+
+// =============================================================================
+// Mutations
+// =============================================================================
+
+
+/// Declarative mutation to apply to a JSON value.
+///
+/// Expressions inside a mutation may use `Current` to read the exact value to
+/// which the mutation is applied. Object parents missing from a `Set` or
+/// `MergePatch` path are created. Array indexes must already exist. Removing a
+/// missing member or index is a successful no-op; removing an array element
+/// shifts later elements left.
+#[json(tag = "mutation")]
+variant JsonMutation {
+    /// Replace a value with an expression result.
+    Set: JsonSetMutation,
+    /// Evaluate an expression and apply the result as an RFC 7396 JSON Merge
+    /// Patch.
+    MergePatch: JsonMergePatchMutation,
+    /// Remove a value at a path.
+    Remove: JsonRemoveMutation,
+}
+
+/// Set mutation.
+record JsonSetMutation {
+    /// Path locating the value to replace. An empty path replaces the root.
+    path: JsonPath,
+    /// Expression that produces the value to write.
+    expr: JsonExpr,
+}
+
+/// RFC 7396 JSON Merge Patch mutation.
+record JsonMergePatchMutation {
+    /// Path locating the value to patch. An empty path patches the root.
+    path: JsonPath,
+    /// Expression that produces the JSON Merge Patch document.
+    expr: JsonExpr,
+}
+
+/// Remove mutation.
+record JsonRemoveMutation {
+    /// Non-empty path to remove in the root value.
+    ///
+    /// A mutation cannot remove its root because its result is still a JSON
+    /// value. Use the operation's `RemoveDeviceProperty` step to delete an
+    /// entire property.
+    path: JsonPath,
+}

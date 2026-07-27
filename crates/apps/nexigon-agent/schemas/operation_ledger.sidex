@@ -1,0 +1,53 @@
+//! Durable device-operation execution ledger entries.
+//!
+//! Each value is stored as one JSON file before or after executing an on-device
+//! command. The tagged states deliberately carry the complete entry so the persisted
+//! representation cannot express an in-progress execution without its claim or a
+//! completed execution without its report.
+
+/// Unique ID of a device operation.
+#[rust(type = "nexigon_ids::ids::DeviceOperationId")]
+#[json(type = "string")]
+opaque DeviceOperationId
+
+/// Unique claim for one lease of a device operation work item.
+#[rust(type = "nexigon_ids::ids::DeviceOperationWorkClaimId")]
+#[json(type = "string")]
+opaque DeviceOperationWorkClaimId
+
+/// Report produced after executing an operation step.
+#[rust(type = "nexigon_api::types::devices::DeviceOperationStepReport")]
+opaque DeviceOperationStepReport
+
+/// Durable execution state for one device-operation step.
+#[json(tag = "state", rename_all = "camelCase")]
+variant OperationExecutionEntry {
+    /// The command was durably marked as dispatched and must not be replayed.
+    InProgress: OperationExecutionInProgress,
+    /// The command finished and its durable report can be sent again safely.
+    Completed: OperationExecutionCompleted,
+}
+
+/// A command that was durably marked as dispatched.
+#[json(rename_all = "camelCase")]
+record OperationExecutionInProgress {
+    /// Operation containing the command step.
+    device_operation_id: DeviceOperationId,
+    /// Zero-based operation step index.
+    step_index: u32,
+    /// Hub lease claim under which the command was dispatched.
+    claim_id: DeviceOperationWorkClaimId,
+}
+
+/// A command that finished locally and has a durable report.
+#[json(rename_all = "camelCase")]
+record OperationExecutionCompleted {
+    /// Operation containing the command step.
+    device_operation_id: DeviceOperationId,
+    /// Zero-based operation step index.
+    step_index: u32,
+    /// Hub lease claim under which the report was last persisted.
+    claim_id: DeviceOperationWorkClaimId,
+    /// Report to send without executing the command again.
+    report: DeviceOperationStepReport,
+}

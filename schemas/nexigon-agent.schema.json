@@ -22,7 +22,10 @@
     "ssl-key": {
       "$ref": "#/$defs/nexigon_agent.config.PathBuf"
     },
-    "dangerous-disable-tls": {
+    "dangerous-allow-plaintext": {
+      "type": "boolean"
+    },
+    "dangerous-accept-invalid-certificates": {
       "type": "boolean"
     },
     "telemetry": {
@@ -39,6 +42,9 @@
     },
     "commands": {
       "$ref": "#/$defs/nexigon_agent.config.CommandsConfig"
+    },
+    "operations": {
+      "$ref": "#/$defs/nexigon_agent.config.OperationsConfig"
     },
     "local-api": {
       "$ref": "#/$defs/nexigon_agent.config.LocalApiConfig"
@@ -110,6 +116,22 @@
         },
         "socket-path": {
           "$ref": "#/$defs/nexigon_agent.config.PathBuf"
+        }
+      },
+      "required": [],
+      "unevaluatedProperties": false
+    },
+    "nexigon_agent.config.OperationsConfig": {
+      "$id": "nexigon_agent.config.OperationsConfig",
+      "type": "object",
+      "description": "Device-polled operation configuration.",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "poll-interval-secs": {
+          "type": "integer",
+          "format": "uint64"
         }
       },
       "required": [],

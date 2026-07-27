@@ -39,6 +39,30 @@ variant RepositoryAssetStatus {
     Deleting,
 }
 
+/// Result of the latest non-destructive object-storage check.
+#[json(tagged = externally)]
+variant RepositoryAssetStorageStatus {
+    /// The asset has not been checked yet.
+    Unknown,
+    /// A legacy object exists with the expected size, but has no verifiable checksum metadata.
+    Present,
+    /// The object carries matching size, checksum, digest, and ownership metadata.
+    Verified,
+    /// No object exists at the expected key.
+    Missing,
+    /// The object exists but its size or verification metadata does not match.
+    Mismatched,
+    /// The storage provider could not be checked.
+    Error,
+}
+
+/// Latest object-storage check for an asset.
+record RepositoryAssetStorage {
+    status: RepositoryAssetStorageStatus,
+    checked_at?: Timestamp,
+    detail?: string,
+}
+
 /// Repository visibility.
 #[json(tagged = externally)]
 variant RepositoryVisibility {
@@ -416,6 +440,8 @@ record PackageAsset {
     size: u64,
     digest: Digest,
     status: RepositoryAssetStatus,
+    /// Latest storage check. Absent when connected to an older Hub.
+    storage?: RepositoryAssetStorage,
     metadata: [string: JsonValue],
 }
 
@@ -655,6 +681,8 @@ record PackageVersionAsset {
     digest: Digest,
     /// Status of the asset.
     status: RepositoryAssetStatus,
+    /// Latest storage check. Absent when connected to an older Hub.
+    storage?: RepositoryAssetStorage,
     /// Arbitrary metadata associated with this asset in the version.
     metadata: [string: JsonValue],
 }
@@ -999,6 +1027,8 @@ record GetAssetDetailsOutput {
     digest: Digest,
     /// Status of the asset.
     status: RepositoryAssetStatus,
+    /// Latest storage check. Absent when connected to an older Hub.
+    storage?: RepositoryAssetStorage,
     /// Number of package versions that refer to the asset.
     reference_count: u64,
 }
@@ -1066,8 +1096,24 @@ record IssueAssetUploadUrlAction {
 
 /// Output of issuing a URL for uploading an asset.
 record IssueAssetUploadUrlOutput {
-    /// URL for uploading the asset.
+    /// Compatibility URL for uploading the asset without verification headers.
+    ///
+    /// Objects uploaded through this URL remain dangling. New clients should use
+    /// `verified_url`, apply every entry in `headers`, and finalize the upload.
     url: string,
+    /// URL for an upload whose digest and ownership can be verified by the hub.
+    verified_url?: string,
+    /// Headers that must accompany a request to `verified_url`.
+    headers?: [string: string],
+}
+
+/// Verify an uploaded object and make its asset available.
+///
+/// This action is idempotent: finalizing an already available asset succeeds.
+#[request(name = "repositories_FinalizeAssetUpload", response = Empty)]
+record FinalizeAssetUploadAction {
+    /// ID of the pending asset to finalize.
+    asset_id: RepositoryAssetId,
 }
 
 /// Query the audit log of the repository.

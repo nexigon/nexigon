@@ -19,5 +19,5 @@ tokio.workspace = true
 tracing.workspace = true
 
 [dev-dependencies]
-tokio = { workspace = true, features = ["full"] }
+tokio = { workspace = true, features = ["full", "test-util"] }
 tracing-subscriber = { version = "0.3", features = ["env-filter", "fmt"] }

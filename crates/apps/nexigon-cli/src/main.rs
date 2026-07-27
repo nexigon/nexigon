@@ -48,9 +48,6 @@ async fn main() -> anyhow::Result<()> {
                 .ok_or_else(|| anyhow!("unable to determine home directory"))?
                 .join(".nexigon/cli.toml")
         };
-        if let Some(parent) = config_path.parent() {
-            tokio::fs::create_dir_all(parent).await.ok();
-        }
         let config = tokio::task::spawn_blocking(|| -> anyhow::Result<Config> {
             let hub_url = dialoguer::Input::new()
                 .with_prompt("Nexigon Hub URL")
@@ -65,9 +62,10 @@ async fn main() -> anyhow::Result<()> {
             })
         })
         .await??;
-        tokio::fs::write(
+        nexigon_common::secure_file::write_private(
             &config_path,
             &toml::to_string_pretty(&config).expect("config is valid TOML"),
+            !*local,
         )
         .await
         .with_context(|| format!("unable to write config file: {config_path:?}"))?;
@@ -75,12 +73,14 @@ async fn main() -> anyhow::Result<()> {
     }
 
     let config_path = get_config_path(&args)?;
-    let config = toml::from_str::<Config>(
-        &tokio::fs::read_to_string(&config_path)
-            .await
-            .context("cannot read config")?,
-    )
-    .context("cannot parse config")?;
+    let config_contents = nexigon_common::secure_file::read_private(&config_path)
+        .await
+        .with_context(|| {
+            format!("configuration must be a private regular file: {config_path:?}")
+        })?;
+    let config_contents =
+        String::from_utf8(config_contents).context("config is not valid UTF-8")?;
+    let config = toml::from_str::<Config>(&config_contents).context("cannot parse config")?;
     nexigon_client::install_crypto_provider();
     let connection = nexigon_client::ClientBuilder::new(
         config.hub_url.parse().unwrap(),

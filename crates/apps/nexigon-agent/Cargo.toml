@@ -19,7 +19,9 @@ anyhow.workspace = true
 clap.workspace = true
 futures.workspace = true
 jiff.workspace = true
+jsonschema.workspace = true
 nexigon-agent-api.workspace = true
+nexigon-agent-protocol.workspace = true
 nexigon-api.workspace = true
 nexigon-cert.workspace = true
 nexigon-client.workspace = true
@@ -30,6 +32,7 @@ nexigon-rpc.workspace = true
 nexigon-version.workspace = true
 reportify.workspace = true
 reqwest.workspace = true
+regex.workspace = true
 serde.workspace = true
 serde_json.workspace = true
 si-observability.workspace = true
@@ -37,18 +40,25 @@ sidex.workspace = true
 sidex-serde.workspace = true
 sysinfo.workspace = true
 tokio.workspace = true
+tokio-util.workspace = true
 toml.workspace = true
 tracing.workspace = true
 
 [build-dependencies]
 sidex-build-rs.workspace = true
 
+[dev-dependencies]
+bytes.workspace = true
+tempfile = "3"
+tokio = { workspace = true, features = ["test-util"] }
+
 [target.'cfg(unix)'.dependencies]
 nix = { version = "0.29", features = [
-    "fs",
-    "term",
-    "user",
-    "process",
-    "signal",
+  "dir",
+  "fs",
+  "term",
+  "user",
+  "process",
+  "signal",
 ] }
 libc = "0.2"

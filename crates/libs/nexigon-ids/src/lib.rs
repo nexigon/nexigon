@@ -478,6 +478,14 @@ define_types! {
     /// Package version id (globally unique).
     PackageVersionId => (FlatRawId, "pkg_v", 22, secret = false),
 
+    /// Fleet operation id (globally unique).
+    FleetOperationId => (FlatRawId, "flt_op", 22, secret = false),
+
+    /// Device operation id (globally unique).
+    DeviceOperationId => (FlatRawId, "d_op", 22, secret = false),
+    /// Claim identifying one lease of device operation work.
+    DeviceOperationWorkClaimId => (FlatRawId, "d_op_claim", 22, secret = false),
+
     /// Job id (globally unique).
     JobId => (DatedRawId, "job", 22, secret = false),
 

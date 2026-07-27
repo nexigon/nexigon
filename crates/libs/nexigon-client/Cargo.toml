@@ -23,3 +23,9 @@ tokio-tungstenite.workspace = true
 tracing.workspace = true
 url.workspace = true
 urlencoding.workspace = true
+x509-cert.workspace = true
+
+[dev-dependencies]
+nexigon-cert.workspace = true
+rcgen.workspace = true
+tokio-rustls = "0.26"

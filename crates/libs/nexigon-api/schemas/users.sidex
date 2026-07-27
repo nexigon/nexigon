@@ -491,12 +491,12 @@ record TerminateUserSessionAction {
 }
 
 /// Register a new user with an email and password.
-#[request(name = "users_Register", response = RegisterUserOutput)]
+#[request(name = "users_Register", response = Empty)]
 record RegisterUserAction {
     /// Name of the user.
     #[validate(
-        { 1 <= _.size <= 128 },
-        message = "Display name must be between 1 and 128 characters."
+        { 1 <= _.size <= 64 },
+        message = "Display name must be between 1 and 64 characters."
     )]
     display_name?: string,
     /// Email address of the user.
@@ -522,38 +522,6 @@ record RegisterUserAction {
     consented_to_terms: bool,
     /// Indicates whether the user has consented to marketing communications.
     consented_to_marketing?: bool,
-}
-
-/// Output of registering a new user.
-#[json(tag = "result")]
-variant RegisterUserOutput {
-    /// User registration has been created.
-    Created: UserRegistration,
-    /// User registration is already pending.
-    Pending: UserRegistration,
-    /// User with the same email already exists.
-    EmailAlreadyExists,
-}
-
-/// User registration.
-record UserRegistration {
-    /// Registration status.
-    status: UserRegistrationStatus,
-    /// Optional message to show to the user.
-    message?: string,
-    /// Timestamp when the registration was created.
-    created_at: Timestamp,
-}
-
-variant UserRegistrationStatus {
-    /// Registration is pending.
-    Pending,
-    //// Registration is waiting for approval.
-    Waiting,
-    /// Registration was successful.
-    Completed,
-    /// Registration failed.
-    Failed,
 }
 
 #[request(name = "users_ResendRegistrationEmail", response = Empty)]

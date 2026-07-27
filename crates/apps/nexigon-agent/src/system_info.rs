@@ -97,11 +97,7 @@ fn get_rugix_info() -> Option<RugixSystemInfo> {
 
 /// Build agent config from the device configuration.
 fn build_agent_config(config: &Config) -> AgentConfig {
-    let terminal_enabled = config
-        .terminal
-        .as_ref()
-        .and_then(|t| t.enabled)
-        .unwrap_or(false);
+    let terminal_enabled = crate::config::terminal_enabled(config);
     let commands_enabled = config
         .commands
         .as_ref()
@@ -121,10 +117,10 @@ fn build_agent_config(config: &Config) -> AgentConfig {
 /// Collect available terminal users from the config.
 fn terminal_users(config: &Config) -> Option<Vec<String>> {
     let terminal = config.terminal.as_ref()?;
-    if !terminal.enabled.unwrap_or(false) {
+    if !crate::config::terminal_enabled(config) {
         return None;
     }
-    let default_user = terminal.user.clone().unwrap_or_else(|| "root".to_owned());
+    let default_user = crate::config::terminal_user(config)?.to_owned();
     let mut users = vec![default_user];
     if let Some(allowed) = &terminal.allowed_users {
         for user in allowed {

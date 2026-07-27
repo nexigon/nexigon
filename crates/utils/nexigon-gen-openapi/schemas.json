@@ -457,11 +457,63 @@
     ],
     "unevaluatedProperties": false
   },
+  "nexigon_api.devices.CancelDeviceOperationAction": {
+    "type": "object",
+    "description": "Cancel a device operation.",
+    "properties": {
+      "deviceOperationId": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceOperationId"
+      }
+    },
+    "required": [
+      "deviceOperationId"
+    ],
+    "unevaluatedProperties": false
+  },
   "nexigon_api.devices.CertificateFingerprint": {
     "type": [
       "string"
     ],
     "description": "Fingerprint of a device certificate."
+  },
+  "nexigon_api.devices.ClaimDeviceOperationWorkAction": {
+    "type": "object",
+    "description": "Atomically claim device operation work for a device.",
+    "properties": {
+      "deviceId": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceId"
+      },
+      "limit": {
+        "type": "integer",
+        "format": "uint32"
+      },
+      "kinds": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.devices.DeviceOperationWorkKind"
+        }
+      }
+    },
+    "required": [
+      "deviceId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.devices.ClaimDeviceOperationWorkOutput": {
+    "type": "object",
+    "description": "Output of claiming operation work for a device.",
+    "properties": {
+      "work": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.devices.DeviceOperationWorkItem"
+        }
+      }
+    },
+    "required": [
+      "work"
+    ],
+    "unevaluatedProperties": false
   },
   "nexigon_api.devices.ConnectionEndReason": {
     "enum": [
@@ -486,6 +538,46 @@
     "required": [
       "projectId",
       "fingerprint"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.devices.CreateDeviceOperationAction": {
+    "type": "object",
+    "description": "Create a device operation.",
+    "properties": {
+      "deviceId": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceId"
+      },
+      "name": {
+        "type": "string"
+      },
+      "description": {
+        "type": "string"
+      },
+      "steps": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.devices.DeviceOperationStep"
+        }
+      }
+    },
+    "required": [
+      "deviceId",
+      "name",
+      "steps"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.devices.CreateDeviceOperationOutput": {
+    "type": "object",
+    "description": "Output of creating a device operation.",
+    "properties": {
+      "deviceOperationId": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceOperationId"
+      }
+    },
+    "required": [
+      "deviceOperationId"
     ],
     "unevaluatedProperties": false
   },
@@ -570,7 +662,7 @@
     "description": "Status of a device certificate."
   },
   "nexigon_api.devices.DeviceCommandDeviceFrame": {
-    "description": "Device-to-hub frame.",
+    "description": "**Unstable (feature `device_commands`).**\n\nDevice-to-hub frame.",
     "oneOf": [
       {
         "type": "object",
@@ -627,7 +719,7 @@
   },
   "nexigon_api.devices.DeviceCommandDoneData": {
     "type": "object",
-    "description": "Command completion.",
+    "description": "**Unstable (feature `device_commands`).**\n\nCommand completion.",
     "properties": {
       "status": {
         "$ref": "#/components/schemas/nexigon_api.devices.DeviceCommandStatus"
@@ -657,7 +749,7 @@
     "unevaluatedProperties": false
   },
   "nexigon_api.devices.DeviceCommandHubFrame": {
-    "description": "Hub-to-device frame.",
+    "description": "**Unstable (feature `device_commands`).**\n\nHub-to-device frame.",
     "oneOf": [
       {
         "type": "object",
@@ -689,7 +781,7 @@
   },
   "nexigon_api.devices.DeviceCommandInvokeData": {
     "type": "object",
-    "description": "Command invocation parameters.",
+    "description": "**Unstable (feature `device_commands`).**\n\nCommand invocation parameters.",
     "properties": {
       "command": {
         "type": "string"
@@ -713,7 +805,7 @@
   },
   "nexigon_api.devices.DeviceCommandLogData": {
     "type": "object",
-    "description": "Log data.",
+    "description": "**Unstable (feature `device_commands`).**\n\nLog data.",
     "properties": {
       "lines": {
         "type": "array",
@@ -732,7 +824,7 @@
       "Ok",
       "Error"
     ],
-    "description": "Status of a device command invocation."
+    "description": "**Unstable (feature `device_commands`).**\n\nStatus of a device command invocation."
   },
   "nexigon_api.devices.DeviceConnection": {
     "type": "object",
@@ -871,6 +963,569 @@
     ],
     "description": "Unique ID of a device."
   },
+  "nexigon_api.devices.DeviceOperationDetails": {
+    "type": "object",
+    "description": "Device operation details.",
+    "properties": {
+      "summary": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceOperationSummary"
+      },
+      "steps": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.devices.DeviceOperationStep"
+        }
+      },
+      "stepStates": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.devices.DeviceOperationStepState"
+        }
+      }
+    },
+    "required": [
+      "summary",
+      "steps",
+      "stepStates"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.devices.DeviceOperationDeviceCommandStep": {
+    "type": "object",
+    "description": "Device-polled command step.",
+    "properties": {
+      "when": {
+        "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
+      },
+      "command": {
+        "type": "string"
+      },
+      "input": {
+        "$ref": "#/components/schemas/nexigon_api.json.JsonValue"
+      },
+      "timeoutSecs": {
+        "type": "integer",
+        "format": "uint32"
+      }
+    },
+    "required": [
+      "command",
+      "input"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.devices.DeviceOperationDeviceTaskStep": {
+    "type": "object",
+    "description": "Durable device task step.\n\nThe Hub exposes task polling, progress, checkpoint, and report semantics for custom\non-device clients. The bundled Nexigon agent requests command work only and has no\ntask executor, so without such a client this step remains running until its timeout.",
+    "properties": {
+      "when": {
+        "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
+      },
+      "task": {
+        "type": "string"
+      },
+      "input": {
+        "$ref": "#/components/schemas/nexigon_api.json.JsonValue"
+      },
+      "timeoutSecs": {
+        "type": "integer",
+        "format": "uint32"
+      }
+    },
+    "required": [
+      "task",
+      "input"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.devices.DeviceOperationId": {
+    "type": [
+      "string"
+    ],
+    "description": "Unique ID of a device operation."
+  },
+  "nexigon_api.devices.DeviceOperationRemoveDevicePropertyStep": {
+    "type": "object",
+    "description": "Server-side device property removal.",
+    "properties": {
+      "when": {
+        "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
+      },
+      "name": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "name"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.devices.DeviceOperationSetDevicePropertyStep": {
+    "type": "object",
+    "description": "Server-side device property set.",
+    "properties": {
+      "when": {
+        "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
+      },
+      "name": {
+        "type": "string"
+      },
+      "value": {
+        "$ref": "#/components/schemas/nexigon_api.json.JsonValue"
+      },
+      "protected": {
+        "type": "boolean"
+      }
+    },
+    "required": [
+      "name",
+      "value"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.devices.DeviceOperationStatus": {
+    "enum": [
+      "Pending",
+      "Running",
+      "Succeeded",
+      "Failed",
+      "TimedOut",
+      "Cancelled"
+    ],
+    "description": "Device operation lifecycle status."
+  },
+  "nexigon_api.devices.DeviceOperationStep": {
+    "description": "One step in a device operation.",
+    "oneOf": [
+      {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "const": "SetDeviceProperty"
+          },
+          "when": {
+            "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
+          },
+          "name": {
+            "type": "string"
+          },
+          "value": {
+            "$ref": "#/components/schemas/nexigon_api.json.JsonValue"
+          },
+          "protected": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "kind",
+          "name",
+          "value"
+        ]
+      },
+      {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "const": "UpdateDeviceProperty"
+          },
+          "when": {
+            "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
+          },
+          "name": {
+            "type": "string"
+          },
+          "mutation": {
+            "$ref": "#/components/schemas/nexigon_api.json.JsonMutation"
+          },
+          "protected": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "kind",
+          "name",
+          "mutation"
+        ]
+      },
+      {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "const": "RemoveDeviceProperty"
+          },
+          "when": {
+            "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "name"
+        ]
+      },
+      {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "const": "DeviceCommand"
+          },
+          "when": {
+            "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
+          },
+          "command": {
+            "type": "string"
+          },
+          "input": {
+            "$ref": "#/components/schemas/nexigon_api.json.JsonValue"
+          },
+          "timeoutSecs": {
+            "type": "integer",
+            "format": "uint32"
+          }
+        },
+        "required": [
+          "kind",
+          "command",
+          "input"
+        ]
+      },
+      {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "const": "DeviceTask"
+          },
+          "when": {
+            "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
+          },
+          "task": {
+            "type": "string"
+          },
+          "input": {
+            "$ref": "#/components/schemas/nexigon_api.json.JsonValue"
+          },
+          "timeoutSecs": {
+            "type": "integer",
+            "format": "uint32"
+          }
+        },
+        "required": [
+          "kind",
+          "task",
+          "input"
+        ]
+      },
+      {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "const": "WaitForDeviceProperty"
+          },
+          "when": {
+            "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
+          },
+          "predicate": {
+            "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
+          },
+          "timeoutSecs": {
+            "type": "integer",
+            "format": "uint32"
+          }
+        },
+        "required": [
+          "kind",
+          "predicate"
+        ]
+      }
+    ]
+  },
+  "nexigon_api.devices.DeviceOperationStepReport": {
+    "type": "object",
+    "description": "Report from a device after executing a polled step.",
+    "properties": {
+      "status": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceOperationStepReportStatus"
+      },
+      "output": {
+        "$ref": "#/components/schemas/nexigon_api.json.JsonValue"
+      },
+      "checkpoint": {
+        "$ref": "#/components/schemas/nexigon_api.json.JsonValue"
+      },
+      "error": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "status"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.devices.DeviceOperationStepReportStatus": {
+    "enum": [
+      "Running",
+      "Succeeded",
+      "Failed"
+    ],
+    "description": "Device-reported step result status."
+  },
+  "nexigon_api.devices.DeviceOperationStepState": {
+    "type": "object",
+    "description": "Persisted state for one device operation step.\n\nLook up `DeviceOperationDetails.steps[step_index]` for the step's kind and\nconfiguration; this only carries the step's execution state.",
+    "properties": {
+      "stepIndex": {
+        "type": "integer",
+        "format": "uint32"
+      },
+      "status": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceOperationStepStatus"
+      },
+      "output": {
+        "$ref": "#/components/schemas/nexigon_api.json.JsonValue"
+      },
+      "error": {
+        "type": "string"
+      },
+      "startedAt": {
+        "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
+      },
+      "completedAt": {
+        "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
+      },
+      "checkpoint": {
+        "$ref": "#/components/schemas/nexigon_api.json.JsonValue"
+      }
+    },
+    "required": [
+      "stepIndex",
+      "status"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.devices.DeviceOperationStepStatus": {
+    "enum": [
+      "Pending",
+      "Running",
+      "Succeeded",
+      "Failed",
+      "TimedOut",
+      "Skipped"
+    ],
+    "description": "Step execution status."
+  },
+  "nexigon_api.devices.DeviceOperationSummary": {
+    "type": "object",
+    "description": "Summary of a device operation.",
+    "properties": {
+      "deviceOperationId": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceOperationId"
+      },
+      "projectId": {
+        "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+      },
+      "deviceId": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceId"
+      },
+      "createdBy": {
+        "$ref": "#/components/schemas/nexigon_api.actor.Actor"
+      },
+      "fleetOperationId": {
+        "$ref": "#/components/schemas/nexigon_api.fleet.FleetOperationId"
+      },
+      "name": {
+        "type": "string"
+      },
+      "description": {
+        "type": "string"
+      },
+      "status": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceOperationStatus"
+      },
+      "stepIndex": {
+        "type": "integer",
+        "format": "uint32"
+      },
+      "stepCount": {
+        "type": "integer",
+        "format": "uint32"
+      },
+      "lastError": {
+        "type": "string"
+      },
+      "createdAt": {
+        "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
+      },
+      "startedAt": {
+        "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
+      },
+      "completedAt": {
+        "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
+      },
+      "updatedAt": {
+        "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
+      }
+    },
+    "required": [
+      "deviceOperationId",
+      "projectId",
+      "deviceId",
+      "name",
+      "status",
+      "stepIndex",
+      "stepCount",
+      "createdAt",
+      "updatedAt"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.devices.DeviceOperationUpdateDevicePropertyStep": {
+    "type": "object",
+    "description": "Server-side device property update.",
+    "properties": {
+      "when": {
+        "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
+      },
+      "name": {
+        "type": "string"
+      },
+      "mutation": {
+        "$ref": "#/components/schemas/nexigon_api.json.JsonMutation"
+      },
+      "protected": {
+        "type": "boolean"
+      }
+    },
+    "required": [
+      "name",
+      "mutation"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.devices.DeviceOperationWaitForDevicePropertyStep": {
+    "type": "object",
+    "description": "Server-observed property wait step.",
+    "properties": {
+      "when": {
+        "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
+      },
+      "predicate": {
+        "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
+      },
+      "timeoutSecs": {
+        "type": "integer",
+        "format": "uint32"
+      }
+    },
+    "required": [
+      "predicate"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.devices.DeviceOperationWorkClaimId": {
+    "type": [
+      "string"
+    ],
+    "description": "Unique claim for one lease of a device operation work item."
+  },
+  "nexigon_api.devices.DeviceOperationWorkItem": {
+    "type": "object",
+    "description": "Work item returned to a device when it polls.",
+    "properties": {
+      "deviceOperationId": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceOperationId"
+      },
+      "claimId": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceOperationWorkClaimId"
+      },
+      "operationName": {
+        "type": "string"
+      },
+      "stepIndex": {
+        "type": "integer",
+        "format": "uint32"
+      },
+      "checkpoint": {
+        "$ref": "#/components/schemas/nexigon_api.json.JsonValue"
+      },
+      "step": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceOperationWorkStep"
+      }
+    },
+    "required": [
+      "deviceOperationId",
+      "claimId",
+      "operationName",
+      "stepIndex",
+      "step"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.devices.DeviceOperationWorkKind": {
+    "enum": [
+      "DeviceCommand",
+      "DeviceTask"
+    ],
+    "description": "Kind of device operation work to return from a poll."
+  },
+  "nexigon_api.devices.DeviceOperationWorkStep": {
+    "description": "Device-executable operation step.",
+    "oneOf": [
+      {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "const": "DeviceCommand"
+          },
+          "when": {
+            "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
+          },
+          "command": {
+            "type": "string"
+          },
+          "input": {
+            "$ref": "#/components/schemas/nexigon_api.json.JsonValue"
+          },
+          "timeoutSecs": {
+            "type": "integer",
+            "format": "uint32"
+          }
+        },
+        "required": [
+          "kind",
+          "command",
+          "input"
+        ]
+      },
+      {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "const": "DeviceTask"
+          },
+          "when": {
+            "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
+          },
+          "task": {
+            "type": "string"
+          },
+          "input": {
+            "$ref": "#/components/schemas/nexigon_api.json.JsonValue"
+          },
+          "timeoutSecs": {
+            "type": "integer",
+            "format": "uint32"
+          }
+        },
+        "required": [
+          "kind",
+          "task",
+          "input"
+        ]
+      }
+    ]
+  },
   "nexigon_api.devices.DeviceProperty": {
     "type": "object",
     "description": "Device property.",
@@ -964,6 +1619,64 @@
       "connections"
     ],
     "unevaluatedProperties": false
+  },
+  "nexigon_api.devices.GetDeviceOperationAction": {
+    "type": "object",
+    "description": "Get device operation details.",
+    "properties": {
+      "deviceOperationId": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceOperationId"
+      }
+    },
+    "required": [
+      "deviceOperationId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.devices.GetDeviceOperationOutput": {
+    "description": "Output of getting device operation details.",
+    "oneOf": [
+      {
+        "type": "object",
+        "properties": {
+          "result": {
+            "const": "NotFound"
+          }
+        },
+        "required": [
+          "result"
+        ]
+      },
+      {
+        "type": "object",
+        "properties": {
+          "result": {
+            "const": "Found"
+          },
+          "summary": {
+            "$ref": "#/components/schemas/nexigon_api.devices.DeviceOperationSummary"
+          },
+          "steps": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/nexigon_api.devices.DeviceOperationStep"
+            }
+          },
+          "stepStates": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/nexigon_api.devices.DeviceOperationStepState"
+            }
+          }
+        },
+        "required": [
+          "result",
+          "summary",
+          "steps",
+          "stepStates"
+        ]
+      }
+    ]
   },
   "nexigon_api.devices.GetDevicePropertyAction": {
     "type": "object",
@@ -1155,7 +1868,7 @@
   },
   "nexigon_api.devices.QueryDeviceCommandsAction": {
     "type": "object",
-    "description": "Query the on-demand commands supported by a device.",
+    "description": "**Unstable (feature `device_commands`).**\n\nQuery the on-demand commands supported by a device.",
     "properties": {
       "deviceId": {
         "$ref": "#/components/schemas/nexigon_api.devices.DeviceId"
@@ -1168,7 +1881,7 @@
   },
   "nexigon_api.devices.QueryDeviceCommandsOutput": {
     "type": "object",
-    "description": "Output of querying device commands.",
+    "description": "**Unstable (feature `device_commands`).**\n\nOutput of querying device commands.",
     "properties": {
       "manifest": {
         "$ref": "#/components/schemas/nexigon_api.properties.DeviceCommandManifest"
@@ -1245,6 +1958,35 @@
     },
     "required": [
       "events"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.devices.QueryDeviceOperationsAction": {
+    "type": "object",
+    "description": "Query device operations for a device.",
+    "properties": {
+      "deviceId": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceId"
+      }
+    },
+    "required": [
+      "deviceId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.devices.QueryDeviceOperationsOutput": {
+    "type": "object",
+    "description": "Output of querying device operations.",
+    "properties": {
+      "operations": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.devices.DeviceOperationSummary"
+        }
+      }
+    },
+    "required": [
+      "operations"
     ],
     "unevaluatedProperties": false
   },
@@ -1390,6 +2132,36 @@
     ],
     "description": "Output of removing a property from a device."
   },
+  "nexigon_api.devices.ReportDeviceOperationStepAction": {
+    "type": "object",
+    "description": "Report the result of a device operation step.\n\nRepeating a report after it was already applied is a successful no-op. A report whose\nclaim has been superseded is also ignored, so an expired worker cannot overwrite the\ncurrent attempt.",
+    "properties": {
+      "deviceId": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceId"
+      },
+      "deviceOperationId": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceOperationId"
+      },
+      "stepIndex": {
+        "type": "integer",
+        "format": "uint32"
+      },
+      "claimId": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceOperationWorkClaimId"
+      },
+      "report": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceOperationStepReport"
+      }
+    },
+    "required": [
+      "deviceId",
+      "deviceOperationId",
+      "stepIndex",
+      "claimId",
+      "report"
+    ],
+    "unevaluatedProperties": false
+  },
   "nexigon_api.devices.SetDeviceCertificateStatusAction": {
     "type": "object",
     "description": "Set the status of a device certificate.",
@@ -1505,6 +2277,19 @@
     },
     "required": [
       "currentVersion"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.devices.StartDeviceOperationAction": {
+    "type": "object",
+    "description": "Start a pending device operation.",
+    "properties": {
+      "deviceOperationId": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceOperationId"
+      }
+    },
+    "required": [
+      "deviceOperationId"
     ],
     "unevaluatedProperties": false
   },
@@ -1734,9 +2519,98 @@
       }
     ]
   },
+  "nexigon_api.fleet.AdvanceFleetOperationStageAction": {
+    "type": "object",
+    "description": "Advance the fleet operation to the next stage.",
+    "properties": {
+      "fleetOperationId": {
+        "$ref": "#/components/schemas/nexigon_api.fleet.FleetOperationId"
+      }
+    },
+    "required": [
+      "fleetOperationId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.fleet.AdvanceFleetOperationStageOutput": {
+    "description": "Output of advancing a fleet operation stage.",
+    "oneOf": [
+      {
+        "type": "object",
+        "properties": {
+          "result": {
+            "const": "Advanced"
+          }
+        },
+        "required": [
+          "result"
+        ]
+      },
+      {
+        "type": "object",
+        "properties": {
+          "result": {
+            "const": "AlreadyFinalStage"
+          }
+        },
+        "required": [
+          "result"
+        ]
+      },
+      {
+        "type": "object",
+        "properties": {
+          "result": {
+            "const": "GuardBlocked"
+          },
+          "minSuccessPercent": {
+            "type": "integer",
+            "format": "uint32"
+          },
+          "successPercent": {
+            "type": "integer",
+            "format": "uint32"
+          },
+          "maxFailurePercent": {
+            "type": "integer",
+            "format": "uint32"
+          },
+          "failurePercent": {
+            "type": "integer",
+            "format": "uint32"
+          },
+          "gates": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/nexigon_api.fleet.FleetOperationStageGateStatus"
+            }
+          }
+        },
+        "required": [
+          "result",
+          "successPercent",
+          "failurePercent",
+          "gates"
+        ]
+      }
+    ]
+  },
+  "nexigon_api.fleet.CancelFleetOperationAction": {
+    "type": "object",
+    "description": "Cancel a fleet operation.",
+    "properties": {
+      "fleetOperationId": {
+        "$ref": "#/components/schemas/nexigon_api.fleet.FleetOperationId"
+      }
+    },
+    "required": [
+      "fleetOperationId"
+    ],
+    "unevaluatedProperties": false
+  },
   "nexigon_api.fleet.ComputedFleetPropertyDefinition": {
     "type": "object",
-    "description": "A computed fleet property definition.",
+    "description": "**Unstable (feature `fleet_computed_properties`).**\n\nA computed fleet property definition.",
     "properties": {
       "name": {
         "type": "string"
@@ -1766,9 +2640,67 @@
     ],
     "unevaluatedProperties": false
   },
+  "nexigon_api.fleet.CreateFleetOperationAction": {
+    "type": "object",
+    "description": "Create a fleet operation.",
+    "properties": {
+      "projectId": {
+        "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+      },
+      "name": {
+        "type": "string"
+      },
+      "description": {
+        "type": "string"
+      },
+      "enrollmentIntervalSecs": {
+        "type": "integer",
+        "format": "uint32"
+      },
+      "closeWhenConverged": {
+        "type": "boolean"
+      },
+      "selector": {
+        "$ref": "#/components/schemas/nexigon_api.fleet.FleetOperationTargetSelector"
+      },
+      "stages": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.fleet.FleetOperationStage"
+        }
+      },
+      "steps": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.devices.DeviceOperationStep"
+        }
+      }
+    },
+    "required": [
+      "projectId",
+      "name",
+      "selector",
+      "stages",
+      "steps"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.fleet.CreateFleetOperationOutput": {
+    "type": "object",
+    "description": "Output of creating a fleet operation.",
+    "properties": {
+      "fleetOperationId": {
+        "$ref": "#/components/schemas/nexigon_api.fleet.FleetOperationId"
+      }
+    },
+    "required": [
+      "fleetOperationId"
+    ],
+    "unevaluatedProperties": false
+  },
   "nexigon_api.fleet.DefineComputedFleetPropertyAction": {
     "type": "object",
-    "description": "Define a computed fleet property.",
+    "description": "**Unstable (feature `fleet_computed_properties`).**\n\nDefine a computed fleet property.",
     "properties": {
       "projectId": {
         "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
@@ -1794,6 +2726,441 @@
       "name",
       "inputProperties",
       "strategy"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.fleet.FleetOperationDetails": {
+    "type": "object",
+    "description": "Fleet operation details.",
+    "properties": {
+      "summary": {
+        "$ref": "#/components/schemas/nexigon_api.fleet.FleetOperationSummary"
+      },
+      "selector": {
+        "$ref": "#/components/schemas/nexigon_api.fleet.FleetOperationTargetSelector"
+      },
+      "stages": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.fleet.FleetOperationStage"
+        }
+      },
+      "steps": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.devices.DeviceOperationStep"
+        }
+      }
+    },
+    "required": [
+      "summary",
+      "selector",
+      "stages",
+      "steps"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.fleet.FleetOperationDevicePropertyGate": {
+    "type": "object",
+    "description": "Gate over target device properties.",
+    "properties": {
+      "predicate": {
+        "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
+      },
+      "minMatchPercent": {
+        "type": "integer",
+        "format": "uint32"
+      }
+    },
+    "required": [
+      "predicate",
+      "minMatchPercent"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.fleet.FleetOperationId": {
+    "type": [
+      "string"
+    ],
+    "description": "Unique ID of a fleet operation."
+  },
+  "nexigon_api.fleet.FleetOperationNotBeforeGate": {
+    "type": "object",
+    "description": "Gate that passes once hub server time has reached a timestamp.",
+    "properties": {
+      "notBefore": {
+        "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
+      }
+    },
+    "required": [
+      "notBefore"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.fleet.FleetOperationProgress": {
+    "type": "object",
+    "description": "Progress counts for selected targets.",
+    "properties": {
+      "total": {
+        "type": "integer",
+        "format": "uint32"
+      },
+      "pending": {
+        "type": "integer",
+        "format": "uint32"
+      },
+      "running": {
+        "type": "integer",
+        "format": "uint32"
+      },
+      "succeeded": {
+        "type": "integer",
+        "format": "uint32"
+      },
+      "failed": {
+        "type": "integer",
+        "format": "uint32"
+      },
+      "timedOut": {
+        "type": "integer",
+        "format": "uint32"
+      },
+      "cancelled": {
+        "type": "integer",
+        "format": "uint32"
+      }
+    },
+    "required": [
+      "total",
+      "pending",
+      "running",
+      "succeeded",
+      "failed",
+      "timedOut",
+      "cancelled"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.fleet.FleetOperationSelectionError": {
+    "type": "object",
+    "description": "A device the target selector could not be evaluated against.\n\nThe device is not a target: the operation could not establish that it even applies to\nit. The error is recorded so that a broken selector is visible instead of silently\nnarrowing the fleet, and the operation retries the device on its next enrollment pass.",
+    "properties": {
+      "deviceId": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceId"
+      },
+      "error": {
+        "type": "string"
+      },
+      "updatedAt": {
+        "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
+      }
+    },
+    "required": [
+      "deviceId",
+      "error",
+      "updatedAt"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.fleet.FleetOperationStage": {
+    "type": "object",
+    "description": "One stage in a fleet operation.",
+    "properties": {
+      "name": {
+        "type": "string"
+      },
+      "percentage": {
+        "type": "integer",
+        "format": "uint32"
+      },
+      "autoAdvance": {
+        "type": "boolean"
+      },
+      "guard": {
+        "$ref": "#/components/schemas/nexigon_api.fleet.FleetOperationStageGuard"
+      }
+    },
+    "required": [
+      "name"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.fleet.FleetOperationStageGate": {
+    "description": "Observed gate checked before a stage can advance.",
+    "oneOf": [
+      {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "const": "DeviceProperty"
+          },
+          "predicate": {
+            "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
+          },
+          "minMatchPercent": {
+            "type": "integer",
+            "format": "uint32"
+          }
+        },
+        "required": [
+          "kind",
+          "predicate",
+          "minMatchPercent"
+        ]
+      },
+      {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "const": "NotBefore"
+          },
+          "notBefore": {
+            "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
+          }
+        },
+        "required": [
+          "kind",
+          "notBefore"
+        ]
+      }
+    ]
+  },
+  "nexigon_api.fleet.FleetOperationStageGateStatus": {
+    "type": "object",
+    "description": "Observed gate result.",
+    "properties": {
+      "gateIndex": {
+        "type": "integer",
+        "format": "uint32"
+      },
+      "passed": {
+        "type": "boolean"
+      },
+      "summary": {
+        "type": "string"
+      },
+      "actualPercent": {
+        "type": "integer",
+        "format": "uint32"
+      },
+      "thresholdPercent": {
+        "type": "integer",
+        "format": "uint32"
+      },
+      "evaluationErrorCount": {
+        "type": "integer",
+        "format": "uint32"
+      },
+      "evaluationError": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "gateIndex",
+      "passed",
+      "summary",
+      "actualPercent",
+      "thresholdPercent",
+      "evaluationErrorCount"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.fleet.FleetOperationStageGuard": {
+    "type": "object",
+    "description": "Guard checked before a stage can be advanced.",
+    "properties": {
+      "minSuccessPercent": {
+        "type": "integer",
+        "format": "uint32"
+      },
+      "maxFailurePercent": {
+        "type": "integer",
+        "format": "uint32"
+      },
+      "gates": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.fleet.FleetOperationStageGate"
+        }
+      }
+    },
+    "required": [
+      "gates"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.fleet.FleetOperationStageGuardStatus": {
+    "type": "object",
+    "description": "Guard status when advancement is blocked.",
+    "properties": {
+      "minSuccessPercent": {
+        "type": "integer",
+        "format": "uint32"
+      },
+      "successPercent": {
+        "type": "integer",
+        "format": "uint32"
+      },
+      "maxFailurePercent": {
+        "type": "integer",
+        "format": "uint32"
+      },
+      "failurePercent": {
+        "type": "integer",
+        "format": "uint32"
+      },
+      "gates": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.fleet.FleetOperationStageGateStatus"
+        }
+      }
+    },
+    "required": [
+      "successPercent",
+      "failurePercent",
+      "gates"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.fleet.FleetOperationStatus": {
+    "enum": [
+      "Draft",
+      "Running",
+      "Paused",
+      "Completed",
+      "Failed",
+      "Cancelled"
+    ],
+    "description": "Fleet operation lifecycle status."
+  },
+  "nexigon_api.fleet.FleetOperationSummary": {
+    "type": "object",
+    "description": "Summary of a fleet operation.",
+    "properties": {
+      "fleetOperationId": {
+        "$ref": "#/components/schemas/nexigon_api.fleet.FleetOperationId"
+      },
+      "projectId": {
+        "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+      },
+      "name": {
+        "type": "string"
+      },
+      "description": {
+        "type": "string"
+      },
+      "status": {
+        "$ref": "#/components/schemas/nexigon_api.fleet.FleetOperationStatus"
+      },
+      "enrollmentIntervalSecs": {
+        "type": "integer",
+        "format": "uint32"
+      },
+      "lastEnrollmentAt": {
+        "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
+      },
+      "closeWhenConverged": {
+        "type": "boolean"
+      },
+      "activeStageIndex": {
+        "type": "integer",
+        "format": "uint32"
+      },
+      "stageCount": {
+        "type": "integer",
+        "format": "uint32"
+      },
+      "progress": {
+        "$ref": "#/components/schemas/nexigon_api.fleet.FleetOperationProgress"
+      },
+      "createdAt": {
+        "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
+      },
+      "startedAt": {
+        "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
+      },
+      "completedAt": {
+        "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
+      }
+    },
+    "required": [
+      "fleetOperationId",
+      "projectId",
+      "name",
+      "status",
+      "closeWhenConverged",
+      "activeStageIndex",
+      "stageCount",
+      "progress",
+      "createdAt"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.fleet.FleetOperationTarget": {
+    "type": "object",
+    "description": "A device a fleet operation applies to, and how its work is faring.\n\nA device becomes a target when the operation's selector matches it and it is given a\ndevice operation. That device operation is what actually executes; the fields below\nreport its progress.",
+    "properties": {
+      "deviceId": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceId"
+      },
+      "deviceOperationId": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceOperationId"
+      },
+      "stageIndex": {
+        "type": "integer",
+        "format": "uint32"
+      },
+      "stepIndex": {
+        "type": "integer",
+        "format": "uint32"
+      },
+      "status": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceOperationStatus"
+      },
+      "lastError": {
+        "type": "string"
+      },
+      "updatedAt": {
+        "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
+      },
+      "stepStates": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.devices.DeviceOperationStepState"
+        }
+      }
+    },
+    "required": [
+      "deviceId",
+      "deviceOperationId",
+      "stageIndex",
+      "stepIndex",
+      "status",
+      "updatedAt",
+      "stepStates"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.fleet.FleetOperationTargetSelector": {
+    "type": "object",
+    "description": "Selector used to identify devices a fleet operation applies to.",
+    "properties": {
+      "deviceIds": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.devices.DeviceId"
+        }
+      },
+      "predicates": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
+        }
+      }
+    },
+    "required": [
+      "predicates"
     ],
     "unevaluatedProperties": false
   },
@@ -1843,6 +3210,68 @@
       }
     ],
     "description": "How a fleet property is managed."
+  },
+  "nexigon_api.fleet.GetFleetOperationAction": {
+    "type": "object",
+    "description": "Get fleet operation details.",
+    "properties": {
+      "fleetOperationId": {
+        "$ref": "#/components/schemas/nexigon_api.fleet.FleetOperationId"
+      }
+    },
+    "required": [
+      "fleetOperationId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.fleet.GetFleetOperationOutput": {
+    "description": "Output of getting fleet operation details.",
+    "oneOf": [
+      {
+        "type": "object",
+        "properties": {
+          "result": {
+            "const": "NotFound"
+          }
+        },
+        "required": [
+          "result"
+        ]
+      },
+      {
+        "type": "object",
+        "properties": {
+          "result": {
+            "const": "Found"
+          },
+          "summary": {
+            "$ref": "#/components/schemas/nexigon_api.fleet.FleetOperationSummary"
+          },
+          "selector": {
+            "$ref": "#/components/schemas/nexigon_api.fleet.FleetOperationTargetSelector"
+          },
+          "stages": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/nexigon_api.fleet.FleetOperationStage"
+            }
+          },
+          "steps": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/nexigon_api.devices.DeviceOperationStep"
+            }
+          }
+        },
+        "required": [
+          "result",
+          "summary",
+          "selector",
+          "stages",
+          "steps"
+        ]
+      }
+    ]
   },
   "nexigon_api.fleet.GetFleetPropertyAction": {
     "type": "object",
@@ -1912,9 +3341,22 @@
       }
     ]
   },
+  "nexigon_api.fleet.PauseFleetOperationAction": {
+    "type": "object",
+    "description": "Pause a running fleet operation.\n\nPausing halts the rollout without undoing any of it. No new devices are enrolled, no\ndevice operation makes progress, and devices are handed no new work. Nothing is\ncancelled and no state is lost.\n\nA device that already took a work item and has carried it out can still report the\nresult, and the result is recorded: pausing stops new work being generated, it does not\ndiscard work that was genuinely done.\n\nResume with `fleet_StartOperation`, which picks the rollout up exactly where it left\noff. Time spent paused does not count towards step timeouts: the clock on any step that\nwas in flight restarts on resume, so a long pause cannot time work out.",
+    "properties": {
+      "fleetOperationId": {
+        "$ref": "#/components/schemas/nexigon_api.fleet.FleetOperationId"
+      }
+    },
+    "required": [
+      "fleetOperationId"
+    ],
+    "unevaluatedProperties": false
+  },
   "nexigon_api.fleet.QueryComputedFleetPropertyDefinitionsAction": {
     "type": "object",
-    "description": "Query computed fleet property definitions for a project.",
+    "description": "**Unstable (feature `fleet_computed_properties`).**\n\nQuery computed fleet property definitions for a project.",
     "properties": {
       "projectId": {
         "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
@@ -1927,7 +3369,7 @@
   },
   "nexigon_api.fleet.QueryComputedFleetPropertyDefinitionsOutput": {
     "type": "object",
-    "description": "Output of querying computed fleet property definitions.",
+    "description": "**Unstable (feature `fleet_computed_properties`).**\n\nOutput of querying computed fleet property definitions.",
     "properties": {
       "definitions": {
         "type": "array",
@@ -1938,6 +3380,93 @@
     },
     "required": [
       "definitions"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.fleet.QueryFleetOperationSelectionErrorsAction": {
+    "type": "object",
+    "description": "Query the devices whose selector evaluation failed for a fleet operation.\n\nNormally empty. A non-empty result means the selector could not be evaluated against\nthose devices, so the operation cannot tell whether it applies to them.",
+    "properties": {
+      "fleetOperationId": {
+        "$ref": "#/components/schemas/nexigon_api.fleet.FleetOperationId"
+      }
+    },
+    "required": [
+      "fleetOperationId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.fleet.QueryFleetOperationSelectionErrorsOutput": {
+    "type": "object",
+    "description": "Output of querying a fleet operation's selection errors.",
+    "properties": {
+      "errors": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.fleet.FleetOperationSelectionError"
+        }
+      }
+    },
+    "required": [
+      "errors"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.fleet.QueryFleetOperationTargetsAction": {
+    "type": "object",
+    "description": "Query the devices a fleet operation applies to, its *targets*.\n\nA target is a device the selector matched, reported together with the device operation\ncarrying out the work on it and the stage that gates it. Devices in stages the rollout\nhas not reached yet are included, and are `Pending`.\n\nThis is a separate query rather than part of the operation's details because the list\ngrows with the fleet, and most reads of an operation do not want it.",
+    "properties": {
+      "fleetOperationId": {
+        "$ref": "#/components/schemas/nexigon_api.fleet.FleetOperationId"
+      }
+    },
+    "required": [
+      "fleetOperationId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.fleet.QueryFleetOperationTargetsOutput": {
+    "type": "object",
+    "description": "Output of querying the devices a fleet operation applies to.",
+    "properties": {
+      "targets": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.fleet.FleetOperationTarget"
+        }
+      }
+    },
+    "required": [
+      "targets"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.fleet.QueryFleetOperationsAction": {
+    "type": "object",
+    "description": "Query fleet operations for a project.",
+    "properties": {
+      "projectId": {
+        "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+      }
+    },
+    "required": [
+      "projectId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.fleet.QueryFleetOperationsOutput": {
+    "type": "object",
+    "description": "Output of querying fleet operations.",
+    "properties": {
+      "operations": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.fleet.FleetOperationSummary"
+        }
+      }
+    },
+    "required": [
+      "operations"
     ],
     "unevaluatedProperties": false
   },
@@ -2016,6 +3545,19 @@
       "projectId",
       "name",
       "value"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.fleet.StartFleetOperationAction": {
+    "type": "object",
+    "description": "Start a draft fleet operation.",
+    "properties": {
+      "fleetOperationId": {
+        "$ref": "#/components/schemas/nexigon_api.fleet.FleetOperationId"
+      }
+    },
+    "required": [
+      "fleetOperationId"
     ],
     "unevaluatedProperties": false
   },
@@ -2180,8 +3722,537 @@
     ],
     "unevaluatedProperties": false
   },
+  "nexigon_api.json.JsonBinaryExpr": {
+    "type": "object",
+    "description": "Binary expression payload.",
+    "properties": {
+      "left": {
+        "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
+      },
+      "right": {
+        "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
+      }
+    },
+    "required": [
+      "left",
+      "right"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.json.JsonExistsExpr": {
+    "type": "object",
+    "description": "Path existence expression payload.",
+    "properties": {
+      "expr": {
+        "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
+      },
+      "path": {
+        "$ref": "#/components/schemas/nexigon_api.json.JsonPath"
+      }
+    },
+    "required": [
+      "expr",
+      "path"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.json.JsonExpr": {
+    "description": "JSON expression evaluated against a context of named JSON values.\n\nEvery expression returns a `JsonValue`; boolean expressions are not a\nseparate language. A consumer that uses an expression as a condition\nrequires its result to be a JSON boolean.\n\n`NamedValue` reads are supplied by the consumer. In device and fleet\noperations, each name is an exact device-property name and its value is the\nproperty's JSON value. A missing name is distinct from a name whose value is\nJSON `null`.",
+    "oneOf": [
+      {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "const": "Literal"
+          },
+          "value": {
+            "$ref": "#/components/schemas/nexigon_api.json.JsonValue"
+          }
+        }
+      },
+      {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "const": "Current"
+          }
+        },
+        "required": [
+          "kind"
+        ]
+      },
+      {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "const": "NamedValue"
+          },
+          "name": {
+            "type": "string"
+          },
+          "default": {
+            "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
+          }
+        },
+        "required": [
+          "kind",
+          "name"
+        ]
+      },
+      {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "const": "Get"
+          },
+          "expr": {
+            "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
+          },
+          "path": {
+            "$ref": "#/components/schemas/nexigon_api.json.JsonPath"
+          },
+          "default": {
+            "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
+          }
+        },
+        "required": [
+          "kind",
+          "expr",
+          "path"
+        ]
+      },
+      {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "const": "Equals"
+          },
+          "left": {
+            "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
+          },
+          "right": {
+            "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
+          }
+        },
+        "required": [
+          "kind",
+          "left",
+          "right"
+        ]
+      },
+      {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "const": "NotEquals"
+          },
+          "left": {
+            "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
+          },
+          "right": {
+            "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
+          }
+        },
+        "required": [
+          "kind",
+          "left",
+          "right"
+        ]
+      },
+      {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "const": "LessThan"
+          },
+          "left": {
+            "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
+          },
+          "right": {
+            "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
+          }
+        },
+        "required": [
+          "kind",
+          "left",
+          "right"
+        ]
+      },
+      {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "const": "LessThanOrEquals"
+          },
+          "left": {
+            "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
+          },
+          "right": {
+            "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
+          }
+        },
+        "required": [
+          "kind",
+          "left",
+          "right"
+        ]
+      },
+      {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "const": "GreaterThan"
+          },
+          "left": {
+            "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
+          },
+          "right": {
+            "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
+          }
+        },
+        "required": [
+          "kind",
+          "left",
+          "right"
+        ]
+      },
+      {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "const": "GreaterThanOrEquals"
+          },
+          "left": {
+            "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
+          },
+          "right": {
+            "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
+          }
+        },
+        "required": [
+          "kind",
+          "left",
+          "right"
+        ]
+      },
+      {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "const": "In"
+          },
+          "left": {
+            "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
+          },
+          "right": {
+            "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
+          }
+        },
+        "required": [
+          "kind",
+          "left",
+          "right"
+        ]
+      },
+      {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "const": "And"
+          },
+          "exprs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
+            }
+          }
+        },
+        "required": [
+          "kind",
+          "exprs"
+        ]
+      },
+      {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "const": "Or"
+          },
+          "exprs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
+            }
+          }
+        },
+        "required": [
+          "kind",
+          "exprs"
+        ]
+      },
+      {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "const": "Not"
+          },
+          "expr": {
+            "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
+          }
+        },
+        "required": [
+          "kind",
+          "expr"
+        ]
+      },
+      {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "const": "Exists"
+          },
+          "expr": {
+            "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
+          },
+          "path": {
+            "$ref": "#/components/schemas/nexigon_api.json.JsonPath"
+          }
+        },
+        "required": [
+          "kind",
+          "expr",
+          "path"
+        ]
+      },
+      {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "const": "VersionRequirement"
+          },
+          "expr": {
+            "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
+          },
+          "requirement": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "expr",
+          "requirement"
+        ]
+      }
+    ]
+  },
+  "nexigon_api.json.JsonGetExpr": {
+    "type": "object",
+    "description": "Get a nested value inside another expression result.",
+    "properties": {
+      "expr": {
+        "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
+      },
+      "path": {
+        "$ref": "#/components/schemas/nexigon_api.json.JsonPath"
+      },
+      "default": {
+        "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
+      }
+    },
+    "required": [
+      "expr",
+      "path"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.json.JsonMergePatchMutation": {
+    "type": "object",
+    "description": "RFC 7396 JSON Merge Patch mutation.",
+    "properties": {
+      "path": {
+        "$ref": "#/components/schemas/nexigon_api.json.JsonPath"
+      },
+      "expr": {
+        "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
+      }
+    },
+    "required": [
+      "path",
+      "expr"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.json.JsonMutation": {
+    "description": "Declarative mutation to apply to a JSON value.\n\nExpressions inside a mutation may use `Current` to read the exact value to\nwhich the mutation is applied. Object parents missing from a `Set` or\n`MergePatch` path are created. Array indexes must already exist. Removing a\nmissing member or index is a successful no-op; removing an array element\nshifts later elements left.",
+    "oneOf": [
+      {
+        "type": "object",
+        "properties": {
+          "mutation": {
+            "const": "Set"
+          },
+          "path": {
+            "$ref": "#/components/schemas/nexigon_api.json.JsonPath"
+          },
+          "expr": {
+            "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
+          }
+        },
+        "required": [
+          "mutation",
+          "path",
+          "expr"
+        ]
+      },
+      {
+        "type": "object",
+        "properties": {
+          "mutation": {
+            "const": "MergePatch"
+          },
+          "path": {
+            "$ref": "#/components/schemas/nexigon_api.json.JsonPath"
+          },
+          "expr": {
+            "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
+          }
+        },
+        "required": [
+          "mutation",
+          "path",
+          "expr"
+        ]
+      },
+      {
+        "type": "object",
+        "properties": {
+          "mutation": {
+            "const": "Remove"
+          },
+          "path": {
+            "$ref": "#/components/schemas/nexigon_api.json.JsonPath"
+          }
+        },
+        "required": [
+          "mutation",
+          "path"
+        ]
+      }
+    ]
+  },
+  "nexigon_api.json.JsonNamedValueExpr": {
+    "type": "object",
+    "description": "Read a named JSON value from the evaluation context.",
+    "properties": {
+      "name": {
+        "type": "string"
+      },
+      "default": {
+        "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
+      }
+    },
+    "required": [
+      "name"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.json.JsonPath": {
+    "type": "array",
+    "description": "Structured path into a JSON value.\n\nA JSON array of path segments. String segments address object members;\nunsigned integer segments address array elements. The empty path addresses\nthe expression or mutation root. Operation definitions accept at most 32\nsegments per path.",
+    "items": {
+      "$ref": "#/components/schemas/nexigon_api.json.JsonPathSegment"
+    }
+  },
+  "nexigon_api.json.JsonPathSegment": {
+    "description": "One segment in a structured JSON path.",
+    "anyOf": [
+      {
+        "type": "string"
+      },
+      {
+        "type": "integer",
+        "format": "uint32"
+      }
+    ]
+  },
+  "nexigon_api.json.JsonRemoveMutation": {
+    "type": "object",
+    "description": "Remove mutation.",
+    "properties": {
+      "path": {
+        "$ref": "#/components/schemas/nexigon_api.json.JsonPath"
+      }
+    },
+    "required": [
+      "path"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.json.JsonSetMutation": {
+    "type": "object",
+    "description": "Set mutation.",
+    "properties": {
+      "path": {
+        "$ref": "#/components/schemas/nexigon_api.json.JsonPath"
+      },
+      "expr": {
+        "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
+      }
+    },
+    "required": [
+      "path",
+      "expr"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.json.JsonUnaryExpr": {
+    "type": "object",
+    "description": "Unary expression payload.",
+    "properties": {
+      "expr": {
+        "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
+      }
+    },
+    "required": [
+      "expr"
+    ],
+    "unevaluatedProperties": false
+  },
   "nexigon_api.json.JsonValue": {
     "description": "JSON value."
+  },
+  "nexigon_api.json.JsonVariadicExpr": {
+    "type": "object",
+    "description": "Variadic expression payload.",
+    "properties": {
+      "exprs": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
+        }
+      }
+    },
+    "required": [
+      "exprs"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.json.JsonVersionRequirementExpr": {
+    "type": "object",
+    "description": "Version requirement expression payload.",
+    "properties": {
+      "expr": {
+        "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
+      },
+      "requirement": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "expr",
+      "requirement"
+    ],
+    "unevaluatedProperties": false
   },
   "nexigon_api.jwt.Jwt": {
     "type": "string",
@@ -2514,15 +4585,19 @@
       "repositoryId": {
         "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryId"
       },
-      "publicName": {
+      "displayName": {
         "type": "string"
       },
-      "displayName": {
+      "slug": {
+        "type": "string"
+      },
+      "publicName": {
         "type": "string"
       }
     },
     "required": [
       "repositoryId",
+      "displayName",
       "publicName"
     ],
     "unevaluatedProperties": false
@@ -2682,6 +4757,55 @@
     ],
     "unevaluatedProperties": false
   },
+  "nexigon_api.projects.CreateDevicePairingKeyAction": {
+    "type": "object",
+    "description": "Create a device pairing key.",
+    "properties": {
+      "projectId": {
+        "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+      },
+      "name": {
+        "type": "string"
+      },
+      "validForSecs": {
+        "type": "integer",
+        "format": "uint32"
+      }
+    },
+    "required": [
+      "projectId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.projects.CreateDevicePairingKeyOutput": {
+    "type": "object",
+    "description": "Output of creating a device pairing key.",
+    "properties": {
+      "pairingKeyId": {
+        "$ref": "#/components/schemas/nexigon_api.projects.DevicePairingKeyId"
+      },
+      "pairingKey": {
+        "type": "string"
+      },
+      "selector": {
+        "type": "string"
+      },
+      "createdAt": {
+        "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
+      },
+      "expiresAt": {
+        "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
+      }
+    },
+    "required": [
+      "pairingKeyId",
+      "pairingKey",
+      "selector",
+      "createdAt",
+      "expiresAt"
+    ],
+    "unevaluatedProperties": false
+  },
   "nexigon_api.projects.CreateProjectAction": {
     "type": "object",
     "description": "Create a new project.",
@@ -2781,6 +4905,12 @@
     ],
     "description": "Unique ID of a deployment token."
   },
+  "nexigon_api.projects.DevicePairingKeyId": {
+    "type": [
+      "string"
+    ],
+    "description": "Unique ID of a device pairing key."
+  },
   "nexigon_api.projects.GetProjectDetailsAction": {
     "type": "object",
     "description": "Get information about a project.",
@@ -2818,7 +4948,7 @@
   },
   "nexigon_api.projects.GetProjectOtlpConfigAction": {
     "type": "object",
-    "description": "Get the OTLP event forwarding configuration for a project.",
+    "description": "**Unstable (feature `otlp_export`).**\n\nGet the OTLP event forwarding configuration for a project.",
     "properties": {
       "projectId": {
         "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
@@ -2831,7 +4961,7 @@
   },
   "nexigon_api.projects.GetProjectOtlpConfigOutput": {
     "type": "object",
-    "description": "Output of getting the OTLP configuration for a project.",
+    "description": "**Unstable (feature `otlp_export`).**\n\nOutput of getting the OTLP configuration for a project.",
     "properties": {
       "config": {
         "$ref": "#/components/schemas/nexigon_api.projects.ProjectOtlpConfig"
@@ -2850,7 +4980,7 @@
   },
   "nexigon_api.projects.ProjectOtlpConfig": {
     "type": "object",
-    "description": "OTLP event forwarding configuration for a project.",
+    "description": "**Unstable (feature `otlp_export`).**\n\nOTLP event forwarding configuration for a project.",
     "properties": {
       "enabled": {
         "type": "boolean"
@@ -2900,6 +5030,75 @@
     ],
     "unevaluatedProperties": false
   },
+  "nexigon_api.projects.QueryDevicePairingKeysAction": {
+    "type": "object",
+    "description": "Query the device pairing keys of a project.",
+    "properties": {
+      "projectId": {
+        "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+      }
+    },
+    "required": [
+      "projectId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.projects.QueryDevicePairingKeysItem": {
+    "type": "object",
+    "description": "Device pairing key item.",
+    "properties": {
+      "pairingKeyId": {
+        "$ref": "#/components/schemas/nexigon_api.projects.DevicePairingKeyId"
+      },
+      "selector": {
+        "type": "string"
+      },
+      "createdAt": {
+        "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
+      },
+      "expiresAt": {
+        "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
+      },
+      "usedAt": {
+        "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
+      },
+      "revokedAt": {
+        "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
+      },
+      "name": {
+        "type": "string"
+      },
+      "deviceId": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceId"
+      },
+      "tokenId": {
+        "$ref": "#/components/schemas/nexigon_api.projects.DeploymentTokenId"
+      }
+    },
+    "required": [
+      "pairingKeyId",
+      "selector",
+      "createdAt",
+      "expiresAt"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.projects.QueryDevicePairingKeysOutput": {
+    "type": "object",
+    "description": "Output of querying the device pairing keys of a project.",
+    "properties": {
+      "pairingKeys": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.projects.QueryDevicePairingKeysItem"
+        }
+      }
+    },
+    "required": [
+      "pairingKeys"
+    ],
+    "unevaluatedProperties": false
+  },
   "nexigon_api.projects.QueryProjectDeploymentTokensAction": {
     "type": "object",
     "description": "Query the deployment tokens of a project.",
@@ -2919,6 +5118,9 @@
     "properties": {
       "tokenId": {
         "$ref": "#/components/schemas/nexigon_api.projects.DeploymentTokenId"
+      },
+      "deviceId": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceId"
       },
       "createdAt": {
         "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
@@ -3045,15 +5247,19 @@
       "repositoryId": {
         "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryId"
       },
-      "publicName": {
+      "displayName": {
         "type": "string"
       },
-      "displayName": {
+      "slug": {
+        "type": "string"
+      },
+      "publicName": {
         "type": "string"
       }
     },
     "required": [
       "repositoryId",
+      "displayName",
       "publicName"
     ],
     "unevaluatedProperties": false
@@ -3114,6 +5320,51 @@
     ],
     "unevaluatedProperties": false
   },
+  "nexigon_api.projects.RedeemDevicePairingKeyAction": {
+    "type": "object",
+    "description": "Redeem a device pairing key.",
+    "properties": {
+      "pairingKey": {
+        "type": "string"
+      },
+      "fingerprint": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceFingerprint"
+      },
+      "deviceName": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "pairingKey",
+      "fingerprint"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.projects.RedeemDevicePairingKeyOutput": {
+    "type": "object",
+    "description": "Output of redeeming a device pairing key.",
+    "properties": {
+      "projectId": {
+        "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+      },
+      "deviceId": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceId"
+      },
+      "tokenId": {
+        "$ref": "#/components/schemas/nexigon_api.projects.DeploymentTokenId"
+      },
+      "token": {
+        "$ref": "#/components/schemas/nexigon_api.projects.DeploymentToken"
+      }
+    },
+    "required": [
+      "projectId",
+      "deviceId",
+      "tokenId",
+      "token"
+    ],
+    "unevaluatedProperties": false
+  },
   "nexigon_api.projects.RemoveProjectRepositoryAction": {
     "type": "object",
     "description": "Remove a repository from the project.",
@@ -3128,6 +5379,19 @@
     "required": [
       "projectId",
       "repositoryId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.projects.RevokeDevicePairingKeyAction": {
+    "type": "object",
+    "description": "Revoke an unused device pairing key.",
+    "properties": {
+      "pairingKeyId": {
+        "$ref": "#/components/schemas/nexigon_api.projects.DevicePairingKeyId"
+      }
+    },
+    "required": [
+      "pairingKeyId"
     ],
     "unevaluatedProperties": false
   },
@@ -3167,7 +5431,7 @@
   },
   "nexigon_api.projects.SetProjectOtlpConfigAction": {
     "type": "object",
-    "description": "Set the OTLP event forwarding configuration for a project.",
+    "description": "**Unstable (feature `otlp_export`).**\n\nSet the OTLP event forwarding configuration for a project.",
     "properties": {
       "projectId": {
         "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
@@ -3243,7 +5507,7 @@
   },
   "nexigon_api.properties.DeviceCommandDescriptor": {
     "type": "object",
-    "description": "Descriptor for an on-demand command.",
+    "description": "**Unstable (feature `device_commands`).**\n\nDescriptor for an on-demand command.",
     "properties": {
       "name": {
         "type": "string"
@@ -3268,7 +5532,7 @@
   },
   "nexigon_api.properties.DeviceCommandManifest": {
     "type": "object",
-    "description": "Command manifest (`dev.nexigon.commands` property).",
+    "description": "**Unstable (feature `device_commands`).**\n\nCommand manifest (`dev.nexigon.commands` property).",
     "properties": {
       "commands": {
         "type": "array",
@@ -3417,7 +5681,7 @@
   },
   "nexigon_api.properties.OtaUpdateConfig": {
     "type": "object",
-    "description": "OTA update configuration identifying the update source.\n\nUsed as the shape of `/etc/nexigon-rugix-ota.json` and the\n`dev.nexigon.ota.config` device property. The device property is\nmerged on top of the file-based defaults.",
+    "description": "**Unstable (feature `ota_updates`).**\n\nOTA update configuration identifying the update source.\n\nUsed as the shape of `/etc/nexigon-rugix-ota.json` and the\n`dev.nexigon.ota.config` device property. The device property is\nmerged on top of the file-based defaults.",
     "properties": {
       "path": {
         "type": "string"
@@ -3437,11 +5701,11 @@
       "blocked",
       "rollback"
     ],
-    "description": "OTA update state.\n\nThe resting states are `idle`, `completed`, `failed`, and `blocked`.\nThe agent remains in one of these until the next check cycle begins\nor the blocking condition clears. `idle` means no update has been\nattempted yet; `completed` and `failed` retain the outcome of the\nlast cycle; `blocked` indicates an update is available but deferred."
+    "description": "**Unstable (feature `ota_updates`).**\n\nOTA update state.\n\nThe resting states are `idle`, `completed`, `failed`, and `blocked`.\nThe agent remains in one of these until the next check cycle begins\nor the blocking condition clears. `idle` means no update has been\nattempted yet; `completed` and `failed` retain the outcome of the\nlast cycle; `blocked` indicates an update is available but deferred."
   },
   "nexigon_api.properties.OtaUpdateStatus": {
     "type": "object",
-    "description": "OTA update status (`dev.nexigon.ota.status`).\n\nPublished by the device agent to report the effective OTA configuration\nand the current state of the update process.",
+    "description": "**Unstable (feature `ota_updates`).**\n\nOTA update status (`dev.nexigon.ota.status`).\n\nPublished by the device agent to report the effective OTA configuration\nand the current state of the update process.",
     "properties": {
       "config": {
         "$ref": "#/components/schemas/nexigon_api.properties.OtaUpdateConfig"
@@ -3990,7 +6254,7 @@
       "organizationId": {
         "$ref": "#/components/schemas/nexigon_api.organizations.OrganizationId"
       },
-      "name": {
+      "displayName": {
         "type": "string"
       },
       "visibility": {
@@ -3999,7 +6263,7 @@
     },
     "required": [
       "organizationId",
-      "name"
+      "displayName"
     ],
     "unevaluatedProperties": false
   },
@@ -4099,6 +6363,19 @@
     ],
     "unevaluatedProperties": false
   },
+  "nexigon_api.repositories.FinalizeAssetUploadAction": {
+    "type": "object",
+    "description": "Verify an uploaded object and make its asset available.\n\nThis action is idempotent: finalizing an already available asset succeeds.",
+    "properties": {
+      "assetId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryAssetId"
+      }
+    },
+    "required": [
+      "assetId"
+    ],
+    "unevaluatedProperties": false
+  },
   "nexigon_api.repositories.GetAssetDetailsAction": {
     "type": "object",
     "description": "Get information about an asset.",
@@ -4128,6 +6405,9 @@
       },
       "status": {
         "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryAssetStatus"
+      },
+      "storage": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryAssetStorage"
       },
       "referenceCount": {
         "type": "integer",
@@ -4276,6 +6556,9 @@
       "displayName": {
         "type": "string"
       },
+      "slug": {
+        "type": "string"
+      },
       "publicName": {
         "type": "string"
       },
@@ -4294,6 +6577,7 @@
     "required": [
       "repositoryId",
       "displayName",
+      "publicName",
       "visibility",
       "packageCount",
       "assetCount"
@@ -4374,6 +6658,15 @@
     "properties": {
       "url": {
         "type": "string"
+      },
+      "verifiedUrl": {
+        "type": "string"
+      },
+      "headers": {
+        "type": "object",
+        "additionalProperties": {
+          "type": "string"
+        }
       }
     },
     "required": [
@@ -4400,6 +6693,9 @@
       },
       "status": {
         "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryAssetStatus"
+      },
+      "storage": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryAssetStorage"
       },
       "metadata": {
         "type": "object",
@@ -4443,6 +6739,9 @@
       },
       "status": {
         "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryAssetStatus"
+      },
+      "storage": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryAssetStorage"
       },
       "metadata": {
         "type": "object",
@@ -4779,6 +7078,36 @@
       "Deleting"
     ],
     "description": "Asset status."
+  },
+  "nexigon_api.repositories.RepositoryAssetStorage": {
+    "type": "object",
+    "description": "Latest object-storage check for an asset.",
+    "properties": {
+      "status": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryAssetStorageStatus"
+      },
+      "checkedAt": {
+        "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
+      },
+      "detail": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "status"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.repositories.RepositoryAssetStorageStatus": {
+    "enum": [
+      "Unknown",
+      "Present",
+      "Verified",
+      "Missing",
+      "Mismatched",
+      "Error"
+    ],
+    "description": "Result of the latest non-destructive object-storage check."
   },
   "nexigon_api.repositories.RepositoryId": {
     "type": [
@@ -5266,37 +7595,10 @@
       }
     },
     "required": [
-      "repositoryId"
-    ],
-    "unevaluatedProperties": false
-  },
-  "nexigon_api.repositories.SetRepositoryPublicNameAction": {
-    "type": "object",
-    "description": "Set the public name of a repository.\n\nNote: Setting the public name requires the `public_repositories` subscription feature.",
-    "properties": {
-      "repositoryId": {
-        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryId"
-      },
-      "publicName": {
-        "type": "string"
-      }
-    },
-    "required": [
       "repositoryId",
-      "publicName"
+      "displayName"
     ],
     "unevaluatedProperties": false
-  },
-  "nexigon_api.repositories.SetRepositoryPublicNameOutput": {
-    "enum": [
-      {
-        "result": "NameAlreadyExists"
-      },
-      {
-        "result": "Success"
-      }
-    ],
-    "description": "Output of setting the public name of a repository."
   },
   "nexigon_api.repositories.SetRepositoryS3ConfigAction": {
     "type": "object",
@@ -5314,6 +7616,34 @@
       "s3Config"
     ],
     "unevaluatedProperties": false
+  },
+  "nexigon_api.repositories.SetRepositorySlugAction": {
+    "type": "object",
+    "description": "Set the slug of a repository.\n\nNote: Setting the slug requires the `public_repositories` subscription feature.",
+    "properties": {
+      "repositoryId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryId"
+      },
+      "slug": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "repositoryId",
+      "slug"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.repositories.SetRepositorySlugOutput": {
+    "enum": [
+      {
+        "result": "SlugAlreadyExists"
+      },
+      {
+        "result": "Success"
+      }
+    ],
+    "description": "Output of setting the slug of a repository."
   },
   "nexigon_api.repositories.SetRepositoryVisibilityAction": {
     "type": "object",
@@ -5385,6 +7715,38 @@
     ],
     "unevaluatedProperties": false
   },
+  "nexigon_api.users.ChangeUserPasswordAction": {
+    "type": "object",
+    "description": "Change the password of the current user.\n\nRequires the user to provide their current password to re-verify their\nidentity, even if they are already authenticated.",
+    "properties": {
+      "userId": {
+        "$ref": "#/components/schemas/nexigon_api.users.UserId"
+      },
+      "currentPassword": {
+        "type": "string"
+      },
+      "newPassword": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "userId",
+      "currentPassword",
+      "newPassword"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.users.ChangeUserPasswordOutput": {
+    "enum": [
+      {
+        "result": "Completed"
+      },
+      {
+        "result": "InvalidCurrentPassword"
+      }
+    ],
+    "description": "Output of [`ChangeUserPasswordAction`]."
+  },
   "nexigon_api.users.CompleteRegistrationAction": {
     "type": "object",
     "description": "Complete the registration of a user.",
@@ -5408,6 +7770,33 @@
       }
     ],
     "description": "Output of completing the registration of a user."
+  },
+  "nexigon_api.users.CompleteUserEmailChangeAction": {
+    "type": "object",
+    "description": "Complete an email-address change using a verification token.",
+    "properties": {
+      "token": {
+        "$ref": "#/components/schemas/nexigon_api.jwt.Jwt"
+      }
+    },
+    "required": [
+      "token"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.users.CompleteUserEmailChangeOutput": {
+    "enum": [
+      {
+        "result": "Completed"
+      },
+      {
+        "result": "InvalidToken"
+      },
+      {
+        "result": "EmailAlreadyExists"
+      }
+    ],
+    "description": "Output of [`CompleteUserEmailChangeAction`]."
   },
   "nexigon_api.users.CompleteUserPasswordResetAction": {
     "type": "object",
@@ -5628,6 +8017,44 @@
       "isAdmin"
     ],
     "unevaluatedProperties": false
+  },
+  "nexigon_api.users.InitiateUserEmailChangeAction": {
+    "type": "object",
+    "description": "Initiate an email-address change for the current user.\n\nRequires the user to provide their current password to re-verify their\nidentity. On success, a verification link is sent to the new address and\na notification is sent to the current address.",
+    "properties": {
+      "userId": {
+        "$ref": "#/components/schemas/nexigon_api.users.UserId"
+      },
+      "currentPassword": {
+        "type": "string"
+      },
+      "newEmail": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "userId",
+      "currentPassword",
+      "newEmail"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.users.InitiateUserEmailChangeOutput": {
+    "enum": [
+      {
+        "result": "Pending"
+      },
+      {
+        "result": "InvalidCurrentPassword"
+      },
+      {
+        "result": "SameEmail"
+      },
+      {
+        "result": "EmailAlreadyExists"
+      }
+    ],
+    "description": "Output of [`InitiateUserEmailChangeAction`]."
   },
   "nexigon_api.users.QueryUserOrganizationInvitationsAction": {
     "type": "object",
@@ -5905,66 +8332,6 @@
     ],
     "unevaluatedProperties": false
   },
-  "nexigon_api.users.RegisterUserOutput": {
-    "description": "Output of registering a new user.",
-    "oneOf": [
-      {
-        "type": "object",
-        "properties": {
-          "result": {
-            "const": "Created"
-          },
-          "status": {
-            "$ref": "#/components/schemas/nexigon_api.users.UserRegistrationStatus"
-          },
-          "message": {
-            "type": "string"
-          },
-          "createdAt": {
-            "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
-          }
-        },
-        "required": [
-          "result",
-          "status",
-          "createdAt"
-        ]
-      },
-      {
-        "type": "object",
-        "properties": {
-          "result": {
-            "const": "Pending"
-          },
-          "status": {
-            "$ref": "#/components/schemas/nexigon_api.users.UserRegistrationStatus"
-          },
-          "message": {
-            "type": "string"
-          },
-          "createdAt": {
-            "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
-          }
-        },
-        "required": [
-          "result",
-          "status",
-          "createdAt"
-        ]
-      },
-      {
-        "type": "object",
-        "properties": {
-          "result": {
-            "const": "EmailAlreadyExists"
-          }
-        },
-        "required": [
-          "result"
-        ]
-      }
-    ]
-  },
   "nexigon_api.users.ResendRegistrationEmailAction": {
     "type": "object",
     "properties": {
@@ -6007,6 +8374,34 @@
     ],
     "unevaluatedProperties": false
   },
+  "nexigon_api.users.SetUserEmailAction": {
+    "type": "object",
+    "description": "Set the email address of a user.\n\nAdmin-only operation that updates the address without verification.",
+    "properties": {
+      "userId": {
+        "$ref": "#/components/schemas/nexigon_api.users.UserId"
+      },
+      "email": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "userId",
+      "email"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.users.SetUserEmailOutput": {
+    "enum": [
+      {
+        "result": "Updated"
+      },
+      {
+        "result": "EmailAlreadyExists"
+      }
+    ],
+    "description": "Output of [`SetUserEmailAction`]."
+  },
   "nexigon_api.users.SetUserIsAdminAction": {
     "type": "object",
     "description": "Set whether the user is an instance administrator.",
@@ -6026,7 +8421,7 @@
   },
   "nexigon_api.users.SetUserPasswordAction": {
     "type": "object",
-    "description": "Set the password of a user.",
+    "description": "Set the password of a user.\n\nAdmin-only operation that sets the password without requiring the current\none. All existing sessions of the user are invalidated.",
     "properties": {
       "userId": {
         "$ref": "#/components/schemas/nexigon_api.users.UserId"
@@ -6059,42 +8454,6 @@
       "string"
     ],
     "description": "Unique ID of a user."
-  },
-  "nexigon_api.users.UserRegistration": {
-    "type": "object",
-    "description": "User registration.",
-    "properties": {
-      "status": {
-        "$ref": "#/components/schemas/nexigon_api.users.UserRegistrationStatus"
-      },
-      "message": {
-        "type": "string"
-      },
-      "createdAt": {
-        "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
-      }
-    },
-    "required": [
-      "status",
-      "createdAt"
-    ],
-    "unevaluatedProperties": false
-  },
-  "nexigon_api.users.UserRegistrationStatus": {
-    "enum": [
-      {
-        "tag": "Pending"
-      },
-      {
-        "tag": "Waiting"
-      },
-      {
-        "tag": "Completed"
-      },
-      {
-        "tag": "Failed"
-      }
-    ]
   },
   "nexigon_api.users.UserSession": {
     "type": "object",
@@ -6251,7 +8610,7 @@
   },
   "nexigon_api.vulnerabilities.GetVersionVulnerabilityOverviewAction": {
     "type": "object",
-    "description": "Get the vulnerability overview for a package version: artifact list,\nSBOM/VDR/VEX descriptors per artifact, package-level VEX, and\n(when indexing is enabled) the rolled-up severity summary.",
+    "description": "**Unstable (feature `vulnerability_management`).**\n\nGet the vulnerability overview for a package version: artifact list,\nSBOM/VDR/VEX descriptors per artifact, package-level VEX, and\n(when indexing is enabled) the rolled-up severity summary.",
     "properties": {
       "versionId": {
         "$ref": "#/components/schemas/nexigon_api.repositories.PackageVersionId"
@@ -6301,7 +8660,7 @@
   },
   "nexigon_api.vulnerabilities.IndexPackageDocumentsAction": {
     "type": "object",
-    "description": "Trigger indexing of every CycloneDX document referenced by the\npackage's metadata via `relations.{vex}` (typically just VEX).\n\nMirrors `IndexVersionDocumentsAction`. Used after attaching a new\npackage-level VEX asset and pointing the package's metadata at it.",
+    "description": "**Unstable (feature `vulnerability_management`).**\n\nTrigger indexing of every CycloneDX document referenced by the\npackage's metadata via `relations.{vex}` (typically just VEX).\n\nMirrors `IndexVersionDocumentsAction`. Used after attaching a new\npackage-level VEX asset and pointing the package's metadata at it.",
     "properties": {
       "packageId": {
         "$ref": "#/components/schemas/nexigon_api.repositories.PackageId"
@@ -6331,7 +8690,7 @@
   },
   "nexigon_api.vulnerabilities.IndexVersionDocumentsAction": {
     "type": "object",
-    "description": "Trigger indexing of every CycloneDX document referenced by the\nversion's artifact assets via `relations.{sbom,vdr,vex}`.\n\nThe hub fetches the referenced documents from the repository's S3\nstorage and rebuilds the index for this version. The repository\nmust have S3 configured.",
+    "description": "**Unstable (feature `vulnerability_management`).**\n\nTrigger indexing of every CycloneDX document referenced by the\nversion's artifact assets via `relations.{sbom,vdr,vex}`.\n\nThe hub fetches the referenced documents from the repository's S3\nstorage and rebuilds the index for this version. The repository\nmust have S3 configured.",
     "properties": {
       "versionId": {
         "$ref": "#/components/schemas/nexigon_api.repositories.PackageVersionId"
@@ -6450,6 +8809,12 @@
       "detail": {
         "type": "string"
       },
+      "responses": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
       "stateOrigin": {
         "$ref": "#/components/schemas/nexigon_api.vulnerabilities.VexStatementOrigin"
       }
@@ -6460,13 +8825,14 @@
       "componentName",
       "vulnerabilityId",
       "severity",
-      "effectiveState"
+      "effectiveState",
+      "responses"
     ],
     "unevaluatedProperties": false
   },
   "nexigon_api.vulnerabilities.QueryPackageVersionComponentsAction": {
     "type": "object",
-    "description": "Query the components extracted from a package version's SBOMs.",
+    "description": "**Unstable (feature `vulnerability_management`).**\n\nQuery the components extracted from a package version's SBOMs.",
     "properties": {
       "versionId": {
         "$ref": "#/components/schemas/nexigon_api.repositories.PackageVersionId"
@@ -6507,6 +8873,7 @@
   },
   "nexigon_api.vulnerabilities.QueryPackageVersionFindingsAction": {
     "type": "object",
+    "description": "**Unstable (feature `vulnerability_management`).**",
     "properties": {
       "versionId": {
         "$ref": "#/components/schemas/nexigon_api.repositories.PackageVersionId"

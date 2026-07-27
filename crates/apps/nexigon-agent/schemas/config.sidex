@@ -32,8 +32,14 @@ record Config {
     ssl_cert?: PathBuf,
     /// Path to the device private key.
     ssl_key?: PathBuf,
-    /// Disable TLS.
-    dangerous_disable_tls?: bool,
+    /// Allow credentials to be sent over plaintext HTTP/WebSocket.
+    ///
+    /// This is intended only for explicitly trusted development networks.
+    dangerous_allow_plaintext?: bool,
+    /// Accept invalid TLS server certificates while retaining encryption.
+    ///
+    /// This disables peer authentication and is intended only for development.
+    dangerous_accept_invalid_certificates?: bool,
     /// Telemetry configuration.
     telemetry?: TelemetryConfig,
     /// Exported services.
@@ -42,6 +48,8 @@ record Config {
     terminal?: TerminalConfig,
     /// On-demand command configuration.
     commands?: CommandsConfig,
+    /// Device-polled operation configuration.
+    operations?: OperationsConfig,
     /// Local API configuration.
     local_api?: LocalApiConfig,
     /// Pairing-key provisioning configuration.
@@ -117,7 +125,10 @@ record HttpExportConfig {
 record TerminalConfig {
     /// Whether terminal access is enabled (defaults to false).
     enabled?: bool,
-    /// Default Unix user for terminal sessions (defaults to `root`).
+    /// Unix user for terminal sessions (defaults to `root`).
+    ///
+    /// Enabling terminal access without setting this field preserves the legacy
+    /// root-session behavior. Set it explicitly to run sessions as another user.
     user?: string,
     /// Default shell to use (fallback: user's login shell, then /bin/sh).
     shell?: string,
@@ -132,6 +143,27 @@ record CommandsConfig {
     enabled?: bool,
     /// Directory containing command definition files (defaults to /etc/nexigon/agent/commands).
     directory?: PathBuf,
+}
+
+/// Device-polled operation configuration.
+#[json(rename_all = "kebab-case")]
+record OperationsConfig {
+    /// Whether operation polling is enabled (defaults to false).
+    ///
+    /// Agents must explicitly opt in with `enabled = true` before they claim
+    /// operation work from the hub.
+    enabled?: bool,
+    /// How long to wait between polls when there is no work (defaults to 60).
+    ///
+    /// This is an *idle* interval. Whenever a poll returns work, the agent carries it
+    /// out and polls again straight away, so a multi-step operation runs at the speed of
+    /// the steps rather than of this interval. What the interval bounds is how soon a
+    /// device notices work that appeared while it was idle.
+    ///
+    /// Every device polls on this interval whether or not there is anything for it, so
+    /// the cost falls on the hub and grows with the size of the fleet. Shorten it only
+    /// if you need idle devices to react faster and you know the fleet is small.
+    poll_interval_secs?: u64,
 }
 
 /// Command definition file.

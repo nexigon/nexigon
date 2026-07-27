@@ -18,11 +18,13 @@ dialoguer = "0.11"
 futures = "0.3"
 indexmap = { version = "2.9", features = ["serde"] }
 jiff = { version = "0.2", features = ["serde"] }
+jsonschema = { version = "=0.18.3", default-features = false }
 parking_lot = "0.12"
 paste = "1.0"
 pin-project = "1.1"
 rand = "0.9"
 rcgen = "0.13"
+regex = "1.12"
 rustls = "0.23"
 rustls-native-certs = "0.8"
 serde = { version = "1.0", features = ["derive"] }
@@ -33,6 +35,7 @@ static_assertions = "1.1"
 sysinfo = "0.37.0"
 thiserror = "2.0"
 tokio = { version = "1.0", features = ["full"] }
+tokio-util = { version = "0.7", features = ["rt"] }
 toml = "0.8"
 tracing = "0.1"
 url = { version = "2.5", features = ["serde"] }
@@ -51,6 +54,7 @@ sidex-validate = { git = "https://github.com/silitics/sidex.git" }
 
 # Local Crates
 nexigon-agent-api = { path = "crates/libs/nexigon-agent-api" }
+nexigon-agent-protocol = { path = "crates/libs/nexigon-agent-protocol" }
 nexigon-api = { path = "crates/libs/nexigon-api" }
 nexigon-cert = { path = "crates/libs/nexigon-cert" }
 nexigon-client = { path = "crates/libs/nexigon-client" }

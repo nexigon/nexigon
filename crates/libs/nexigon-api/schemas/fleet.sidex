@@ -1,6 +1,12 @@
 //! Fleet-level actions and types.
 
 import datetime::Timestamp
+import devices::DeviceId
+import devices::DeviceOperationId
+import devices::DeviceOperationStatus
+import devices::DeviceOperationStep
+import devices::DeviceOperationStepState
+import json::JsonExpr
 import json::JsonValue
 import outputs::Empty
 import projects::ProjectId
@@ -184,4 +190,427 @@ record ComputedFleetPropertyDefinition {
     config: JsonValue,
     /// When the definition was created.
     created_at: Timestamp,
+}
+
+// ============================================================================
+// Fleet Operations
+// ============================================================================
+
+
+/// Unique ID of a fleet operation.
+#[rust(type = "nexigon_ids::ids::FleetOperationId")]
+#[json(type = "string")]
+opaque FleetOperationId
+
+/// Selector used to identify devices a fleet operation applies to.
+record FleetOperationTargetSelector {
+    /// Optional explicit device allow-list.
+    device_ids?: [DeviceId],
+    /// Expressions that all have to evaluate to JSON `true`.
+    ///
+    /// `NamedValue` reads address device properties by exact name. Expressions
+    /// are evaluated in order and stop at the first false result. An evaluation
+    /// error is recorded for that device instead of silently excluding it.
+    predicates: [JsonExpr],
+}
+
+/// One stage in a fleet operation.
+record FleetOperationStage {
+    /// Human-readable stage name.
+    #[validate(
+        { 1 <= _.size <= 128 },
+        message = "Stage name must be between 1 and 128 characters."
+    )]
+    name: string,
+    /// Percent of matching devices included in this stage.
+    ///
+    /// Uses deterministic sampling so stage membership is stable for a
+    /// given fleet operation and device. Defaults to 100.
+    #[validate(
+        { 1 <= _ <= 100 },
+        message = "Stage percentage must be between 1 and 100."
+    )]
+    percentage?: u32,
+    /// Whether to automatically activate the next stage once this stage's
+    /// guard criteria pass.
+    auto_advance?: bool,
+    /// Guard checked before advancing past this stage.
+    guard?: FleetOperationStageGuard,
+}
+
+/// Guard checked before a stage can be advanced.
+record FleetOperationStageGuard {
+    /// Required percent of selected targets that must have succeeded.
+    #[validate(
+        { _ <= 100 },
+        message = "Success percentage must be between 0 and 100."
+    )]
+    min_success_percent?: u32,
+    /// Maximum percent of selected targets that may have failed.
+    #[validate(
+        { _ <= 100 },
+        message = "Failure percentage must be between 0 and 100."
+    )]
+    max_failure_percent?: u32,
+    /// Additional observed gates that must pass before advancing.
+    gates: [FleetOperationStageGate],
+}
+
+/// Observed gate checked before a stage can advance.
+#[json(tag = "kind")]
+variant FleetOperationStageGate {
+    /// Require a percentage of stage targets to match a predicate expression.
+    DeviceProperty: FleetOperationDevicePropertyGate,
+    /// Prevent advancement before a scheduled timestamp.
+    NotBefore: FleetOperationNotBeforeGate,
+}
+
+/// Gate over target device properties.
+record FleetOperationDevicePropertyGate {
+    /// Boolean expression evaluated against selected targets' properties.
+    ///
+    /// A missing property is a non-match. Other evaluation errors block the
+    /// gate and are reported in its status.
+    predicate: JsonExpr,
+    /// Required percent of selected targets that must match.
+    #[validate(
+        { _ <= 100 },
+        message = "Match percentage must be between 0 and 100."
+    )]
+    min_match_percent: u32,
+}
+
+/// Gate that passes once hub server time has reached a timestamp.
+record FleetOperationNotBeforeGate {
+    /// Earliest timestamp at which the stage can advance.
+    not_before: Timestamp,
+}
+
+/// Fleet operation lifecycle status.
+#[json(tagged = externally)]
+variant FleetOperationStatus {
+    /// Fleet operation has been created but not started.
+    Draft,
+    /// Fleet operation is running and target device operations are being driven.
+    Running,
+    /// Fleet operation is paused.
+    Paused,
+    /// Fleet operation reached a terminal state for all selected targets.
+    Completed,
+    /// Fleet operation converged, but one or more targets or selector evaluations failed.
+    Failed,
+    /// Fleet operation was cancelled.
+    Cancelled,
+}
+
+/// Summary of a fleet operation.
+record FleetOperationSummary {
+    /// ID of the fleet operation.
+    fleet_operation_id: FleetOperationId,
+    /// Project the fleet operation belongs to.
+    project_id: ProjectId,
+    /// Name of the fleet operation.
+    name: string,
+    /// Optional description.
+    description?: string,
+    /// Lifecycle status.
+    status: FleetOperationStatus,
+    /// How often the selector is re-evaluated to enroll newly matching devices.
+    ///
+    /// Absence means snapshot enrollment: the selector is evaluated exactly once.
+    /// Presence makes the operation dynamic: the selector is re-evaluated while the
+    /// operation remains running. The instance clamps this to a minimum when scheduling,
+    /// so the interval actually used may be longer than the one requested here.
+    enrollment_interval_secs?: u32,
+    /// When the selector was last evaluated. Absent until the first enrollment pass.
+    last_enrollment_at?: Timestamp,
+    /// Whether the operation automatically completes once all of its targets
+    /// converge to a terminal state.
+    ///
+    /// Always `true` when `enrollment_interval_secs` is absent. When an interval is
+    /// present, `false` keeps the operation running indefinitely, continuing to enroll
+    /// newly matching devices until explicitly cancelled.
+    close_when_converged: bool,
+    /// Highest activated stage index.
+    ///
+    /// All stages up to and including this index can continue progressing.
+    /// The guard for this index controls advancement to the next stage.
+    active_stage_index: u32,
+    /// Number of stages.
+    stage_count: u32,
+    /// Progress across selected targets.
+    progress: FleetOperationProgress,
+    /// Creation time.
+    created_at: Timestamp,
+    /// Start time.
+    started_at?: Timestamp,
+    /// Completion time.
+    completed_at?: Timestamp,
+}
+
+/// Fleet operation details.
+record FleetOperationDetails {
+    /// Summary.
+    summary: FleetOperationSummary,
+    /// Target selector.
+    selector: FleetOperationTargetSelector,
+    /// Stages.
+    stages: [FleetOperationStage],
+    /// Ordered steps for each selected device.
+    steps: [DeviceOperationStep],
+}
+
+/// Progress counts for selected targets.
+record FleetOperationProgress {
+    total: u32,
+    pending: u32,
+    running: u32,
+    succeeded: u32,
+    failed: u32,
+    timed_out: u32,
+    cancelled: u32,
+}
+
+/// A device the target selector could not be evaluated against.
+///
+/// The device is not a target: the operation could not establish that it even applies to
+/// it. The error is recorded so that a broken selector is visible instead of silently
+/// narrowing the fleet, and the operation retries the device on its next enrollment pass.
+record FleetOperationSelectionError {
+    /// Device the selector failed on.
+    device_id: DeviceId,
+    /// Why evaluating the selector failed.
+    error: string,
+    /// When the error was last observed.
+    updated_at: Timestamp,
+}
+
+/// A device a fleet operation applies to, and how its work is faring.
+///
+/// A device becomes a target when the operation's selector matches it and it is given a
+/// device operation. That device operation is what actually executes; the fields below
+/// report its progress.
+record FleetOperationTarget {
+    /// Device the fleet operation applies to.
+    device_id: DeviceId,
+    /// ID of the device operation carrying out the work on that device.
+    device_operation_id: DeviceOperationId,
+    stage_index: u32,
+    step_index: u32,
+    status: DeviceOperationStatus,
+    last_error?: string,
+    updated_at: Timestamp,
+    /// State for steps that have started, one entry per step reached so far.
+    ///
+    /// A step with no entry here has not been reached yet. Correlate entries
+    /// with `FleetOperationDetails.steps` by `step_index`, not array position
+    /// or length — this list isn't guaranteed to stay dense or gapless as a
+    /// matter of API contract, even though the current driver happens to
+    /// fill it in strictly in order.
+    step_states: [DeviceOperationStepState],
+}
+
+/// Query fleet operations for a project.
+#[request(name = "fleet_QueryOperations", response = QueryFleetOperationsOutput)]
+record QueryFleetOperationsAction {
+    /// ID of the project.
+    project_id: ProjectId,
+}
+
+/// Output of querying fleet operations.
+record QueryFleetOperationsOutput {
+    /// Fleet operations.
+    operations: [FleetOperationSummary],
+}
+
+/// Get fleet operation details.
+#[request(name = "fleet_GetOperation", response = GetFleetOperationOutput)]
+record GetFleetOperationAction {
+    /// ID of the fleet operation.
+    fleet_operation_id: FleetOperationId,
+}
+
+/// Output of getting fleet operation details.
+#[json(tag = "result")]
+variant GetFleetOperationOutput {
+    /// Fleet operation was not found or the actor cannot access it.
+    NotFound,
+    /// Fleet operation was found.
+    Found: FleetOperationDetails,
+}
+
+/// Create a fleet operation.
+#[request(name = "fleet_CreateOperation", response = CreateFleetOperationOutput)]
+record CreateFleetOperationAction {
+    /// Project the fleet operation belongs to.
+    project_id: ProjectId,
+    /// Fleet operation name.
+    #[validate(
+        { 1 <= _.size <= 128 },
+        message = "Fleet operation name must be between 1 and 128 characters."
+    )]
+    name: string,
+    /// Optional description.
+    #[validate(
+        { _.size <= 4096 },
+        message = "Fleet operation description must be at most 4096 characters."
+    )]
+    description?: string,
+    /// How often to re-evaluate the selector, in seconds, to enroll devices that
+    /// have started matching since the operation was created.
+    ///
+    /// Presence makes the operation dynamic. Absence means snapshot enrollment and
+    /// evaluates the selector exactly once. The instance enforces a minimum when
+    /// scheduling, so a shorter interval than the instance permits is accepted but
+    /// enrolled no more often than policy allows.
+    #[validate(
+        { _ >= 1 },
+        message = "Enrollment interval must be at least one second."
+    )]
+    enrollment_interval_secs?: u32,
+    /// Whether to automatically complete the operation once all of its targets
+    /// converge to a terminal state. Defaults to `true`.
+    ///
+    /// Can only be set to `false` when `enrollment_interval_secs` is present.
+    close_when_converged?: bool,
+    /// Target selector.
+    selector: FleetOperationTargetSelector,
+    /// Ordered stages.
+    stages: [FleetOperationStage],
+    /// Ordered steps for each selected device.
+    steps: [DeviceOperationStep],
+}
+
+/// Output of creating a fleet operation.
+record CreateFleetOperationOutput {
+    /// ID of the created fleet operation.
+    fleet_operation_id: FleetOperationId,
+}
+
+/// Start a draft fleet operation.
+#[request(name = "fleet_StartOperation", response = Empty)]
+record StartFleetOperationAction {
+    /// ID of the fleet operation.
+    fleet_operation_id: FleetOperationId,
+}
+
+/// Advance the fleet operation to the next stage.
+#[request(
+    name = "fleet_AdvanceOperationStage",
+    response = AdvanceFleetOperationStageOutput
+)]
+record AdvanceFleetOperationStageAction {
+    /// ID of the fleet operation.
+    fleet_operation_id: FleetOperationId,
+}
+
+/// Output of advancing a fleet operation stage.
+#[json(tag = "result")]
+variant AdvanceFleetOperationStageOutput {
+    /// The fleet operation advanced to the next stage.
+    Advanced,
+    /// The fleet operation is already on its final stage.
+    AlreadyFinalStage,
+    /// The frontier stage guard blocked advancement.
+    GuardBlocked: FleetOperationStageGuardStatus,
+}
+
+/// Guard status when advancement is blocked.
+record FleetOperationStageGuardStatus {
+    /// Required success percentage.
+    min_success_percent?: u32,
+    /// Actual success percentage.
+    success_percent: u32,
+    /// Maximum allowed failure percentage.
+    max_failure_percent?: u32,
+    /// Actual failure percentage.
+    failure_percent: u32,
+    /// Observed gate results.
+    gates: [FleetOperationStageGateStatus],
+}
+
+/// Observed gate result.
+record FleetOperationStageGateStatus {
+    /// Gate index in the stage guard.
+    gate_index: u32,
+    /// Whether the gate passed.
+    passed: bool,
+    /// Human-readable summary.
+    summary: string,
+    /// Actual observed percentage for the gate.
+    actual_percent: u32,
+    /// Required threshold percentage.
+    threshold_percent: u32,
+    /// Number of targets whose gate expression produced a non-missing error.
+    evaluation_error_count: u32,
+    /// One representative evaluation error, when any occurred.
+    evaluation_error?: string,
+}
+
+/// Query the devices a fleet operation applies to, its *targets*.
+///
+/// A target is a device the selector matched, reported together with the device operation
+/// carrying out the work on it and the stage that gates it. Devices in stages the rollout
+/// has not reached yet are included, and are `Pending`.
+///
+/// This is a separate query rather than part of the operation's details because the list
+/// grows with the fleet, and most reads of an operation do not want it.
+#[request(
+    name = "fleet_QueryOperationTargets",
+    response = QueryFleetOperationTargetsOutput
+)]
+record QueryFleetOperationTargetsAction {
+    /// ID of the fleet operation.
+    fleet_operation_id: FleetOperationId,
+}
+
+/// Output of querying the devices a fleet operation applies to.
+record QueryFleetOperationTargetsOutput {
+    /// Devices the fleet operation applies to.
+    targets: [FleetOperationTarget],
+}
+
+/// Query the devices whose selector evaluation failed for a fleet operation.
+///
+/// Normally empty. A non-empty result means the selector could not be evaluated against
+/// those devices, so the operation cannot tell whether it applies to them.
+#[request(
+    name = "fleet_QueryOperationSelectionErrors",
+    response = QueryFleetOperationSelectionErrorsOutput
+)]
+record QueryFleetOperationSelectionErrorsAction {
+    /// ID of the fleet operation.
+    fleet_operation_id: FleetOperationId,
+}
+
+/// Output of querying a fleet operation's selection errors.
+record QueryFleetOperationSelectionErrorsOutput {
+    /// Devices the selector could not be evaluated against.
+    errors: [FleetOperationSelectionError],
+}
+
+/// Pause a running fleet operation.
+///
+/// Pausing halts the rollout without undoing any of it. No new devices are enrolled, no
+/// device operation makes progress, and devices are handed no new work. Nothing is
+/// cancelled and no state is lost.
+///
+/// A device that already took a work item and has carried it out can still report the
+/// result, and the result is recorded: pausing stops new work being generated, it does not
+/// discard work that was genuinely done.
+///
+/// Resume with `fleet_StartOperation`, which picks the rollout up exactly where it left
+/// off. Time spent paused does not count towards step timeouts: the clock on any step that
+/// was in flight restarts on resume, so a long pause cannot time work out.
+#[request(name = "fleet_PauseOperation", response = Empty)]
+record PauseFleetOperationAction {
+    /// ID of the fleet operation.
+    fleet_operation_id: FleetOperationId,
+}
+
+/// Cancel a fleet operation.
+#[request(name = "fleet_CancelOperation", response = Empty)]
+record CancelFleetOperationAction {
+    /// ID of the fleet operation.
+    fleet_operation_id: FleetOperationId,
 }
