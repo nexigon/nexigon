@@ -5,19 +5,16 @@
   "description": "Agent configuration.",
   "properties": {
     "hub-url": {
-      "type": "string",
-      "description": "URL of the Nexigon Hub server.\n\nRequired for static deployments. If omitted, the agent reads\nprovisioned credentials from `credentials.json` in `data-path`."
+      "type": "string"
     },
     "token": {
-      "$ref": "#/$defs/nexigon_agent.config.DeploymentToken",
-      "description": "Deployment token.\n\nRequired for static deployments. If omitted, the agent reads\nprovisioned credentials from `credentials.json` in `data-path`."
+      "$ref": "#/$defs/nexigon_agent.config.DeploymentToken"
     },
     "fingerprint-script": {
       "$ref": "#/$defs/nexigon_agent.config.PathBuf"
     },
     "data-path": {
-      "$ref": "#/$defs/nexigon_agent.config.PathBuf",
-      "description": "Persistent agent data directory.\n\nProvisioned credentials are stored as `credentials.json` below this\npath. Defaults to `/var/lib/nexigon/agent`."
+      "$ref": "#/$defs/nexigon_agent.config.PathBuf"
     },
     "ssl-cert": {
       "$ref": "#/$defs/nexigon_agent.config.PathBuf"
@@ -131,23 +128,19 @@
       "description": "Pairing-key provisioning configuration.\n\nWhen static credentials and provisioned credentials are both absent,\nthe agent can expose a minimal local HTTP endpoint to accept a one-time\npairing key and redeem it into device credentials.",
       "properties": {
         "enabled": {
-          "type": "boolean",
-          "description": "Whether pairing-key provisioning is enabled (defaults to false)."
+          "type": "boolean"
         },
         "bind": {
-          "type": "string",
-          "description": "Local bind address for the provisioning endpoint\n(defaults to `0.0.0.0:51337`)."
+          "type": "string"
         },
         "endpoints": {
           "type": "array",
           "items": {
             "type": "string"
-          },
-          "description": "Hub endpoints to try when redeeming a pairing key.\n\nDefaults to `https://eu.nexigon.cloud` and `https://us.nexigon.cloud`."
+          }
         },
         "device-name": {
-          "type": "string",
-          "description": "Optional display name for the device created during pairing."
+          "type": "string"
         }
       },
       "required": [],

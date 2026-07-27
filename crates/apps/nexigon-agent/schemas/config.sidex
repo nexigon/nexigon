@@ -58,7 +58,7 @@ record ProvisioningConfig {
     /// Whether pairing-key provisioning is enabled (defaults to false).
     enabled?: bool,
     /// Local bind address for the provisioning endpoint
-    /// (defaults to `0.0.0.0:51337`).
+    /// (defaults to `0.0.0.0:6947`).
     bind?: string,
     /// Hub endpoints to try when redeeming a pairing key.
     ///

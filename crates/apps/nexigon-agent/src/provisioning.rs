@@ -33,7 +33,7 @@ use crate::AgentCredentials;
 use crate::config::Config;
 use crate::credentials_path;
 
-const DEFAULT_BIND: &str = "0.0.0.0:51337";
+const DEFAULT_BIND: &str = "0.0.0.0:6947";
 const DEFAULT_ENDPOINTS: &[&str] = &["https://eu.nexigon.cloud", "https://us.nexigon.cloud"];
 const REQUEST_TIMEOUT: Duration = Duration::from_secs(15);
 const MAX_HEADER_BYTES: usize = 8 * 1024;
