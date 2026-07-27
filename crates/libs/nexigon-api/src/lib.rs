@@ -30,7 +30,7 @@ pub trait Action:
 #[rustfmt::skip]
 macro_rules! with_actions {
     ($name:ident) => {
-        $name![
+        $name! {
             // # Users
             ("users_Query", QueryUsers, users::QueryUsersAction, users::QueryUsersOutput),
             ("users_GetDetails", GetUserDetails, users::GetUserDetailsAction, users::GetUserDetailsOutput),
@@ -239,7 +239,7 @@ macro_rules! with_actions {
 
             // # Actors
             ("actor_GetActor", GetActor, actor::GetActorAction, actor::GetActorOutput),
-        ];
+        }
     };
 }
 
