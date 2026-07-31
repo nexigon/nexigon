@@ -36,12 +36,12 @@ use std::os::unix::fs::MetadataExt as _;
 
 const UPLOAD_BUFFER_SIZE: usize = 64 * 1024;
 const UPLOAD_TIMEOUT: Duration = Duration::from_secs(2 * 60 * 60);
-const REQUIRED_VERIFIED_HEADERS: [&str; 4] = [
-    "x-amz-checksum-sha256",
+const REQUIRED_VERIFIED_HEADERS: [&str; 3] = [
     "x-amz-meta-nexigon-asset-id",
     "x-amz-meta-nexigon-digest",
     "if-none-match",
 ];
+const VERIFIED_INTEGRITY_HEADERS: [&str; 2] = ["x-amz-content-sha256", "x-amz-checksum-sha256"];
 
 #[derive(Clone)]
 struct UploadSettings {
@@ -400,6 +400,17 @@ fn require_verified_headers(
             bail!("hub did not provide required verified upload header {required}");
         }
     }
+    let has_integrity_header = VERIFIED_INTEGRITY_HEADERS.iter().any(|required| {
+        headers
+            .iter()
+            .any(|(name, value)| name.eq_ignore_ascii_case(required) && !value.is_empty())
+    });
+    if !has_integrity_header {
+        bail!(
+            "hub did not provide a required verified upload integrity header ({})",
+            VERIFIED_INTEGRITY_HEADERS.join(" or ")
+        );
+    }
     Ok(())
 }
 
@@ -534,6 +545,7 @@ mod tests {
     use super::UploadProgress;
     use super::UploadSettings;
     use super::UploadStream;
+    use super::VERIFIED_INTEGRITY_HEADERS;
     use super::finish_task;
     use super::open_and_hash_with_observer;
     use super::put_prepared_upload;
@@ -558,6 +570,7 @@ mod tests {
     fn required_headers() -> HashMap<String, String> {
         REQUIRED_VERIFIED_HEADERS
             .into_iter()
+            .chain(VERIFIED_INTEGRITY_HEADERS)
             .map(|name| {
                 let value = if name == "if-none-match" { "*" } else { "test" };
                 (name.to_owned(), value.to_owned())
@@ -698,12 +711,19 @@ mod tests {
     }
 
     #[test]
-    fn verified_upload_requires_the_checksum_contract() {
+    fn verified_upload_requires_an_integrity_contract() {
         let mut headers = required_headers();
         headers.remove("x-amz-checksum-sha256");
-        let error = require_verified_headers(&headers).expect_err("checksum header is mandatory");
+        assert!(require_verified_headers(&headers).is_ok());
+
+        let mut legacy_headers = required_headers();
+        legacy_headers.remove("x-amz-content-sha256");
+        assert!(require_verified_headers(&legacy_headers).is_ok());
+
+        headers.remove("x-amz-content-sha256");
+        let error = require_verified_headers(&headers).expect_err("integrity header is mandatory");
         assert!(
-            error.to_string().contains("x-amz-checksum-sha256"),
+            error.to_string().contains("x-amz-content-sha256"),
             "unexpected error: {error:#}"
         );
     }
