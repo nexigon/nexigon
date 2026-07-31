@@ -7,6 +7,7 @@
 //! an execution interrupted after dispatch is failed conservatively rather than replayed.
 
 use std::collections::BTreeMap;
+use std::io::Write;
 use std::path::Path;
 use std::path::PathBuf;
 
@@ -21,6 +22,7 @@ use nexigon_ids::Id;
 use nexigon_ids::ids::DeviceOperationWorkClaimId;
 
 const LEDGER_DIRECTORY_NAME: &str = "operation-executions";
+const TEMPORARY_LEDGER_ENTRY_PREFIX: &str = ".operation-execution-";
 const LARGE_LEDGER_ENTRY_COUNT: usize = 1_000;
 
 pub(super) enum PreviousExecution {
@@ -146,19 +148,34 @@ impl OperationLedger {
         let bytes =
             serde_json::to_vec_pretty(entry).context("serializing operation execution entry")?;
         let path = self.entry_path(operation_id, step_index);
-        let temporary = path.with_extension("json.tmp");
-        tokio::fs::write(&temporary, bytes)
-            .await
-            .with_context(|| format!("writing operation ledger entry {}", temporary.display()))?;
-        tokio::fs::File::open(&temporary)
-            .await
-            .with_context(|| format!("opening operation ledger entry {}", temporary.display()))?
-            .sync_all()
-            .await
-            .with_context(|| format!("syncing operation ledger entry {}", temporary.display()))?;
-        tokio::fs::rename(&temporary, &path)
-            .await
-            .with_context(|| format!("committing operation ledger entry {}", path.display()))?;
+        let directory = self.directory.clone();
+        tokio::task::spawn_blocking(move || -> anyhow::Result<()> {
+            // `NamedTempFile::persist` replaces an existing destination atomically on
+            // both Unix and Windows. `std::fs::rename` cannot replace files on Windows.
+            let mut temporary = tempfile::Builder::new()
+                .prefix(TEMPORARY_LEDGER_ENTRY_PREFIX)
+                .tempfile_in(&directory)
+                .with_context(|| {
+                    format!(
+                        "creating temporary operation ledger entry in {}",
+                        directory.display()
+                    )
+                })?;
+            temporary
+                .write_all(&bytes)
+                .with_context(|| format!("writing operation ledger entry {}", path.display()))?;
+            temporary
+                .as_file()
+                .sync_all()
+                .with_context(|| format!("syncing operation ledger entry {}", path.display()))?;
+            temporary
+                .persist(&path)
+                .map_err(|error| error.error)
+                .with_context(|| format!("committing operation ledger entry {}", path.display()))?;
+            Ok(())
+        })
+        .await
+        .context("waiting for operation ledger entry persistence")??;
         sync_directory(&self.directory).await
     }
 
@@ -168,7 +185,12 @@ impl OperationLedger {
             .with_context(|| format!("reading operation ledger {}", self.directory.display()))?;
         while let Some(item) = directory.next_entry().await? {
             let path = item.path();
-            if path.extension().and_then(|extension| extension.to_str()) == Some("tmp") {
+            let is_temporary = path
+                .file_name()
+                .and_then(|name| name.to_str())
+                .is_some_and(|name| name.starts_with(TEMPORARY_LEDGER_ENTRY_PREFIX))
+                || path.extension().and_then(|extension| extension.to_str()) == Some("tmp");
+            if is_temporary {
                 // A crash before rename can leave only a temporary file. It was never a
                 // committed dispatch record, so it is safe to discard.
                 let _ = tokio::fs::remove_file(path).await;
