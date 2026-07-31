@@ -1,7 +1,7 @@
-/// User token.
-#[rust(type = "nexigon_ids::ids::UserToken")]
+/// User token or organization API token used to authenticate the CLI.
+#[rust(type = "crate::config::AuthenticationToken")]
 #[json(type = "string")]
-opaque UserToken
+opaque AuthenticationToken
 
 /// Filesystem path.
 #[rust(type = "std::path::PathBuf")]
@@ -13,6 +13,6 @@ opaque PathBuf
 record Config {
     /// URL of the Nexigon Hub server.
     hub_url: string,
-    /// User token.
-    token: UserToken,
+    /// User token or organization API token.
+    token: AuthenticationToken,
 }

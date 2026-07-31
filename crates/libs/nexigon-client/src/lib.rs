@@ -26,6 +26,7 @@ use nexigon_api::types::errors::ActionError;
 use nexigon_ids::Id;
 use nexigon_ids::ids::DeploymentToken;
 use nexigon_ids::ids::DeviceFingerprint;
+use nexigon_ids::ids::OrganizationApiToken;
 use nexigon_ids::ids::UserToken;
 use nexigon_multiplex::Channel;
 use nexigon_multiplex::Connection;
@@ -178,6 +179,8 @@ fn root_store_from_native_certificates(
 pub enum ClientToken {
     /// Deployment token.
     DeploymentToken(DeploymentToken),
+    /// Organization API token.
+    OrganizationApiToken(OrganizationApiToken),
     /// User token.
     UserToken(UserToken),
 }
@@ -187,6 +190,7 @@ impl ClientToken {
     pub fn stringify(&self) -> String {
         match self {
             Self::DeploymentToken(token) => token.stringify(),
+            Self::OrganizationApiToken(token) => token.stringify(),
             Self::UserToken(token) => token.stringify(),
         }
     }
@@ -354,6 +358,7 @@ impl ClientBuilder {
                     .headers_mut()
                     .append("X-Deployment-Token", token.stringify().try_into().unwrap());
             }
+            ClientToken::OrganizationApiToken(_) => {}
             ClientToken::UserToken(token) => {
                 request
                     .headers_mut()
@@ -640,6 +645,7 @@ mod tests {
     use nexigon_ids::Id;
     use nexigon_ids::ids::DeploymentToken;
     use nexigon_ids::ids::DeviceFingerprint;
+    use nexigon_ids::ids::OrganizationApiToken;
     use nexigon_ids::ids::UserToken;
     use rcgen::BasicConstraints;
     use rcgen::CertificateParams;
@@ -1091,6 +1097,28 @@ mod tests {
         assert!(request.deployment_token.is_empty());
         assert!(request.device_fingerprint.is_empty());
         assert!(request.client_certificate.is_empty());
+        drop(connection);
+        server.await.unwrap();
+    }
+
+    // Organization API tokens use standard bearer authentication without legacy headers.
+    #[tokio::test]
+    async fn organization_api_token_uses_bearer_authentication() {
+        let (address, request, server) = plaintext_server().await;
+        let token = OrganizationApiToken::generate();
+        let expected = token.stringify();
+        let connection = ClientBuilder::new(
+            Url::parse(&format!("http://{address}")).unwrap(),
+            ClientToken::OrganizationApiToken(token),
+        )
+        .dangerous_with_allow_plaintext(true)
+        .connect()
+        .await
+        .unwrap();
+        let request = request.await.unwrap();
+        assert_eq!(request.authorization, format!("Bearer {expected}"));
+        assert!(request.user_token.is_empty());
+        assert!(request.deployment_token.is_empty());
         drop(connection);
         server.await.unwrap();
     }

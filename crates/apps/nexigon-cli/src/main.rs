@@ -54,7 +54,7 @@ async fn main() -> anyhow::Result<()> {
                 .default("https://eu.nexigon.cloud".to_owned())
                 .interact()?;
             let token = dialoguer::Password::new()
-                .with_prompt("User Access Token")
+                .with_prompt("User or Organization API Token")
                 .interact()?;
             Ok(Config {
                 hub_url,
@@ -84,7 +84,7 @@ async fn main() -> anyhow::Result<()> {
     nexigon_client::install_crypto_provider();
     let connection = nexigon_client::ClientBuilder::new(
         config.hub_url.parse().unwrap(),
-        ClientToken::UserToken(config.token.clone()),
+        ClientToken::from(config.token.clone()),
     )
     .connect()
     .await
@@ -92,7 +92,7 @@ async fn main() -> anyhow::Result<()> {
     let mut connection_ref = connection.make_ref();
     let join_handle = connection.spawn();
     let mut executor = connect_executor(&mut connection_ref).await.unwrap();
-    let _actor = match executor
+    match executor
         .execute(GetActorAction::new())
         .await
         .unwrap()
@@ -101,12 +101,14 @@ async fn main() -> anyhow::Result<()> {
     {
         nexigon_api::types::actor::Actor::UserToken(actor) => {
             info!(user_id = %actor.user_id);
-            actor
+        }
+        nexigon_api::types::actor::Actor::OrganizationApiToken(actor) => {
+            info!(organization_id = %actor.organization_id, token_id = %actor.token_id);
         }
         _ => {
             bail!("received unexpected actor type");
         }
-    };
+    }
     match &args.cmd {
         Cmd::Configure { .. } => {
             unreachable!()

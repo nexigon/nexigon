@@ -18,6 +18,22 @@
 
 For documentation and guides, visit [docs.nexigon.dev](https://docs.nexigon.dev).
 
+## CLI Authentication
+
+The Nexigon CLI accepts a personal user token or a fine-grained organization API
+token in the same `token` configuration field:
+
+```toml
+hub-url = "https://nexigon.example.com"
+token = "org_sk_..."
+```
+
+Prefer an organization API token for automation. An artifact publisher needs two
+policy statements scoped to its target repository: repository `view` and
+`manage_assets`, plus package `view` and `manage_versions`. It does not need
+organization, project, device, repository-settings, or package-management
+permissions when the destination package already exists.
+
 ## Security
 
 For information about reporting security vulnerabilities, see [SECURITY.md](SECURITY.md).

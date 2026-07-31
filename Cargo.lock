@@ -1290,6 +1290,7 @@ dependencies = [
  "sidex",
  "sidex-build-rs",
  "sidex-serde",
+ "thiserror 2.0.18",
  "tokio",
  "toml 0.8.23",
  "tracing",

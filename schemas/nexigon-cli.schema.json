@@ -8,7 +8,7 @@
       "type": "string"
     },
     "token": {
-      "$ref": "#/$defs/nexigon_cli.config.UserToken"
+      "$ref": "#/$defs/nexigon_cli.config.AuthenticationToken"
     }
   },
   "required": [
@@ -17,12 +17,12 @@
   ],
   "unevaluatedProperties": false,
   "$defs": {
-    "nexigon_cli.config.UserToken": {
-      "$id": "nexigon_cli.config.UserToken",
+    "nexigon_cli.config.AuthenticationToken": {
+      "$id": "nexigon_cli.config.AuthenticationToken",
       "type": [
         "string"
       ],
-      "description": "User token."
+      "description": "User token or organization API token used to authenticate the CLI."
     }
   }
 }

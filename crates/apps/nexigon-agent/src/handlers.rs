@@ -1520,6 +1520,8 @@ impl StderrRingBuffer {
 mod tests {
     use std::path::PathBuf;
     #[cfg(unix)]
+    use std::sync::OnceLock;
+    #[cfg(unix)]
     use std::time::Duration;
 
     use nexigon_api::types::devices::DeviceCommandInvokeData;
@@ -1595,11 +1597,23 @@ mod tests {
     }
 
     #[cfg(unix)]
+    /// Return a shell in a private directory accepted by the executable trust policy.
     fn shell_program() -> String {
-        std::fs::canonicalize("/bin/sh")
-            .unwrap()
-            .to_string_lossy()
-            .into_owned()
+        use std::os::unix::fs::PermissionsExt;
+
+        static SHELL: OnceLock<(TempDir, String)> = OnceLock::new();
+        SHELL
+            .get_or_init(|| {
+                let directory = TempDir::new().unwrap();
+                let executable = directory.path().join("sh");
+                std::fs::copy("/bin/sh", &executable).unwrap();
+                std::fs::set_permissions(&executable, std::fs::Permissions::from_mode(0o500))
+                    .unwrap();
+                let executable = executable.to_string_lossy().into_owned();
+                (directory, executable)
+            })
+            .1
+            .clone()
     }
 
     #[cfg(unix)]
