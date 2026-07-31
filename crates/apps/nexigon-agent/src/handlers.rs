@@ -1609,7 +1609,10 @@ mod tests {
                 std::fs::copy("/bin/sh", &executable).unwrap();
                 std::fs::set_permissions(&executable, std::fs::Permissions::from_mode(0o500))
                     .unwrap();
-                let executable = executable.to_string_lossy().into_owned();
+                let executable = std::fs::canonicalize(executable)
+                    .unwrap()
+                    .to_string_lossy()
+                    .into_owned();
                 (directory, executable)
             })
             .1

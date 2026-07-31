@@ -1052,7 +1052,6 @@ fn local_api_task(
 mod tests {
     use std::collections::VecDeque;
     use std::net::Ipv4Addr;
-    use std::net::SocketAddr;
     use std::path::PathBuf;
     use std::sync::Arc;
     use std::sync::atomic::AtomicBool;
@@ -1344,22 +1343,13 @@ mod tests {
 
     #[tokio::test]
     async fn unavailable_forwarding_port_is_rejected_without_panicking() {
-        // Keep the port bound without listening so connection attempts are rejected and no
-        // parallel test can claim the fixture between port selection and the assertion.
-        let unavailable_socket = tokio::net::TcpSocket::new_v4().expect("create TCP socket");
-        unavailable_socket
-            .bind(SocketAddr::new(Ipv4Addr::LOCALHOST.into(), 0))
-            .expect("reserve unavailable local TCP port");
-        let port = unavailable_socket.local_addr().unwrap().port();
-
+        // Port zero cannot be a listening destination, so the fixture is unavailable without
+        // racing another process for a released ephemeral port.
         let mut agent = EndpointTestAgent::start().await;
-        let endpoint = format!("forward/tcp/{port}");
-        let unavailable = tokio::time::timeout(
-            Duration::from_secs(2),
-            agent.hub_ref.open(endpoint.as_bytes()),
-        )
-        .await
-        .expect("unavailable forwarding request timed out");
+        let unavailable =
+            tokio::time::timeout(Duration::from_secs(2), agent.hub_ref.open(b"forward/tcp/0"))
+                .await
+                .expect("unavailable forwarding request timed out");
         assert!(unavailable.is_err());
         assert!(!agent.agent.is_finished());
 
