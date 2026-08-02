@@ -29,6 +29,8 @@ jobs:
         run: curl -s -L "$CARGO_DENY_URL" | tar xvzf - -C /usr/local/bin --strip-components=1 --wildcards --no-anchored 'cargo-deny'
       - name: Run Checks
         run: |
+          bash -n installer/*.sh
+          installer/test-install-hub.sh
           cargo deny check
           cargo fmt --check
           cargo clippy --all-targets --all-features -- -D warnings
