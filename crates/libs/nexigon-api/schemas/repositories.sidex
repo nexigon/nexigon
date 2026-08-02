@@ -108,6 +108,9 @@ record RepositoryS3Config {
         message = "Bucket prefix must be at most 1024 characters."
     )]
     prefix?: string,
+    /// Force path-style bucket addressing.
+    /// By default, Nexigon uses virtual-hosted addressing.
+    force_path_style?: bool,
     /// S3 access key ID (not sensitive, can be plain text).
     #[validate(
         { 1 <= _.size <= 256 },
