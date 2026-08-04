@@ -33,7 +33,7 @@ jq -S -n \
     --argjson size "$(stat --format '%s' "$release/nexigon-hubctl")" '
     {
         formatVersion: 1,
-        releaseId: "build-2026.2.0-20260802120347-83b301b1",
+        releaseId: "build-2026.2.0-20260802120347",
         version: "2026.2.0",
         architecture: "x86_64",
         hubctl: {path: "nexigon-hubctl", sha256: $checksum, size: $size}
@@ -77,7 +77,7 @@ if grep -Fq test-download-token "$output"; then
 fi
 grep -qx 'token=test-download-token' "$record"
 grep -qx 'selector=' "$record"
-grep -qx 'base=https://nexigon.silitics.com/api/v1/repositories/nexigon-enterprise/nexigon-hub/build-2026.2.0-20260802120347-83b301b1/assets/x86_64' "$record"
+grep -qx 'base=https://nexigon.silitics.com/api/v1/repositories/nexigon-enterprise/nexigon-hub/build-2026.2.0-20260802120347/assets/x86_64' "$record"
 grep -qx 'argument=install' "$record"
 grep -qx 'selector=' "$record"
 grep -qx 'argument=--install-dir' "$record"
@@ -88,7 +88,7 @@ bootstrap="$(sed -n 's/^bootstrap=//p' "$record")"
 [[ "$bootstrap" = "${TMPDIR:-/tmp}/nexigon-hub-installer."* ]]
 [ ! -e "$bootstrap" ]
 grep -Fxq 'https://nexigon.silitics.com/api/v1/repositories/nexigon-enterprise/nexigon-hub/stable/assets/x86_64/release.json' "$curl_log"
-grep -Fxq 'https://nexigon.silitics.com/api/v1/repositories/nexigon-enterprise/nexigon-hub/build-2026.2.0-20260802120347-83b301b1/assets/x86_64/release.json' "$curl_log"
+grep -Fxq 'https://nexigon.silitics.com/api/v1/repositories/nexigon-enterprise/nexigon-hub/build-2026.2.0-20260802120347/assets/x86_64/release.json' "$curl_log"
 
 # An exact product-version selector is resolved once and then pinned to the
 # same immutable release ID before hubctl starts.
@@ -103,5 +103,21 @@ PATH="$fake_bin:$PATH" \
 grep -Fxq 'https://nexigon.silitics.com/api/v1/repositories/nexigon-enterprise/nexigon-hub/v2026.2.0/assets/x86_64/release.json' "$curl_log"
 grep -qx 'argument=install' "$record"
 grep -qx "argument=$scratch/exact-install" "$record"
+
+# The internal rolling selector follows the same immutable-manifest pinning
+# path without being interpreted as a product version.
+: >"$curl_log"
+NEXIGON_DOWNLOAD_TOKEN=test-download-token \
+NEXIGON_HUB_RELEASE=rolling \
+FAKE_CURL_LOG="$curl_log" \
+FAKE_RELEASE="$release" \
+FAKE_HUBCTL_RECORD="$record" \
+PATH="$fake_bin:$PATH" \
+    "$installer" --install-dir "$scratch/rolling-install" >/dev/null 2>&1
+grep -Fxq 'https://nexigon.silitics.com/api/v1/repositories/nexigon-enterprise/nexigon-hub/rolling/assets/x86_64/release.json' "$curl_log"
+grep -Fxq 'https://nexigon.silitics.com/api/v1/repositories/nexigon-enterprise/nexigon-hub/build-2026.2.0-20260802120347/assets/x86_64/release.json' "$curl_log"
+grep -qx 'base=https://nexigon.silitics.com/api/v1/repositories/nexigon-enterprise/nexigon-hub/build-2026.2.0-20260802120347/assets/x86_64' "$record"
+grep -qx 'argument=install' "$record"
+grep -qx "argument=$scratch/rolling-install" "$record"
 
 echo 'Hub bootstrap contract tests passed'

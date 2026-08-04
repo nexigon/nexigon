@@ -85,19 +85,20 @@ if [ -n "$base_url" ]; then
     download "$base_url" release.json "$release_manifest"
     validate_manifest "$release_manifest"
 else
-    if [ "$requested_release" = stable ]; then
-        selector=stable
+    if [ "$requested_release" = stable ] || [ "$requested_release" = rolling ]; then
+        selector="$requested_release"
     elif [[ "$requested_release" =~ ^[0-9A-Za-z][0-9A-Za-z.+-]*$ ]] \
         && [ "${#requested_release}" -le "$max_product_version_length" ]; then
         selector="v$requested_release"
     else
-        fail "NEXIGON_HUB_RELEASE must be 'stable' or a product version."
+        fail "NEXIGON_HUB_RELEASE must be 'stable', 'rolling', or a product version."
     fi
     selector_base="$repository_url/$selector/assets/x86_64"
     download "$selector_base" release.json "$selected_manifest"
     validate_manifest "$selected_manifest"
     selected_version="$(jq -er '.version' "$selected_manifest")"
     if [ "$requested_release" != stable ] \
+        && [ "$requested_release" != rolling ] \
         && [ "$selected_version" != "$requested_release" ]; then
         fail "The selected release does not match NEXIGON_HUB_RELEASE."
     fi
