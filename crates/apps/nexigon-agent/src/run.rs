@@ -223,8 +223,7 @@ pub async fn run_with_connection(
             .as_ref()
             .and_then(|h| h.directory.as_deref())
             .unwrap_or(Path::new("/etc/nexigon/agent/commands"));
-        let registry = CommandRegistry::load_external(commands_dir)
-            .context("failed to load command definitions")?;
+        let registry = load_command_registry(commands_dir);
         Some(Arc::new(registry))
     } else {
         None
@@ -920,6 +919,21 @@ fn operation_polling_enabled(config: Option<&OperationsConfig>) -> bool {
         .unwrap_or(false)
 }
 
+/// Load optional command support without making it an agent startup dependency.
+fn load_command_registry(commands_dir: &Path) -> CommandRegistry {
+    match CommandRegistry::load_external(commands_dir) {
+        Ok(registry) => registry,
+        Err(error) => {
+            warn!(
+                ?commands_dir,
+                error = ?error,
+                "failed to load command definitions, continuing without external commands"
+            );
+            CommandRegistry::default()
+        }
+    }
+}
+
 fn command_slots() -> Arc<Semaphore> {
     Arc::new(Semaphore::new(MAX_CONCURRENT_COMMANDS))
 }
@@ -1068,6 +1082,7 @@ mod tests {
     use nexigon_multiplex::ConnectionEvent;
     use nexigon_multiplex::ConnectionRef;
     use nexigon_multiplex::transport::InMemory;
+    use tempfile::TempDir;
     use tokio::io::AsyncReadExt;
     use tokio::io::AsyncWriteExt;
     use tokio::sync::mpsc;
@@ -1090,6 +1105,7 @@ mod tests {
     use super::SupervisedTask;
     use super::TaskKind;
     use super::command_slots;
+    use super::load_command_registry;
     use super::operation_polling_enabled;
     use super::report_operation_step_with_retry;
     use super::run_connection_event_loop;
@@ -1099,6 +1115,18 @@ mod tests {
     use super::supervise_tasks;
     use crate::config::Config;
     use crate::config::OperationsConfig;
+
+    /// A commands-directory failure leaves an empty registry for agent startup.
+    #[test]
+    fn command_registry_failures_do_not_escape_startup() {
+        let directory = TempDir::new().unwrap();
+        let not_a_directory = directory.path().join("commands");
+        std::fs::write(&not_a_directory, b"not a directory").unwrap();
+
+        let registry = load_command_registry(&not_a_directory);
+
+        assert!(registry.manifest().commands.is_empty());
+    }
 
     struct EndpointTestAgent {
         hub_ref: ConnectionRef,

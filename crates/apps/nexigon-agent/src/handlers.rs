@@ -19,6 +19,8 @@ use std::os::fd::AsRawFd;
 use std::os::fd::FromRawFd;
 #[cfg(unix)]
 use std::os::unix::ffi::OsStringExt;
+#[cfg(unix)]
+use std::path::Component;
 
 use anyhow::Context;
 use nexigon_agent_protocol::FRAME_READ_TIMEOUT;
@@ -101,6 +103,7 @@ impl ExternalHandlerResult {
 }
 
 /// Registry of loaded command definitions.
+#[derive(Default)]
 pub struct CommandRegistry {
     commands: HashMap<String, LoadedCommand>,
 }
@@ -120,7 +123,11 @@ struct CompiledCommandSchema {
 }
 
 impl CommandRegistry {
-    /// Load external command definitions from TOML files in the given directory.
+    /// Load valid external command definitions from TOML files in the given directory.
+    ///
+    /// Invalid individual definitions are logged and skipped. Errors that affect the
+    /// directory or the complete registry are returned to the caller.
+    #[tracing::instrument(level = "debug", skip_all, fields(directory = %directory.display()))]
     pub fn load_external(directory: &Path) -> anyhow::Result<Self> {
         let mut commands = HashMap::new();
         let Some((resolved_directory, names)) = open_command_directory(directory)? else {
@@ -135,49 +142,29 @@ impl CommandRegistry {
 
         for name in names {
             let path = directory.join(&name);
-            let mut file = open_command_file(&resolved_directory, &name)
-                .with_context(|| format!("failed to securely open {}", path.display()))?;
-            let content = read_bounded_definition(&mut file)
-                .with_context(|| format!("failed to read {}", path.display()))?;
-            add_registry_bytes(&mut registry_bytes, content.len())?;
-            let def: CommandDefinition = toml::from_str(&content)
-                .with_context(|| format!("failed to parse {}", path.display()))?;
-            validate_command_definition(&def)
-                .with_context(|| format!("invalid command definition {}", path.display()))?;
-            let executable = validate_handler_executable(&def.exec.handler[0])
-                .with_context(|| format!("invalid command executable in {}", path.display()))?;
-            let input_schema = compile_command_schema(def.input.as_ref(), "input", &path)?;
-            let output_schema = compile_command_schema(def.output.as_ref(), "output", &path)?;
-            add_registry_bytes(
-                &mut registry_bytes,
-                input_schema
-                    .as_ref()
-                    .map_or(0, |schema| schema.expanded_bytes)
-                    .checked_add(
-                        output_schema
-                            .as_ref()
-                            .map_or(0, |schema| schema.expanded_bytes),
-                    )
-                    .context("command registry schema byte count overflow")?,
-            )?;
-            info!(name = %def.command.name, ?path, "loaded command");
-            let name = def.command.name.clone();
-            if let Some(previous) = loaded_from.insert(name.clone(), path.clone()) {
-                anyhow::bail!(
-                    "duplicate command {name:?} in {} and {}",
-                    previous.display(),
-                    path.display()
+            let (command, command_bytes) =
+                match load_external_command(&resolved_directory, &name, &path) {
+                    Ok(command) => command,
+                    Err(error) => {
+                        warn!(?path, error = ?error, "skipping invalid command definition");
+                        continue;
+                    }
+                };
+            add_registry_bytes(&mut registry_bytes, command_bytes)?;
+
+            let command_name = command.definition.command.name.clone();
+            if let Some(previous) = loaded_from.get(&command_name) {
+                warn!(
+                    name = %command_name,
+                    ?path,
+                    previous = ?previous,
+                    "skipping duplicate command definition"
                 );
+                continue;
             }
-            commands.insert(
-                name,
-                LoadedCommand {
-                    definition: def,
-                    executable,
-                    input_schema,
-                    output_schema,
-                },
-            );
+            info!(name = %command_name, ?path, "loaded command");
+            loaded_from.insert(command_name.clone(), path);
+            commands.insert(command_name, command);
         }
 
         let registry = Self { commands };
@@ -217,6 +204,55 @@ impl CommandRegistry {
         commands.sort_unstable_by(|left, right| left.name.cmp(&right.name));
         DeviceCommandManifest { commands }
     }
+}
+
+/// Load and validate one external command definition.
+fn load_external_command(
+    resolved_commands_directory: &Path,
+    definition_name: &OsString,
+    definition_path: &Path,
+) -> anyhow::Result<(LoadedCommand, usize)> {
+    let mut file = open_command_file(resolved_commands_directory, definition_name)
+        .with_context(|| format!("failed to securely open {}", definition_path.display()))?;
+    let content = read_bounded_definition(&mut file)
+        .with_context(|| format!("failed to read {}", definition_path.display()))?;
+    let definition: CommandDefinition = toml::from_str(&content)
+        .with_context(|| format!("failed to parse {}", definition_path.display()))?;
+    validate_command_definition(&definition)
+        .with_context(|| format!("invalid command definition {}", definition_path.display()))?;
+    let executable =
+        validate_handler_executable(&definition.exec.handler[0], resolved_commands_directory)
+            .with_context(|| {
+                format!(
+                    "invalid command executable in {}",
+                    definition_path.display()
+                )
+            })?;
+    let input_schema = compile_command_schema(definition.input.as_ref(), "input", definition_path)?;
+    let output_schema =
+        compile_command_schema(definition.output.as_ref(), "output", definition_path)?;
+    let schema_bytes = input_schema
+        .as_ref()
+        .map_or(0, |schema| schema.expanded_bytes)
+        .checked_add(
+            output_schema
+                .as_ref()
+                .map_or(0, |schema| schema.expanded_bytes),
+        )
+        .context("command registry schema byte count overflow")?;
+    let command_bytes = content
+        .len()
+        .checked_add(schema_bytes)
+        .context("command registry byte count overflow")?;
+    Ok((
+        LoadedCommand {
+            definition,
+            executable,
+            input_schema,
+            output_schema,
+        },
+        command_bytes,
+    ))
 }
 
 fn add_registry_bytes(total: &mut usize, additional: usize) -> anyhow::Result<()> {
@@ -433,16 +469,15 @@ fn open_trusted_regular_file(path: &Path, label: &str) -> anyhow::Result<File> {
 }
 
 #[cfg(unix)]
-fn validate_handler_executable(program: &str) -> anyhow::Result<PathBuf> {
+/// Resolve and validate a command handler while retaining its canonical path.
+fn validate_handler_executable(program: &str, command_directory: &Path) -> anyhow::Result<PathBuf> {
     let program = Path::new(program);
-    if !program.is_absolute() {
-        anyhow::bail!("command handler program must be an absolute path");
-    }
+    let program = resolve_handler_program(program, command_directory)?;
 
     // Resolve links once at load time and retain the resolved program path for
     // execution. The target and every component of its resolved route still have
     // to satisfy the ownership and write-permission policy.
-    let resolved = std::fs::canonicalize(program).with_context(|| {
+    let resolved = std::fs::canonicalize(&program).with_context(|| {
         format!(
             "failed to resolve command executable {} and its symlink target",
             program.display()
@@ -455,6 +490,41 @@ fn validate_handler_executable(program: &str) -> anyhow::Result<PathBuf> {
         anyhow::bail!("command executable {} is not executable", program.display());
     }
     Ok(resolved)
+}
+
+#[cfg(unix)]
+/// Resolve a configured handler into a candidate path for trust validation.
+fn resolve_handler_program(program: &Path, command_directory: &Path) -> anyhow::Result<PathBuf> {
+    if program.is_absolute() {
+        return Ok(program.to_owned());
+    }
+
+    let mut components = program.components();
+    if matches!(components.next(), Some(Component::Normal(_))) && components.next().is_none() {
+        let search_path = std::env::var_os("PATH")
+            .context("failed to resolve command handler because PATH is not set")?;
+        for directory in std::env::split_paths(&search_path) {
+            let candidate = directory.join(program);
+            match std::fs::symlink_metadata(&candidate) {
+                Ok(_) => return Ok(candidate),
+                Err(error) if error.kind() == std::io::ErrorKind::NotFound => continue,
+                Err(error) => {
+                    return Err(error).with_context(|| {
+                        format!(
+                            "failed to inspect command handler candidate {}",
+                            candidate.display()
+                        )
+                    });
+                }
+            }
+        }
+        anyhow::bail!(
+            "command handler program {:?} was not found in PATH",
+            program.as_os_str()
+        );
+    }
+
+    Ok(command_directory.join(program))
 }
 
 #[cfg(not(unix))]
@@ -474,7 +544,7 @@ fn open_command_file(_directory: &Path, _name: &OsString) -> anyhow::Result<File
 }
 
 #[cfg(not(unix))]
-fn validate_handler_executable(_program: &str) -> anyhow::Result<PathBuf> {
+fn validate_handler_executable(_program: &str, _directory: &Path) -> anyhow::Result<PathBuf> {
     anyhow::bail!("secure external command loading is unsupported on this platform")
 }
 
@@ -1666,6 +1736,27 @@ mod tests {
         assert_eq!(result.error.as_deref(), Some("command not found"));
     }
 
+    /// One malformed definition does not hide other device commands.
+    #[cfg(unix)]
+    #[test]
+    fn skips_invalid_definitions_and_loads_valid_commands() {
+        let directory = TempDir::new().unwrap();
+        std::fs::write(directory.path().join("invalid.toml"), b"this is not TOML").unwrap();
+        write_command_definition(
+            directory.path(),
+            "valid.toml",
+            "valid",
+            &inert_handler(),
+            None,
+            None,
+        );
+
+        let registry = CommandRegistry::load_external(directory.path()).unwrap();
+
+        assert_eq!(registry.manifest().commands.len(), 1);
+        assert!(registry.get("valid").is_some());
+    }
+
     #[cfg(unix)]
     #[test]
     fn loads_and_publishes_only_compiled_command_schemas() {
@@ -1706,33 +1797,36 @@ mod tests {
         );
     }
 
+    /// Duplicate names deterministically keep the first definition by filename.
     #[cfg(unix)]
     #[test]
-    fn rejects_duplicate_names_deterministically() {
+    fn skips_duplicate_names_deterministically() {
         let directory = TempDir::new().unwrap();
-        write_command_definition(
+        write_command_definition_with_description(
             directory.path(),
             "z.toml",
             "duplicate",
+            Some("z file"),
             &inert_handler(),
             None,
             None,
         );
-        write_command_definition(
+        write_command_definition_with_description(
             directory.path(),
             "a.toml",
             "duplicate",
+            Some("a file"),
             &inert_handler(),
             None,
             None,
         );
 
-        let error = CommandRegistry::load_external(directory.path())
-            .err()
-            .expect("duplicate command must fail loading");
-        let message = error.to_string();
-        assert!(message.contains("duplicate command"));
-        assert!(message.find("a.toml").unwrap() < message.find("z.toml").unwrap());
+        let registry = CommandRegistry::load_external(directory.path()).unwrap();
+        assert_eq!(registry.manifest().commands.len(), 1);
+        assert_eq!(
+            registry.get("duplicate").unwrap().command.description,
+            Some("a file".to_owned())
+        );
     }
 
     #[cfg(unix)]
@@ -1814,9 +1908,10 @@ mod tests {
         assert!(error.to_string().contains("manifest exceeds"));
     }
 
+    /// Malformed and unsafe schemas are skipped before entering the registry.
     #[cfg(unix)]
     #[test]
-    fn rejects_malformed_unbounded_or_external_schemas_at_load_time() {
+    fn skips_malformed_unbounded_or_external_schemas_at_load_time() {
         let excessive_work = json!({
             "anyOf": (0..=MAX_COMMAND_SCHEMA_WORK)
                 .map(|_| json!({}))
@@ -1916,19 +2011,18 @@ mod tests {
                 Some(&schema),
                 None,
             );
-            let error = CommandRegistry::load_external(directory.path())
-                .err()
-                .expect("invalid schema must fail loading");
+            let registry = CommandRegistry::load_external(directory.path()).unwrap();
             assert!(
-                error.to_string().contains("schema"),
-                "unexpected error for {filename}: {error:#}"
+                registry.get("unsafe-schema").is_none(),
+                "invalid schema from {filename} was loaded"
             );
         }
     }
 
+    /// Schema expansion limits skip only the definition that exceeds them.
     #[cfg(unix)]
     #[test]
-    fn rejects_schema_reference_expansion_beyond_serialized_byte_limit() {
+    fn skips_schema_reference_expansion_beyond_serialized_byte_limit() {
         let directory = TempDir::new().unwrap();
         let schema = json!({
             "definitions": {
@@ -1950,17 +2044,15 @@ mod tests {
             None,
         );
 
-        let error = CommandRegistry::load_external(directory.path())
-            .err()
-            .expect("oversized expanded schema must fail loading");
-        let message = error.to_string();
-        assert!(message.contains("expanded input schema"), "{error:#}");
-        assert!(message.contains("serialized byte limit"), "{error:#}");
+        let registry = CommandRegistry::load_external(directory.path()).unwrap();
+        assert!(registry.get("expanded").is_none());
     }
 
+    /// Handler resolution accepts trusted path forms and symlinks but skips writable
+    /// targets.
     #[cfg(unix)]
     #[test]
-    fn follows_trusted_executable_symlinks_and_rejects_unsafe_programs() {
+    fn resolves_relative_and_symlinked_executables_and_skips_unsafe_programs() {
         use std::os::unix::fs::PermissionsExt;
         use std::os::unix::fs::symlink;
 
@@ -1973,10 +2065,32 @@ mod tests {
             None,
             None,
         );
-        let error = CommandRegistry::load_external(relative.path())
-            .err()
-            .expect("PATH-resolved executable must fail loading");
-        assert!(format!("{error:#}").contains("absolute path"));
+        let registry = CommandRegistry::load_external(relative.path()).unwrap();
+        assert!(
+            registry
+                .get_loaded("relative")
+                .unwrap()
+                .executable
+                .is_absolute()
+        );
+
+        let local = TempDir::new().unwrap();
+        let executable = local.path().join("handler.bin");
+        std::fs::write(&executable, b"#!/bin/sh\nexit 0\n").unwrap();
+        std::fs::set_permissions(&executable, std::fs::Permissions::from_mode(0o500)).unwrap();
+        write_command_definition(
+            local.path(),
+            "local.toml",
+            "local",
+            &["./handler.bin".to_owned()],
+            None,
+            None,
+        );
+        let registry = CommandRegistry::load_external(local.path()).unwrap();
+        assert_eq!(
+            registry.get_loaded("local").unwrap().executable,
+            std::fs::canonicalize(executable).unwrap()
+        );
 
         let writable = TempDir::new().unwrap();
         let executable = writable.path().join("handler.bin");
@@ -1990,10 +2104,8 @@ mod tests {
             None,
             None,
         );
-        let error = CommandRegistry::load_external(writable.path())
-            .err()
-            .expect("writable executable must fail loading");
-        assert!(format!("{error:#}").contains("group- or world-writable"));
+        let registry = CommandRegistry::load_external(writable.path()).unwrap();
+        assert!(registry.get("writable").is_none());
 
         let linked = TempDir::new().unwrap();
         let executable = linked.path().join("handler.bin");
@@ -2032,6 +2144,7 @@ mod tests {
         assert!(error.to_string().contains("unsupported on this platform"));
     }
 
+    /// Definition symlinks load trusted targets and skip replaceable or non-file targets.
     #[cfg(unix)]
     #[test]
     fn follows_trusted_definition_symlinks_and_rejects_unsafe_targets() {
@@ -2053,10 +2166,8 @@ mod tests {
 
         std::fs::remove_file(directory.path().join("linked.toml")).unwrap();
         std::fs::create_dir(directory.path().join("directory.toml")).unwrap();
-        let error = CommandRegistry::load_external(directory.path())
-            .err()
-            .expect("non-regular file must fail loading");
-        assert!(format!("{error:#}").contains("not a regular file"));
+        let registry = CommandRegistry::load_external(directory.path()).unwrap();
+        assert!(registry.manifest().commands.is_empty());
 
         std::fs::remove_dir(directory.path().join("directory.toml")).unwrap();
         let insecure = write_command_definition(
@@ -2068,19 +2179,15 @@ mod tests {
             None,
         );
         std::fs::set_permissions(&insecure, std::fs::Permissions::from_mode(0o660)).unwrap();
-        let error = CommandRegistry::load_external(directory.path())
-            .err()
-            .expect("writable file must fail loading");
-        assert!(format!("{error:#}").contains("group- or world-writable"));
+        let registry = CommandRegistry::load_external(directory.path()).unwrap();
+        assert!(registry.get("insecure").is_none());
 
         let unsafe_target = directory.path().join("unsafe-target.txt");
         std::fs::rename(&insecure, &unsafe_target).unwrap();
         let linked = directory.path().join("linked-insecure.toml");
         symlink(&unsafe_target, &linked).unwrap();
-        let error = CommandRegistry::load_external(directory.path())
-            .err()
-            .expect("symlink to writable target must fail loading");
-        assert!(format!("{error:#}").contains("group- or world-writable"));
+        let registry = CommandRegistry::load_external(directory.path()).unwrap();
+        assert!(registry.get("insecure").is_none());
     }
 
     #[cfg(unix)]

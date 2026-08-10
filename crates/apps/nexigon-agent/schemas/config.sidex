@@ -196,7 +196,11 @@ record CommandSchemaBlock {
 
 /// Command execution configuration.
 record CommandExec {
-    /// Executable and arguments to run.
+    /// Executable followed by its arguments.
+    ///
+    /// An absolute executable path is used directly. A bare name is resolved through
+    /// the agent's `PATH`; a relative path containing a directory separator is resolved
+    /// from the commands directory.
     handler: [string],
     /// Timeout in seconds (defaults to 30).
     timeout?: u64,
