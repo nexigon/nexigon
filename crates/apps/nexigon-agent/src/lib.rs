@@ -26,6 +26,7 @@ use nexigon_client::WebsocketConnection;
 use nexigon_ids::ids::DeploymentToken;
 use nexigon_ids::ids::DeviceFingerprint;
 use nexigon_ids::ids::DeviceId;
+use nexigon_multiplex::ConnectionLimits;
 use serde::Deserialize;
 use serde::Serialize;
 use tokio::sync::oneshot;
@@ -167,6 +168,7 @@ async fn connect_with_identity(
     identity: DeviceIdentity,
     register_connection: bool,
 ) -> anyhow::Result<WebsocketConnection> {
+    let connection_limits = hub_connection_limits();
     let connection = nexigon_client::ClientBuilder::new(
         credentials
             .hub_url
@@ -177,6 +179,7 @@ async fn connect_with_identity(
     .with_identity(Some(identity.client_identity))
     .with_device_fingerprint(Some(identity.fingerprint))
     .with_register_connection(register_connection)
+    .with_connection_limits(connection_limits)
     .dangerous_with_allow_plaintext(config.dangerous_allow_plaintext.unwrap_or(false))
     .dangerous_with_accept_invalid_certificates(
         config
@@ -187,6 +190,16 @@ async fn connect_with_identity(
     .await
     .context("cannot connect to Nexigon Hub")?;
     Ok(connection)
+}
+
+/// Admit pending Hub requests up to the transport's existing channel bound.
+fn hub_connection_limits() -> ConnectionLimits {
+    let mut connection_limits = ConnectionLimits::default();
+    // An agent trusts its Hub to apply feature-level admission. Let
+    // channel requests use the transport's full bounded channel capacity so a
+    // browser burst is not rejected by the lower pending-request default.
+    connection_limits.max_pending_channel_requests = connection_limits.max_channels;
+    connection_limits
 }
 
 pub(crate) async fn load_device_identity(

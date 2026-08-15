@@ -38,7 +38,6 @@ use nexigon_ids::ids::DeviceId;
 use nexigon_ids::ids::DeviceOperationWorkClaimId;
 use nexigon_multiplex::ConnectionEvent;
 use tokio::net::TcpStream;
-use tokio::sync::OwnedSemaphorePermit;
 use tokio::sync::Semaphore;
 use tokio::sync::mpsc;
 use tokio::sync::oneshot;
@@ -56,13 +55,13 @@ use crate::operation_ledger::OperationLedger;
 use crate::operation_ledger::PreviousExecution;
 use crate::system_info::get_system_info;
 
-const MAX_CONCURRENT_TCP_FORWARDINGS: usize = 16;
 #[cfg(target_os = "linux")]
 const MAX_CONCURRENT_TERMINALS: usize = 4;
 #[cfg(not(target_os = "linux"))]
 const MAX_CONCURRENT_TERMINALS: usize = 0;
-const SUPERVISOR_QUEUE_CAPACITY: usize =
-    MAX_CONCURRENT_TCP_FORWARDINGS + MAX_CONCURRENT_TERMINALS + MAX_CONCURRENT_COMMANDS;
+// Forwarding has no feature-level semaphore; the default multiplex connection
+// bounds the total number of active endpoint tasks to 32.
+const SUPERVISOR_QUEUE_CAPACITY: usize = 32;
 const TCP_CONNECT_TIMEOUT: Duration = Duration::from_secs(10);
 const TASK_SHUTDOWN_GRACE: Duration = Duration::from_secs(8);
 
@@ -125,7 +124,6 @@ struct TaskCompletion {
 
 #[derive(Clone)]
 struct EndpointLimits {
-    tcp_forwardings: Arc<Semaphore>,
     #[cfg(target_os = "linux")]
     terminals: Arc<Semaphore>,
     commands: Arc<Semaphore>,
@@ -134,7 +132,6 @@ struct EndpointLimits {
 impl EndpointLimits {
     fn new(commands: Arc<Semaphore>) -> Self {
         Self {
-            tcp_forwardings: Arc::new(Semaphore::new(MAX_CONCURRENT_TCP_FORWARDINGS)),
             #[cfg(target_os = "linux")]
             terminals: Arc::new(Semaphore::new(MAX_CONCURRENT_TERMINALS)),
             commands,
@@ -694,23 +691,13 @@ fn handle_channel_request(
             request.reject(b"invalid TCP forwarding endpoint");
             return;
         };
-        let Ok(forwarding_permit) = limits.tcp_forwardings.clone().try_acquire_owned() else {
-            request.reject(b"too many concurrent TCP forwardings");
-            return;
-        };
         let Ok(task_slot) = task_tx.clone().try_reserve_owned() else {
             request.reject(b"agent task queue is full");
             return;
         };
         task_slot.send(SupervisedTask::new(
             TaskKind::TcpConnect,
-            connect_tcp_forwarding(
-                request,
-                port,
-                forwarding_permit,
-                task_tx.clone(),
-                cancellation.clone(),
-            ),
+            connect_tcp_forwarding(request, port, task_tx.clone(), cancellation.clone()),
         ));
         return;
     }
@@ -792,7 +779,6 @@ fn handle_channel_request(
 async fn connect_tcp_forwarding(
     request: nexigon_multiplex::ChannelRequest,
     port: u16,
-    forwarding_permit: OwnedSemaphorePermit,
     task_tx: mpsc::Sender<SupervisedTask>,
     cancellation: CancellationToken,
 ) -> anyhow::Result<()> {
@@ -821,7 +807,6 @@ async fn connect_tcp_forwarding(
     };
     request.accept(move |mut channel| {
         task_slot.send(SupervisedTask::new(TaskKind::TcpForward, async move {
-            let _forwarding_permit = forwarding_permit;
             tokio::select! {
                 () = cancellation.cancelled() => Ok(()),
                 result = tokio::io::copy_bidirectional(&mut channel, &mut tcp) => {
@@ -1076,10 +1061,12 @@ mod tests {
     use anyhow::Context;
     use bytes::Bytes;
     use futures::StreamExt;
+    use futures::future::join_all;
     use nexigon_api::types::devices::DeviceOperationStepReportStatus;
     use nexigon_ids::Generate;
     use nexigon_multiplex::Connection;
     use nexigon_multiplex::ConnectionEvent;
+    use nexigon_multiplex::ConnectionLimits;
     use nexigon_multiplex::ConnectionRef;
     use nexigon_multiplex::transport::InMemory;
     use tempfile::TempDir;
@@ -1096,7 +1083,6 @@ mod tests {
     use super::DeviceOperationStepReport;
     use super::DeviceOperationWorkClaimId;
     use super::EndpointLimits;
-    use super::MAX_CONCURRENT_TCP_FORWARDINGS;
     #[cfg(target_os = "linux")]
     use super::MAX_CONCURRENT_TERMINALS;
     use super::OperationReporter;
@@ -1138,8 +1124,13 @@ mod tests {
     impl EndpointTestAgent {
         async fn start() -> Self {
             let (hub_transport, agent_transport) = InMemory::<Bytes, Bytes>::new_buffered(64);
-            let mut hub_connection = Connection::new(hub_transport);
-            let agent_connection = Connection::new(agent_transport);
+            let hub_limits = ConnectionLimits {
+                max_pending_channel_requests: 24,
+                ..ConnectionLimits::default()
+            };
+            let mut hub_connection = Connection::with_limits(hub_transport, hub_limits);
+            let agent_connection =
+                Connection::with_limits(agent_transport, crate::hub_connection_limits());
             let hub_ref = hub_connection.make_ref();
             let hub = tokio::spawn(async move {
                 while let Some(event) = hub_connection.next().await {
@@ -1235,20 +1226,6 @@ mod tests {
     async fn endpoint_feature_limits_are_strictly_bounded_and_recover() {
         let limits = EndpointLimits::new(command_slots());
 
-        let mut forwarding = Vec::new();
-        for _ in 0..MAX_CONCURRENT_TCP_FORWARDINGS {
-            forwarding.push(
-                limits
-                    .tcp_forwardings
-                    .clone()
-                    .try_acquire_owned()
-                    .expect("forwarding slot within limit"),
-            );
-        }
-        assert!(limits.tcp_forwardings.clone().try_acquire_owned().is_err());
-        forwarding.pop();
-        assert!(limits.tcp_forwardings.clone().try_acquire_owned().is_ok());
-
         #[cfg(target_os = "linux")]
         {
             let mut terminals = Vec::new();
@@ -1267,13 +1244,16 @@ mod tests {
         }
     }
 
+    /// A Hub may establish 24 simultaneous forwarding connections.
     #[tokio::test]
-    async fn live_forwarding_limit_is_enforced_and_recovers() {
+    async fn live_forwarding_accepts_twenty_four_connections() {
+        const CONCURRENT_FORWARDINGS: usize = 24;
+
         let listener = tokio::net::TcpListener::bind((Ipv4Addr::LOCALHOST, 0))
             .await
             .expect("bind forwarding target");
         let port = listener.local_addr().unwrap().port();
-        let (accepted_tx, mut accepted_rx) = mpsc::channel(MAX_CONCURRENT_TCP_FORWARDINGS + 1);
+        let (accepted_tx, mut accepted_rx) = mpsc::channel(CONCURRENT_FORWARDINGS);
         let accept_driver = tokio::spawn(async move {
             while let Ok((stream, _)) = listener.accept().await {
                 if accepted_tx.send(stream).await.is_err() {
@@ -1281,21 +1261,23 @@ mod tests {
                 }
             }
         });
-        let mut agent = EndpointTestAgent::start().await;
+        let agent = EndpointTestAgent::start().await;
         let endpoint = format!("forward/tcp/{port}");
         let mut channels = Vec::new();
         let mut local_streams = Vec::new();
 
-        for _ in 0..MAX_CONCURRENT_TCP_FORWARDINGS {
-            channels.push(
-                tokio::time::timeout(
-                    Duration::from_secs(2),
-                    agent.hub_ref.open(endpoint.as_bytes()),
-                )
-                .await
-                .expect("forwarding request timed out")
-                .expect("forwarding request below limit was rejected"),
-            );
+        let channel_requests = (0..CONCURRENT_FORWARDINGS).map(|_| {
+            let mut hub_ref = agent.hub_ref.clone();
+            let endpoint = endpoint.clone();
+            async move {
+                tokio::time::timeout(Duration::from_secs(2), hub_ref.open(endpoint.as_bytes()))
+                    .await
+                    .expect("forwarding request timed out")
+                    .expect("forwarding request was rejected")
+            }
+        });
+        channels.extend(join_all(channel_requests).await);
+        for _ in 0..CONCURRENT_FORWARDINGS {
             local_streams.push(
                 tokio::time::timeout(Duration::from_secs(2), accepted_rx.recv())
                     .await
@@ -1303,34 +1285,6 @@ mod tests {
                     .expect("forwarding accept driver stopped"),
             );
         }
-
-        let over_limit = tokio::time::timeout(
-            Duration::from_secs(2),
-            agent.hub_ref.open(endpoint.as_bytes()),
-        )
-        .await
-        .expect("over-limit request timed out");
-        assert!(over_limit.is_err(), "forwarding limit was not enforced");
-
-        drop(channels.pop());
-        drop(local_streams.pop());
-        let replacement = tokio::time::timeout(Duration::from_secs(2), async {
-            loop {
-                match agent.hub_ref.open(endpoint.as_bytes()).await {
-                    Ok(channel) => break channel,
-                    Err(_) => tokio::time::sleep(Duration::from_millis(10)).await,
-                }
-            }
-        })
-        .await
-        .expect("forwarding permit was not recovered");
-        channels.push(replacement);
-        local_streams.push(
-            accepted_rx
-                .recv()
-                .await
-                .expect("replacement forwarding was not connected"),
-        );
 
         drop(channels);
         drop(local_streams);

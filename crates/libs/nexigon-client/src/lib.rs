@@ -32,6 +32,7 @@ use nexigon_multiplex::Channel;
 use nexigon_multiplex::Connection;
 use nexigon_multiplex::ConnectionError;
 use nexigon_multiplex::ConnectionEvent;
+use nexigon_multiplex::ConnectionLimits;
 use nexigon_multiplex::ConnectionRef;
 use nexigon_rpc::ExecuteError;
 
@@ -213,6 +214,8 @@ pub struct ClientBuilder {
     accept_invalid_certificates: bool,
     /// Indicates whether the connection should be registered.
     register_connection: bool,
+    /// Resource limits for the multiplex connection.
+    connection_limits: ConnectionLimits,
 }
 
 impl ClientBuilder {
@@ -226,7 +229,19 @@ impl ClientBuilder {
             allow_plaintext: false,
             accept_invalid_certificates: false,
             register_connection: true,
+            connection_limits: ConnectionLimits::default(),
         }
+    }
+
+    /// Configure multiplex connection resource limits.
+    pub fn with_connection_limits(mut self, connection_limits: ConnectionLimits) -> Self {
+        self.connection_limits = connection_limits;
+        self
+    }
+
+    /// Set multiplex connection resource limits.
+    pub fn set_connection_limits(&mut self, connection_limits: ConnectionLimits) {
+        self.connection_limits = connection_limits;
     }
 
     /// Set the client identity.
@@ -387,7 +402,7 @@ impl ClientBuilder {
             tokio_tungstenite::connect_async_tls_with_config(request, None, true, Some(connector))
                 .await?;
         let transport = WebSocketTransport::new(socket);
-        let connection = Connection::new(transport);
+        let connection = Connection::with_limits(transport, self.connection_limits);
         Ok(WebsocketConnection { connection })
     }
 
