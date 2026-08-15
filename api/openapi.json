@@ -7177,6 +7177,9 @@
               "deviceId": {
                 "$ref": "#/components/schemas/nexigon_api.devices.DeviceId"
               },
+              "issuer": {
+                "$ref": "#/components/schemas/nexigon_api.actor.Actor"
+              },
               "hostname": {
                 "type": "string"
               },
@@ -7195,6 +7198,9 @@
         "properties": {
           "deviceId": {
             "$ref": "#/components/schemas/nexigon_api.devices.DeviceId"
+          },
+          "issuer": {
+            "$ref": "#/components/schemas/nexigon_api.actor.Actor"
           },
           "hostname": {
             "type": "string"
@@ -11841,6 +11847,9 @@
           },
           "prefix": {
             "type": "string"
+          },
+          "forcePathStyle": {
+            "type": "boolean"
           },
           "accessKeyId": {
             "type": "string"

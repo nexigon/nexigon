@@ -369,6 +369,8 @@ record IssueDeviceHttpProxyTokenAction {
     /// Hostname to accept requests for.
     ///
     /// Defaults to a device-specific pseudo-random subdomain of the instance domain.
+    /// A custom hostname requires a configured instance URL or legacy domain setting
+    /// and must differ from the Nexigon Hub hostname.
     #[validate(
         { 1 <= _.size <= 253 },
         message = "Hostname must be between 1 and 253 characters."
@@ -432,6 +434,10 @@ record ValidateDeviceHttpProxyTokenInvalid {
 record ValidateDeviceHttpProxyTokenSuccess {
     /// ID of the device.
     device_id: DeviceId,
+    /// Actor that issued the token.
+    ///
+    /// Missing on proxy tokens issued before issuer tracking was introduced.
+    issuer?: Actor,
     /// Hostname to accept requests for.
     hostname?: string,
     /// Device port to proxy to.
@@ -1182,7 +1188,10 @@ record CancelDeviceOperationAction {
 }
 
 /// Atomically claim device operation work for a device.
-#[request(name = "devices_ClaimOperationWork", response = ClaimDeviceOperationWorkOutput)]
+#[request(
+    name = "devices_ClaimOperationWork",
+    response = ClaimDeviceOperationWorkOutput
+)]
 record ClaimDeviceOperationWorkAction {
     /// ID of the device claiming work.
     device_id: DeviceId,
