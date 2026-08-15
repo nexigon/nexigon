@@ -18,6 +18,21 @@
 
 For documentation and guides, visit [docs.nexigon.dev](https://docs.nexigon.dev).
 
+## Device Pairing
+
+A Nexigon Hub instance is the server that manages a fleet and receives agent
+connections. Its UI displays a one-time pairing value containing the Hub domain
+and pairing key. Send that value unchanged to an unpaired agent so it connects
+to the same instance:
+
+```sh
+curl --data "HUB_DOMAIN,PAIRING_KEY" http://DEVICE_ADDRESS:6947/pair
+```
+
+The agent converts the Hub domain to an HTTPS endpoint. If the pairing value
+omits the domain, the agent instead tries the Hub endpoints from its
+provisioning configuration.
+
 ## CLI Authentication
 
 The Nexigon CLI accepts a personal user token or a fine-grained organization API

@@ -1,9 +1,10 @@
 //! Pairing-key provisioning for unpaired agents.
 //!
 //! This is intentionally not a general-purpose HTTP server. It implements the
-//! small request shape needed by `curl --data '<pairing-key>' /pair`, redeems
-//! the key against the configured hub endpoints, writes `credentials.json`,
-//! returns a short JSON status response, and exits.
+//! small request shape needed by `curl --data '<domain>,<pairing-key>' /pair`,
+//! redeems the key against that Hub domain (or the configured Hub endpoints
+//! when no domain is supplied), writes `credentials.json`, returns a short JSON
+//! status response, and exits.
 
 use std::collections::HashMap;
 use std::path::Path;
@@ -145,15 +146,15 @@ async fn handle_client(
         return Ok(None);
     }
 
-    let pairing_key = match parse_pairing_key(&request.body) {
-        Ok(pairing_key) => pairing_key,
+    let pairing_request = match parse_pairing_request(&request.body) {
+        Ok(pairing_request) => pairing_request,
         Err(error) => {
             write_error(&mut stream, 400, &error).await?;
             return Ok(None);
         }
     };
 
-    match redeem_pairing_key(&pairing_key, runtime, fingerprint).await {
+    match redeem_pairing_key(&pairing_request, runtime, fingerprint).await {
         Ok((credentials, device_id)) => {
             store_credentials(&runtime.credentials_path, &credentials).await?;
             if let Err(error) = write_json(
@@ -182,13 +183,19 @@ async fn handle_client(
 }
 
 async fn redeem_pairing_key(
-    pairing_key: &str,
+    pairing_request: &PairingRequest,
     runtime: &ProvisioningRuntime,
     fingerprint: &DeviceFingerprint,
 ) -> anyhow::Result<(AgentCredentials, nexigon_ids::ids::DeviceId)> {
+    let endpoints = match pairing_request.endpoint.as_ref() {
+        Some(endpoint) => std::slice::from_ref(endpoint),
+        None => &runtime.endpoints,
+    };
     let mut last_error = None;
-    for endpoint in &runtime.endpoints {
-        match redeem_pairing_key_at(endpoint, pairing_key, runtime, fingerprint).await {
+    for endpoint in endpoints {
+        match redeem_pairing_key_at(endpoint, &pairing_request.pairing_key, runtime, fingerprint)
+            .await
+        {
             Ok(output) => {
                 let credentials = AgentCredentials {
                     hub_url: endpoint.clone(),
@@ -204,6 +211,9 @@ async fn redeem_pairing_key(
         }
     }
     match last_error {
+        Some(error) if pairing_request.endpoint.is_some() => {
+            Err(error).context("qualified provisioning endpoint failed")
+        }
         Some(error) => Err(error).context("all provisioning endpoints failed"),
         None => bail!("no provisioning endpoints configured"),
     }
@@ -394,13 +404,24 @@ fn find_header_end(buf: &[u8]) -> Option<usize> {
     buf.windows(4).position(|window| window == b"\r\n\r\n")
 }
 
+/// Pairing information parsed from the local provisioning request.
+#[derive(Debug, PartialEq, Eq)]
+struct PairingRequest {
+    /// Qualified HTTPS endpoint, or none when configured endpoints should be tried.
+    endpoint: Option<String>,
+    /// One-time key to redeem at the selected endpoint.
+    pairing_key: String,
+}
+
+/// JSON envelope accepted as an alternative to the plain-text request body.
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 struct PairingJson {
     pairing_key: String,
 }
 
-fn parse_pairing_key(body: &[u8]) -> Result<String, String> {
+/// Parse the body accepted by the local pairing endpoint.
+fn parse_pairing_request(body: &[u8]) -> Result<PairingRequest, String> {
     let text = std::str::from_utf8(body)
         .map_err(|_| "request body must be UTF-8".to_owned())?
         .trim();
@@ -410,14 +431,50 @@ fn parse_pairing_key(body: &[u8]) -> Result<String, String> {
     if text.starts_with('{') {
         let parsed: PairingJson =
             serde_json::from_str(text).map_err(|_| "invalid pairing JSON".to_owned())?;
-        let pairing_key = parsed.pairing_key.trim();
-        if pairing_key.is_empty() {
-            return Err("pairing key is required".to_owned());
-        }
-        Ok(pairing_key.to_owned())
+        parse_pairing_value(&parsed.pairing_key)
     } else {
-        Ok(text.to_owned())
+        parse_pairing_value(text)
     }
+}
+
+/// Parse an optionally domain-qualified pairing value.
+fn parse_pairing_value(value: &str) -> Result<PairingRequest, String> {
+    let value = value.trim();
+    if value.is_empty() {
+        return Err("pairing key is required".to_owned());
+    }
+    let Some((domain, pairing_key)) = value.split_once(',') else {
+        return Ok(PairingRequest {
+            endpoint: None,
+            pairing_key: value.to_owned(),
+        });
+    };
+    let pairing_key = pairing_key.trim();
+    if pairing_key.is_empty() {
+        return Err("pairing key is required".to_owned());
+    }
+    Ok(PairingRequest {
+        endpoint: Some(endpoint_from_domain(domain)?),
+        pairing_key: pairing_key.to_owned(),
+    })
+}
+
+/// Convert a Hub domain with an optional port into a normalized HTTPS origin.
+fn endpoint_from_domain(domain: &str) -> Result<String, String> {
+    let domain = domain.trim();
+    if domain.is_empty() {
+        return Err("pairing domain is required".to_owned());
+    }
+    if domain.contains('/') || domain.contains('\\') || domain.contains('?') || domain.contains('#')
+    {
+        return Err("invalid pairing domain: expected a host with an optional port".to_owned());
+    }
+    let url = reqwest::Url::parse(&format!("https://{domain}"))
+        .map_err(|_| "invalid pairing domain: expected a host with an optional port".to_owned())?;
+    if url.host_str().is_none() || !url.username().is_empty() || url.password().is_some() {
+        return Err("invalid pairing domain: expected a host with an optional port".to_owned());
+    }
+    Ok(url.origin().ascii_serialization())
 }
 
 async fn write_error(stream: &mut TcpStream, status: u16, message: &str) -> anyhow::Result<()> {
@@ -465,22 +522,61 @@ fn reason_phrase(status: u16) -> &'static str {
 
 #[cfg(test)]
 mod tests {
-    use super::parse_pairing_key;
+    use super::PairingRequest;
+    use super::parse_pairing_request;
     use super::validate_endpoint_transport;
 
+    /// A legacy key without a domain continues to use configured endpoints.
     #[test]
     fn parses_plain_pairing_key() {
-        assert_eq!(parse_pairing_key(b"ABCD-123456\n").unwrap(), "ABCD-123456");
-    }
-
-    #[test]
-    fn parses_json_pairing_key() {
         assert_eq!(
-            parse_pairing_key(br#"{"pairingKey":"ABCD-123456"}"#).unwrap(),
-            "ABCD-123456",
+            parse_pairing_request(b"ABCD-123456\n").unwrap(),
+            PairingRequest {
+                endpoint: None,
+                pairing_key: "ABCD-123456".to_owned(),
+            },
         );
     }
 
+    /// A qualified key selects the HTTPS endpoint represented by its domain.
+    #[test]
+    fn parses_domain_and_pairing_key() {
+        assert_eq!(
+            parse_pairing_request(b"data-modul.nexigon.dev,ABCD-123456\n").unwrap(),
+            PairingRequest {
+                endpoint: Some("https://data-modul.nexigon.dev".to_owned()),
+                pairing_key: "ABCD-123456".to_owned(),
+            },
+        );
+    }
+
+    /// JSON requests accept the same qualified pairing-key representation.
+    #[test]
+    fn parses_json_pairing_key() {
+        let body = br#"{"pairingKey":"data-modul.nexigon.dev:8443,ABCD-123456"}"#;
+        assert_eq!(
+            parse_pairing_request(body).unwrap(),
+            PairingRequest {
+                endpoint: Some("https://data-modul.nexigon.dev:8443".to_owned()),
+                pairing_key: "ABCD-123456".to_owned(),
+            },
+        );
+    }
+
+    /// Qualified pairing values reject URLs and credentials in place of a domain.
+    #[test]
+    fn rejects_invalid_pairing_domains() {
+        for value in [
+            "https://hub.example,ABCD-123456",
+            "hub.example/path,ABCD-123456",
+            "hub.example\\path,ABCD-123456",
+            "user@hub.example,ABCD-123456",
+        ] {
+            assert!(parse_pairing_request(value.as_bytes()).is_err());
+        }
+    }
+
+    /// Pairing redemption only permits secure transport without a development opt-in.
     #[test]
     fn provisioning_requires_secure_transport_by_default() {
         let https = reqwest::Url::parse("https://hub.example").unwrap();
