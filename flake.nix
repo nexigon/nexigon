@@ -10,7 +10,14 @@
       flake-utils,
       nixpkgs,
     }:
-    flake-utils.lib.eachDefaultSystem (
+    {
+      nixosModules.nexigon-agent = ./nix/nexigon-agent.nix;
+      nixosModules.default = self.nixosModules.nexigon-agent;
+      overlays.default = final: _prev: {
+        nexigon-agent = self.packages.${final.stdenv.hostPlatform.system}.nexigon-agent;
+      };
+    }
+    // flake-utils.lib.eachDefaultSystem (
       system:
       let
         pkgs = (import nixpkgs) {
@@ -18,6 +25,24 @@
         };
       in
       {
+        packages.nexigon-agent = self.packages.${system}.default.overrideAttrs {
+          cargoBuildFlags = [
+            "--bin"
+            "nexigon-agent"
+          ];
+          # Workspace filesystem-ownership tests require a conventional root filesystem.
+          doCheck = false;
+          meta.mainProgram = "nexigon-agent";
+        };
+
+        checks = pkgs.lib.optionalAttrs pkgs.stdenv.isLinux {
+          nixos = import ./nix/test.nix {
+            inherit pkgs;
+            module = self.nixosModules.nexigon-agent;
+            agent = self.packages.${system}.nexigon-agent;
+          };
+        };
+
         packages.default = pkgs.rustPlatform.buildRustPackage {
           name = "nexigon";
           src = ./.;

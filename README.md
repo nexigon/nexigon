@@ -18,6 +18,11 @@
 
 For documentation and guides, visit [docs.nexigon.dev](https://docs.nexigon.dev).
 
+## NixOS
+
+The flake provides an agent package and NixOS service module. See
+[NixOS Agent Integration](nix/README.md) for configuration and provisioning options.
+
 ## Device Pairing
 
 A Nexigon Hub instance is the server that manages a fleet and receives agent
