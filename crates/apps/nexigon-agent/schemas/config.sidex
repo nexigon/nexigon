@@ -42,8 +42,10 @@ record Config {
     dangerous_accept_invalid_certificates?: bool,
     /// Telemetry configuration.
     telemetry?: TelemetryConfig,
-    /// Exported services.
+    /// Exported services. Each HTTP export authorizes TCP forwarding to its port.
     exports?: [ExportConfig],
+    /// Additional TCP ports, beyond exported services. Disabled unless explicitly enabled.
+    forwarding?: ForwardingConfig,
     /// Remote terminal configuration.
     terminal?: TerminalConfig,
     /// On-demand command configuration.
@@ -102,7 +104,29 @@ record TelemetryConfig {
     system_info?: bool,
 }
 
-/// Service export configuration.
+/// TCP destination port (1–65535).
+#[rust(type = "std::num::NonZeroU16")]
+#[json(type = "number")]
+#[validate(
+    { 1 <= _ <= 65535 },
+    message = "TCP ports must be between 1 and 65535."
+)]
+opaque TcpPort
+
+/// Additional TCP ports for CLI tunnels and Hub HTTP proxy access.
+#[json(rename_all = "kebab-case")]
+record ForwardingConfig {
+    /// Whether the additional port allowlist is enabled (defaults to false).
+    ///
+    /// HTTP export ports remain accessible regardless of this setting.
+    enabled?: bool,
+    /// Permitted TCP destination ports on 127.0.0.1 (defaults to none).
+    ///
+    /// Each port permits raw TCP access. HTTP export ports are allowed separately.
+    allowed_tcp_ports?: [TcpPort],
+}
+
+/// Service exports. Each HTTP export permits raw TCP access to its localhost port.
 #[json(tag = "protocol", rename_all = "lowercase")]
 variant ExportConfig {
     /// HTTP export configuration.
@@ -114,9 +138,9 @@ variant ExportConfig {
 record HttpExportConfig {
     /// Name of the export.
     name: string,
-    /// Port the service listens on.
+    /// Localhost port the service listens on; also authorizes raw TCP forwarding.
     port: u16,
-    /// URL path prefix for the service.
+    /// URL path prefix for the service. Does not restrict TCP forwarding.
     path?: string,
 }
 

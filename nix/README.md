@@ -58,6 +58,24 @@ private runtime file on service startup. Use pairing-key provisioning for
 credentials: values in `settings`, including tokens, are stored in the readable
 Nix store.
 
+## TCP Forwarding
+
+Agent 0.6 disables TCP forwarding by default. To allow SSH and a local HTTP
+service, configure their ports explicitly:
+
+```nix
+services.nexigon-agent.settings.forwarding = {
+  enabled = true;
+  allowed-tcp-ports = [ 22 80 ];
+};
+```
+
+Targets are restricted to `127.0.0.1`. HTTP exports automatically authorize
+their own ports, so an exported service does not also need an allowlist entry.
+Both forms permit raw TCP access. `forwarding.enabled = false` disables only
+additional ports; exports remain accessible. Upgrade the agent package and
+its settings together; older agents do not enforce this policy.
+
 ## Test the Service
 
 ```console

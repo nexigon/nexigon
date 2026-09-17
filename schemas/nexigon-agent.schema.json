@@ -37,6 +37,9 @@
         "$ref": "#/$defs/nexigon_agent.config.ExportConfig"
       }
     },
+    "forwarding": {
+      "$ref": "#/$defs/nexigon_agent.config.ForwardingConfig"
+    },
     "terminal": {
       "$ref": "#/$defs/nexigon_agent.config.TerminalConfig"
     },
@@ -82,7 +85,7 @@
     },
     "nexigon_agent.config.ExportConfig": {
       "$id": "nexigon_agent.config.ExportConfig",
-      "description": "Service export configuration.",
+      "description": "Service exports. Each HTTP export permits raw TCP access to its localhost port.",
       "oneOf": [
         {
           "type": "object",
@@ -105,6 +108,24 @@
           ]
         }
       ]
+    },
+    "nexigon_agent.config.ForwardingConfig": {
+      "$id": "nexigon_agent.config.ForwardingConfig",
+      "type": "object",
+      "description": "Additional TCP ports for CLI tunnels and Hub HTTP proxy access.",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "allowed-tcp-ports": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/nexigon_agent.config.TcpPort"
+          }
+        }
+      },
+      "required": [],
+      "unevaluatedProperties": false
     },
     "nexigon_agent.config.LocalApiConfig": {
       "$id": "nexigon_agent.config.LocalApiConfig",
@@ -167,6 +188,13 @@
       },
       "required": [],
       "unevaluatedProperties": false
+    },
+    "nexigon_agent.config.TcpPort": {
+      "$id": "nexigon_agent.config.TcpPort",
+      "type": [
+        "number"
+      ],
+      "description": "TCP destination port (1–65535)."
     },
     "nexigon_agent.config.TelemetryConfig": {
       "$id": "nexigon_agent.config.TelemetryConfig",

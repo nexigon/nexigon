@@ -691,6 +691,14 @@ fn handle_channel_request(
             request.reject(b"invalid TCP forwarding endpoint");
             return;
         };
+        if port == 0 {
+            request.reject(b"invalid TCP forwarding endpoint");
+            return;
+        }
+        if !crate::config::tcp_forwarding_allowed(config, port) {
+            request.reject(b"TCP forwarding port is not allowed");
+            return;
+        }
         let Ok(task_slot) = task_tx.clone().try_reserve_owned() else {
             request.reject(b"agent task queue is full");
             return;
@@ -1068,6 +1076,7 @@ mod tests {
     use nexigon_multiplex::ConnectionEvent;
     use nexigon_multiplex::ConnectionLimits;
     use nexigon_multiplex::ConnectionRef;
+    use nexigon_multiplex::OpenError;
     use nexigon_multiplex::transport::InMemory;
     use tempfile::TempDir;
     use tokio::io::AsyncReadExt;
@@ -1123,6 +1132,20 @@ mod tests {
 
     impl EndpointTestAgent {
         async fn start() -> Self {
+            Self::with_config(Config::new(PathBuf::from("unused-fingerprint"))).await
+        }
+
+        /// Start an agent with one explicitly allowed TCP destination.
+        async fn forwarding(port: u16) -> Self {
+            let config = toml::from_str(&format!(
+                "fingerprint-script = 'unused'\n[forwarding]\nenabled = true\nallowed-tcp-ports = [{port}]"
+            ))
+            .unwrap();
+            Self::with_config(config).await
+        }
+
+        /// Run real channel handling and task supervision with the supplied policy.
+        async fn with_config(config: Config) -> Self {
             let (hub_transport, agent_transport) = InMemory::<Bytes, Bytes>::new_buffered(64);
             let hub_limits = ConnectionLimits {
                 max_pending_channel_requests: 24,
@@ -1147,7 +1170,7 @@ mod tests {
             let cancellation = CancellationToken::new();
             let agent_cancellation = cancellation.clone();
             let agent = tokio::spawn(async move {
-                let config = Arc::new(Config::new(PathBuf::from("unused-fingerprint")));
+                let config = Arc::new(config);
                 let limits = EndpointLimits::new(command_slots());
                 let (task_tx, mut task_rx) = mpsc::channel(SUPERVISOR_QUEUE_CAPACITY);
                 let mut tasks = JoinSet::new();
@@ -1261,7 +1284,7 @@ mod tests {
                 }
             }
         });
-        let agent = EndpointTestAgent::start().await;
+        let agent = EndpointTestAgent::forwarding(port).await;
         let endpoint = format!("forward/tcp/{port}");
         let mut channels = Vec::new();
         let mut local_streams = Vec::new();
@@ -1323,28 +1346,186 @@ mod tests {
         agent.stop().await;
     }
 
+    /// Missing or disabled forwarding and absent allowlist entries never reach the
+    /// target.
+    #[tokio::test]
+    async fn forwarding_policy_rejects_before_connecting() {
+        let listener = tokio::net::TcpListener::bind((Ipv4Addr::LOCALHOST, 0))
+            .await
+            .unwrap();
+        let port = listener.local_addr().unwrap().port();
+        let policies = [
+            String::new(),
+            "[forwarding]".to_owned(),
+            format!("[forwarding]\nallowed-tcp-ports = [{port}]"),
+            format!("[forwarding]\nenabled = false\nallowed-tcp-ports = [{port}]"),
+            "[forwarding]\nenabled = true".to_owned(),
+            "[forwarding]\nenabled = true\nallowed-tcp-ports = []".to_owned(),
+            format!(
+                "[forwarding]\nenabled = true\nallowed-tcp-ports = [{}]",
+                if port == 1 { 2 } else { 1 }
+            ),
+        ];
+        for policy in policies {
+            let config =
+                toml::from_str(&format!("fingerprint-script = 'unused'\n{policy}")).unwrap();
+            let mut agent = EndpointTestAgent::with_config(config).await;
+            let endpoint = format!("forward/tcp/{port}");
+            let result = tokio::time::timeout(
+                Duration::from_secs(2),
+                agent.hub_ref.open(endpoint.as_bytes()),
+            )
+            .await
+            .expect("denied forwarding request timed out");
+            assert!(
+                matches!(result, Err(OpenError::Rejected(ref rejection)) if rejection.reason() == b"TCP forwarding port is not allowed"),
+                "policy: {policy}"
+            );
+            assert!(
+                tokio::time::timeout(Duration::from_millis(50), listener.accept())
+                    .await
+                    .is_err(),
+                "denied request reached the target: {policy}"
+            );
+            assert!(!agent.agent.is_finished());
+            agent.stop().await;
+        }
+    }
+
+    /// Exports authorize raw TCP independently; additional ports still require opt-in.
+    #[tokio::test]
+    async fn http_exports_allow_forwarding_independently_of_additional_ports() {
+        let exported = tokio::net::TcpListener::bind((Ipv4Addr::LOCALHOST, 0))
+            .await
+            .unwrap();
+        let exported_port = exported.local_addr().unwrap().port();
+        let additional = tokio::net::TcpListener::bind((Ipv4Addr::LOCALHOST, 0))
+            .await
+            .unwrap();
+        let additional_port = additional.local_addr().unwrap().port();
+        let unlisted = tokio::net::TcpListener::bind((Ipv4Addr::LOCALHOST, 0))
+            .await
+            .unwrap();
+        let unlisted_port = unlisted.local_addr().unwrap().port();
+        let policies = [
+            (String::new(), false),
+            (
+                format!("[forwarding]\nallowed-tcp-ports = [{additional_port}]"),
+                false,
+            ),
+            (
+                format!("[forwarding]\nenabled = false\nallowed-tcp-ports = [{additional_port}]"),
+                false,
+            ),
+            (
+                "[forwarding]\nenabled = true\nallowed-tcp-ports = []".to_owned(),
+                false,
+            ),
+            (
+                format!("[forwarding]\nenabled = true\nallowed-tcp-ports = [{additional_port}]"),
+                true,
+            ),
+        ];
+        for (policy, additional_allowed) in policies {
+            let config = toml::from_str(&format!(
+                "fingerprint-script = 'unused'\n{policy}\n[[exports]]\nprotocol = 'http'\nname = 'Web UI'\nport = {exported_port}\npath = '/ui'"
+            )).unwrap();
+            let mut agent = EndpointTestAgent::with_config(config).await;
+            let endpoint = format!("forward/tcp/{exported_port}");
+            let mut channel = tokio::time::timeout(
+                Duration::from_secs(2),
+                agent.hub_ref.open(endpoint.as_bytes()),
+            )
+            .await
+            .expect("export request timed out")
+            .expect("export was rejected");
+            let (mut target, _) = tokio::time::timeout(Duration::from_secs(2), exported.accept())
+                .await
+                .expect("export target connection timed out")
+                .unwrap();
+            channel.write_all(b"raw TCP").await.unwrap();
+            channel.flush().await.unwrap();
+            let mut data = [0; 7];
+            tokio::time::timeout(Duration::from_secs(2), target.read_exact(&mut data))
+                .await
+                .unwrap()
+                .unwrap();
+            assert_eq!(&data, b"raw TCP");
+
+            for (port, listener, allowed) in [
+                (additional_port, &additional, additional_allowed),
+                (unlisted_port, &unlisted, false),
+            ] {
+                let endpoint = format!("forward/tcp/{port}");
+                let result = tokio::time::timeout(
+                    Duration::from_secs(2),
+                    agent.hub_ref.open(endpoint.as_bytes()),
+                )
+                .await
+                .expect("forwarding request timed out");
+                if allowed {
+                    let _channel = result.expect("additional allowed port was rejected");
+                    let _target = tokio::time::timeout(Duration::from_secs(2), listener.accept())
+                        .await
+                        .expect("additional target connection timed out")
+                        .unwrap();
+                } else {
+                    assert!(
+                        matches!(result, Err(OpenError::Rejected(ref rejection)) if rejection.reason() == b"TCP forwarding port is not allowed")
+                    );
+                    assert!(
+                        tokio::time::timeout(Duration::from_millis(50), listener.accept())
+                            .await
+                            .is_err()
+                    );
+                }
+            }
+            agent.stop().await;
+        }
+    }
+
+    /// A bound but non-listening socket keeps the allowed target unavailable without a
+    /// port race.
     #[tokio::test]
     async fn unavailable_forwarding_port_is_rejected_without_panicking() {
-        // Port zero cannot be a listening destination, so the fixture is unavailable without
-        // racing another process for a released ephemeral port.
-        let mut agent = EndpointTestAgent::start().await;
-        let unavailable =
-            tokio::time::timeout(Duration::from_secs(2), agent.hub_ref.open(b"forward/tcp/0"))
-                .await
-                .expect("unavailable forwarding request timed out");
-        assert!(unavailable.is_err());
-        assert!(!agent.agent.is_finished());
-
-        let follow_up = tokio::time::timeout(
+        let target = tokio::net::TcpSocket::new_v4().unwrap();
+        target.bind((Ipv4Addr::LOCALHOST, 0).into()).unwrap();
+        let port = target.local_addr().unwrap().port();
+        let mut agent = EndpointTestAgent::forwarding(port).await;
+        let endpoint = format!("forward/tcp/{port}");
+        let unavailable = tokio::time::timeout(
             Duration::from_secs(2),
-            agent.hub_ref.open(b"still-connected"),
+            agent.hub_ref.open(endpoint.as_bytes()),
         )
         .await
-        .expect("follow-up request timed out");
-        assert!(follow_up.is_err());
+        .expect("unavailable forwarding request timed out");
+        assert!(
+            matches!(unavailable, Err(OpenError::Rejected(ref rejection)) if rejection.reason() == b"local TCP forwarding target is unavailable")
+        );
+        assert!(!agent.agent.is_finished());
         agent.stop().await;
     }
 
+    /// Port zero and malformed or out-of-range endpoints cannot bypass an enabled policy.
+    #[tokio::test]
+    async fn invalid_forwarding_ports_are_rejected() {
+        let mut agent = EndpointTestAgent::forwarding(80).await;
+        for port in ["0", "65536", "-1", "*", "80/other", "127.0.0.1:80"] {
+            let endpoint = format!("forward/tcp/{port}");
+            let result = tokio::time::timeout(
+                Duration::from_secs(2),
+                agent.hub_ref.open(endpoint.as_bytes()),
+            )
+            .await
+            .expect("invalid request timed out");
+            assert!(
+                matches!(result, Err(OpenError::Rejected(ref rejection)) if rejection.reason() == b"invalid TCP forwarding endpoint")
+            );
+        }
+        agent.stop().await;
+    }
+
+    /// Stopping the agent closes an allowed relay after it has transferred data.
     #[tokio::test]
     async fn shutdown_closes_an_active_forwarding_relay() {
         let listener = tokio::net::TcpListener::bind((Ipv4Addr::LOCALHOST, 0))
@@ -1352,7 +1533,7 @@ mod tests {
             .expect("bind local forwarding target");
         let port = listener.local_addr().unwrap().port();
         let accept = tokio::spawn(async move { listener.accept().await.unwrap().0 });
-        let mut agent = EndpointTestAgent::start().await;
+        let mut agent = EndpointTestAgent::forwarding(port).await;
         let endpoint = format!("forward/tcp/{port}");
         let mut channel = tokio::time::timeout(
             Duration::from_secs(2),
