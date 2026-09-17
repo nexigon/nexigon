@@ -10,6 +10,8 @@ import json::JsonMutation
 import json::JsonValue
 import jwt::Jwt
 import outputs::Empty
+import pagination::PageInfo
+import pagination::PageRequest
 import projects::DeploymentToken
 import projects::DeploymentTokenId
 import projects::ProjectId
@@ -83,6 +85,8 @@ record GetDeviceDetailsAction {
 
 /// Output of getting information about a device.
 record GetDeviceDetailsOutput {
+    /// Groups currently assigned to this device.
+    groups: [DeviceGroup],
     /// ID of the device.
     device_id: DeviceId,
     /// Project ID of the device.
@@ -125,6 +129,7 @@ record DeviceConnection {
 
 /// Combined device status (connection + health).
 #[json(tagged = externally, rename_all = "lowercase")]
+#[rust(derive(PartialEq, Eq))]
 variant DeviceStatus {
     /// Device is healthy and connected.
     Healthy,
@@ -239,7 +244,7 @@ record IssueDeviceTokenOutput {
 }
 
 /// Validate a device JWT.
-/// 
+///
 /// **Note: Only use this action for integration with external systems.**
 #[request(
     name = "devices_ValidateDeviceToken",
@@ -275,7 +280,7 @@ record AddDeviceCertificateAction {
     /// Fingerprint of the certificate.
     fingerprint: CertificateFingerprint,
     /// Initial status of the certificate.
-    /// 
+    ///
     /// Defaults to `Pending`.
     status?: DeviceCertificateStatus,
 }
@@ -456,6 +461,9 @@ record PublishDeviceEventsAction {
 /// Query device events.
 #[request(name = "devices_QueryEvents", response = QueryDeviceEventsOutput)]
 record QueryDeviceEventsAction {
+    /// Opt into cursor pagination. Without this field, the existing limit applies.
+    page?: PageRequest,
+
     /// ID of the device.
     device_id: DeviceId,
     /// Limit the number of events to return.
@@ -467,6 +475,9 @@ record QueryDeviceEventsAction {
 
 /// Output of querying device events.
 record QueryDeviceEventsOutput {
+    /// Present when cursor pagination was requested.
+    page?: PageInfo,
+
     /// List of events.
     events: [DeviceEvent],
 }
@@ -642,12 +653,18 @@ record DeviceProperty {
 /// Query the audit log of a device.
 #[request(name = "devices_QueryAuditLog", response = QueryDeviceAuditLogOutput)]
 record QueryDeviceAuditLogAction {
+    /// Opt into cursor pagination. Without this field, the existing limit applies.
+    page?: PageRequest,
+
     /// ID of the device.
     device_id: DeviceId,
 }
 
 /// Output of querying the audit log of a device.
 record QueryDeviceAuditLogOutput {
+    /// Present when cursor pagination was requested.
+    page?: PageInfo,
+
     /// List of audit log events.
     events: [AuditLogEvent],
 }
@@ -732,6 +749,125 @@ record DeviceCommandDoneData {
     log_tail: [string],
     /// Execution duration in milliseconds.
     duration_ms: u64,
+}
+
+// ============================================================================
+// Device Groups
+// ============================================================================
+
+/// Stable identity of a group. Renaming does not change its identity.
+#[rust(type = "nexigon_ids::ids::DeviceGroupId")]
+#[json(type = "string")]
+opaque DeviceGroupId
+
+/// Opaque RGB background color in hexadecimal notation, such as `#3b82f6`.
+/// Group text uses black or white, whichever has higher contrast.
+#[validate(
+    { matches(_, "^#[0-9a-fA-F]{6}$") },
+    message = "Group color must be a six-digit hexadecimal color, such as #3b82f6."
+)]
+wrapper DeviceGroupColor: string
+
+/// A project-owned group that may be assigned to any number of its devices.
+record DeviceGroup {
+    group_id: DeviceGroupId,
+    project_id: ProjectId,
+    /// Unique within the project, ignoring case and surrounding whitespace.
+    name: string,
+    color?: DeviceGroupColor,
+    description?: string,
+}
+
+/// List a project's group catalog, including groups without assignments.
+#[request(name = "groups_Query", response = QueryDeviceGroupsOutput)]
+record QueryDeviceGroupsAction {
+    project_id: ProjectId,
+}
+
+record QueryDeviceGroupsOutput {
+    groups: [DeviceGroup],
+}
+
+/// Create a group. Case-insensitive name collisions are rejected.
+#[request(name = "groups_Create", response = DeviceGroup)]
+record CreateDeviceGroupAction {
+    project_id: ProjectId,
+    #[validate(
+        { 1 <= _.size <= 128 },
+        message = "Group name must be between 1 and 128 characters."
+    )]
+    name: string,
+    color?: DeviceGroupColor,
+    #[validate(
+        { _.size <= 4096 },
+        message = "Group description must be at most 4096 characters."
+    )]
+    description?: string,
+}
+
+/// Replace group metadata while retaining its identity and assignments.
+#[request(name = "groups_Update", response = Empty)]
+record UpdateDeviceGroupAction {
+    project_id: ProjectId,
+    group_id: DeviceGroupId,
+    #[validate(
+        { 1 <= _.size <= 128 },
+        message = "Group name must be between 1 and 128 characters."
+    )]
+    name: string,
+    color?: DeviceGroupColor,
+    #[validate(
+        { _.size <= 4096 },
+        message = "Group description must be at most 4096 characters."
+    )]
+    description?: string,
+}
+
+/// Delete a group and its assignments.
+///
+/// Existing operation selectors retain the group identity and continue evaluating
+/// membership. A deleted group is absent from every device.
+#[request(name = "groups_Delete", response = Empty)]
+record DeleteDeviceGroupAction {
+    project_id: ProjectId,
+    group_id: DeviceGroupId,
+}
+
+/// Atomically add and remove memberships on explicit devices in one project.
+///
+/// Adding an existing membership or removing an absent one is a no-op. A group
+/// cannot appear in both lists. Unrelated memberships are preserved. All devices
+/// and groups must belong to the project; otherwise no memberships change.
+/// Device credentials cannot change groups. Removing a membership does not cancel
+/// work that an operation has already assigned to the device.
+#[request(name = "devices_UpdateGroups", response = Empty)]
+record UpdateDeviceGroupsAction {
+    project_id: ProjectId,
+    #[validate({ _.size >= 1 }, message = "Select at least one device.")]
+    device_ids: [DeviceId],
+    add: [DeviceGroupId],
+    remove: [DeviceGroupId],
+}
+
+// ============================================================================
+// Device Selection
+// ============================================================================
+
+/// Group membership conditions, combined with AND.
+record DeviceGroupSelector {
+    /// Every listed group must be present. Empty or absent imposes no condition.
+    all?: [DeviceGroupId],
+    /// At least one listed group must be present. Empty matches no devices;
+    /// absence imposes no condition.
+    any?: [DeviceGroupId],
+    /// Every listed group must be absent. Empty or absent imposes no condition.
+    none?: [DeviceGroupId],
+}
+
+/// A device whose property predicates could not be evaluated.
+record DeviceSelectionError {
+    device_id: DeviceId,
+    error: string,
 }
 
 // ============================================================================

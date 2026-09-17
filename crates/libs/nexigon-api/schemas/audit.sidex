@@ -1,5 +1,6 @@
 //! Actions and types related to the audit log.
 
+import pagination::{PageRequest, PageInfo}
 import actor::Actor
 import datetime::Timestamp
 import jobs::JobId
@@ -87,10 +88,16 @@ variant AuditLogActionStatus {
     name = "audit_QueryAuditLogEvents",
     response = QueryAuditLogEventsOutput
 )]
-record QueryAuditLogEventsAction {}
+record QueryAuditLogEventsAction {
+    /// Opt into cursor pagination. Without this field, the existing limit applies.
+    page?: PageRequest,
+}
 
 /// Output of querying the events recorded in the audit log.
 record QueryAuditLogEventsOutput {
+    /// Present when cursor pagination was requested.
+    page?: PageInfo,
+
     /// List of audit events.
     events: [AuditLogEvent],
 }
@@ -102,10 +109,16 @@ record QueryAuditLogEventsOutput {
     name = "audit_QueryAuditLogActions",
     response = QueryAuditLogActionsOutput
 )]
-record QueryAuditLogActionsAction {}
+record QueryAuditLogActionsAction {
+    /// Opt into cursor pagination. Without this field, the existing limit applies.
+    page?: PageRequest,
+}
 
 /// Output of querying the actions recorded in the audit log.
 record QueryAuditLogActionsOutput {
+    /// Present when cursor pagination was requested.
+    page?: PageInfo,
+
     /// List of actions.
     actions: [AuditLogAction],
 }

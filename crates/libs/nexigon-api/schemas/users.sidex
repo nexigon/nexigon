@@ -1,6 +1,7 @@
 //! Actions and types related to users.
 
 import actor::Actor
+import authorization::ActionAuthorization
 import datetime::Timestamp
 import devices::DeviceId
 import jwt::Jwt
@@ -84,6 +85,8 @@ record GetUserDetailsOutput {
 /// Create a new user.
 #[request(name = "users_Create", response = CreateUserOutput)]
 record CreateUserAction {
+    /// Authorization for this administrative action.
+    authorization: ActionAuthorization,
     /// Email of the user.
     #[validate(
         { 3 <= _.size <= 254 },
@@ -149,6 +152,8 @@ record SetUserDisplayNameAction {
 /// Set whether the user is an instance administrator.
 #[request(name = "users_SetIsAdmin", response = Empty)]
 record SetUserIsAdminAction {
+    /// Authorization for this administrative action.
+    authorization: ActionAuthorization,
     /// ID of the user.
     user_id: UserId,
     /// Whether the user is an instance administrator.
@@ -161,6 +166,8 @@ record SetUserIsAdminAction {
 /// one. All existing sessions of the user are invalidated.
 #[request(name = "users_SetPassword", response = Empty)]
 record SetUserPasswordAction {
+    /// Authorization for this administrative action.
+    authorization: ActionAuthorization,
     /// ID of the user.
     user_id: UserId,
     /// New password to set.
@@ -176,6 +183,8 @@ record SetUserPasswordAction {
 /// Admin-only operation that updates the address without verification.
 #[request(name = "users_SetEmail", response = SetUserEmailOutput)]
 record SetUserEmailAction {
+    /// Authorization for this administrative action.
+    authorization: ActionAuthorization,
     /// ID of the user.
     user_id: UserId,
     /// New email address.
@@ -202,14 +211,14 @@ variant SetUserEmailOutput {
 
 /// Change the password of the current user.
 ///
-/// Requires the user to provide their current password to re-verify their
-/// identity, even if they are already authenticated.
-#[request(name = "users_ChangePassword", response = ChangeUserPasswordOutput)]
+/// Requires account credentials in `authorization`, even if the user is
+/// already authenticated.
+#[request(name = "users_ChangePassword", response = Empty)]
 record ChangeUserPasswordAction {
+    /// Credentials that re-verify the current user session.
+    authorization: ActionAuthorization,
     /// ID of the user.
     user_id: UserId,
-    /// Current password of the user.
-    current_password: string,
     /// New password to set.
     #[validate(
         { 8 <= _.size <= 256 },
@@ -218,29 +227,19 @@ record ChangeUserPasswordAction {
     new_password: string,
 }
 
-/// Output of [`ChangeUserPasswordAction`].
-#[json(tag = "result")]
-variant ChangeUserPasswordOutput {
-    /// Password was changed successfully.
-    Completed,
-    /// Provided current password is incorrect.
-    InvalidCurrentPassword,
-}
-
 /// Initiate an email-address change for the current user.
 ///
-/// Requires the user to provide their current password to re-verify their
-/// identity. On success, a verification link is sent to the new address and
-/// a notification is sent to the current address.
+/// Requires account credentials in `authorization`. On success, a verification
+/// link is sent to the new address and a notification is sent to the current address.
 #[request(
     name = "users_InitiateEmailChange",
     response = InitiateUserEmailChangeOutput
 )]
 record InitiateUserEmailChangeAction {
+    /// Credentials that re-verify the current user session.
+    authorization: ActionAuthorization,
     /// ID of the user.
     user_id: UserId,
-    /// Current password of the user.
-    current_password: string,
     /// New email address to switch to.
     #[validate(
         { 3 <= _.size <= 254 },
@@ -259,8 +258,6 @@ record InitiateUserEmailChangeAction {
 variant InitiateUserEmailChangeOutput {
     /// Verification email has been scheduled.
     Pending,
-    /// Provided current password is incorrect.
-    InvalidCurrentPassword,
     /// New email address is the same as the current one.
     SameEmail,
     /// Another user already has the requested email address.
@@ -455,6 +452,8 @@ record GetDevicePermissionsOutput {
 /// Create a user token.
 #[request(name = "users_CreateToken", response = CreateUserTokenOutput)]
 record CreateUserTokenAction {
+    /// Credentials that re-verify the current user session.
+    authorization: ActionAuthorization,
     /// ID of the user.
     user_id: UserId,
     /// Name of the token.

@@ -346,7 +346,11 @@
   "nexigon_api.audit.QueryAuditLogActionsAction": {
     "type": "object",
     "description": "Query the actions recorded in the audit log.\n\nRequires administrator permissions.",
-    "properties": {},
+    "properties": {
+      "page": {
+        "$ref": "#/components/schemas/nexigon_api.pagination.PageRequest"
+      }
+    },
     "required": [],
     "unevaluatedProperties": false
   },
@@ -354,6 +358,9 @@
     "type": "object",
     "description": "Output of querying the actions recorded in the audit log.",
     "properties": {
+      "page": {
+        "$ref": "#/components/schemas/nexigon_api.pagination.PageInfo"
+      },
       "actions": {
         "type": "array",
         "items": {
@@ -369,7 +376,11 @@
   "nexigon_api.audit.QueryAuditLogEventsAction": {
     "type": "object",
     "description": "Query the events recorded in the audit log.\n\nRequires administrator permissions.",
-    "properties": {},
+    "properties": {
+      "page": {
+        "$ref": "#/components/schemas/nexigon_api.pagination.PageRequest"
+      }
+    },
     "required": [],
     "unevaluatedProperties": false
   },
@@ -377,6 +388,9 @@
     "type": "object",
     "description": "Output of querying the events recorded in the audit log.",
     "properties": {
+      "page": {
+        "$ref": "#/components/schemas/nexigon_api.pagination.PageInfo"
+      },
       "events": {
         "type": "array",
         "items": {
@@ -386,6 +400,56 @@
     },
     "required": [
       "events"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.authorization.ActionAuthorization": {
+    "description": "Authorization material available to an action.\n\n`Context` is not an authorization decision. It asks the action to evaluate\nwhether its already-authenticated actor, permissions, and other contextual\nevidence are sufficient. Each action defines which variants it accepts.",
+    "oneOf": [
+      {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "const": "Context"
+          }
+        },
+        "required": [
+          "kind"
+        ]
+      },
+      {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "const": "Credentials"
+          },
+          "password": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "password"
+        ]
+      }
+    ]
+  },
+  "nexigon_api.authorization.ActionCredentials": {
+    "type": "object",
+    "description": "Credentials that re-verify the user session for one action execution.",
+    "properties": {
+      "password": {
+        "type": "string"
+      },
+      "code": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "password"
     ],
     "unevaluatedProperties": false
   },
@@ -541,6 +605,29 @@
     ],
     "unevaluatedProperties": false
   },
+  "nexigon_api.devices.CreateDeviceGroupAction": {
+    "type": "object",
+    "description": "Create a group. Case-insensitive name collisions are rejected.",
+    "properties": {
+      "projectId": {
+        "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+      },
+      "name": {
+        "type": "string"
+      },
+      "color": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceGroupColor"
+      },
+      "description": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "projectId",
+      "name"
+    ],
+    "unevaluatedProperties": false
+  },
   "nexigon_api.devices.CreateDeviceOperationAction": {
     "type": "object",
     "description": "Create a device operation.",
@@ -617,6 +704,23 @@
     },
     "required": [
       "certificateId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.devices.DeleteDeviceGroupAction": {
+    "type": "object",
+    "description": "Delete a group and its assignments.\n\nExisting operation selectors retain the group identity and continue evaluating\nmembership. A deleted group is absent from every device.",
+    "properties": {
+      "projectId": {
+        "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+      },
+      "groupId": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceGroupId"
+      }
+    },
+    "required": [
+      "projectId",
+      "groupId"
     ],
     "unevaluatedProperties": false
   },
@@ -956,6 +1060,69 @@
       "string"
     ],
     "description": "Device fingerprint ID."
+  },
+  "nexigon_api.devices.DeviceGroup": {
+    "type": "object",
+    "description": "A project-owned group that may be assigned to any number of its devices.",
+    "properties": {
+      "groupId": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceGroupId"
+      },
+      "projectId": {
+        "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+      },
+      "name": {
+        "type": "string"
+      },
+      "color": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceGroupColor"
+      },
+      "description": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "groupId",
+      "projectId",
+      "name"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.devices.DeviceGroupColor": {
+    "type": "string",
+    "description": "Opaque RGB background color in hexadecimal notation, such as `#3b82f6`.\nGroup text uses black or white, whichever has higher contrast."
+  },
+  "nexigon_api.devices.DeviceGroupId": {
+    "type": [
+      "string"
+    ],
+    "description": "Stable identity of a group. Renaming does not change its identity."
+  },
+  "nexigon_api.devices.DeviceGroupSelector": {
+    "type": "object",
+    "description": "Group membership conditions, combined with AND.",
+    "properties": {
+      "all": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.devices.DeviceGroupId"
+        }
+      },
+      "any": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.devices.DeviceGroupId"
+        }
+      },
+      "none": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.devices.DeviceGroupId"
+        }
+      }
+    },
+    "required": [],
+    "unevaluatedProperties": false
   },
   "nexigon_api.devices.DeviceId": {
     "type": [
@@ -1556,6 +1723,23 @@
     ],
     "unevaluatedProperties": false
   },
+  "nexigon_api.devices.DeviceSelectionError": {
+    "type": "object",
+    "description": "A device whose property predicates could not be evaluated.",
+    "properties": {
+      "deviceId": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceId"
+      },
+      "error": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "deviceId",
+      "error"
+    ],
+    "unevaluatedProperties": false
+  },
   "nexigon_api.devices.DeviceStatus": {
     "enum": [
       "healthy",
@@ -1582,6 +1766,12 @@
     "type": "object",
     "description": "Output of getting information about a device.",
     "properties": {
+      "groups": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.devices.DeviceGroup"
+        }
+      },
       "deviceId": {
         "$ref": "#/components/schemas/nexigon_api.devices.DeviceId"
       },
@@ -1611,6 +1801,7 @@
       }
     },
     "required": [
+      "groups",
       "deviceId",
       "projectId",
       "fingerprintId",
@@ -1841,6 +2032,9 @@
     "type": "object",
     "description": "Query the audit log of a device.",
     "properties": {
+      "page": {
+        "$ref": "#/components/schemas/nexigon_api.pagination.PageRequest"
+      },
       "deviceId": {
         "$ref": "#/components/schemas/nexigon_api.devices.DeviceId"
       }
@@ -1854,6 +2048,9 @@
     "type": "object",
     "description": "Output of querying the audit log of a device.",
     "properties": {
+      "page": {
+        "$ref": "#/components/schemas/nexigon_api.pagination.PageInfo"
+      },
       "events": {
         "type": "array",
         "items": {
@@ -1932,6 +2129,9 @@
     "type": "object",
     "description": "Query device events.",
     "properties": {
+      "page": {
+        "$ref": "#/components/schemas/nexigon_api.pagination.PageRequest"
+      },
       "deviceId": {
         "$ref": "#/components/schemas/nexigon_api.devices.DeviceId"
       },
@@ -1949,6 +2149,9 @@
     "type": "object",
     "description": "Output of querying device events.",
     "properties": {
+      "page": {
+        "$ref": "#/components/schemas/nexigon_api.pagination.PageInfo"
+      },
       "events": {
         "type": "array",
         "items": {
@@ -1958,6 +2161,34 @@
     },
     "required": [
       "events"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.devices.QueryDeviceGroupsAction": {
+    "type": "object",
+    "description": "List a project's group catalog, including groups without assignments.",
+    "properties": {
+      "projectId": {
+        "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+      }
+    },
+    "required": [
+      "projectId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.devices.QueryDeviceGroupsOutput": {
+    "type": "object",
+    "properties": {
+      "groups": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.devices.DeviceGroup"
+        }
+      }
+    },
+    "required": [
+      "groups"
     ],
     "unevaluatedProperties": false
   },
@@ -2310,6 +2541,67 @@
     ],
     "unevaluatedProperties": false
   },
+  "nexigon_api.devices.UpdateDeviceGroupAction": {
+    "type": "object",
+    "description": "Replace group metadata while retaining its identity and assignments.",
+    "properties": {
+      "projectId": {
+        "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+      },
+      "groupId": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceGroupId"
+      },
+      "name": {
+        "type": "string"
+      },
+      "color": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceGroupColor"
+      },
+      "description": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "projectId",
+      "groupId",
+      "name"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.devices.UpdateDeviceGroupsAction": {
+    "type": "object",
+    "description": "Atomically add and remove memberships on explicit devices in one project.\n\nAdding an existing membership or removing an absent one is a no-op. A group\ncannot appear in both lists. Unrelated memberships are preserved. All devices\nand groups must belong to the project; otherwise no memberships change.\nDevice credentials cannot change groups. Removing a membership does not cancel\nwork that an operation has already assigned to the device.",
+    "properties": {
+      "projectId": {
+        "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+      },
+      "deviceIds": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.devices.DeviceId"
+        }
+      },
+      "add": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.devices.DeviceGroupId"
+        }
+      },
+      "remove": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.devices.DeviceGroupId"
+        }
+      }
+    },
+    "required": [
+      "projectId",
+      "deviceIds",
+      "add",
+      "remove"
+    ],
+    "unevaluatedProperties": false
+  },
   "nexigon_api.devices.ValidateDeviceHttpProxyTokenAction": {
     "type": "object",
     "description": "Validate a HTTP proxy JWT.",
@@ -2475,6 +2767,10 @@
       },
       "message": {
         "type": "string"
+      },
+      "retryAfterSeconds": {
+        "type": "integer",
+        "format": "uint64"
       }
     },
     "required": [
@@ -2487,8 +2783,11 @@
     "enum": [
       "Invalid",
       "Forbidden",
+      "OperationAuthorizationRequired",
+      "MfaEnrollmentRequired",
       "Internal",
-      "RateLimited"
+      "RateLimited",
+      "Unavailable"
     ],
     "description": "Kind of an action error."
   },
@@ -2515,6 +2814,10 @@
           },
           "message": {
             "type": "string"
+          },
+          "retryAfterSeconds": {
+            "type": "integer",
+            "format": "uint64"
           }
         },
         "required": [
@@ -3150,7 +3453,7 @@
   },
   "nexigon_api.fleet.FleetOperationTargetSelector": {
     "type": "object",
-    "description": "Selector used to identify devices a fleet operation applies to.",
+    "description": "Device selection within a single project. All supplied conditions must hold.",
     "properties": {
       "deviceIds": {
         "type": "array",
@@ -3163,6 +3466,15 @@
         "items": {
           "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
         }
+      },
+      "groups": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceGroupSelector"
+      },
+      "search": {
+        "type": "string"
+      },
+      "status": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceStatus"
       }
     },
     "required": [
@@ -4398,6 +4710,9 @@
     "type": "object",
     "description": "Query the audit log of an organization.",
     "properties": {
+      "page": {
+        "$ref": "#/components/schemas/nexigon_api.pagination.PageRequest"
+      },
       "organizationId": {
         "$ref": "#/components/schemas/nexigon_api.organizations.OrganizationId"
       }
@@ -4411,6 +4726,9 @@
     "type": "object",
     "description": "Output of querying the audit log of an organization.",
     "properties": {
+      "page": {
+        "$ref": "#/components/schemas/nexigon_api.pagination.PageInfo"
+      },
       "events": {
         "type": "array",
         "items": {
@@ -4706,6 +5024,35 @@
     "type": "object",
     "description": "Empty output.",
     "properties": {},
+    "required": [],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.pagination.PageCursor": {
+    "description": "A sequence of Unicode code points."
+  },
+  "nexigon_api.pagination.PageInfo": {
+    "type": "object",
+    "description": "Continuation information for a requested page.",
+    "properties": {
+      "nextCursor": {
+        "$ref": "#/components/schemas/nexigon_api.pagination.PageCursor"
+      }
+    },
+    "required": [],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.pagination.PageRequest": {
+    "type": "object",
+    "description": "Request a bounded page. Omit the cursor to start a new traversal.",
+    "properties": {
+      "limit": {
+        "type": "integer",
+        "format": "uint32"
+      },
+      "cursor": {
+        "$ref": "#/components/schemas/nexigon_api.pagination.PageCursor"
+      }
+    },
     "required": [],
     "unevaluatedProperties": false
   },
@@ -5011,6 +5358,9 @@
     "type": "object",
     "description": "Query the audit log of the project.",
     "properties": {
+      "page": {
+        "$ref": "#/components/schemas/nexigon_api.pagination.PageRequest"
+      },
       "projectId": {
         "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
       }
@@ -5024,6 +5374,9 @@
     "type": "object",
     "description": "Output of querying the audit log of the project.",
     "properties": {
+      "page": {
+        "$ref": "#/components/schemas/nexigon_api.pagination.PageInfo"
+      },
       "events": {
         "type": "array",
         "items": {
@@ -5165,6 +5518,9 @@
     "type": "object",
     "description": "Query the devices of a project.",
     "properties": {
+      "selector": {
+        "$ref": "#/components/schemas/nexigon_api.fleet.FleetOperationTargetSelector"
+      },
       "projectId": {
         "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
       }
@@ -5178,6 +5534,12 @@
     "type": "object",
     "description": "Device item.",
     "properties": {
+      "groups": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.devices.DeviceGroup"
+        }
+      },
       "deviceId": {
         "$ref": "#/components/schemas/nexigon_api.devices.DeviceId"
       },
@@ -5209,6 +5571,7 @@
       }
     },
     "required": [
+      "groups",
       "deviceId",
       "firstSeen",
       "status",
@@ -5221,6 +5584,12 @@
     "type": "object",
     "description": "Output of querying the devices of a project.",
     "properties": {
+      "selectionErrors": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.devices.DeviceSelectionError"
+        }
+      },
       "devices": {
         "type": "array",
         "items": {
@@ -5229,6 +5598,7 @@
       }
     },
     "required": [
+      "selectionErrors",
       "devices"
     ],
     "unevaluatedProperties": false
@@ -6793,6 +7163,9 @@
     "type": "object",
     "description": "Query the audit log of the repository.",
     "properties": {
+      "page": {
+        "$ref": "#/components/schemas/nexigon_api.pagination.PageRequest"
+      },
       "repositoryId": {
         "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryId"
       }
@@ -6806,6 +7179,9 @@
     "type": "object",
     "description": "Output of querying the audit log of the repository.",
     "properties": {
+      "page": {
+        "$ref": "#/components/schemas/nexigon_api.pagination.PageInfo"
+      },
       "events": {
         "type": "array",
         "items": {
@@ -7726,35 +8102,24 @@
   },
   "nexigon_api.users.ChangeUserPasswordAction": {
     "type": "object",
-    "description": "Change the password of the current user.\n\nRequires the user to provide their current password to re-verify their\nidentity, even if they are already authenticated.",
+    "description": "Change the password of the current user.\n\nRequires account credentials in `authorization`, even if the user is\nalready authenticated.",
     "properties": {
+      "authorization": {
+        "$ref": "#/components/schemas/nexigon_api.authorization.ActionAuthorization"
+      },
       "userId": {
         "$ref": "#/components/schemas/nexigon_api.users.UserId"
-      },
-      "currentPassword": {
-        "type": "string"
       },
       "newPassword": {
         "type": "string"
       }
     },
     "required": [
+      "authorization",
       "userId",
-      "currentPassword",
       "newPassword"
     ],
     "unevaluatedProperties": false
-  },
-  "nexigon_api.users.ChangeUserPasswordOutput": {
-    "enum": [
-      {
-        "result": "Completed"
-      },
-      {
-        "result": "InvalidCurrentPassword"
-      }
-    ],
-    "description": "Output of [`ChangeUserPasswordAction`]."
   },
   "nexigon_api.users.CompleteRegistrationAction": {
     "type": "object",
@@ -7839,6 +8204,9 @@
     "type": "object",
     "description": "Create a new user.",
     "properties": {
+      "authorization": {
+        "$ref": "#/components/schemas/nexigon_api.authorization.ActionAuthorization"
+      },
       "email": {
         "type": "string"
       },
@@ -7853,6 +8221,7 @@
       }
     },
     "required": [
+      "authorization",
       "email"
     ],
     "unevaluatedProperties": false
@@ -7905,6 +8274,9 @@
     "type": "object",
     "description": "Create a user token.",
     "properties": {
+      "authorization": {
+        "$ref": "#/components/schemas/nexigon_api.authorization.ActionAuthorization"
+      },
       "userId": {
         "$ref": "#/components/schemas/nexigon_api.users.UserId"
       },
@@ -7913,6 +8285,7 @@
       }
     },
     "required": [
+      "authorization",
       "userId"
     ],
     "unevaluatedProperties": false
@@ -8029,21 +8402,21 @@
   },
   "nexigon_api.users.InitiateUserEmailChangeAction": {
     "type": "object",
-    "description": "Initiate an email-address change for the current user.\n\nRequires the user to provide their current password to re-verify their\nidentity. On success, a verification link is sent to the new address and\na notification is sent to the current address.",
+    "description": "Initiate an email-address change for the current user.\n\nRequires account credentials in `authorization`. On success, a verification\nlink is sent to the new address and a notification is sent to the current address.",
     "properties": {
+      "authorization": {
+        "$ref": "#/components/schemas/nexigon_api.authorization.ActionAuthorization"
+      },
       "userId": {
         "$ref": "#/components/schemas/nexigon_api.users.UserId"
-      },
-      "currentPassword": {
-        "type": "string"
       },
       "newEmail": {
         "type": "string"
       }
     },
     "required": [
+      "authorization",
       "userId",
-      "currentPassword",
       "newEmail"
     ],
     "unevaluatedProperties": false
@@ -8052,9 +8425,6 @@
     "enum": [
       {
         "result": "Pending"
-      },
-      {
-        "result": "InvalidCurrentPassword"
       },
       {
         "result": "SameEmail"
@@ -8387,6 +8757,9 @@
     "type": "object",
     "description": "Set the email address of a user.\n\nAdmin-only operation that updates the address without verification.",
     "properties": {
+      "authorization": {
+        "$ref": "#/components/schemas/nexigon_api.authorization.ActionAuthorization"
+      },
       "userId": {
         "$ref": "#/components/schemas/nexigon_api.users.UserId"
       },
@@ -8395,6 +8768,7 @@
       }
     },
     "required": [
+      "authorization",
       "userId",
       "email"
     ],
@@ -8415,6 +8789,9 @@
     "type": "object",
     "description": "Set whether the user is an instance administrator.",
     "properties": {
+      "authorization": {
+        "$ref": "#/components/schemas/nexigon_api.authorization.ActionAuthorization"
+      },
       "userId": {
         "$ref": "#/components/schemas/nexigon_api.users.UserId"
       },
@@ -8423,6 +8800,7 @@
       }
     },
     "required": [
+      "authorization",
       "userId",
       "isAdmin"
     ],
@@ -8432,6 +8810,9 @@
     "type": "object",
     "description": "Set the password of a user.\n\nAdmin-only operation that sets the password without requiring the current\none. All existing sessions of the user are invalidated.",
     "properties": {
+      "authorization": {
+        "$ref": "#/components/schemas/nexigon_api.authorization.ActionAuthorization"
+      },
       "userId": {
         "$ref": "#/components/schemas/nexigon_api.users.UserId"
       },
@@ -8440,6 +8821,7 @@
       }
     },
     "required": [
+      "authorization",
       "userId",
       "password"
     ],
@@ -8669,7 +9051,7 @@
   },
   "nexigon_api.vulnerabilities.IndexPackageDocumentsAction": {
     "type": "object",
-    "description": "**Unstable (feature `vulnerability_management`).**\n\nTrigger indexing of every CycloneDX document referenced by the\npackage's metadata via `relations.{vex}` (typically just VEX).\n\nMirrors `IndexVersionDocumentsAction`. Used after attaching a new\npackage-level VEX asset and pointing the package's metadata at it.",
+    "description": "**Unstable (feature `vulnerability_management`).**\n\nTrigger indexing of every CycloneDX or SPDX document referenced by the\npackage's metadata via `relations.{vex}` (typically just VEX).\n\nMirrors `IndexVersionDocumentsAction`. Used after attaching a new\npackage-level VEX asset and pointing the package's metadata at it.",
     "properties": {
       "packageId": {
         "$ref": "#/components/schemas/nexigon_api.repositories.PackageId"
@@ -8699,7 +9081,7 @@
   },
   "nexigon_api.vulnerabilities.IndexVersionDocumentsAction": {
     "type": "object",
-    "description": "**Unstable (feature `vulnerability_management`).**\n\nTrigger indexing of every CycloneDX document referenced by the\nversion's artifact assets via `relations.{sbom,vdr,vex}`.\n\nThe hub fetches the referenced documents from the repository's S3\nstorage and rebuilds the index for this version. The repository\nmust have S3 configured.",
+    "description": "**Unstable (feature `vulnerability_management`).**\n\nTrigger indexing of every CycloneDX or SPDX document referenced by the\nversion's artifact assets via `relations.{sbom,vdr,vex}`.\n\nThe hub fetches the referenced documents from the repository's S3\nstorage and rebuilds the index for this version. The repository\nmust have S3 configured.",
     "properties": {
       "versionId": {
         "$ref": "#/components/schemas/nexigon_api.repositories.PackageVersionId"

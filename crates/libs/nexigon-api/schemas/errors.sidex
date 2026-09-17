@@ -8,10 +8,16 @@ variant ActionErrorKind {
     Invalid,
     /// Forbidden action.
     Forbidden,
+    /// The action requires inline credential re-verification.
+    OperationAuthorizationRequired,
+    /// A scope policy requires authenticator enrollment before access.
+    MfaEnrollmentRequired,
     /// Internal server error.
     Internal,
     /// Rate limit exceeded.
     RateLimited,
+    /// Service or dependency capacity is temporarily unavailable.
+    Unavailable,
 }
 
 /// Action error.
@@ -20,6 +26,8 @@ record ActionError {
     kind: ActionErrorKind,
     /// Message of the error.
     message: string,
+    /// Minimum number of seconds to wait before retrying.
+    retry_after_seconds?: u64,
 }
 
 /// Action result.

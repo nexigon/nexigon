@@ -18,7 +18,9 @@ fn main() {
 
     with_actions!(add_action);
 
-    let components = openapi::Components::new().with_schemas(Some(schemas));
+    let components = openapi::Components::new()
+        .with_schemas(Some(schemas))
+        .with_responses(Some(action_error_components()));
 
     let openapi = openapi::OpenApi::new(
         "3.0.1".to_owned(),
@@ -105,11 +107,87 @@ pub fn add_action(
                                 }),
                         ),
                     );
+                    responses.insert("400".to_owned(), action_error_ref("InvalidAction"));
+                    responses.insert("403".to_owned(), action_error_ref("ForbiddenAction"));
+                    responses.insert("429".to_owned(), action_error_ref("ActionRateLimited"));
+                    responses.insert("500".to_owned(), action_error_ref("InternalAction"));
+                    responses.insert("503".to_owned(), action_error_ref("ActionUnavailable"));
                     responses
                 })))
                 .with_tags(Some(vec![name.rsplit_once("_").unwrap().0.to_owned()])),
         )),
     );
+}
+
+/// Build reusable action error responses for the OpenAPI components section.
+fn action_error_components() -> IndexMap<String, openapi::MaybeRef<openapi::Response>> {
+    [
+        ("InvalidAction", "The action input is invalid.", false),
+        (
+            "ForbiddenAction",
+            "The actor is not allowed to invoke the action.",
+            false,
+        ),
+        (
+            "ActionRateLimited",
+            "The actor or rate-limit capacity is exhausted.",
+            true,
+        ),
+        ("InternalAction", "The action failed internally.", false),
+        (
+            "ActionUnavailable",
+            "Global or dependency capacity is exhausted.",
+            true,
+        ),
+    ]
+    .into_iter()
+    .map(|(name, description, retry_after)| {
+        (
+            name.to_owned(),
+            action_error_response(description, retry_after),
+        )
+    })
+    .collect()
+}
+
+/// Reference a reusable action error response by component name.
+fn action_error_ref(name: &str) -> openapi::MaybeRef<openapi::Response> {
+    openapi::MaybeRef::Reference(openapi::Reference::new(format!(
+        "#/components/responses/{name}"
+    )))
+}
+
+/// Build an action error response with structured JSON and optional retry metadata.
+fn action_error_response(
+    description: &str,
+    retry_after: bool,
+) -> openapi::MaybeRef<openapi::Response> {
+    let mut contents = IndexMap::new();
+    contents.insert(
+        "application/json".to_owned(),
+        openapi::MediaType::new().with_schema(Some(schema_ref(
+            "#/components/schemas/nexigon_api.errors.ActionError",
+        ))),
+    );
+    let response = openapi::Response::new(openapi::Markdown::new(description.to_owned()))
+        .with_content(Some(contents));
+    let response = if retry_after {
+        let schema = openapi::schema::SchemaObject::new().with_allowed_types(Some(
+            openapi::schema::MaybeArray::Single(openapi::schema::Type::Integer),
+        ));
+        let header = openapi::Header::new()
+            .with_description(Some(openapi::Markdown::new(
+                "Seconds to wait before retrying.".to_owned(),
+            )))
+            .with_required(Some(true))
+            .with_schema(Some(schema));
+        let mut headers = IndexMap::new();
+        headers.insert("Retry-After".to_owned(), openapi::MaybeRef::Value(header));
+        response.with_headers(Some(headers))
+    } else {
+        response
+    };
+    openapi::MaybeRef::Value(response)
 }
 
 /// Create a JSON Schema for a reference to another schema.

@@ -1,3 +1,5 @@
+//! Public typed action contracts shared by Nexigon Hub clients and servers.
+
 use std::any::Any;
 
 use serde::Serialize;
@@ -40,7 +42,7 @@ macro_rules! with_actions {
             ("users_SetIsAdmin", SetUserIsAdmin, users::SetUserIsAdminAction, outputs::Empty),
             ("users_SetPassword", SetUserPassword, users::SetUserPasswordAction, outputs::Empty),
             ("users_SetEmail", SetUserEmail, users::SetUserEmailAction, users::SetUserEmailOutput),
-            ("users_ChangePassword", ChangeUserPassword, users::ChangeUserPasswordAction, users::ChangeUserPasswordOutput),
+            ("users_ChangePassword", ChangeUserPassword, users::ChangeUserPasswordAction, outputs::Empty),
             ("users_ResetPassword", ResetUserPassword, users::ResetUserPasswordAction, outputs::Empty),
             ("users_CompletePasswordReset", CompleteUserPasswordReset, users::CompleteUserPasswordResetAction, users::CompleteUserPasswordResetOutput),
             ("users_InitiateEmailChange", InitiateUserEmailChange, users::InitiateUserEmailChangeAction, users::InitiateUserEmailChangeOutput),
@@ -79,6 +81,13 @@ macro_rules! with_actions {
             ("organizations_DeleteInvitation", DeleteOrganizationInvitation, organizations::DeleteOrganizationInvitationAction, outputs::Empty),
             // ## Organization Audit Log
             ("organizations_QueryAuditLog", QueryOrganizationAuditLog, organizations::QueryOrganizationAuditLogAction, organizations::QueryOrganizationAuditLogOutput),
+
+            // # Device Groups
+            ("groups_Query", QueryDeviceGroups, devices::QueryDeviceGroupsAction, devices::QueryDeviceGroupsOutput),
+            ("groups_Create", CreateDeviceGroup, devices::CreateDeviceGroupAction, devices::DeviceGroup),
+            ("groups_Update", UpdateDeviceGroup, devices::UpdateDeviceGroupAction, outputs::Empty),
+            ("groups_Delete", DeleteDeviceGroup, devices::DeleteDeviceGroupAction, outputs::Empty),
+            ("devices_UpdateGroups", UpdateDeviceGroups, devices::UpdateDeviceGroupsAction, outputs::Empty),
 
             // # Projects
             ("projects_Query", QueryProjects, projects::QueryProjectsAction, projects::QueryProjectsOutput),
@@ -293,5 +302,61 @@ impl Jwt {
 
     pub fn as_str(&self) -> &str {
         &self.0
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use sidex_validate::Validate;
+
+    use crate::types::repositories::AddTagItem;
+    use crate::types::repositories::RemoveTagItem;
+    use crate::types::repositories::ResolvePackageVersionAssetByPathAction;
+    use crate::types::repositories::ResolvePackageVersionByPathAction;
+
+    /// Verifies that repository version operations accept build metadata in tags.
+    #[test]
+    fn repository_version_tags_accept_plus_signs() {
+        let tag = "build-2026.3.0-rolling+g7c2de6a".to_owned();
+
+        assert!(
+            AddTagItem::new(tag.clone())
+                .validate()
+                .into_errors()
+                .is_empty()
+        );
+        assert!(
+            RemoveTagItem::new(tag.clone())
+                .validate()
+                .into_errors()
+                .is_empty()
+        );
+        assert!(
+            ResolvePackageVersionByPathAction::new(
+                "repository".to_owned(),
+                "package".to_owned(),
+                tag.clone(),
+            )
+            .validate()
+            .into_errors()
+            .is_empty()
+        );
+        assert!(
+            ResolvePackageVersionAssetByPathAction::new(
+                "repository".to_owned(),
+                "package".to_owned(),
+                tag,
+                "release.json".to_owned(),
+            )
+            .validate()
+            .into_errors()
+            .is_empty()
+        );
+        assert!(
+            !AddTagItem::new("build/invalid".to_owned())
+                .validate()
+                .into_errors()
+                .is_empty()
+        );
     }
 }

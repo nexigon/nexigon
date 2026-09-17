@@ -22,6 +22,7 @@ jobs:
       - name: Install Rust Toolchain
         uses: dtolnay/rust-toolchain@nightly
         with:
+          toolchain: nightly-2026-07-11
           components: rustfmt, clippy
       - name: Install Taplo
         uses: dtolnay/install@taplo-cli

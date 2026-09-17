@@ -1,0 +1,20 @@
+//! Forward pagination through live query results.
+
+/// Opaque, authenticated continuation token. Clients must not interpret its contents.
+alias PageCursor: string
+
+/// Request a bounded page. Omit the cursor to start a new traversal.
+record PageRequest {
+    /// Maximum number of items. The default depends on the endpoint and the ceiling
+    /// is configured by the Hub operator (1000 by default).
+    #[validate({ 1 <= _ }, message = "Page limit must be positive.")]
+    limit?: u32,
+    /// Continue the same endpoint, scope, filters, and ordering.
+    cursor?: PageCursor,
+}
+
+/// Continuation information for a requested page.
+record PageInfo {
+    /// Cursor for the next page; absent when no more matching rows were visible.
+    next_cursor?: PageCursor,
+}

@@ -1,5 +1,5 @@
 [tools]
-rust = { version = "nightly", profile = "default", components = "rustfmt,clippy" }
+rust = { version = "nightly-2026-07-11", profile = "default", components = "rustfmt,clippy" }
 taplo = "latest"
 python = "latest"
 uv = "latest"

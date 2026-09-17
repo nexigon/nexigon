@@ -1,4 +1,4 @@
-//! Actions and types for vulnerability data (CycloneDX SBOM, VDR, VEX).
+//! Actions and types for SBOM, VDR, and VEX vulnerability data.
 //!
 //! Vulnerability documents are stored as ordinary repository assets and
 //! linked from artifact assets through their per-asset metadata using
@@ -10,8 +10,9 @@
 //!
 //! Each entry references *another asset attached to the same package
 //! version*, by filename. The hub resolves the filename within the
-//! version, fetches the bytes from S3, parses the CycloneDX document,
-//! and indexes the result with the artifact asset as the BOM subject.
+//! version, fetches the bytes from S3, parses CycloneDX 1.4–1.7 JSON,
+//! SPDX 2.2/2.3 JSON, or SPDX 3 JSON-LD, and indexes the result with
+//! the artifact asset as the BOM subject.
 //!
 //! Indexing is gated by the `vulnerability_management` subscription
 //! feature flag. Without it, documents still upload as regular assets
@@ -41,7 +42,7 @@ variant VexStatementOrigin {
     Scanner,
 }
 
-/// Trigger indexing of every CycloneDX document referenced by the
+/// Trigger indexing of every CycloneDX or SPDX document referenced by the
 /// version's artifact assets via `relations.{sbom,vdr,vex}`.
 ///
 /// The hub fetches the referenced documents from the repository's S3
@@ -67,7 +68,7 @@ record IndexVersionDocumentsOutput {
     document_count: u32,
 }
 
-/// Trigger indexing of every CycloneDX document referenced by the
+/// Trigger indexing of every CycloneDX or SPDX document referenced by the
 /// package's metadata via `relations.{vex}` (typically just VEX).
 ///
 /// Mirrors `IndexVersionDocumentsAction`. Used after attaching a new

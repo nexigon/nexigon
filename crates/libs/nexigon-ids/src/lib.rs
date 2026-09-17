@@ -450,6 +450,8 @@ define_types! {
     /// Device pairing key id (globally unique).
     DevicePairingKeyId => (FlatRawId, "d_pairing", 22, secret = false),
 
+    /// Stable identity of a project-owned device group.
+    DeviceGroupId => (FlatRawId, "d_group", 22, secret = false),
     /// Device id (globally unique).
     ///
     /// Uniquely identifies a device within the system.

@@ -4,9 +4,14 @@ import audit::AuditLogEvent
 import datetime::Timestamp
 import devices::DeviceFingerprint
 import devices::DeviceId
+import devices::DeviceGroup
+import devices::DeviceSelectionError
 import devices::DeviceStatus
+import fleet::FleetOperationTargetSelector
 import organizations::OrganizationId
 import outputs::Empty
+import pagination::PageInfo
+import pagination::PageRequest
 import repositories::RepositoryId
 
 /// Unique ID of a project.
@@ -112,18 +117,24 @@ record DeleteProjectAction {
 /// Query the devices of a project.
 #[request(name = "projects_QueryDevices", response = QueryProjectDevicesOutput)]
 record QueryProjectDevicesAction {
+    /// Shared filter, also accepted by fleet operations.
+    selector?: FleetOperationTargetSelector,
     /// ID of the project.
     project_id: ProjectId,
 }
 
 /// Output of querying the devices of a project.
 record QueryProjectDevicesOutput {
+    /// Devices whose property predicates failed evaluation.
+    selection_errors: [DeviceSelectionError],
     /// List of devices.
     devices: [QueryProjectDevicesItem],
 }
 
 /// Device item.
 record QueryProjectDevicesItem {
+    /// Groups currently assigned to this device.
+    groups: [DeviceGroup],
     /// ID of the device.
     device_id: DeviceId,
     /// Name of the device.
@@ -379,12 +390,18 @@ record RedeemDevicePairingKeyOutput {
     response = QueryAuditLogEventsOutput
 )]
 record QueryAuditLogEventsAction {
+    /// Opt into cursor pagination. Without this field, the existing limit applies.
+    page?: PageRequest,
+
     /// ID of the project.
     project_id: ProjectId,
 }
 
 /// Output of querying the audit log of the project.
 record QueryAuditLogEventsOutput {
+    /// Present when cursor pagination was requested.
+    page?: PageInfo,
+
     /// List of audit log events.
     events: [AuditLogEvent],
 }

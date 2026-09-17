@@ -1,5 +1,6 @@
 //! Actions and types related to repositories.
 
+import pagination::{PageRequest, PageInfo}
 import audit::AuditLogEvent
 import datetime::Timestamp
 import digest::Digest
@@ -642,8 +643,8 @@ record AddTagItem {
         message = "Tag must be between 1 and 128 characters."
     )]
     #[validate(
-        { matches(_, "^[a-zA-Z0-9][a-zA-Z0-9._-]*$") },
-        message = "Tag must start with a letter or digit and contain only letters, digits, dots, underscores, or hyphens.",
+        { matches(_, "^[a-zA-Z0-9][a-zA-Z0-9._+-]*$") },
+        message = "Tag must start with a letter or digit and contain only letters, digits, dots, plus signs, underscores, or hyphens.",
         code = "format:tag"
     )]
     tag: string,
@@ -665,8 +666,8 @@ record RemoveTagItem {
         message = "Tag must be between 1 and 128 characters."
     )]
     #[validate(
-        { matches(_, "^[a-zA-Z0-9][a-zA-Z0-9._-]*$") },
-        message = "Tag must start with a letter or digit and contain only letters, digits, dots, underscores, or hyphens.",
+        { matches(_, "^[a-zA-Z0-9][a-zA-Z0-9._+-]*$") },
+        message = "Tag must start with a letter or digit and contain only letters, digits, dots, plus signs, underscores, or hyphens.",
         code = "format:tag"
     )]
     tag: string,
@@ -724,8 +725,8 @@ record ResolvePackageVersionByPathAction {
         message = "Tag must be between 1 and 128 characters."
     )]
     #[validate(
-        { matches(_, "^[a-zA-Z0-9][a-zA-Z0-9._-]*$") },
-        message = "Tag must start with a letter or digit and contain only letters, digits, dots, underscores, or hyphens.",
+        { matches(_, "^[a-zA-Z0-9][a-zA-Z0-9._+-]*$") },
+        message = "Tag must start with a letter or digit and contain only letters, digits, dots, plus signs, underscores, or hyphens.",
         code = "format:tag"
     )]
     tag: string,
@@ -949,8 +950,8 @@ record ResolvePackageVersionAssetByPathAction {
         message = "Tag must be between 1 and 128 characters."
     )]
     #[validate(
-        { matches(_, "^[a-zA-Z0-9][a-zA-Z0-9._-]*$") },
-        message = "Tag must start with a letter or digit and contain only letters, digits, dots, underscores, or hyphens.",
+        { matches(_, "^[a-zA-Z0-9][a-zA-Z0-9._+-]*$") },
+        message = "Tag must start with a letter or digit and contain only letters, digits, dots, plus signs, underscores, or hyphens.",
         code = "format:tag"
     )]
     tag: string,
@@ -1125,12 +1126,18 @@ record FinalizeAssetUploadAction {
     response = QueryAuditLogEventsOutput
 )]
 record QueryAuditLogEventsAction {
+    /// Opt into cursor pagination. Without this field, the existing limit applies.
+    page?: PageRequest,
+
     /// ID of the repository.
     repository_id: RepositoryId,
 }
 
 /// Output of querying the audit log of the repository.
 record QueryAuditLogEventsOutput {
+    /// Present when cursor pagination was requested.
+    page?: PageInfo,
+
     /// List of audit log events.
     events: [AuditLogEvent],
 }

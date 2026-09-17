@@ -2,10 +2,12 @@
 
 import datetime::Timestamp
 import devices::DeviceId
+import devices::DeviceGroupSelector
 import devices::DeviceOperationId
 import devices::DeviceOperationStatus
 import devices::DeviceOperationStep
 import devices::DeviceOperationStepState
+import devices::DeviceStatus
 import json::JsonExpr
 import json::JsonValue
 import outputs::Empty
@@ -202,16 +204,20 @@ record ComputedFleetPropertyDefinition {
 #[json(type = "string")]
 opaque FleetOperationId
 
-/// Selector used to identify devices a fleet operation applies to.
+/// Device selection within a single project. All supplied conditions must hold.
+#[rust(derive(Default))]
 record FleetOperationTargetSelector {
-    /// Optional explicit device allow-list.
+    /// Optional explicit allow-list. An empty list matches no devices.
     device_ids?: [DeviceId],
-    /// Expressions that all have to evaluate to JSON `true`.
-    ///
-    /// `NamedValue` reads address device properties by exact name. Expressions
-    /// are evaluated in order and stop at the first false result. An evaluation
-    /// error is recorded for that device instead of silently excluding it.
+    /// Property expressions, evaluated in order until the first false or error.
+    /// NamedValue reads a device property by its exact name. Errors are reported
+    /// separately from non-matches. Metadata conditions are evaluated first.
     predicates: [JsonExpr],
+    groups?: DeviceGroupSelector,
+    /// Case-insensitive substring of device name, hostname, or ID.
+    search?: string,
+    /// Current combined health and connection status.
+    status?: DeviceStatus,
 }
 
 /// One stage in a fleet operation.

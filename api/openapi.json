@@ -33,6 +33,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -64,6 +79,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -95,6 +125,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -126,6 +171,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -157,6 +217,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -188,6 +263,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -219,6 +309,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -250,6 +355,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -260,7 +380,7 @@
           "users"
         ],
         "summary": "ChangePassword",
-        "description": "Change the password of the current user.\n\nRequires the user to provide their current password to re-verify their\nidentity, even if they are already authenticated.",
+        "description": "Change the password of the current user.\n\nRequires account credentials in `authorization`, even if the user is\nalready authenticated.",
         "operationId": "users_ChangePassword",
         "requestBody": {
           "content": {
@@ -277,10 +397,25 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/nexigon_api.users.ChangeUserPasswordOutput"
+                  "$ref": "#/components/schemas/nexigon_api.outputs.Empty"
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -312,6 +447,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -343,6 +493,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -353,7 +518,7 @@
           "users"
         ],
         "summary": "InitiateEmailChange",
-        "description": "Initiate an email-address change for the current user.\n\nRequires the user to provide their current password to re-verify their\nidentity. On success, a verification link is sent to the new address and\na notification is sent to the current address.",
+        "description": "Initiate an email-address change for the current user.\n\nRequires account credentials in `authorization`. On success, a verification\nlink is sent to the new address and a notification is sent to the current address.",
         "operationId": "users_InitiateEmailChange",
         "requestBody": {
           "content": {
@@ -374,6 +539,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -405,6 +585,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -436,6 +631,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -467,6 +677,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -498,6 +723,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -529,6 +769,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -560,6 +815,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -591,6 +861,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -622,6 +907,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -653,6 +953,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -684,6 +999,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -715,6 +1045,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -746,6 +1091,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -777,6 +1137,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -808,6 +1183,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -839,6 +1229,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -870,6 +1275,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -901,6 +1321,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -932,6 +1367,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -963,6 +1413,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -994,6 +1459,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -1025,6 +1505,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -1056,6 +1551,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -1087,6 +1597,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -1118,6 +1643,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -1149,6 +1689,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -1180,6 +1735,251 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
+          }
+        }
+      }
+    },
+    "/api/v1/actions/invoke/groups_Query": {
+      "post": {
+        "tags": [
+          "groups"
+        ],
+        "summary": "Query",
+        "description": "List a project's group catalog, including groups without assignments.",
+        "operationId": "groups_Query",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/nexigon_api.devices.QueryDeviceGroupsAction"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/nexigon_api.devices.QueryDeviceGroupsOutput"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
+          }
+        }
+      }
+    },
+    "/api/v1/actions/invoke/groups_Create": {
+      "post": {
+        "tags": [
+          "groups"
+        ],
+        "summary": "Create",
+        "description": "Create a group. Case-insensitive name collisions are rejected.",
+        "operationId": "groups_Create",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/nexigon_api.devices.CreateDeviceGroupAction"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/nexigon_api.devices.DeviceGroup"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
+          }
+        }
+      }
+    },
+    "/api/v1/actions/invoke/groups_Update": {
+      "post": {
+        "tags": [
+          "groups"
+        ],
+        "summary": "Update",
+        "description": "Replace group metadata while retaining its identity and assignments.",
+        "operationId": "groups_Update",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/nexigon_api.devices.UpdateDeviceGroupAction"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/nexigon_api.outputs.Empty"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
+          }
+        }
+      }
+    },
+    "/api/v1/actions/invoke/groups_Delete": {
+      "post": {
+        "tags": [
+          "groups"
+        ],
+        "summary": "Delete",
+        "description": "Delete a group and its assignments.\n\nExisting operation selectors retain the group identity and continue evaluating\nmembership. A deleted group is absent from every device.",
+        "operationId": "groups_Delete",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/nexigon_api.devices.DeleteDeviceGroupAction"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/nexigon_api.outputs.Empty"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
+          }
+        }
+      }
+    },
+    "/api/v1/actions/invoke/devices_UpdateGroups": {
+      "post": {
+        "tags": [
+          "devices"
+        ],
+        "summary": "UpdateGroups",
+        "description": "Atomically add and remove memberships on explicit devices in one project.\n\nAdding an existing membership or removing an absent one is a no-op. A group\ncannot appear in both lists. Unrelated memberships are preserved. All devices\nand groups must belong to the project; otherwise no memberships change.\nDevice credentials cannot change groups. Removing a membership does not cancel\nwork that an operation has already assigned to the device.",
+        "operationId": "devices_UpdateGroups",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/nexigon_api.devices.UpdateDeviceGroupsAction"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/nexigon_api.outputs.Empty"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -1211,6 +2011,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -1242,6 +2057,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -1273,6 +2103,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -1304,6 +2149,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -1335,6 +2195,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -1366,6 +2241,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -1397,6 +2287,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -1428,6 +2333,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -1459,6 +2379,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -1490,6 +2425,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -1521,6 +2471,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -1552,6 +2517,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -1583,6 +2563,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -1614,6 +2609,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -1645,6 +2655,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -1676,6 +2701,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -1707,6 +2747,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -1738,6 +2793,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -1769,6 +2839,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -1800,6 +2885,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -1831,6 +2931,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -1862,6 +2977,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -1893,6 +3023,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -1924,6 +3069,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -1955,6 +3115,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -1986,6 +3161,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -2017,6 +3207,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -2048,6 +3253,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -2079,6 +3299,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -2110,6 +3345,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -2141,6 +3391,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -2172,6 +3437,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -2203,6 +3483,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -2234,6 +3529,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -2265,6 +3575,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -2296,6 +3621,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -2327,6 +3667,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -2358,6 +3713,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -2389,6 +3759,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -2420,6 +3805,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -2451,6 +3851,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -2482,6 +3897,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -2513,6 +3943,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -2544,6 +3989,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -2575,6 +4035,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -2606,6 +4081,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -2637,6 +4127,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -2668,6 +4173,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -2699,6 +4219,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -2730,6 +4265,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -2761,6 +4311,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -2792,6 +4357,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -2823,6 +4403,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -2854,6 +4449,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -2885,6 +4495,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -2916,6 +4541,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -2947,6 +4587,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -2978,6 +4633,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -3009,6 +4679,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -3040,6 +4725,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -3071,6 +4771,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -3102,6 +4817,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -3133,6 +4863,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -3164,6 +4909,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -3195,6 +4955,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -3226,6 +5001,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -3257,6 +5047,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -3288,6 +5093,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -3319,6 +5139,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -3350,6 +5185,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -3381,6 +5231,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -3412,6 +5277,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -3443,6 +5323,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -3474,6 +5369,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -3505,6 +5415,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -3536,6 +5461,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -3567,6 +5507,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -3598,6 +5553,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -3629,6 +5599,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -3660,6 +5645,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -3691,6 +5691,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -3722,6 +5737,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -3753,6 +5783,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -3784,6 +5829,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -3815,6 +5875,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -3846,6 +5921,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -3877,6 +5967,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -3908,6 +6013,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -3939,6 +6059,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -3970,6 +6105,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -4001,6 +6151,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -4032,6 +6197,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -4063,6 +6243,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -4094,6 +6289,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -4125,6 +6335,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -4156,6 +6381,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -4187,6 +6427,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -4218,6 +6473,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -4249,6 +6519,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -4280,6 +6565,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -4311,6 +6611,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -4342,6 +6657,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -4373,6 +6703,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -4404,6 +6749,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -4435,6 +6795,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -4466,6 +6841,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -4497,6 +6887,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -4507,7 +6912,7 @@
           "vulnerabilities"
         ],
         "summary": "IndexVersion",
-        "description": "**Unstable (feature `vulnerability_management`).**\n\nTrigger indexing of every CycloneDX document referenced by the\nversion's artifact assets via `relations.{sbom,vdr,vex}`.\n\nThe hub fetches the referenced documents from the repository's S3\nstorage and rebuilds the index for this version. The repository\nmust have S3 configured.",
+        "description": "**Unstable (feature `vulnerability_management`).**\n\nTrigger indexing of every CycloneDX or SPDX document referenced by the\nversion's artifact assets via `relations.{sbom,vdr,vex}`.\n\nThe hub fetches the referenced documents from the repository's S3\nstorage and rebuilds the index for this version. The repository\nmust have S3 configured.",
         "operationId": "vulnerabilities_IndexVersion",
         "requestBody": {
           "content": {
@@ -4528,6 +6933,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -4538,7 +6958,7 @@
           "vulnerabilities"
         ],
         "summary": "IndexPackage",
-        "description": "**Unstable (feature `vulnerability_management`).**\n\nTrigger indexing of every CycloneDX document referenced by the\npackage's metadata via `relations.{vex}` (typically just VEX).\n\nMirrors `IndexVersionDocumentsAction`. Used after attaching a new\npackage-level VEX asset and pointing the package's metadata at it.",
+        "description": "**Unstable (feature `vulnerability_management`).**\n\nTrigger indexing of every CycloneDX or SPDX document referenced by the\npackage's metadata via `relations.{vex}` (typically just VEX).\n\nMirrors `IndexVersionDocumentsAction`. Used after attaching a new\npackage-level VEX asset and pointing the package's metadata at it.",
         "operationId": "vulnerabilities_IndexPackage",
         "requestBody": {
           "content": {
@@ -4559,6 +6979,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -4590,6 +7025,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -4621,6 +7071,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -4652,6 +7117,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -4683,6 +7163,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -4714,6 +7209,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -4745,6 +7255,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -4776,6 +7301,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -4807,6 +7347,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -4838,6 +7393,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -4869,6 +7439,21 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
           }
         }
       }
@@ -5217,7 +7802,11 @@
       },
       "nexigon_api.audit.QueryAuditLogActionsAction": {
         "type": "object",
-        "properties": {},
+        "properties": {
+          "page": {
+            "$ref": "#/components/schemas/nexigon_api.pagination.PageRequest"
+          }
+        },
         "required": [],
         "unevaluatedProperties": false
       },
@@ -5225,6 +7814,9 @@
         "type": "object",
         "description": "Output of querying the actions recorded in the audit log.",
         "properties": {
+          "page": {
+            "$ref": "#/components/schemas/nexigon_api.pagination.PageInfo"
+          },
           "actions": {
             "type": "array",
             "items": {
@@ -5239,7 +7831,11 @@
       },
       "nexigon_api.audit.QueryAuditLogEventsAction": {
         "type": "object",
-        "properties": {},
+        "properties": {
+          "page": {
+            "$ref": "#/components/schemas/nexigon_api.pagination.PageRequest"
+          }
+        },
         "required": [],
         "unevaluatedProperties": false
       },
@@ -5247,6 +7843,9 @@
         "type": "object",
         "description": "Output of querying the events recorded in the audit log.",
         "properties": {
+          "page": {
+            "$ref": "#/components/schemas/nexigon_api.pagination.PageInfo"
+          },
           "events": {
             "type": "array",
             "items": {
@@ -5256,6 +7855,56 @@
         },
         "required": [
           "events"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.authorization.ActionAuthorization": {
+        "description": "Authorization material available to an action.\n\n`Context` is not an authorization decision. It asks the action to evaluate\nwhether its already-authenticated actor, permissions, and other contextual\nevidence are sufficient. Each action defines which variants it accepts.",
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "const": "Context"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "const": "Credentials"
+              },
+              "password": {
+                "type": "string"
+              },
+              "code": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "kind",
+              "password"
+            ]
+          }
+        ]
+      },
+      "nexigon_api.authorization.ActionCredentials": {
+        "type": "object",
+        "description": "Credentials that re-verify the user session for one action execution.",
+        "properties": {
+          "password": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "password"
         ],
         "unevaluatedProperties": false
       },
@@ -5399,6 +8048,28 @@
         ],
         "unevaluatedProperties": false
       },
+      "nexigon_api.devices.CreateDeviceGroupAction": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+          },
+          "name": {
+            "type": "string"
+          },
+          "color": {
+            "$ref": "#/components/schemas/nexigon_api.devices.DeviceGroupColor"
+          },
+          "description": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "projectId",
+          "name"
+        ],
+        "unevaluatedProperties": false
+      },
       "nexigon_api.devices.CreateDeviceOperationAction": {
         "type": "object",
         "properties": {
@@ -5472,6 +8143,22 @@
         },
         "required": [
           "certificateId"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.devices.DeleteDeviceGroupAction": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+          },
+          "groupId": {
+            "$ref": "#/components/schemas/nexigon_api.devices.DeviceGroupId"
+          }
+        },
+        "required": [
+          "projectId",
+          "groupId"
         ],
         "unevaluatedProperties": false
       },
@@ -5801,6 +8488,67 @@
       "nexigon_api.devices.DeviceFingerprintId": {
         "type": "string",
         "description": "Device fingerprint ID."
+      },
+      "nexigon_api.devices.DeviceGroup": {
+        "type": "object",
+        "description": "A project-owned group that may be assigned to any number of its devices.",
+        "properties": {
+          "groupId": {
+            "$ref": "#/components/schemas/nexigon_api.devices.DeviceGroupId"
+          },
+          "projectId": {
+            "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+          },
+          "name": {
+            "type": "string"
+          },
+          "color": {
+            "$ref": "#/components/schemas/nexigon_api.devices.DeviceGroupColor"
+          },
+          "description": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "groupId",
+          "projectId",
+          "name"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.devices.DeviceGroupColor": {
+        "type": "string",
+        "description": "Opaque RGB background color in hexadecimal notation, such as `#3b82f6`.\nGroup text uses black or white, whichever has higher contrast."
+      },
+      "nexigon_api.devices.DeviceGroupId": {
+        "type": "string",
+        "description": "Stable identity of a group. Renaming does not change its identity."
+      },
+      "nexigon_api.devices.DeviceGroupSelector": {
+        "type": "object",
+        "description": "Group membership conditions, combined with AND.",
+        "properties": {
+          "all": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/nexigon_api.devices.DeviceGroupId"
+            }
+          },
+          "any": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/nexigon_api.devices.DeviceGroupId"
+            }
+          },
+          "none": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/nexigon_api.devices.DeviceGroupId"
+            }
+          }
+        },
+        "required": [],
+        "unevaluatedProperties": false
       },
       "nexigon_api.devices.DeviceId": {
         "type": "string",
@@ -6395,6 +9143,23 @@
         ],
         "unevaluatedProperties": false
       },
+      "nexigon_api.devices.DeviceSelectionError": {
+        "type": "object",
+        "description": "A device whose property predicates could not be evaluated.",
+        "properties": {
+          "deviceId": {
+            "$ref": "#/components/schemas/nexigon_api.devices.DeviceId"
+          },
+          "error": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "deviceId",
+          "error"
+        ],
+        "unevaluatedProperties": false
+      },
       "nexigon_api.devices.DeviceStatus": {
         "enum": [
           "healthy",
@@ -6420,6 +9185,12 @@
         "type": "object",
         "description": "Output of getting information about a device.",
         "properties": {
+          "groups": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/nexigon_api.devices.DeviceGroup"
+            }
+          },
           "deviceId": {
             "$ref": "#/components/schemas/nexigon_api.devices.DeviceId"
           },
@@ -6449,6 +9220,7 @@
           }
         },
         "required": [
+          "groups",
           "deviceId",
           "projectId",
           "fingerprintId",
@@ -6673,6 +9445,9 @@
       "nexigon_api.devices.QueryDeviceAuditLogAction": {
         "type": "object",
         "properties": {
+          "page": {
+            "$ref": "#/components/schemas/nexigon_api.pagination.PageRequest"
+          },
           "deviceId": {
             "$ref": "#/components/schemas/nexigon_api.devices.DeviceId"
           }
@@ -6686,6 +9461,9 @@
         "type": "object",
         "description": "Output of querying the audit log of a device.",
         "properties": {
+          "page": {
+            "$ref": "#/components/schemas/nexigon_api.pagination.PageInfo"
+          },
           "events": {
             "type": "array",
             "items": {
@@ -6761,6 +9539,9 @@
       "nexigon_api.devices.QueryDeviceEventsAction": {
         "type": "object",
         "properties": {
+          "page": {
+            "$ref": "#/components/schemas/nexigon_api.pagination.PageRequest"
+          },
           "deviceId": {
             "$ref": "#/components/schemas/nexigon_api.devices.DeviceId"
           },
@@ -6778,6 +9559,9 @@
         "type": "object",
         "description": "Output of querying device events.",
         "properties": {
+          "page": {
+            "$ref": "#/components/schemas/nexigon_api.pagination.PageInfo"
+          },
           "events": {
             "type": "array",
             "items": {
@@ -6787,6 +9571,33 @@
         },
         "required": [
           "events"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.devices.QueryDeviceGroupsAction": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+          }
+        },
+        "required": [
+          "projectId"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.devices.QueryDeviceGroupsOutput": {
+        "type": "object",
+        "properties": {
+          "groups": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/nexigon_api.devices.DeviceGroup"
+            }
+          }
+        },
+        "required": [
+          "groups"
         ],
         "unevaluatedProperties": false
       },
@@ -7128,6 +9939,65 @@
         ],
         "unevaluatedProperties": false
       },
+      "nexigon_api.devices.UpdateDeviceGroupAction": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+          },
+          "groupId": {
+            "$ref": "#/components/schemas/nexigon_api.devices.DeviceGroupId"
+          },
+          "name": {
+            "type": "string"
+          },
+          "color": {
+            "$ref": "#/components/schemas/nexigon_api.devices.DeviceGroupColor"
+          },
+          "description": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "projectId",
+          "groupId",
+          "name"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.devices.UpdateDeviceGroupsAction": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+          },
+          "deviceIds": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/nexigon_api.devices.DeviceId"
+            }
+          },
+          "add": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/nexigon_api.devices.DeviceGroupId"
+            }
+          },
+          "remove": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/nexigon_api.devices.DeviceGroupId"
+            }
+          }
+        },
+        "required": [
+          "projectId",
+          "deviceIds",
+          "add",
+          "remove"
+        ],
+        "unevaluatedProperties": false
+      },
       "nexigon_api.devices.ValidateDeviceHttpProxyTokenAction": {
         "type": "object",
         "properties": {
@@ -7289,6 +10159,10 @@
           },
           "message": {
             "type": "string"
+          },
+          "retryAfterSeconds": {
+            "type": "integer",
+            "format": "uint64"
           }
         },
         "required": [
@@ -7301,8 +10175,11 @@
         "enum": [
           "Invalid",
           "Forbidden",
+          "OperationAuthorizationRequired",
+          "MfaEnrollmentRequired",
           "Internal",
-          "RateLimited"
+          "RateLimited",
+          "Unavailable"
         ],
         "description": "Kind of an action error."
       },
@@ -7329,6 +10206,10 @@
               },
               "message": {
                 "type": "string"
+              },
+              "retryAfterSeconds": {
+                "type": "integer",
+                "format": "uint64"
               }
             },
             "required": [
@@ -7958,7 +10839,7 @@
       },
       "nexigon_api.fleet.FleetOperationTargetSelector": {
         "type": "object",
-        "description": "Selector used to identify devices a fleet operation applies to.",
+        "description": "Device selection within a single project. All supplied conditions must hold.",
         "properties": {
           "deviceIds": {
             "type": "array",
@@ -7971,6 +10852,15 @@
             "items": {
               "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
             }
+          },
+          "groups": {
+            "$ref": "#/components/schemas/nexigon_api.devices.DeviceGroupSelector"
+          },
+          "search": {
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/nexigon_api.devices.DeviceStatus"
           }
         },
         "required": [
@@ -9177,6 +12067,9 @@
       "nexigon_api.organizations.QueryOrganizationAuditLogAction": {
         "type": "object",
         "properties": {
+          "page": {
+            "$ref": "#/components/schemas/nexigon_api.pagination.PageRequest"
+          },
           "organizationId": {
             "$ref": "#/components/schemas/nexigon_api.organizations.OrganizationId"
           }
@@ -9190,6 +12083,9 @@
         "type": "object",
         "description": "Output of querying the audit log of an organization.",
         "properties": {
+          "page": {
+            "$ref": "#/components/schemas/nexigon_api.pagination.PageInfo"
+          },
           "events": {
             "type": "array",
             "items": {
@@ -9481,6 +12377,35 @@
         "required": [],
         "unevaluatedProperties": false
       },
+      "nexigon_api.pagination.PageCursor": {
+        "description": "A sequence of Unicode code points."
+      },
+      "nexigon_api.pagination.PageInfo": {
+        "type": "object",
+        "description": "Continuation information for a requested page.",
+        "properties": {
+          "nextCursor": {
+            "$ref": "#/components/schemas/nexigon_api.pagination.PageCursor"
+          }
+        },
+        "required": [],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.pagination.PageRequest": {
+        "type": "object",
+        "description": "Request a bounded page. Omit the cursor to start a new traversal.",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "format": "uint32"
+          },
+          "cursor": {
+            "$ref": "#/components/schemas/nexigon_api.pagination.PageCursor"
+          }
+        },
+        "required": [],
+        "unevaluatedProperties": false
+      },
       "nexigon_api.projects.AddProjectRepositoryAction": {
         "type": "object",
         "properties": {
@@ -9766,6 +12691,9 @@
       "nexigon_api.projects.QueryAuditLogEventsAction": {
         "type": "object",
         "properties": {
+          "page": {
+            "$ref": "#/components/schemas/nexigon_api.pagination.PageRequest"
+          },
           "projectId": {
             "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
           }
@@ -9779,6 +12707,9 @@
         "type": "object",
         "description": "Output of querying the audit log of the project.",
         "properties": {
+          "page": {
+            "$ref": "#/components/schemas/nexigon_api.pagination.PageInfo"
+          },
           "events": {
             "type": "array",
             "items": {
@@ -9917,6 +12848,9 @@
       "nexigon_api.projects.QueryProjectDevicesAction": {
         "type": "object",
         "properties": {
+          "selector": {
+            "$ref": "#/components/schemas/nexigon_api.fleet.FleetOperationTargetSelector"
+          },
           "projectId": {
             "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
           }
@@ -9930,6 +12864,12 @@
         "type": "object",
         "description": "Device item.",
         "properties": {
+          "groups": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/nexigon_api.devices.DeviceGroup"
+            }
+          },
           "deviceId": {
             "$ref": "#/components/schemas/nexigon_api.devices.DeviceId"
           },
@@ -9961,6 +12901,7 @@
           }
         },
         "required": [
+          "groups",
           "deviceId",
           "firstSeen",
           "status",
@@ -9973,6 +12914,12 @@
         "type": "object",
         "description": "Output of querying the devices of a project.",
         "properties": {
+          "selectionErrors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/nexigon_api.devices.DeviceSelectionError"
+            }
+          },
           "devices": {
             "type": "array",
             "items": {
@@ -9981,6 +12928,7 @@
           }
         },
         "required": [
+          "selectionErrors",
           "devices"
         ],
         "unevaluatedProperties": false
@@ -11514,6 +14462,9 @@
       "nexigon_api.repositories.QueryAuditLogEventsAction": {
         "type": "object",
         "properties": {
+          "page": {
+            "$ref": "#/components/schemas/nexigon_api.pagination.PageRequest"
+          },
           "repositoryId": {
             "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryId"
           }
@@ -11527,6 +14478,9 @@
         "type": "object",
         "description": "Output of querying the audit log of the repository.",
         "properties": {
+          "page": {
+            "$ref": "#/components/schemas/nexigon_api.pagination.PageInfo"
+          },
           "events": {
             "type": "array",
             "items": {
@@ -12420,33 +15374,22 @@
       "nexigon_api.users.ChangeUserPasswordAction": {
         "type": "object",
         "properties": {
+          "authorization": {
+            "$ref": "#/components/schemas/nexigon_api.authorization.ActionAuthorization"
+          },
           "userId": {
             "$ref": "#/components/schemas/nexigon_api.users.UserId"
-          },
-          "currentPassword": {
-            "type": "string"
           },
           "newPassword": {
             "type": "string"
           }
         },
         "required": [
+          "authorization",
           "userId",
-          "currentPassword",
           "newPassword"
         ],
         "unevaluatedProperties": false
-      },
-      "nexigon_api.users.ChangeUserPasswordOutput": {
-        "enum": [
-          {
-            "result": "Completed"
-          },
-          {
-            "result": "InvalidCurrentPassword"
-          }
-        ],
-        "description": "Output of [`ChangeUserPasswordAction`]."
       },
       "nexigon_api.users.CompleteRegistrationAction": {
         "type": "object",
@@ -12527,6 +15470,9 @@
       "nexigon_api.users.CreateUserAction": {
         "type": "object",
         "properties": {
+          "authorization": {
+            "$ref": "#/components/schemas/nexigon_api.authorization.ActionAuthorization"
+          },
           "email": {
             "type": "string"
           },
@@ -12541,6 +15487,7 @@
           }
         },
         "required": [
+          "authorization",
           "email"
         ],
         "unevaluatedProperties": false
@@ -12592,6 +15539,9 @@
       "nexigon_api.users.CreateUserTokenAction": {
         "type": "object",
         "properties": {
+          "authorization": {
+            "$ref": "#/components/schemas/nexigon_api.authorization.ActionAuthorization"
+          },
           "userId": {
             "$ref": "#/components/schemas/nexigon_api.users.UserId"
           },
@@ -12600,6 +15550,7 @@
           }
         },
         "required": [
+          "authorization",
           "userId"
         ],
         "unevaluatedProperties": false
@@ -12713,19 +15664,19 @@
       "nexigon_api.users.InitiateUserEmailChangeAction": {
         "type": "object",
         "properties": {
+          "authorization": {
+            "$ref": "#/components/schemas/nexigon_api.authorization.ActionAuthorization"
+          },
           "userId": {
             "$ref": "#/components/schemas/nexigon_api.users.UserId"
-          },
-          "currentPassword": {
-            "type": "string"
           },
           "newEmail": {
             "type": "string"
           }
         },
         "required": [
+          "authorization",
           "userId",
-          "currentPassword",
           "newEmail"
         ],
         "unevaluatedProperties": false
@@ -12734,9 +15685,6 @@
         "enum": [
           {
             "result": "Pending"
-          },
-          {
-            "result": "InvalidCurrentPassword"
           },
           {
             "result": "SameEmail"
@@ -13060,6 +16008,9 @@
       "nexigon_api.users.SetUserEmailAction": {
         "type": "object",
         "properties": {
+          "authorization": {
+            "$ref": "#/components/schemas/nexigon_api.authorization.ActionAuthorization"
+          },
           "userId": {
             "$ref": "#/components/schemas/nexigon_api.users.UserId"
           },
@@ -13068,6 +16019,7 @@
           }
         },
         "required": [
+          "authorization",
           "userId",
           "email"
         ],
@@ -13087,6 +16039,9 @@
       "nexigon_api.users.SetUserIsAdminAction": {
         "type": "object",
         "properties": {
+          "authorization": {
+            "$ref": "#/components/schemas/nexigon_api.authorization.ActionAuthorization"
+          },
           "userId": {
             "$ref": "#/components/schemas/nexigon_api.users.UserId"
           },
@@ -13095,6 +16050,7 @@
           }
         },
         "required": [
+          "authorization",
           "userId",
           "isAdmin"
         ],
@@ -13103,6 +16059,9 @@
       "nexigon_api.users.SetUserPasswordAction": {
         "type": "object",
         "properties": {
+          "authorization": {
+            "$ref": "#/components/schemas/nexigon_api.authorization.ActionAuthorization"
+          },
           "userId": {
             "$ref": "#/components/schemas/nexigon_api.users.UserId"
           },
@@ -13111,6 +16070,7 @@
           }
         },
         "required": [
+          "authorization",
           "userId",
           "password"
         ],
@@ -13618,6 +16578,76 @@
           "Scanner"
         ],
         "description": "Origin of a VEX statement, used by the effective-state precedence\nrule (operator > vendor > scanner)."
+      }
+    },
+    "responses": {
+      "InvalidAction": {
+        "description": "The action input is invalid.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/nexigon_api.errors.ActionError"
+            }
+          }
+        }
+      },
+      "ForbiddenAction": {
+        "description": "The actor is not allowed to invoke the action.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/nexigon_api.errors.ActionError"
+            }
+          }
+        }
+      },
+      "ActionRateLimited": {
+        "description": "The actor or rate-limit capacity is exhausted.",
+        "headers": {
+          "Retry-After": {
+            "description": "Seconds to wait before retrying.",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/nexigon_api.errors.ActionError"
+            }
+          }
+        }
+      },
+      "InternalAction": {
+        "description": "The action failed internally.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/nexigon_api.errors.ActionError"
+            }
+          }
+        }
+      },
+      "ActionUnavailable": {
+        "description": "Global or dependency capacity is exhausted.",
+        "headers": {
+          "Retry-After": {
+            "description": "Seconds to wait before retrying.",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/nexigon_api.errors.ActionError"
+            }
+          }
+        }
       }
     }
   },

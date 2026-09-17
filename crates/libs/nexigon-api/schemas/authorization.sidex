@@ -1,0 +1,22 @@
+//! Per-action authorization supplied as part of an action's typed input.
+
+/// Credentials that re-verify the user session for one action execution.
+record ActionCredentials {
+    /// Password of the user owning the current session.
+    password: string,
+    /// Authenticator or recovery code when MFA is enabled.
+    code?: string,
+}
+
+/// Authorization material available to an action.
+///
+/// `Context` is not an authorization decision. It asks the action to evaluate
+/// whether its already-authenticated actor, permissions, and other contextual
+/// evidence are sufficient. Each action defines which variants it accepts.
+#[json(tag = "kind")]
+variant ActionAuthorization {
+    /// Evaluate the action's authenticated execution context.
+    Context,
+    /// Re-verify the current user session with account credentials.
+    Credentials: ActionCredentials,
+}
