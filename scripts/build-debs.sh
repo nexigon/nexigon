@@ -115,7 +115,7 @@ Upstream-Contact: Silitics GmbH <info@silitics.com>
 Source: https://github.com/nexigon/nexigon/
 Comment: This binary statically links third-party Rust crates. A full
  machine-readable Software Bill of Materials (SBOM) in CycloneDX format
- is available in the upstream release tarballs at
+ is available with the upstream release assets at
  https://github.com/nexigon/nexigon/releases
 
 Files: *

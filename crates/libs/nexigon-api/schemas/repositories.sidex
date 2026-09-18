@@ -1,12 +1,13 @@
 //! Actions and types related to repositories.
 
-import pagination::{PageRequest, PageInfo}
 import audit::AuditLogEvent
 import datetime::Timestamp
 import digest::Digest
 import json::JsonValue
 import organizations::OrganizationId
 import outputs::Empty
+import pagination::PageInfo
+import pagination::PageRequest
 import projects::ProjectId
 
 /// Unique ID of a repository.
@@ -1128,7 +1129,6 @@ record FinalizeAssetUploadAction {
 record QueryAuditLogEventsAction {
     /// Opt into cursor pagination. Without this field, the existing limit applies.
     page?: PageRequest,
-
     /// ID of the repository.
     repository_id: RepositoryId,
 }
@@ -1137,7 +1137,6 @@ record QueryAuditLogEventsAction {
 record QueryAuditLogEventsOutput {
     /// Present when cursor pagination was requested.
     page?: PageInfo,
-
     /// List of audit log events.
     events: [AuditLogEvent],
 }

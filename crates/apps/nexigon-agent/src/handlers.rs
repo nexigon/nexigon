@@ -2048,8 +2048,8 @@ mod tests {
         assert!(registry.get("expanded").is_none());
     }
 
-    /// Handler resolution accepts trusted path forms and symlinks but skips writable
-    /// targets.
+    /// Handler resolution finds PATH entries, accepts trusted path forms and symlinks,
+    /// and skips writable targets.
     #[cfg(unix)]
     #[test]
     fn resolves_relative_and_symlinked_executables_and_skips_unsafe_programs() {
@@ -2057,22 +2057,8 @@ mod tests {
         use std::os::unix::fs::symlink;
 
         let relative = TempDir::new().unwrap();
-        write_command_definition(
-            relative.path(),
-            "relative.toml",
-            "relative",
-            &["sh".to_owned()],
-            None,
-            None,
-        );
-        let registry = CommandRegistry::load_external(relative.path()).unwrap();
-        assert!(
-            registry
-                .get_loaded("relative")
-                .unwrap()
-                .executable
-                .is_absolute()
-        );
+        let resolved = resolve_handler_program(Path::new("sh"), relative.path()).unwrap();
+        assert!(resolved.is_absolute());
 
         let local = TempDir::new().unwrap();
         let executable = local.path().join("handler.bin");

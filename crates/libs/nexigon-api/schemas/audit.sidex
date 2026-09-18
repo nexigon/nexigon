@@ -1,10 +1,11 @@
 //! Actions and types related to the audit log.
 
-import pagination::{PageRequest, PageInfo}
 import actor::Actor
 import datetime::Timestamp
 import jobs::JobId
 import json::JsonValue
+import pagination::PageInfo
+import pagination::PageRequest
 
 /// Unique ID of an audit log action.
 #[rust(type = "nexigon_ids::ids::AuditLogActionId")]
@@ -97,7 +98,6 @@ record QueryAuditLogEventsAction {
 record QueryAuditLogEventsOutput {
     /// Present when cursor pagination was requested.
     page?: PageInfo,
-
     /// List of audit events.
     events: [AuditLogEvent],
 }
@@ -118,7 +118,6 @@ record QueryAuditLogActionsAction {
 record QueryAuditLogActionsOutput {
     /// Present when cursor pagination was requested.
     page?: PageInfo,
-
     /// List of actions.
     actions: [AuditLogAction],
 }

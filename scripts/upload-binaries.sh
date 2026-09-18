@@ -54,6 +54,7 @@ function upload_binaries() {
 
     # For proper releases (e.g., v0.5.0), also reassign v$major and v$major.$minor tags.
     if [[ "$DESCRIBED_VERSION" =~ ^v([0-9]+)\.([0-9]+)\.[0-9]+$ ]]; then
+        tag_args+=(--tag "latest,reassign")
         tag_args+=(--tag "v${BASH_REMATCH[1]},reassign")
         tag_args+=(--tag "v${BASH_REMATCH[1]}.${BASH_REMATCH[2]},reassign")
     fi

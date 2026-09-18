@@ -1,8 +1,9 @@
 //! Actions and types related to organizations.
 
-import pagination::{PageRequest, PageInfo}
 import audit::AuditLogEvent
 import outputs::Empty
+import pagination::PageInfo
+import pagination::PageRequest
 import projects::ProjectId
 import repositories::RepositoryId
 import users::UserId
@@ -253,7 +254,6 @@ record DeleteOrganizationInvitationAction {
 record QueryOrganizationAuditLogAction {
     /// Opt into cursor pagination. Without this field, the existing limit applies.
     page?: PageRequest,
-
     /// ID of the organization.
     organization_id: OrganizationId,
 }
@@ -262,7 +262,6 @@ record QueryOrganizationAuditLogAction {
 record QueryOrganizationAuditLogOutput {
     /// Present when cursor pagination was requested.
     page?: PageInfo,
-
     /// List of audit log events.
     events: [AuditLogEvent],
 }

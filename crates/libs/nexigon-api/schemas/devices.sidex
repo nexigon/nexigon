@@ -463,7 +463,6 @@ record PublishDeviceEventsAction {
 record QueryDeviceEventsAction {
     /// Opt into cursor pagination. Without this field, the existing limit applies.
     page?: PageRequest,
-
     /// ID of the device.
     device_id: DeviceId,
     /// Limit the number of events to return.
@@ -477,7 +476,6 @@ record QueryDeviceEventsAction {
 record QueryDeviceEventsOutput {
     /// Present when cursor pagination was requested.
     page?: PageInfo,
-
     /// List of events.
     events: [DeviceEvent],
 }
@@ -655,7 +653,6 @@ record DeviceProperty {
 record QueryDeviceAuditLogAction {
     /// Opt into cursor pagination. Without this field, the existing limit applies.
     page?: PageRequest,
-
     /// ID of the device.
     device_id: DeviceId,
 }
@@ -664,7 +661,6 @@ record QueryDeviceAuditLogAction {
 record QueryDeviceAuditLogOutput {
     /// Present when cursor pagination was requested.
     page?: PageInfo,
-
     /// List of audit log events.
     events: [AuditLogEvent],
 }
@@ -754,6 +750,7 @@ record DeviceCommandDoneData {
 // ============================================================================
 // Device Groups
 // ============================================================================
+
 
 /// Stable identity of a group. Renaming does not change its identity.
 #[rust(type = "nexigon_ids::ids::DeviceGroupId")]
@@ -852,6 +849,7 @@ record UpdateDeviceGroupsAction {
 // ============================================================================
 // Device Selection
 // ============================================================================
+
 
 /// Group membership conditions, combined with AND.
 record DeviceGroupSelector {

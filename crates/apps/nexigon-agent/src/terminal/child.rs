@@ -93,10 +93,14 @@ fn prepare_with_argv(
     let credentials = credentials_for_user(user, &username)?;
     let current = read_process_credentials()?;
     let credential_mode = credential_mode(&current, &credentials)?;
+    let group_verification_count = match credential_mode {
+        CredentialMode::SetAndVerify => credentials.groups.len(),
+        CredentialMode::VerifyOnly => current.groups.len(),
+    };
     let environment = minimal_environment(&username, &cwd, &executable)?;
 
     let mut prepared = PreparedChild {
-        group_verification_buffer: vec![0; credentials.groups.len()],
+        group_verification_buffer: vec![0; group_verification_count],
         credentials,
         credential_mode,
         cwd,
@@ -112,12 +116,14 @@ fn prepare_with_argv(
 }
 
 fn credentials_for_user(user: &User, username: &CStr) -> anyhow::Result<Credentials> {
+    // `getgrouplist` includes the primary group, while `setgroups` and
+    // `getgroups` operate on the supplementary group list only.
     let mut groups = nix::unistd::getgrouplist(username, user.gid)
         .context("failed to resolve terminal user's supplementary groups")?
         .into_iter()
         .map(|group| group.as_raw())
+        .filter(|group| *group != user.gid.as_raw())
         .collect::<Vec<_>>();
-    groups.push(user.gid.as_raw());
     groups.sort_unstable();
     groups.dedup();
     Ok(Credentials {
@@ -177,7 +183,7 @@ fn credential_mode(
             target.gid
         );
     }
-    if current.groups != target.groups {
+    if !same_supplementary_group_set(&current.groups, &target.groups, target.gid) {
         bail!("agent supplementary groups do not match requested terminal user");
     }
     Ok(CredentialMode::VerifyOnly)
@@ -383,20 +389,21 @@ unsafe fn configure_and_exec<S: ChildSyscalls>(
     let Some(group_count) = (unsafe { syscalls.group_count() }) else {
         return Err(ChildFailure::VerifyGroups);
     };
-    if group_count != prepared.credentials.groups.len() {
+    if group_count != prepared.group_verification_buffer.len() {
         return Err(ChildFailure::VerifyGroups);
     }
     if group_count > 0 {
-        // SAFETY: The verification buffer was allocated to the target group count
-        // before the fork.
+        // SAFETY: The verification buffer was allocated to the expected process
+        // group count before the fork.
         if !unsafe {
             syscalls.read_groups(
                 prepared.group_verification_buffer.as_mut_ptr(),
                 prepared.group_verification_buffer.len(),
             )
-        } || !same_group_set(
+        } || !same_supplementary_group_set(
             &prepared.group_verification_buffer,
             &prepared.credentials.groups,
+            prepared.credentials.gid,
         ) {
             return Err(ChildFailure::VerifyGroups);
         }
@@ -419,8 +426,13 @@ unsafe fn configure_and_exec<S: ChildSyscalls>(
     Err(ChildFailure::Exec)
 }
 
-fn same_group_set(actual: &[libc::gid_t], expected: &[libc::gid_t]) -> bool {
-    actual.len() == expected.len()
+fn same_supplementary_group_set(
+    actual: &[libc::gid_t],
+    expected: &[libc::gid_t],
+    primary_gid: libc::gid_t,
+) -> bool {
+    expected.iter().all(|group| *group != primary_gid)
+        && actual.iter().filter(|group| **group != primary_gid).count() == expected.len()
         && expected.iter().all(|expected_group| {
             actual
                 .iter()
@@ -592,7 +604,7 @@ mod tests {
         prepared.credentials = Credentials {
             uid: 1001,
             gid: 1002,
-            groups: vec![1002, 1003],
+            groups: vec![1003],
         };
         prepared.credential_mode = CredentialMode::SetAndVerify;
         prepared.group_verification_buffer = vec![0; prepared.credentials.groups.len()];
@@ -628,19 +640,9 @@ mod tests {
     #[test]
     fn credential_mismatches_prevent_exec() {
         let cases = [
-            (
-                [1001; 3],
-                [55; 3],
-                vec![1002, 1003],
-                ChildFailure::VerifyGid,
-            ),
-            (
-                [55; 3],
-                [1002; 3],
-                vec![1002, 1003],
-                ChildFailure::VerifyUid,
-            ),
-            ([1001; 3], [1002; 3], vec![1002], ChildFailure::VerifyGroups),
+            ([1001; 3], [55; 3], vec![1003], ChildFailure::VerifyGid),
+            ([55; 3], [1002; 3], vec![1003], ChildFailure::VerifyUid),
+            ([1001; 3], [1002; 3], vec![], ChildFailure::VerifyGroups),
         ];
 
         for (uids, gids, groups, expected_failure) in cases {
@@ -687,15 +689,23 @@ mod tests {
         let target = Credentials {
             uid: 1000,
             gid: 1000,
-            groups: vec![10, 1000],
+            groups: vec![10],
         };
         let matching = ProcessCredentials {
             uids: [1000; 3],
             gids: [1000; 3],
-            groups: vec![10, 1000],
+            groups: vec![10],
         };
         assert_eq!(
             credential_mode(&matching, &target).unwrap(),
+            CredentialMode::VerifyOnly
+        );
+        let matching_with_primary_group = ProcessCredentials {
+            groups: vec![10, 1000],
+            ..matching.clone()
+        };
+        assert_eq!(
+            credential_mode(&matching_with_primary_group, &target).unwrap(),
             CredentialMode::VerifyOnly
         );
 
@@ -708,6 +718,27 @@ mod tests {
         let mut mismatch = matching;
         mismatch.groups.pop();
         assert!(credential_mode(&mismatch, &target).is_err());
+    }
+
+    #[test]
+    fn verify_only_tolerates_primary_group_in_supplementary_set() {
+        let mut prepared = switched_test_child();
+        prepared.credential_mode = CredentialMode::VerifyOnly;
+        prepared.group_verification_buffer = vec![0; 2];
+        let mut syscalls = FakeSyscalls {
+            fail_on: None,
+            calls: Vec::new(),
+            uids: [1001; 3],
+            gids: [1002; 3],
+            groups: vec![1002, 1003],
+        };
+
+        // SAFETY: Fake syscalls operate entirely in the test process.
+        assert_eq!(
+            unsafe { configure_and_exec(&mut prepared, &mut syscalls) },
+            Err(ChildFailure::Exec)
+        );
+        assert!(syscalls.calls.contains(&Operation::Exec));
     }
 
     #[test]
@@ -735,7 +766,7 @@ mod tests {
         let target = Credentials {
             uid: 1001,
             gid: 1001,
-            groups: vec![1001],
+            groups: vec![],
         };
         assert_eq!(
             credential_mode(&current, &target).unwrap(),
@@ -843,9 +874,12 @@ mod tests {
             cstrings(&["sh", "-c", "id -u; id -g; id -G"]),
         )
         .unwrap();
-        let expected_groups = prepared.credentials.groups.clone();
+        let mut expected_groups = prepared.credentials.groups.clone();
         let expected_uid = prepared.credentials.uid;
         let expected_gid = prepared.credentials.gid;
+        expected_groups.push(expected_gid);
+        expected_groups.sort_unstable();
+        expected_groups.dedup();
 
         let (code, output) = run_child_and_capture(prepared);
         assert_eq!(code, 0);
@@ -872,10 +906,10 @@ mod tests {
     }
 
     #[test]
-    fn target_primary_group_is_always_in_supplementary_set() {
+    fn target_primary_group_is_not_in_supplementary_set() {
         let user = current_user();
         let username = CString::new(user.name.as_bytes()).unwrap();
         let credentials = credentials_for_user(&user, &username).unwrap();
-        assert!(credentials.groups.contains(&credentials.gid));
+        assert!(!credentials.groups.contains(&credentials.gid));
     }
 }

@@ -3,8 +3,8 @@
 import audit::AuditLogEvent
 import datetime::Timestamp
 import devices::DeviceFingerprint
-import devices::DeviceId
 import devices::DeviceGroup
+import devices::DeviceId
 import devices::DeviceSelectionError
 import devices::DeviceStatus
 import fleet::FleetOperationTargetSelector
@@ -392,7 +392,6 @@ record RedeemDevicePairingKeyOutput {
 record QueryAuditLogEventsAction {
     /// Opt into cursor pagination. Without this field, the existing limit applies.
     page?: PageRequest,
-
     /// ID of the project.
     project_id: ProjectId,
 }
@@ -401,7 +400,6 @@ record QueryAuditLogEventsAction {
 record QueryAuditLogEventsOutput {
     /// Present when cursor pagination was requested.
     page?: PageInfo,
-
     /// List of audit log events.
     events: [AuditLogEvent],
 }

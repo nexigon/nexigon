@@ -10,6 +10,8 @@ on:
 env:
   # Download link for the `cargo-deny` binary to use.
   CARGO_DENY_URL: https://github.com/EmbarkStudios/cargo-deny/releases/download/0.19.0/cargo-deny-0.19.0-x86_64-unknown-linux-musl.tar.gz
+  # Download link for the `sidex` binary to use.
+  SIDEX_URL: https://github.com/silitics/sidex/releases/download/v0.2.6/sidex-x86_64-unknown-linux-musl.tar.gz
   # Download link for the `cross` binary to use.
   CROSS_URL: https://github.com/cross-rs/cross/releases/download/v0.2.5/cross-x86_64-unknown-linux-gnu.tar.gz
 
@@ -28,14 +30,25 @@ jobs:
         uses: dtolnay/install@taplo-cli
       - name: Install Cargo Deny
         run: curl -s -L "$CARGO_DENY_URL" | tar xvzf - -C /usr/local/bin --strip-components=1 --wildcards --no-anchored 'cargo-deny'
+      - name: Install Sidex
+        run: curl -fsSL "$SIDEX_URL" | tar xzf - -C /usr/local/bin sidex
       - name: Run Checks
         run: |
           bash -n installer/*.sh
+          bash -n scripts/*.sh
           installer/test-install-hub.sh
           cargo deny check
           cargo fmt --check
           cargo clippy --all-targets --all-features -- -D warnings
           taplo fmt --check
+          for directory in \
+            crates/libs/nexigon-api \
+            crates/libs/nexigon-agent-api \
+            crates/libs/nexigon-agent-protocol \
+            crates/apps/nexigon-cli \
+            crates/apps/nexigon-agent; do
+              (cd "$directory" && sidex fmt --check && sidex check)
+          done
   test:
     name: Test
     needs: check
@@ -201,7 +214,7 @@ jobs:
           path: build/source/*
           if-no-files-found: error
   release_assets:
-    name: Upload Release Assets
+    name: Create Release
     needs:
       - build
       - build_debs
@@ -212,6 +225,10 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v4
+      - name: Install Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+      - name: Install cargo-cyclonedx
+        run: cargo install cargo-cyclonedx --version 0.5.9 --locked
       - name: Download Binaries
         uses: actions/download-artifact@v4
         with:
@@ -229,14 +246,34 @@ jobs:
         with:
           name: source-package
           path: build/source
-      - name: List Assets
+      - name: Prepare Release Assets
         run: |
-          find build/binaries
-          find build/debs
-          find build/source
+          mkdir -p build/release
+          cp build/binaries/* build/debs/* build/source/* build/release/
+          ./scripts/prepare-release-assets.sh build/release
+          find build/release -maxdepth 1 -type f -printf '%f\n' | sort
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="${{ github.ref_name }}"
+          NOTES="releases/$TAG.md"
+          if [[ ! -f "$NOTES" ]]; then
+            echo "Missing release notes: $NOTES" >&2
+            exit 1
+          fi
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release edit "$TAG" --latest
+          else
+            gh release create "$TAG" \
+              --verify-tag \
+              --latest \
+              --title "Nexigon Agent and CLI ${TAG#v}" \
+              --notes-file "$NOTES"
+          fi
       - name: Upload Release Assets
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh release upload "${{ github.ref_name }}" \
-            build/binaries/* build/debs/* build/source/* --clobber
+            build/release/* --clobber

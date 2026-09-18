@@ -1,8 +1,8 @@
 //! Fleet-level actions and types.
 
 import datetime::Timestamp
-import devices::DeviceId
 import devices::DeviceGroupSelector
+import devices::DeviceId
 import devices::DeviceOperationId
 import devices::DeviceOperationStatus
 import devices::DeviceOperationStep
