@@ -57,8 +57,6 @@ use crate::system_info::get_system_info;
 
 #[cfg(target_os = "linux")]
 const MAX_CONCURRENT_TERMINALS: usize = 4;
-#[cfg(not(target_os = "linux"))]
-const MAX_CONCURRENT_TERMINALS: usize = 0;
 const TCP_CONNECT_TIMEOUT: Duration = Duration::from_secs(10);
 const TASK_SHUTDOWN_GRACE: Duration = Duration::from_secs(8);
 
@@ -124,6 +122,7 @@ struct EndpointLimits {
     #[cfg(target_os = "linux")]
     terminals: Arc<Semaphore>,
     commands: Arc<Semaphore>,
+    tcp_connect_timeout: Duration,
 }
 
 impl EndpointLimits {
@@ -132,6 +131,7 @@ impl EndpointLimits {
             #[cfg(target_os = "linux")]
             terminals: Arc::new(Semaphore::new(MAX_CONCURRENT_TERMINALS)),
             commands,
+            tcp_connect_timeout: TCP_CONNECT_TIMEOUT,
         }
     }
 }
@@ -705,7 +705,13 @@ fn handle_channel_request(
         };
         task_slot.send(SupervisedTask::new(
             TaskKind::TcpConnect,
-            connect_tcp_forwarding(request, port, task_tx.clone(), cancellation.clone()),
+            connect_tcp_forwarding(
+                request,
+                port,
+                limits.tcp_connect_timeout,
+                task_tx.clone(),
+                cancellation.clone(),
+            ),
         ));
         return;
     }
@@ -787,11 +793,12 @@ fn handle_channel_request(
 async fn connect_tcp_forwarding(
     request: nexigon_multiplex::ChannelRequest,
     port: u16,
+    connect_timeout: Duration,
     task_tx: mpsc::Sender<SupervisedTask>,
     cancellation: CancellationToken,
 ) -> anyhow::Result<()> {
     let address = SocketAddr::new(Ipv4Addr::LOCALHOST.into(), port);
-    let connect = tokio::time::timeout(TCP_CONNECT_TIMEOUT, TcpStream::connect(address));
+    let connect = tokio::time::timeout(connect_timeout, TcpStream::connect(address));
     let mut tcp = tokio::select! {
         () = cancellation.cancelled() => return Ok(()),
         result = connect => match result {
@@ -1096,6 +1103,7 @@ mod tests {
     use super::OperationReporter;
     use super::ReportAttempt;
     use super::SupervisedTask;
+    use super::TCP_CONNECT_TIMEOUT;
     use super::TaskKind;
     use super::command_slots;
     use super::load_command_registry;
@@ -1135,15 +1143,27 @@ mod tests {
 
         /// Start an agent with one explicitly allowed TCP destination.
         async fn forwarding(port: u16) -> Self {
+            Self::forwarding_with_connect_timeout(port, TCP_CONNECT_TIMEOUT).await
+        }
+
+        /// Start an agent with one TCP destination and a test-controlled connect timeout.
+        async fn forwarding_with_connect_timeout(port: u16, connect_timeout: Duration) -> Self {
             let config = toml::from_str(&format!(
                 "fingerprint-script = 'unused'\n[forwarding]\nenabled = true\nallowed-tcp-ports = [{port}]"
             ))
             .unwrap();
-            Self::with_config(config).await
+            Self::with_config_and_connect_timeout(config, connect_timeout).await
         }
 
         /// Run real channel handling and task supervision with the supplied policy.
         async fn with_config(config: Config) -> Self {
+            Self::with_config_and_connect_timeout(config, TCP_CONNECT_TIMEOUT).await
+        }
+
+        async fn with_config_and_connect_timeout(
+            config: Config,
+            connect_timeout: Duration,
+        ) -> Self {
             let (hub_transport, agent_transport) = InMemory::<Bytes, Bytes>::new_buffered(64);
             let multiplex_settings = crate::config::multiplex_settings(&config).unwrap();
             let hub_limits = crate::hub_connection_limits(multiplex_settings);
@@ -1169,7 +1189,8 @@ mod tests {
             let agent_cancellation = cancellation.clone();
             let agent = tokio::spawn(async move {
                 let config = Arc::new(config);
-                let limits = EndpointLimits::new(command_slots());
+                let mut limits = EndpointLimits::new(command_slots());
+                limits.tcp_connect_timeout = connect_timeout;
                 let supervisor_queue_capacity = crate::config::multiplex_settings(&config)
                     .unwrap()
                     .supervisor_queue_capacity();
@@ -1246,26 +1267,24 @@ mod tests {
         assert!(slots.try_acquire_owned().is_ok());
     }
 
+    #[cfg(target_os = "linux")]
     #[tokio::test]
     async fn endpoint_feature_limits_are_strictly_bounded_and_recover() {
         let limits = EndpointLimits::new(command_slots());
 
-        #[cfg(target_os = "linux")]
-        {
-            let mut terminals = Vec::new();
-            for _ in 0..MAX_CONCURRENT_TERMINALS {
-                terminals.push(
-                    limits
-                        .terminals
-                        .clone()
-                        .try_acquire_owned()
-                        .expect("terminal slot within limit"),
-                );
-            }
-            assert!(limits.terminals.clone().try_acquire_owned().is_err());
-            terminals.pop();
-            assert!(limits.terminals.try_acquire_owned().is_ok());
+        let mut terminals = Vec::new();
+        for _ in 0..MAX_CONCURRENT_TERMINALS {
+            terminals.push(
+                limits
+                    .terminals
+                    .clone()
+                    .try_acquire_owned()
+                    .expect("terminal slot within limit"),
+            );
         }
+        assert!(limits.terminals.clone().try_acquire_owned().is_err());
+        terminals.pop();
+        assert!(limits.terminals.try_acquire_owned().is_ok());
     }
 
     /// A browser-sized burst can establish far more than the legacy 24 connections.
@@ -1485,14 +1504,16 @@ mod tests {
         }
     }
 
-    /// A bound but non-listening socket keeps the allowed target unavailable without a
-    /// port race.
+    /// A bound but non-listening socket is refused immediately on some operating systems
+    /// and remains pending on others. Both outcomes must reject without a port race.
     #[tokio::test]
     async fn unavailable_forwarding_port_is_rejected_without_panicking() {
         let target = tokio::net::TcpSocket::new_v4().unwrap();
         target.bind((Ipv4Addr::LOCALHOST, 0).into()).unwrap();
         let port = target.local_addr().unwrap().port();
-        let mut agent = EndpointTestAgent::forwarding(port).await;
+        let mut agent =
+            EndpointTestAgent::forwarding_with_connect_timeout(port, Duration::from_millis(100))
+                .await;
         let endpoint = format!("forward/tcp/{port}");
         let unavailable = tokio::time::timeout(
             Duration::from_secs(2),
@@ -1500,9 +1521,15 @@ mod tests {
         )
         .await
         .expect("unavailable forwarding request timed out");
-        assert!(
-            matches!(unavailable, Err(OpenError::Rejected(ref rejection)) if rejection.reason() == b"local TCP forwarding target is unavailable")
-        );
+        assert!(matches!(
+            unavailable,
+            Err(OpenError::Rejected(ref rejection))
+                if matches!(
+                    rejection.reason(),
+                    b"local TCP forwarding target is unavailable"
+                        | b"local TCP forwarding target timed out"
+                )
+        ));
         assert!(!agent.agent.is_finished());
         agent.stop().await;
     }
