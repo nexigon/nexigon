@@ -91,10 +91,11 @@ pub fn tcp_forwarding_allowed(config: &Config, port: u16) -> bool {
     exported
         || config.forwarding.as_ref().is_some_and(|forwarding| {
             forwarding.enabled == Some(true)
-                && forwarding
-                    .allowed_tcp_ports
-                    .as_ref()
-                    .is_some_and(|ports| ports.iter().any(|allowed| allowed.get() == port))
+                && (forwarding.allow_all_ports == Some(true)
+                    || forwarding
+                        .allowed_tcp_ports
+                        .as_ref()
+                        .is_some_and(|ports| ports.iter().any(|allowed| allowed.get() == port)))
         })
 }
 

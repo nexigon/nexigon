@@ -120,6 +120,9 @@
         "enabled": {
           "type": "boolean"
         },
+        "allow-all-ports": {
+          "type": "boolean"
+        },
         "allowed-tcp-ports": {
           "type": "array",
           "items": {

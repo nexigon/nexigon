@@ -118,10 +118,15 @@ opaque TcpPort
 /// Additional TCP ports for CLI tunnels and Hub HTTP proxy access.
 #[json(rename_all = "kebab-case")]
 record ForwardingConfig {
-    /// Whether the additional port allowlist is enabled (defaults to false).
+    /// Whether forwarding to additional ports is enabled (defaults to false).
     ///
     /// HTTP export ports remain accessible regardless of this setting.
     enabled?: bool,
+    /// Whether every TCP destination port is permitted when forwarding is enabled
+    /// (defaults to false).
+    ///
+    /// Prefer `allowed-tcp-ports` when the required destination ports are known.
+    allow_all_ports?: bool,
     /// Permitted TCP destination ports on 127.0.0.1 (defaults to none).
     ///
     /// Each port permits raw TCP access. HTTP export ports are allowed separately.

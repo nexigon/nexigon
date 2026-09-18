@@ -2,8 +2,8 @@
 
 ## 0.6.0 (Unreleased)
 
-- Require explicitly permitted TCP forwarding ports. HTTP exports permit their
-  own ports.
+- Require an explicit TCP forwarding policy. HTTP exports permit their own
+  ports, and devices can opt in to forwarding all ports.
 - Increase the default multiplex capacity to 512 channels and announce usable
   forwarding capacity to compatible Hubs.
 - Make multiplex channel capacity and the channel-open rate configurable.

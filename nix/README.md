@@ -72,9 +72,14 @@ services.nexigon-agent.settings.forwarding = {
 
 Targets are restricted to `127.0.0.1`. HTTP exports automatically authorize
 their own ports, so an exported service does not also need an allowlist entry.
-Both forms permit raw TCP access. `forwarding.enabled = false` disables only
-additional ports; exports remain accessible. Upgrade the agent package and
-its settings together; older agents do not enforce this policy.
+Exports and additional forwarding policies permit raw TCP access.
+`forwarding.enabled = false` disables only additional ports; exports remain
+accessible. Upgrade the agent package and its settings together; older agents
+do not enforce this policy.
+
+To permit every TCP destination port, set `allow-all-ports = true` alongside
+`enabled = true`. Prefer `allowed-tcp-ports` when the required ports are known
+so the device exposes only the intended local services.
 
 ## Test the Service
 

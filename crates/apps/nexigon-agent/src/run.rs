@@ -1366,8 +1366,7 @@ mod tests {
         agent.stop().await;
     }
 
-    /// Missing or disabled forwarding and absent allowlist entries never reach the
-    /// target.
+    /// Missing, disabled, or non-matching forwarding policies never reach the target.
     #[tokio::test]
     async fn forwarding_policy_rejects_before_connecting() {
         let listener = tokio::net::TcpListener::bind((Ipv4Addr::LOCALHOST, 0))
@@ -1378,7 +1377,9 @@ mod tests {
             String::new(),
             "[forwarding]".to_owned(),
             format!("[forwarding]\nallowed-tcp-ports = [{port}]"),
+            "[forwarding]\nallow-all-ports = true".to_owned(),
             format!("[forwarding]\nenabled = false\nallowed-tcp-ports = [{port}]"),
+            "[forwarding]\nenabled = false\nallow-all-ports = true".to_owned(),
             "[forwarding]\nenabled = true".to_owned(),
             "[forwarding]\nenabled = true\nallowed-tcp-ports = []".to_owned(),
             format!(
@@ -1412,7 +1413,8 @@ mod tests {
         }
     }
 
-    /// Exports authorize raw TCP independently; additional ports still require opt-in.
+    /// Exports authorize raw TCP independently; enabled policies can grant listed or all
+    /// ports.
     #[tokio::test]
     async fn http_exports_allow_forwarding_independently_of_additional_ports() {
         let exported = tokio::net::TcpListener::bind((Ipv4Addr::LOCALHOST, 0))
@@ -1428,25 +1430,34 @@ mod tests {
             .unwrap();
         let unlisted_port = unlisted.local_addr().unwrap().port();
         let policies = [
-            (String::new(), false),
+            (String::new(), false, false),
             (
                 format!("[forwarding]\nallowed-tcp-ports = [{additional_port}]"),
+                false,
                 false,
             ),
             (
                 format!("[forwarding]\nenabled = false\nallowed-tcp-ports = [{additional_port}]"),
                 false,
+                false,
             ),
             (
                 "[forwarding]\nenabled = true\nallowed-tcp-ports = []".to_owned(),
+                false,
                 false,
             ),
             (
                 format!("[forwarding]\nenabled = true\nallowed-tcp-ports = [{additional_port}]"),
                 true,
+                false,
+            ),
+            (
+                "[forwarding]\nenabled = true\nallow-all-ports = true".to_owned(),
+                true,
+                true,
             ),
         ];
-        for (policy, additional_allowed) in policies {
+        for (policy, additional_allowed, unlisted_allowed) in policies {
             let config = toml::from_str(&format!(
                 "fingerprint-script = 'unused'\n{policy}\n[[exports]]\nprotocol = 'http'\nname = 'Web UI'\nport = {exported_port}\npath = '/ui'"
             )).unwrap();
@@ -1474,7 +1485,7 @@ mod tests {
 
             for (port, listener, allowed) in [
                 (additional_port, &additional, additional_allowed),
-                (unlisted_port, &unlisted, false),
+                (unlisted_port, &unlisted, unlisted_allowed),
             ] {
                 let endpoint = format!("forward/tcp/{port}");
                 let result = tokio::time::timeout(
