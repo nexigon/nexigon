@@ -40,6 +40,9 @@
     "forwarding": {
       "$ref": "#/$defs/nexigon_agent.config.ForwardingConfig"
     },
+    "multiplex": {
+      "$ref": "#/$defs/nexigon_agent.config.MultiplexConfig"
+    },
     "terminal": {
       "$ref": "#/$defs/nexigon_agent.config.TerminalConfig"
     },
@@ -137,6 +140,27 @@
         },
         "socket-path": {
           "$ref": "#/$defs/nexigon_agent.config.PathBuf"
+        }
+      },
+      "required": [],
+      "unevaluatedProperties": false
+    },
+    "nexigon_agent.config.MultiplexConfig": {
+      "$id": "nexigon_agent.config.MultiplexConfig",
+      "type": "object",
+      "description": "Multiplex connection capacity and burst handling.",
+      "properties": {
+        "max-channels": {
+          "type": "integer",
+          "format": "uint32"
+        },
+        "reserved-channels": {
+          "type": "integer",
+          "format": "uint32"
+        },
+        "max-channel-requests-per-second": {
+          "type": "integer",
+          "format": "uint32"
         }
       },
       "required": [],

@@ -1,4 +1,4 @@
-//! Shared framing for agent/hub application protocols.
+//! Shared framing and connection metadata for Agent/Hub application protocols.
 //!
 //! These codecs deliberately retain the legacy wire representation while enforcing
 //! resource limits before allocating a peer-declared payload. A peer that violates a
@@ -15,6 +15,13 @@ use tokio::io::AsyncReadExt;
 use tokio::io::AsyncWrite;
 use tokio::io::AsyncWriteExt;
 
+sidex::include_bundle!(
+    #[allow(warnings)]
+    pub nexigon_agent_protocol as types
+);
+
+pub use types::connection::AgentHello;
+
 /// Maximum terminal data carried by one application frame.
 pub const MAX_TERMINAL_DATA_LEN: usize = 1024 * 1024;
 /// Maximum terminal frame body, including the one-byte message type.
@@ -23,6 +30,11 @@ pub const MAX_TERMINAL_FRAME_LEN: usize = MAX_TERMINAL_DATA_LEN + 1;
 pub const MAX_COMMAND_FRAME_LEN: usize = 16 * 1024 * 1024;
 /// Deadline for the rest of a frame after its first header byte arrives.
 pub const FRAME_READ_TIMEOUT: Duration = Duration::from_secs(60);
+
+/// Current Agent Hello metadata contract version.
+pub const AGENT_HELLO_VERSION: u32 = 1;
+/// Maximum encoded Agent Hello metadata size.
+pub const MAX_AGENT_HELLO_LEN: usize = 4 * 1024;
 
 /// Maximum number of external commands the agent runs concurrently.
 pub const MAX_CONCURRENT_COMMANDS: usize = 4;
@@ -85,6 +97,43 @@ pub enum FrameError {
     /// JSON serialization or deserialization failed.
     #[error("invalid command frame JSON: {0}")]
     Json(#[from] serde_json::Error),
+}
+
+/// Invalid Agent Hello connection metadata.
+#[derive(Debug, Error)]
+pub enum AgentHelloError {
+    /// The encoded metadata exceeds the multiplex control-payload limit.
+    #[error("agent hello length {actual} exceeds limit {limit}")]
+    TooLarge { actual: usize, limit: usize },
+    /// The metadata is not a valid Agent Hello JSON document.
+    #[error("invalid agent hello JSON: {0}")]
+    Json(#[from] serde_json::Error),
+}
+
+/// Encode Agent capacity metadata for the multiplex Hello frame.
+pub fn encode_agent_hello(hello: &AgentHello) -> Result<Vec<u8>, AgentHelloError> {
+    let encoded = serde_json::to_vec(hello)?;
+    if encoded.len() > MAX_AGENT_HELLO_LEN {
+        return Err(AgentHelloError::TooLarge {
+            actual: encoded.len(),
+            limit: MAX_AGENT_HELLO_LEN,
+        });
+    }
+    Ok(encoded)
+}
+
+/// Decode Agent capacity metadata, treating empty metadata as a legacy Agent.
+pub fn decode_agent_hello(encoded: &[u8]) -> Result<Option<AgentHello>, AgentHelloError> {
+    if encoded.is_empty() {
+        return Ok(None);
+    }
+    if encoded.len() > MAX_AGENT_HELLO_LEN {
+        return Err(AgentHelloError::TooLarge {
+            actual: encoded.len(),
+            limit: MAX_AGENT_HELLO_LEN,
+        });
+    }
+    Ok(Some(serde_json::from_slice(encoded)?))
 }
 
 /// Read and validate one hub-to-agent terminal frame.
@@ -279,6 +328,16 @@ mod tests {
     #[derive(Debug, Deserialize, Eq, PartialEq, Serialize)]
     struct JsonFrame {
         value: String,
+    }
+
+    /// Agent Hello metadata round-trips and empty metadata identifies a legacy Agent.
+    #[test]
+    fn agent_hello_round_trip_preserves_capacity() {
+        let expected = AgentHello::new(AGENT_HELLO_VERSION, 512, 480, 512, 2_048);
+        let encoded = encode_agent_hello(&expected).unwrap();
+
+        assert_eq!(decode_agent_hello(&encoded).unwrap(), Some(expected));
+        assert_eq!(decode_agent_hello(b"").unwrap(), None);
     }
 
     async fn terminal_input(len: u32, body: &[u8]) -> tokio::io::DuplexStream {

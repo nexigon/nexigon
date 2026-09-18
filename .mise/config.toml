@@ -15,6 +15,7 @@ run = [
   "taplo fmt --check",
   "cd crates/libs/nexigon-api && sidex fmt --check && sidex check",
   "cd crates/libs/nexigon-agent-api && sidex fmt --check && sidex check",
+  "cd crates/libs/nexigon-agent-protocol && sidex fmt --check && sidex check",
   "cd crates/apps/nexigon-cli && sidex fmt --check && sidex check",
   "cd crates/apps/nexigon-agent && sidex fmt --check && sidex check",
 ]
@@ -26,6 +27,7 @@ run = [
   "taplo fmt",
   "cd crates/libs/nexigon-api && sidex fmt",
   "cd crates/libs/nexigon-agent-api && sidex fmt",
+  "cd crates/libs/nexigon-agent-protocol && sidex fmt",
   "cd crates/apps/nexigon-cli && sidex fmt",
   "cd crates/apps/nexigon-agent && sidex fmt",
 ]
@@ -36,6 +38,7 @@ run = [
   "cargo clippy --all-targets --all-features --fix --allow-dirty --allow-staged",
   "cd crates/libs/nexigon-api && sidex check --fix",
   "cd crates/libs/nexigon-agent-api && sidex check --fix",
+  "cd crates/libs/nexigon-agent-protocol && sidex check --fix",
   "cd crates/apps/nexigon-cli && sidex check --fix",
   "cd crates/apps/nexigon-agent && sidex check --fix",
   "mise run fmt",

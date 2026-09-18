@@ -20,6 +20,9 @@ use std::sync::Arc;
 use anyhow::Context;
 use anyhow::bail;
 use jiff::Timestamp;
+use nexigon_agent_protocol::AGENT_HELLO_VERSION;
+use nexigon_agent_protocol::AgentHello;
+use nexigon_agent_protocol::encode_agent_hello;
 use nexigon_client::ClientIdentity;
 use nexigon_client::ClientToken;
 use nexigon_client::WebsocketConnection;
@@ -51,11 +54,13 @@ pub use run::run;
 pub use run::run_with_connection;
 
 use crate::config::Config;
+use crate::config::MultiplexSettings;
 
 /// Default directory for persistent agent data.
 pub const DEFAULT_DATA_PATH: &str = "/var/lib/nexigon/agent";
 
 const CREDENTIALS_FILE_NAME: &str = "credentials.json";
+const MAX_AGGREGATE_RECEIVE_BYTE_CREDIT: usize = 64 * 1024 * 1024;
 
 /// Credentials persisted after successful pairing-key provisioning.
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -168,7 +173,20 @@ async fn connect_with_identity(
     identity: DeviceIdentity,
     register_connection: bool,
 ) -> anyhow::Result<WebsocketConnection> {
-    let connection_limits = hub_connection_limits();
+    let multiplex_settings =
+        crate::config::multiplex_settings(config).context("invalid multiplex configuration")?;
+    let connection_limits = hub_connection_limits(multiplex_settings);
+    let connection_info = encode_agent_hello(&AgentHello::new(
+        AGENT_HELLO_VERSION,
+        u32::try_from(multiplex_settings.max_channels)
+            .expect("configured channel limit originates from u32"),
+        u32::try_from(multiplex_settings.forwarding_channels)
+            .expect("configured forwarding limit originates from u32"),
+        u32::try_from(multiplex_settings.max_channels)
+            .expect("configured pending limit originates from u32"),
+        multiplex_settings.max_channel_requests_per_second,
+    ))
+    .context("cannot encode Agent connection metadata")?;
     let connection = nexigon_client::ClientBuilder::new(
         credentials
             .hub_url
@@ -180,6 +198,7 @@ async fn connect_with_identity(
     .with_device_fingerprint(Some(identity.fingerprint))
     .with_register_connection(register_connection)
     .with_connection_limits(connection_limits)
+    .with_connection_info(connection_info)
     .dangerous_with_allow_plaintext(config.dangerous_allow_plaintext.unwrap_or(false))
     .dangerous_with_accept_invalid_certificates(
         config
@@ -192,13 +211,31 @@ async fn connect_with_identity(
     Ok(connection)
 }
 
-/// Admit pending Hub requests up to the transport's existing channel bound.
-fn hub_connection_limits() -> ConnectionLimits {
+/// Build multiplex limits that can absorb the configured channel burst.
+fn hub_connection_limits(settings: MultiplexSettings) -> ConnectionLimits {
     let mut connection_limits = ConnectionLimits::default();
-    // An agent trusts its Hub to apply feature-level admission. Let
-    // channel requests use the transport's full bounded channel capacity so a
-    // browser burst is not rejected by the lower pending-request default.
+    connection_limits.max_channels = settings.max_channels;
     connection_limits.max_pending_channel_requests = connection_limits.max_channels;
+    connection_limits.max_queued_commands = connection_limits
+        .max_queued_commands
+        .max(settings.max_channels * 4);
+    connection_limits.max_queued_frames = connection_limits
+        .max_queued_frames
+        .max(settings.max_channels * 8);
+    connection_limits.reserved_control_queue_frames = connection_limits
+        .reserved_control_queue_frames
+        .max(settings.max_channels);
+    connection_limits.max_channel_requests_per_second = settings.max_channel_requests_per_second;
+    connection_limits.max_control_frames_per_second = connection_limits
+        .max_control_frames_per_second
+        .max(settings.max_channel_requests_per_second * 4);
+    connection_limits.max_closed_channel_tombstones = connection_limits
+        .max_closed_channel_tombstones
+        .max(settings.max_channels * 2);
+    connection_limits.max_frames_processed_per_poll = connection_limits
+        .max_frames_processed_per_poll
+        .max(settings.max_channels.min(1_024));
+    connection_limits.bound_aggregate_receive_byte_credit(MAX_AGGREGATE_RECEIVE_BYTE_CREDIT);
     connection_limits
 }
 

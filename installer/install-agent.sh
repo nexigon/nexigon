@@ -123,6 +123,7 @@ TimeoutStopSec=5
 KillMode=mixed
 Restart=always
 RestartSec=60s
+LimitNOFILE=8192
 
 [Install]
 WantedBy=multi-user.target

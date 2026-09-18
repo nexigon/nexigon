@@ -46,6 +46,8 @@ record Config {
     exports?: [ExportConfig],
     /// Additional TCP ports, beyond exported services. Disabled unless explicitly enabled.
     forwarding?: ForwardingConfig,
+    /// Multiplex connection capacity and burst handling.
+    multiplex?: MultiplexConfig,
     /// Remote terminal configuration.
     terminal?: TerminalConfig,
     /// On-demand command configuration.
@@ -124,6 +126,30 @@ record ForwardingConfig {
     ///
     /// Each port permits raw TCP access. HTTP export ports are allowed separately.
     allowed_tcp_ports?: [TcpPort],
+}
+
+/// Multiplex connection capacity and burst handling.
+#[json(rename_all = "kebab-case")]
+record MultiplexConfig {
+    /// Maximum simultaneously open channels (defaults to 512).
+    #[validate(
+        { 32 <= _ <= 4096 },
+        message = "Maximum channels must be between 32 and 4096."
+    )]
+    max_channels?: u32,
+    /// Channels excluded from advertised forwarding capacity, leaving room for
+    /// RPC, commands, terminals, and control work (defaults to 32).
+    #[validate(
+        { 1 <= _ <= 4095 },
+        message = "Reserved channels must be between 1 and 4095."
+    )]
+    reserved_channels?: u32,
+    /// Maximum channel-open requests accepted per second (defaults to 2048).
+    #[validate(
+        { 32 <= _ <= 65536 },
+        message = "Channel requests per second must be between 32 and 65536."
+    )]
+    max_channel_requests_per_second?: u32,
 }
 
 /// Service exports. Each HTTP export permits raw TCP access to its localhost port.

@@ -1,0 +1,12 @@
+[bundle]
+name = "nexigon_agent_protocol"
+version = "1"
+description = "Shared wire contracts between Nexigon Agent and Hub."
+authors = ["Silitics GmbH <info@silitics.com>"]
+
+[backend.rust]
+derive = ["Clone", "Debug", "Eq", "PartialEq"]
+plugins = ["builder", "serde"]
+
+[backend.rust.plugin.serde]
+sidex_serde_path = "::sidex_serde"

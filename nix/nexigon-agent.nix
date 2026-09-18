@@ -126,6 +126,7 @@ in
         ExecStart = "${cfg.package}/bin/nexigon-agent --config /run/nexigon/agent.toml run";
         Restart = "always";
         RestartSec = "60s";
+        LimitNOFILE = 8192;
       };
     };
   };

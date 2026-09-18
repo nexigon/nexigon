@@ -3,6 +3,7 @@
 use std::future::Future;
 use std::sync::Arc;
 
+use bytes::Bytes;
 use futures::Stream;
 use futures::StreamExt;
 use rustls::pki_types::CertificateDer;
@@ -216,6 +217,8 @@ pub struct ClientBuilder {
     register_connection: bool,
     /// Resource limits for the multiplex connection.
     connection_limits: ConnectionLimits,
+    /// Metadata sent in the multiplex Hello frame.
+    connection_info: Bytes,
 }
 
 impl ClientBuilder {
@@ -230,6 +233,7 @@ impl ClientBuilder {
             accept_invalid_certificates: false,
             register_connection: true,
             connection_limits: ConnectionLimits::default(),
+            connection_info: Bytes::new(),
         }
     }
 
@@ -242,6 +246,17 @@ impl ClientBuilder {
     /// Set multiplex connection resource limits.
     pub fn set_connection_limits(&mut self, connection_limits: ConnectionLimits) {
         self.connection_limits = connection_limits;
+    }
+
+    /// Configure metadata sent in the multiplex Hello frame.
+    pub fn with_connection_info(mut self, connection_info: impl Into<Bytes>) -> Self {
+        self.connection_info = connection_info.into();
+        self
+    }
+
+    /// Set metadata sent in the multiplex Hello frame.
+    pub fn set_connection_info(&mut self, connection_info: impl Into<Bytes>) {
+        self.connection_info = connection_info.into();
     }
 
     /// Set the client identity.
@@ -402,7 +417,11 @@ impl ClientBuilder {
             tokio_tungstenite::connect_async_tls_with_config(request, None, true, Some(connector))
                 .await?;
         let transport = WebSocketTransport::new(socket);
-        let connection = Connection::with_limits(transport, self.connection_limits);
+        let connection = Connection::with_limits_and_info(
+            transport,
+            self.connection_limits,
+            self.connection_info.clone(),
+        );
         Ok(WebsocketConnection { connection })
     }
 

@@ -85,8 +85,8 @@ const CHANNEL_INITIAL_BYTE_CREDIT: u32 = (16 * KIB) as u32;
 /// The initial channel credits are fixed by the legacy protocol implementation. The
 /// configurable receive-credit ceilings therefore apply only to subsequent window growth.
 /// Requests beyond the channel and pending-request limits are rejected. Exceeding a hard
-/// queue, frame-size, or rate limit terminates the connection instead of dropping
-/// protocol frames.
+/// queue or frame-size limit terminates the connection instead of dropping protocol
+/// frames. Excess channel-open requests are rejected without closing the connection.
 #[derive(Debug, Clone, Copy)]
 pub struct ConnectionLimits {
     /// Maximum time allowed for the peer's initial Hello frame.
@@ -134,6 +134,26 @@ pub struct ConnectionLimits {
 }
 
 impl ConnectionLimits {
+    /// Bound aggregate receive byte credit across all configured channels.
+    ///
+    /// The bound must accommodate the fixed legacy initial window for every channel.
+    /// A channel may advertise less than the current per-channel maximum after this call.
+    ///
+    /// # Panics
+    ///
+    /// Panics when `max_aggregate_byte_credit` cannot accommodate every channel's
+    /// fixed initial byte credit or the channel count is zero.
+    pub fn bound_aggregate_receive_byte_credit(&mut self, max_aggregate_byte_credit: usize) {
+        assert!(self.max_channels > 0, "max_channels must not be zero");
+        let per_channel = max_aggregate_byte_credit / self.max_channels;
+        assert!(
+            per_channel >= CHANNEL_INITIAL_BYTE_CREDIT as usize,
+            "aggregate receive byte credit must accommodate every initial channel window"
+        );
+        let per_channel = u32::try_from(per_channel).unwrap_or(u32::MAX);
+        self.max_receive_byte_credit = self.max_receive_byte_credit.min(per_channel);
+    }
+
     /// Validate the limits.
     fn validate(self) {
         let minimum_frame_size =
@@ -320,6 +340,11 @@ impl ConnectionRef {
     /// Obtain the estimated round-trip time of the connection.
     pub fn estimate_round_trip_time(&self) -> Option<Duration> {
         *self.shared.smoothened_rtt.read()
+    }
+
+    /// Return peer metadata received in the Hello frame after the handshake.
+    pub fn peer_info(&self) -> Option<Bytes> {
+        self.shared.peer_info.read().clone()
     }
 
     /// Obtain an estimate on the number of frames sent over the connection.
@@ -545,6 +570,8 @@ struct ConnectionShared {
     limits: ConnectionLimits,
     /// Smoothened estimated round-trip time.
     smoothened_rtt: RwLock<Option<Duration>>,
+    /// Peer metadata received in the Hello frame.
+    peer_info: RwLock<Option<Bytes>>,
     /// Frames sent over the connection.
     frames_sent: AtomicU64,
     /// Frames received over the connection.
@@ -958,7 +985,26 @@ impl<T: ConnectionTransport> Connection<T> {
     /// Panics when the limits cannot accommodate the legacy initial channel window or
     /// otherwise contain a zero-sized mandatory capacity.
     pub fn with_limits(transport: T, limits: ConnectionLimits) -> Self {
+        Self::with_limits_and_info(transport, limits, Bytes::new())
+    }
+
+    /// Create a connection with explicit resource limits and local Hello metadata.
+    ///
+    /// # Panics
+    ///
+    /// Panics when the limits are invalid or the metadata exceeds the configured
+    /// control-payload limit.
+    pub fn with_limits_and_info(
+        transport: T,
+        limits: ConnectionLimits,
+        hello_info: impl Into<Bytes>,
+    ) -> Self {
         limits.validate();
+        let hello_info = hello_info.into();
+        assert!(
+            hello_info.len() <= limits.max_control_payload_size,
+            "hello_info must fit within max_control_payload_size"
+        );
         debug!("creating new multiplex connection");
         let shared = Arc::new(ConnectionShared {
             closed: AtomicBool::new(false),
@@ -968,12 +1014,13 @@ impl<T: ConnectionTransport> Connection<T> {
             pending_incoming_requests: atomic::AtomicUsize::new(0),
             limits,
             smoothened_rtt: RwLock::new(None),
+            peer_info: RwLock::new(None),
             frames_sent: AtomicU64::new(0),
             frames_received: AtomicU64::new(0),
         });
         let this_ref = ConnectionRef { shared };
         assert!(
-            this_ref.send_frame(FrameHello::new(&PROTOCOL_MAGIC, b"").into()),
+            this_ref.send_frame(FrameHello::new(&PROTOCOL_MAGIC, &hello_info).into()),
             "validated connection limits must accommodate the hello frame"
         );
         let mut ping_interval = tokio::time::interval_at(
@@ -1168,14 +1215,6 @@ impl<T: ConnectionTransport> Connection<T> {
             return Err(ProtocolViolation("hello must be the first peer frame"));
         }
         let limits = self.this_ref.shared.limits;
-        if matches!(&frame, Frame::ChannelRequest(_))
-            && !self
-                .channel_request_rate
-                .record(limits.max_channel_requests_per_second)
-        {
-            error!("protocol violation: channel request rate limit exceeded");
-            return Err(ProtocolViolation("channel request rate limit exceeded"));
-        }
         let control_payload_len = match &frame {
             Frame::Hello(frame) => Some(frame.info().len()),
             Frame::Close(frame) => Some(frame.reason().len()),
@@ -1225,6 +1264,8 @@ impl<T: ConnectionTransport> Connection<T> {
                     return Err(ProtocolViolation("duplicate hello frame"));
                 }
                 self.hello_received = true;
+                *self.this_ref.shared.peer_info.write() =
+                    Some(Bytes::copy_from_slice(frame.info()));
                 debug!(info = frame.info(), "connection established");
                 Some(ConnectionEvent::Connected)
             }
@@ -1234,6 +1275,25 @@ impl<T: ConnectionTransport> Connection<T> {
                 Some(ConnectionEvent::Closed)
             }
             Frame::ChannelRequest(frame) => {
+                if !self
+                    .channel_request_rate
+                    .record(limits.max_channel_requests_per_second)
+                {
+                    warn!(
+                        channel.remote_id = frame.sender_id().0,
+                        "rejecting channel after reaching the request rate limit"
+                    );
+                    if !self.this_ref.send_frame(
+                        FrameChannelReject::new(
+                            frame.sender_id(),
+                            b"channel request rate limit reached",
+                        )
+                        .into(),
+                    ) {
+                        return Err(ProtocolViolation("outgoing frame queue limit exceeded"));
+                    }
+                    return Ok(None);
+                }
                 debug!(
                     channel.sender_id = frame.sender_id().0,
                     channel.endpoint = frame.endpoint(),
@@ -3108,6 +3168,43 @@ mod tests {
         assert_eq!(error.0, "hello must be the first peer frame");
     }
 
+    /// Hello metadata is sent unchanged and retained for the connection owner.
+    #[tokio::test]
+    async fn hello_metadata_is_exchanged() {
+        let limits = ConnectionLimits::default();
+        let (transport_a, transport_b) = InMemory::new_buffered(8);
+        let mut connection_a =
+            Connection::with_limits_and_info(transport_a, limits, Bytes::from_static(b"agent"));
+        let mut connection_b = Connection::with_limits(transport_b, limits);
+
+        let (event_a, event_b) = tokio::join!(connection_a.next(), connection_b.next());
+        assert!(matches!(event_a, Some(Ok(ConnectionEvent::Connected))));
+        assert!(matches!(event_b, Some(Ok(ConnectionEvent::Connected))));
+        assert_eq!(
+            connection_b.make_ref().peer_info().as_deref(),
+            Some(b"agent".as_slice())
+        );
+        assert_eq!(
+            connection_a.make_ref().peer_info().as_deref(),
+            Some(b"".as_slice())
+        );
+    }
+
+    /// Aggregate receive-credit bounds scale the per-channel window without changing its
+    /// floor.
+    #[test]
+    fn aggregate_receive_byte_credit_is_bounded() {
+        let mut limits = ConnectionLimits {
+            max_channels: 512,
+            ..ConnectionLimits::default()
+        };
+
+        limits.bound_aggregate_receive_byte_credit(64 * MIB as usize);
+
+        assert_eq!(limits.max_receive_byte_credit, 128 * KIB as u32);
+        limits.validate();
+    }
+
     #[tokio::test(start_paused = true)]
     async fn unanswered_ping_closes_an_established_connection() {
         let limits = ConnectionLimits {
@@ -3943,6 +4040,42 @@ mod tests {
                 .load(atomic::Ordering::Acquire),
             0
         );
+    }
+
+    /// Excess channel opens are rejected without terminating an otherwise healthy
+    /// connection.
+    #[tokio::test]
+    async fn channel_request_rate_limit_is_non_fatal() {
+        let limits = ConnectionLimits {
+            max_channels: 2,
+            max_pending_channel_requests: 2,
+            max_channel_requests_per_second: 1,
+            ..ConnectionLimits::default()
+        };
+        let (mut connection, _peer) = in_memory_connection_with_limits(limits);
+
+        let first = connection
+            .handle_frame(FrameChannelRequest::new(ChannelId(10), 1, 1, b"first").into())
+            .expect("first request caused a protocol error")
+            .expect("first request was rejected");
+        assert!(matches!(first, ConnectionEvent::RequestChannel(_)));
+        assert!(
+            connection
+                .handle_frame(FrameChannelRequest::new(ChannelId(11), 1, 1, b"second").into())
+                .expect("rate-limited request caused a protocol error")
+                .is_none()
+        );
+        assert!(!connection.closed);
+
+        let _hello = connection
+            .this_ref
+            .shared
+            .pop_frame()
+            .expect("hello frame was not queued");
+        assert!(matches!(
+            connection.this_ref.shared.pop_frame(),
+            Some(Frame::ChannelReject(_))
+        ));
     }
 
     #[tokio::test]

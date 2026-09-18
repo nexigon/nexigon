@@ -59,9 +59,6 @@ use crate::system_info::get_system_info;
 const MAX_CONCURRENT_TERMINALS: usize = 4;
 #[cfg(not(target_os = "linux"))]
 const MAX_CONCURRENT_TERMINALS: usize = 0;
-// Forwarding has no feature-level semaphore; the default multiplex connection
-// bounds the total number of active endpoint tasks to 32.
-const SUPERVISOR_QUEUE_CAPACITY: usize = 32;
 const TCP_CONNECT_TIMEOUT: Duration = Duration::from_secs(10);
 const TASK_SHUTDOWN_GRACE: Duration = Duration::from_secs(8);
 
@@ -228,7 +225,10 @@ pub async fn run_with_connection(
     let command_slots = command_slots();
     let endpoint_limits = EndpointLimits::new(command_slots.clone());
     let cancellation = CancellationToken::new();
-    let (task_tx, mut task_rx) = mpsc::channel(SUPERVISOR_QUEUE_CAPACITY);
+    let supervisor_queue_capacity = crate::config::multiplex_settings(&config)
+        .context("invalid multiplex configuration")?
+        .supervisor_queue_capacity();
+    let (task_tx, mut task_rx) = mpsc::channel(supervisor_queue_capacity);
     let mut tasks = JoinSet::new();
 
     let shutdown_cancellation = cancellation.clone();
@@ -1074,7 +1074,6 @@ mod tests {
     use nexigon_ids::Generate;
     use nexigon_multiplex::Connection;
     use nexigon_multiplex::ConnectionEvent;
-    use nexigon_multiplex::ConnectionLimits;
     use nexigon_multiplex::ConnectionRef;
     use nexigon_multiplex::OpenError;
     use nexigon_multiplex::transport::InMemory;
@@ -1096,7 +1095,6 @@ mod tests {
     use super::MAX_CONCURRENT_TERMINALS;
     use super::OperationReporter;
     use super::ReportAttempt;
-    use super::SUPERVISOR_QUEUE_CAPACITY;
     use super::SupervisedTask;
     use super::TaskKind;
     use super::command_slots;
@@ -1147,13 +1145,13 @@ mod tests {
         /// Run real channel handling and task supervision with the supplied policy.
         async fn with_config(config: Config) -> Self {
             let (hub_transport, agent_transport) = InMemory::<Bytes, Bytes>::new_buffered(64);
-            let hub_limits = ConnectionLimits {
-                max_pending_channel_requests: 24,
-                ..ConnectionLimits::default()
-            };
+            let multiplex_settings = crate::config::multiplex_settings(&config).unwrap();
+            let hub_limits = crate::hub_connection_limits(multiplex_settings);
             let mut hub_connection = Connection::with_limits(hub_transport, hub_limits);
-            let agent_connection =
-                Connection::with_limits(agent_transport, crate::hub_connection_limits());
+            let agent_connection = Connection::with_limits(
+                agent_transport,
+                crate::hub_connection_limits(multiplex_settings),
+            );
             let hub_ref = hub_connection.make_ref();
             let hub = tokio::spawn(async move {
                 while let Some(event) = hub_connection.next().await {
@@ -1172,7 +1170,10 @@ mod tests {
             let agent = tokio::spawn(async move {
                 let config = Arc::new(config);
                 let limits = EndpointLimits::new(command_slots());
-                let (task_tx, mut task_rx) = mpsc::channel(SUPERVISOR_QUEUE_CAPACITY);
+                let supervisor_queue_capacity = crate::config::multiplex_settings(&config)
+                    .unwrap()
+                    .supervisor_queue_capacity();
+                let (task_tx, mut task_rx) = mpsc::channel(supervisor_queue_capacity);
                 let mut tasks = JoinSet::new();
                 spawn_supervised(
                     &mut tasks,
@@ -1267,10 +1268,10 @@ mod tests {
         }
     }
 
-    /// A Hub may establish 24 simultaneous forwarding connections.
+    /// A browser-sized burst can establish far more than the legacy 24 connections.
     #[tokio::test]
-    async fn live_forwarding_accepts_twenty_four_connections() {
-        const CONCURRENT_FORWARDINGS: usize = 24;
+    async fn live_forwarding_accepts_large_browser_burst() {
+        const CONCURRENT_FORWARDINGS: usize = 128;
 
         let listener = tokio::net::TcpListener::bind((Ipv4Addr::LOCALHOST, 0))
             .await

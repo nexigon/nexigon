@@ -1,0 +1,18 @@
+//! Agent connection metadata exchanged during the multiplex handshake.
+
+/// Agent resource capacity advertised to a Hub.
+///
+/// The Hub treats every value as an upper bound and applies its own configured
+/// limits. New optional fields may be added in later contract versions.
+record AgentHello {
+    /// Connection metadata contract version.
+    version: u32,
+    /// Maximum simultaneously open multiplex channels.
+    max_channels: u32,
+    /// Maximum channels available for TCP forwarding.
+    max_forwarding_channels: u32,
+    /// Maximum incoming channel requests awaiting an Agent response.
+    max_pending_channel_requests: u32,
+    /// Maximum channel-open requests accepted in one second.
+    max_channel_requests_per_second: u32,
+}
