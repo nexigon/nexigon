@@ -4,8 +4,7 @@
 //! with a `type` field. Unknown types are ignored for forward compatibility.
 
 /// JSON value.
-#[rust(type = "serde_json::Value")]
-opaque JsonValue
+alias JsonValue: json
 
 /// Line written by a command to stdout.
 #[json(tag = "type")]

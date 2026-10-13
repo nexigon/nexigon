@@ -8,7 +8,7 @@ repository.workspace = true
 homepage.workspace = true
 
 [dependencies]
-indexmap.workspace = true
 nexigon-api.workspace = true
 serde_json.workspace = true
+sidex.workspace = true
 sidex-types-openapi.workspace = true

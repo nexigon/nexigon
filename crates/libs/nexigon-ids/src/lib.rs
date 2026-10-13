@@ -257,6 +257,8 @@ macro_rules! define_types {
             }
         }
 
+        sidex::types::impl_text!(AnyId, |id| Id::stringify(id));
+
         impl std::str::FromStr for AnyId {
             type Err = errors::InvalidIdError;
 
@@ -353,6 +355,8 @@ macro_rules! define_types {
                         })
                     }
                 }
+
+                sidex::types::impl_text!($name, |id| Id::stringify(id));
 
                 impl std::fmt::Display for $name {
                     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {

@@ -9,9 +9,7 @@
 //! (e.g. for `endpoint = "executor"`, raw `nexigon-rpc` bytes flow through).
 
 /// JSON value.
-#[rust(type = "serde_json::Value")]
-#[json(type = "any")]
-opaque JsonValue
+alias JsonValue: json
 
 /// Initial message sent by the client.
 record ClientHello {

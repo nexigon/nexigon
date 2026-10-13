@@ -1,14 +1,10 @@
 //! Time and date types.
 
 /// ISO 8601 formatted date and time string.
-#[rust(type = "jiff::Timestamp")]
-#[json(type = "string")]
-opaque Timestamp
+alias Timestamp: timestamp
 
 /// Date string without time zone.
-#[rust(type = "jiff::civil::Date")]
-#[json(type = "string")]
-opaque Date
+alias Date: date
 
 /// Date span with start and end dates.
 /// 

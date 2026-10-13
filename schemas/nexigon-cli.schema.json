@@ -18,10 +18,7 @@
   "unevaluatedProperties": false,
   "$defs": {
     "nexigon_cli.config.AuthenticationToken": {
-      "$id": "nexigon_cli.config.AuthenticationToken",
-      "type": [
-        "string"
-      ],
+      "type": "string",
       "description": "User token or organization API token used to authenticate the CLI."
     }
   }

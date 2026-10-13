@@ -11,7 +11,7 @@ env:
   # Download link for the `cargo-deny` binary to use.
   CARGO_DENY_URL: https://github.com/EmbarkStudios/cargo-deny/releases/download/0.19.0/cargo-deny-0.19.0-x86_64-unknown-linux-musl.tar.gz
   # Download link for the `sidex` binary to use.
-  SIDEX_URL: https://github.com/silitics/sidex/releases/download/v0.2.6/sidex-x86_64-unknown-linux-musl.tar.gz
+  SIDEX_URL: https://github.com/silitics/sidex/releases/download/v0.4.0/sidex-x86_64-unknown-linux-musl.tar.gz
   # Download link for the `cross` binary to use.
   CROSS_URL: https://github.com/cross-rs/cross/releases/download/v0.2.5/cross-x86_64-unknown-linux-gnu.tar.gz
 

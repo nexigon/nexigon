@@ -758,7 +758,10 @@ pub async fn execute_repositories_cmd(
         RepositoriesCmd::IssueUrl { asset, filename } => {
             let asset_id = resolve_asset(executor, asset).await?;
             let output = executor
-                .execute(IssueAssetDownloadUrlAction::new(asset_id).with_filename(filename.clone()))
+                .execute(
+                    IssueAssetDownloadUrlAction::new(asset_id)
+                        .with_filename(filename.clone().map(Into::into)),
+                )
                 .await
                 .context("unable to issue asset download URL")??;
             write_json(&output);
@@ -821,8 +824,13 @@ pub async fn execute_repositories_cmd(
                 let output = executor
                     .execute(
                         CreatePackageAction::new(repository_id.clone(), name.to_owned())
-                            .with_kind(kind.clone())
-                            .with_metadata(metadata),
+                            .with_kind(kind.clone().map(Into::into))
+                            .with_metadata(metadata.map(|value| {
+                                value
+                                    .into_iter()
+                                    .map(|(key, value)| (key.into(), value.into()))
+                                    .collect()
+                            })),
                     )
                     .await
                     .context("creating package")??;
@@ -847,7 +855,10 @@ pub async fn execute_repositories_cmd(
             PackagesCmd::SetKind { package, kind } => {
                 let package_id = resolve_package(executor, package).await?;
                 let output = executor
-                    .execute(SetPackageKindAction::new(package_id).with_kind(kind.clone()))
+                    .execute(
+                        SetPackageKindAction::new(package_id)
+                            .with_kind(kind.clone().map(Into::into)),
+                    )
                     .await
                     .context("setting package kind")??;
                 write_json(&output);
@@ -857,7 +868,10 @@ pub async fn execute_repositories_cmd(
                 let output = executor
                     .execute(SetPackageMetadataAction::new(
                         package_id,
-                        json_value_to_map(metadata),
+                        json_value_to_map(metadata)
+                            .into_iter()
+                            .map(|(key, value)| (key.into(), value.into()))
+                            .collect(),
                     ))
                     .await
                     .context("setting package metadata")??;
@@ -879,7 +893,12 @@ pub async fn execute_repositories_cmd(
                                 asset_id.clone(),
                                 filename.clone(),
                             )
-                            .with_metadata(metadata),
+                            .with_metadata(metadata.map(|value| {
+                                value
+                                    .into_iter()
+                                    .map(|(key, value)| (key.into(), value.into()))
+                                    .collect()
+                            })),
                         )
                         .await
                         .context("adding package asset")??;
@@ -903,7 +922,10 @@ pub async fn execute_repositories_cmd(
                         .execute(SetPackageAssetMetadataAction::new(
                             package_id,
                             filename.clone(),
-                            json_value_to_map(metadata),
+                            json_value_to_map(metadata)
+                                .into_iter()
+                                .map(|(key, value)| (key.into(), value.into()))
+                                .collect(),
                         ))
                         .await
                         .context("setting package asset metadata")??;
@@ -1001,9 +1023,14 @@ pub async fn execute_versions_cmd(
             let output = executor
                 .execute(
                     CreatePackageVersionAction::new(package_id.clone())
-                        .with_name(name.clone())
+                        .with_name(name.clone().map(Into::into))
                         .with_tags(Some(tags.iter().map(|tag| tag.0.clone()).collect()))
-                        .with_metadata(metadata),
+                        .with_metadata(metadata.map(|value| {
+                            value
+                                .into_iter()
+                                .map(|(key, value)| (key.into(), value.into()))
+                                .collect()
+                        })),
                 )
                 .await
                 .context("creating package version")??;
@@ -1021,7 +1048,8 @@ pub async fn execute_versions_cmd(
             let version_id = resolve_version(executor, version).await?;
             let output = executor
                 .execute(
-                    SetPackageVersionNameAction::new(version_id.clone()).with_name(name.clone()),
+                    SetPackageVersionNameAction::new(version_id.clone())
+                        .with_name(name.clone().map(Into::into)),
                 )
                 .await
                 .context("renaming package version")??;
@@ -1032,7 +1060,10 @@ pub async fn execute_versions_cmd(
             let output = executor
                 .execute(SetPackageVersionMetadataAction::new(
                     version_id.clone(),
-                    json_value_to_map(metadata),
+                    json_value_to_map(metadata)
+                        .into_iter()
+                        .map(|(key, value)| (key.into(), value.into()))
+                        .collect(),
                 ))
                 .await
                 .context("setting package version metadata")??;
@@ -1076,7 +1107,12 @@ pub async fn execute_versions_cmd(
                             asset_id.clone(),
                             filename.to_owned(),
                         )
-                        .with_metadata(metadata),
+                        .with_metadata(metadata.map(|value| {
+                            value
+                                .into_iter()
+                                .map(|(key, value)| (key.into(), value.into()))
+                                .collect()
+                        })),
                     )
                     .await??;
                 write_json(&output);
@@ -1101,7 +1137,10 @@ pub async fn execute_versions_cmd(
                     .execute(SetPackageVersionAssetMetadataAction::new(
                         version_id.clone(),
                         filename.clone(),
-                        json_value_to_map(metadata),
+                        json_value_to_map(metadata)
+                            .into_iter()
+                            .map(|(key, value)| (key.into(), value.into()))
+                            .collect(),
                     ))
                     .await
                     .context("setting package version asset metadata")??;

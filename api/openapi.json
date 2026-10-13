@@ -7914,6 +7914,7 @@
       },
       "nexigon_api.datetime.Date": {
         "type": "string",
+        "format": "date",
         "description": "Date string without time zone."
       },
       "nexigon_api.datetime.DateSpan": {
@@ -7935,6 +7936,7 @@
       },
       "nexigon_api.datetime.Timestamp": {
         "type": "string",
+        "format": "date-time",
         "description": "ISO 8601 formatted date and time string."
       },
       "nexigon_api.devices.AddDeviceCertificateAction": {
@@ -7993,7 +7995,9 @@
           },
           "limit": {
             "type": "integer",
-            "format": "uint32"
+            "format": "uint32",
+            "maximum": 4294967295,
+            "minimum": 0
           },
           "kinds": {
             "type": "array",
@@ -8244,8 +8248,13 @@
                 }
               },
               "durationMs": {
-                "type": "integer",
-                "format": "uint64"
+                "type": [
+                  "integer",
+                  "string"
+                ],
+                "format": "uint64",
+                "minimum": 0,
+                "pattern": "^[0-9]+$"
               }
             },
             "required": [
@@ -8277,8 +8286,13 @@
             }
           },
           "durationMs": {
-            "type": "integer",
-            "format": "uint64"
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "uint64",
+            "minimum": 0,
+            "pattern": "^[0-9]+$"
           }
         },
         "required": [
@@ -8308,7 +8322,9 @@
               },
               "timeoutSecs": {
                 "type": "integer",
-                "format": "uint32"
+                "format": "uint32",
+                "maximum": 4294967295,
+                "minimum": 0
               }
             },
             "required": [
@@ -8334,7 +8350,9 @@
           },
           "timeoutSecs": {
             "type": "integer",
-            "format": "uint32"
+            "format": "uint32",
+            "maximum": 4294967295,
+            "minimum": 0
           }
         },
         "required": [
@@ -8381,7 +8399,9 @@
           },
           "connectedForSecs": {
             "type": "integer",
-            "format": "uint32"
+            "format": "uint32",
+            "maximum": 4294967295,
+            "minimum": 0
           }
         },
         "required": [
@@ -8417,7 +8437,9 @@
           },
           "durationSecs": {
             "type": "integer",
-            "format": "uint32"
+            "format": "uint32",
+            "maximum": 4294967295,
+            "minimum": 0
           }
         },
         "required": [
@@ -8596,7 +8618,9 @@
           },
           "timeoutSecs": {
             "type": "integer",
-            "format": "uint32"
+            "format": "uint32",
+            "maximum": 4294967295,
+            "minimum": 0
           }
         },
         "required": [
@@ -8620,7 +8644,9 @@
           },
           "timeoutSecs": {
             "type": "integer",
-            "format": "uint32"
+            "format": "uint32",
+            "maximum": 4294967295,
+            "minimum": 0
           }
         },
         "required": [
@@ -8771,7 +8797,9 @@
               },
               "timeoutSecs": {
                 "type": "integer",
-                "format": "uint32"
+                "format": "uint32",
+                "maximum": 4294967295,
+                "minimum": 0
               }
             },
             "required": [
@@ -8797,7 +8825,9 @@
               },
               "timeoutSecs": {
                 "type": "integer",
-                "format": "uint32"
+                "format": "uint32",
+                "maximum": 4294967295,
+                "minimum": 0
               }
             },
             "required": [
@@ -8820,7 +8850,9 @@
               },
               "timeoutSecs": {
                 "type": "integer",
-                "format": "uint32"
+                "format": "uint32",
+                "maximum": 4294967295,
+                "minimum": 0
               }
             },
             "required": [
@@ -8866,7 +8898,9 @@
         "properties": {
           "stepIndex": {
             "type": "integer",
-            "format": "uint32"
+            "format": "uint32",
+            "maximum": 4294967295,
+            "minimum": 0
           },
           "status": {
             "$ref": "#/components/schemas/nexigon_api.devices.DeviceOperationStepStatus"
@@ -8934,11 +8968,15 @@
           },
           "stepIndex": {
             "type": "integer",
-            "format": "uint32"
+            "format": "uint32",
+            "maximum": 4294967295,
+            "minimum": 0
           },
           "stepCount": {
             "type": "integer",
-            "format": "uint32"
+            "format": "uint32",
+            "maximum": 4294967295,
+            "minimum": 0
           },
           "lastError": {
             "type": "string"
@@ -9004,7 +9042,9 @@
           },
           "timeoutSecs": {
             "type": "integer",
-            "format": "uint32"
+            "format": "uint32",
+            "maximum": 4294967295,
+            "minimum": 0
           }
         },
         "required": [
@@ -9031,7 +9071,9 @@
           },
           "stepIndex": {
             "type": "integer",
-            "format": "uint32"
+            "format": "uint32",
+            "maximum": 4294967295,
+            "minimum": 0
           },
           "checkpoint": {
             "$ref": "#/components/schemas/nexigon_api.json.JsonValue"
@@ -9076,7 +9118,9 @@
               },
               "timeoutSecs": {
                 "type": "integer",
-                "format": "uint32"
+                "format": "uint32",
+                "maximum": 4294967295,
+                "minimum": 0
               }
             },
             "required": [
@@ -9102,7 +9146,9 @@
               },
               "timeoutSecs": {
                 "type": "integer",
-                "format": "uint32"
+                "format": "uint32",
+                "maximum": 4294967295,
+                "minimum": 0
               }
             },
             "required": [
@@ -9127,8 +9173,13 @@
             "type": "boolean"
           },
           "version": {
-            "type": "integer",
-            "format": "uint64"
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "uint64",
+            "minimum": 0,
+            "pattern": "^[0-9]+$"
           },
           "lastUpdated": {
             "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
@@ -9333,8 +9384,13 @@
                 "type": "boolean"
               },
               "version": {
-                "type": "integer",
-                "format": "uint64"
+                "type": [
+                  "integer",
+                  "string"
+                ],
+                "format": "uint64",
+                "minimum": 0,
+                "pattern": "^[0-9]+$"
               },
               "lastUpdated": {
                 "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
@@ -9359,12 +9415,18 @@
           },
           "validForSecs": {
             "type": "integer",
-            "format": "uint32"
+            "format": "uint32",
+            "maximum": 4294967295,
+            "minimum": 0
           },
           "hostname": {
             "type": "string"
           },
-          "port": {},
+          "port": {
+            "type": "integer",
+            "maximum": 65535,
+            "minimum": 0
+          },
           "redirect": {
             "type": "string"
           }
@@ -9399,7 +9461,9 @@
           },
           "validForSecs": {
             "type": "integer",
-            "format": "uint32"
+            "format": "uint32",
+            "maximum": 4294967295,
+            "minimum": 0
           },
           "claims": {
             "$ref": "#/components/schemas/nexigon_api.json.JsonValue"
@@ -9509,7 +9573,9 @@
           },
           "limit": {
             "type": "integer",
-            "format": "uint32"
+            "format": "uint32",
+            "maximum": 4294967295,
+            "minimum": 0
           },
           "activeOnly": {
             "type": "boolean"
@@ -9547,7 +9613,9 @@
           },
           "limit": {
             "type": "integer",
-            "format": "uint32"
+            "format": "uint32",
+            "maximum": 4294967295,
+            "minimum": 0
           }
         },
         "required": [
@@ -9681,7 +9749,9 @@
           },
           "currentConnectionDurationSecs": {
             "type": "integer",
-            "format": "uint32"
+            "format": "uint32",
+            "maximum": 4294967295,
+            "minimum": 0
           }
         },
         "required": [
@@ -9778,7 +9848,9 @@
           },
           "stepIndex": {
             "type": "integer",
-            "format": "uint32"
+            "format": "uint32",
+            "maximum": 4294967295,
+            "minimum": 0
           },
           "claimId": {
             "$ref": "#/components/schemas/nexigon_api.devices.DeviceOperationWorkClaimId"
@@ -9843,8 +9915,13 @@
             "type": "boolean"
           },
           "expectedVersion": {
-            "type": "integer",
-            "format": "uint64"
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "uint64",
+            "minimum": 0,
+            "pattern": "^[0-9]+$"
           }
         },
         "required": [
@@ -9875,8 +9952,13 @@
                 "const": "VersionConflict"
               },
               "currentVersion": {
-                "type": "integer",
-                "format": "uint64"
+                "type": [
+                  "integer",
+                  "string"
+                ],
+                "format": "uint64",
+                "minimum": 0,
+                "pattern": "^[0-9]+$"
               }
             },
             "required": [
@@ -9902,8 +9984,13 @@
         "description": "Details of a version conflict when setting a device property.",
         "properties": {
           "currentVersion": {
-            "type": "integer",
-            "format": "uint64"
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "uint64",
+            "minimum": 0,
+            "pattern": "^[0-9]+$"
           }
         },
         "required": [
@@ -10053,7 +10140,11 @@
               "hostname": {
                 "type": "string"
               },
-              "port": {}
+              "port": {
+                "type": "integer",
+                "maximum": 65535,
+                "minimum": 0
+              }
             },
             "required": [
               "result",
@@ -10075,7 +10166,11 @@
           "hostname": {
             "type": "string"
           },
-          "port": {}
+          "port": {
+            "type": "integer",
+            "maximum": 65535,
+            "minimum": 0
+          }
         },
         "required": [
           "deviceId"
@@ -10161,8 +10256,13 @@
             "type": "string"
           },
           "retryAfterSeconds": {
-            "type": "integer",
-            "format": "uint64"
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "uint64",
+            "minimum": 0,
+            "pattern": "^[0-9]+$"
           }
         },
         "required": [
@@ -10193,7 +10293,11 @@
                 "const": "Ok"
               },
               "value": {}
-            }
+            },
+            "required": [
+              "result",
+              "value"
+            ]
           },
           {
             "type": "object",
@@ -10201,21 +10305,13 @@
               "result": {
                 "const": "Error"
               },
-              "kind": {
-                "$ref": "#/components/schemas/nexigon_api.errors.ActionErrorKind"
-              },
-              "message": {
-                "type": "string"
-              },
-              "retryAfterSeconds": {
-                "type": "integer",
-                "format": "uint64"
+              "error": {
+                "$ref": "#/components/schemas/nexigon_api.errors.ActionError"
               }
             },
             "required": [
               "result",
-              "kind",
-              "message"
+              "error"
             ]
           }
         ]
@@ -10265,19 +10361,27 @@
               },
               "minSuccessPercent": {
                 "type": "integer",
-                "format": "uint32"
+                "format": "uint32",
+                "maximum": 4294967295,
+                "minimum": 0
               },
               "successPercent": {
                 "type": "integer",
-                "format": "uint32"
+                "format": "uint32",
+                "maximum": 4294967295,
+                "minimum": 0
               },
               "maxFailurePercent": {
                 "type": "integer",
-                "format": "uint32"
+                "format": "uint32",
+                "maximum": 4294967295,
+                "minimum": 0
               },
               "failurePercent": {
                 "type": "integer",
-                "format": "uint32"
+                "format": "uint32",
+                "maximum": 4294967295,
+                "minimum": 0
               },
               "gates": {
                 "type": "array",
@@ -10353,7 +10457,9 @@
           },
           "enrollmentIntervalSecs": {
             "type": "integer",
-            "format": "uint32"
+            "format": "uint32",
+            "maximum": 4294967295,
+            "minimum": 0
           },
           "closeWhenConverged": {
             "type": "boolean"
@@ -10466,7 +10572,9 @@
           },
           "minMatchPercent": {
             "type": "integer",
-            "format": "uint32"
+            "format": "uint32",
+            "maximum": 4294967295,
+            "minimum": 0
           }
         },
         "required": [
@@ -10498,31 +10606,45 @@
         "properties": {
           "total": {
             "type": "integer",
-            "format": "uint32"
+            "format": "uint32",
+            "maximum": 4294967295,
+            "minimum": 0
           },
           "pending": {
             "type": "integer",
-            "format": "uint32"
+            "format": "uint32",
+            "maximum": 4294967295,
+            "minimum": 0
           },
           "running": {
             "type": "integer",
-            "format": "uint32"
+            "format": "uint32",
+            "maximum": 4294967295,
+            "minimum": 0
           },
           "succeeded": {
             "type": "integer",
-            "format": "uint32"
+            "format": "uint32",
+            "maximum": 4294967295,
+            "minimum": 0
           },
           "failed": {
             "type": "integer",
-            "format": "uint32"
+            "format": "uint32",
+            "maximum": 4294967295,
+            "minimum": 0
           },
           "timedOut": {
             "type": "integer",
-            "format": "uint32"
+            "format": "uint32",
+            "maximum": 4294967295,
+            "minimum": 0
           },
           "cancelled": {
             "type": "integer",
-            "format": "uint32"
+            "format": "uint32",
+            "maximum": 4294967295,
+            "minimum": 0
           }
         },
         "required": [
@@ -10566,7 +10688,9 @@
           },
           "percentage": {
             "type": "integer",
-            "format": "uint32"
+            "format": "uint32",
+            "maximum": 4294967295,
+            "minimum": 0
           },
           "autoAdvance": {
             "type": "boolean"
@@ -10594,7 +10718,9 @@
               },
               "minMatchPercent": {
                 "type": "integer",
-                "format": "uint32"
+                "format": "uint32",
+                "maximum": 4294967295,
+                "minimum": 0
               }
             },
             "required": [
@@ -10626,7 +10752,9 @@
         "properties": {
           "gateIndex": {
             "type": "integer",
-            "format": "uint32"
+            "format": "uint32",
+            "maximum": 4294967295,
+            "minimum": 0
           },
           "passed": {
             "type": "boolean"
@@ -10636,15 +10764,21 @@
           },
           "actualPercent": {
             "type": "integer",
-            "format": "uint32"
+            "format": "uint32",
+            "maximum": 4294967295,
+            "minimum": 0
           },
           "thresholdPercent": {
             "type": "integer",
-            "format": "uint32"
+            "format": "uint32",
+            "maximum": 4294967295,
+            "minimum": 0
           },
           "evaluationErrorCount": {
             "type": "integer",
-            "format": "uint32"
+            "format": "uint32",
+            "maximum": 4294967295,
+            "minimum": 0
           },
           "evaluationError": {
             "type": "string"
@@ -10666,11 +10800,15 @@
         "properties": {
           "minSuccessPercent": {
             "type": "integer",
-            "format": "uint32"
+            "format": "uint32",
+            "maximum": 4294967295,
+            "minimum": 0
           },
           "maxFailurePercent": {
             "type": "integer",
-            "format": "uint32"
+            "format": "uint32",
+            "maximum": 4294967295,
+            "minimum": 0
           },
           "gates": {
             "type": "array",
@@ -10690,19 +10828,27 @@
         "properties": {
           "minSuccessPercent": {
             "type": "integer",
-            "format": "uint32"
+            "format": "uint32",
+            "maximum": 4294967295,
+            "minimum": 0
           },
           "successPercent": {
             "type": "integer",
-            "format": "uint32"
+            "format": "uint32",
+            "maximum": 4294967295,
+            "minimum": 0
           },
           "maxFailurePercent": {
             "type": "integer",
-            "format": "uint32"
+            "format": "uint32",
+            "maximum": 4294967295,
+            "minimum": 0
           },
           "failurePercent": {
             "type": "integer",
-            "format": "uint32"
+            "format": "uint32",
+            "maximum": 4294967295,
+            "minimum": 0
           },
           "gates": {
             "type": "array",
@@ -10750,7 +10896,9 @@
           },
           "enrollmentIntervalSecs": {
             "type": "integer",
-            "format": "uint32"
+            "format": "uint32",
+            "maximum": 4294967295,
+            "minimum": 0
           },
           "lastEnrollmentAt": {
             "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
@@ -10760,11 +10908,15 @@
           },
           "activeStageIndex": {
             "type": "integer",
-            "format": "uint32"
+            "format": "uint32",
+            "maximum": 4294967295,
+            "minimum": 0
           },
           "stageCount": {
             "type": "integer",
-            "format": "uint32"
+            "format": "uint32",
+            "maximum": 4294967295,
+            "minimum": 0
           },
           "progress": {
             "$ref": "#/components/schemas/nexigon_api.fleet.FleetOperationProgress"
@@ -10804,11 +10956,15 @@
           },
           "stageIndex": {
             "type": "integer",
-            "format": "uint32"
+            "format": "uint32",
+            "maximum": 4294967295,
+            "minimum": 0
           },
           "stepIndex": {
             "type": "integer",
-            "format": "uint32"
+            "format": "uint32",
+            "maximum": 4294967295,
+            "minimum": 0
           },
           "status": {
             "$ref": "#/components/schemas/nexigon_api.devices.DeviceOperationStatus"
@@ -10882,8 +11038,13 @@
             "$ref": "#/components/schemas/nexigon_api.fleet.FleetPropertyKind"
           },
           "version": {
-            "type": "integer",
-            "format": "uint64"
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "uint64",
+            "minimum": 0,
+            "pattern": "^[0-9]+$"
           },
           "error": {
             "type": "string"
@@ -11022,8 +11183,13 @@
                 "$ref": "#/components/schemas/nexigon_api.fleet.FleetPropertyKind"
               },
               "version": {
-                "type": "integer",
-                "format": "uint64"
+                "type": [
+                  "integer",
+                  "string"
+                ],
+                "format": "uint64",
+                "minimum": 0,
+                "pattern": "^[0-9]+$"
               },
               "error": {
                 "type": "string"
@@ -11288,15 +11454,21 @@
         "properties": {
           "users": {
             "type": "integer",
-            "format": "uint32"
+            "format": "uint32",
+            "maximum": 4294967295,
+            "minimum": 0
           },
           "projects": {
             "type": "integer",
-            "format": "uint32"
+            "format": "uint32",
+            "maximum": 4294967295,
+            "minimum": 0
           },
           "devices": {
             "type": "integer",
-            "format": "uint32"
+            "format": "uint32",
+            "maximum": 4294967295,
+            "minimum": 0
           }
         },
         "required": [
@@ -11340,19 +11512,27 @@
           },
           "attempts": {
             "type": "integer",
-            "format": "uint32"
+            "format": "uint32",
+            "maximum": 4294967295,
+            "minimum": 0
           },
           "retryLimit": {
             "type": "integer",
-            "format": "uint32"
+            "format": "uint32",
+            "maximum": 4294967295,
+            "minimum": 0
           },
           "retryDelay": {
             "type": "integer",
-            "format": "uint32"
+            "format": "uint32",
+            "maximum": 4294967295,
+            "minimum": 0
           },
           "timeout": {
             "type": "integer",
-            "format": "uint32"
+            "format": "uint32",
+            "maximum": 4294967295,
+            "minimum": 0
           },
           "createdAt": {
             "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
@@ -11455,7 +11635,11 @@
               "value": {
                 "$ref": "#/components/schemas/nexigon_api.json.JsonValue"
               }
-            }
+            },
+            "required": [
+              "kind",
+              "value"
+            ]
           },
           {
             "type": "object",
@@ -11858,7 +12042,9 @@
           },
           {
             "type": "integer",
-            "format": "uint32"
+            "format": "uint32",
+            "maximum": 4294967295,
+            "minimum": 0
           }
         ]
       },
@@ -12378,7 +12564,8 @@
         "unevaluatedProperties": false
       },
       "nexigon_api.pagination.PageCursor": {
-        "description": "A sequence of Unicode code points."
+        "type": "string",
+        "description": "Opaque, authenticated continuation token. Clients must not interpret its contents."
       },
       "nexigon_api.pagination.PageInfo": {
         "type": "object",
@@ -12397,7 +12584,9 @@
         "properties": {
           "limit": {
             "type": "integer",
-            "format": "uint32"
+            "format": "uint32",
+            "maximum": 4294967295,
+            "minimum": 0
           },
           "cursor": {
             "$ref": "#/components/schemas/nexigon_api.pagination.PageCursor"
@@ -12469,7 +12658,9 @@
           },
           "validForSecs": {
             "type": "integer",
-            "format": "uint32"
+            "format": "uint32",
+            "maximum": 4294967295,
+            "minimum": 0
           }
         },
         "required": [
@@ -12626,7 +12817,9 @@
           },
           "deviceCount": {
             "type": "integer",
-            "format": "uint32"
+            "format": "uint32",
+            "maximum": 4294967295,
+            "minimum": 0
           }
         },
         "required": [
@@ -12890,14 +13083,18 @@
           },
           "pendingCertificatesCount": {
             "type": "integer",
-            "format": "uint32"
+            "format": "uint32",
+            "maximum": 4294967295,
+            "minimum": 0
           },
           "lastConnectedAt": {
             "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
           },
           "currentConnectionDurationSecs": {
             "type": "integer",
-            "format": "uint32"
+            "format": "uint32",
+            "maximum": 4294967295,
+            "minimum": 0
           }
         },
         "required": [
@@ -13279,12 +13476,22 @@
             "type": "string"
           },
           "totalSpace": {
-            "type": "integer",
-            "format": "uint64"
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "uint64",
+            "minimum": 0,
+            "pattern": "^[0-9]+$"
           },
           "availableSpace": {
-            "type": "integer",
-            "format": "uint64"
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "uint64",
+            "minimum": 0,
+            "pattern": "^[0-9]+$"
           }
         },
         "required": [
@@ -13308,7 +13515,11 @@
               "name": {
                 "type": "string"
               },
-              "port": {},
+              "port": {
+                "type": "integer",
+                "maximum": 65535,
+                "minimum": 0
+              },
               "path": {
                 "type": "string"
               }
@@ -13328,7 +13539,11 @@
           "name": {
             "type": "string"
           },
-          "port": {},
+          "port": {
+            "type": "integer",
+            "maximum": 65535,
+            "minimum": 0
+          },
           "path": {
             "type": "string"
           }
@@ -13344,8 +13559,13 @@
         "description": "Memory information.",
         "properties": {
           "total": {
-            "type": "integer",
-            "format": "uint64"
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "uint64",
+            "minimum": 0,
+            "pattern": "^[0-9]+$"
           }
         },
         "required": [
@@ -13419,7 +13639,9 @@
           },
           "failureCount": {
             "type": "integer",
-            "format": "uint32"
+            "format": "uint32",
+            "maximum": 4294967295,
+            "minimum": 0
           },
           "lastError": {
             "type": "string"
@@ -13520,8 +13742,13 @@
             }
           },
           "size": {
-            "type": "integer",
-            "format": "uint64"
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "uint64",
+            "minimum": 0,
+            "pattern": "^[0-9]+$"
           },
           "updatedAt": {
             "type": "string"
@@ -13770,8 +13997,13 @@
             "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryId"
           },
           "size": {
-            "type": "integer",
-            "format": "uint64"
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "uint64",
+            "minimum": 0,
+            "pattern": "^[0-9]+$"
           },
           "digest": {
             "$ref": "#/components/schemas/nexigon_api.digest.Digest"
@@ -13796,7 +14028,11 @@
               "assetId": {
                 "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryAssetId"
               }
-            }
+            },
+            "required": [
+              "result",
+              "assetId"
+            ]
           },
           {
             "type": "object",
@@ -13807,7 +14043,11 @@
               "assetId": {
                 "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryAssetId"
               }
-            }
+            },
+            "required": [
+              "result",
+              "assetId"
+            ]
           }
         ]
       },
@@ -14083,8 +14323,13 @@
             "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryAssetId"
           },
           "size": {
-            "type": "integer",
-            "format": "uint64"
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "uint64",
+            "minimum": 0,
+            "pattern": "^[0-9]+$"
           },
           "digest": {
             "$ref": "#/components/schemas/nexigon_api.digest.Digest"
@@ -14096,8 +14341,13 @@
             "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryAssetStorage"
           },
           "referenceCount": {
-            "type": "integer",
-            "format": "uint64"
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "uint64",
+            "minimum": 0,
+            "pattern": "^[0-9]+$"
           }
         },
         "required": [
@@ -14135,8 +14385,13 @@
             "type": "string"
           },
           "versionCount": {
-            "type": "integer",
-            "format": "uint64"
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "uint64",
+            "minimum": 0,
+            "pattern": "^[0-9]+$"
           },
           "metadata": {
             "type": "object",
@@ -14249,12 +14504,22 @@
             "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryVisibility"
           },
           "packageCount": {
-            "type": "integer",
-            "format": "uint64"
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "uint64",
+            "minimum": 0,
+            "pattern": "^[0-9]+$"
           },
           "assetCount": {
-            "type": "integer",
-            "format": "uint64"
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "uint64",
+            "minimum": 0,
+            "pattern": "^[0-9]+$"
           }
         },
         "required": [
@@ -14365,8 +14630,13 @@
             "type": "string"
           },
           "size": {
-            "type": "integer",
-            "format": "uint64"
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "uint64",
+            "minimum": 0,
+            "pattern": "^[0-9]+$"
           },
           "digest": {
             "$ref": "#/components/schemas/nexigon_api.digest.Digest"
@@ -14409,8 +14679,13 @@
             "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryAssetId"
           },
           "size": {
-            "type": "integer",
-            "format": "uint64"
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "uint64",
+            "minimum": 0,
+            "pattern": "^[0-9]+$"
           },
           "digest": {
             "$ref": "#/components/schemas/nexigon_api.digest.Digest"
@@ -14568,8 +14843,13 @@
             "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryAssetId"
           },
           "size": {
-            "type": "integer",
-            "format": "uint64"
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "uint64",
+            "minimum": 0,
+            "pattern": "^[0-9]+$"
           },
           "digest": {
             "$ref": "#/components/schemas/nexigon_api.digest.Digest"
@@ -15090,7 +15370,11 @@
               "repositoryId": {
                 "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryId"
               }
-            }
+            },
+            "required": [
+              "result",
+              "repositoryId"
+            ]
           },
           {
             "type": "object",
@@ -16163,7 +16447,9 @@
           },
           "componentCount": {
             "type": "integer",
-            "format": "uint32"
+            "format": "uint32",
+            "maximum": 4294967295,
+            "minimum": 0
           }
         },
         "required": [
@@ -16187,8 +16473,13 @@
             "type": "string"
           },
           "size": {
-            "type": "integer",
-            "format": "uint64"
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "uint64",
+            "minimum": 0,
+            "pattern": "^[0-9]+$"
           }
         },
         "required": [
@@ -16228,7 +16519,9 @@
           },
           "statementCount": {
             "type": "integer",
-            "format": "uint32"
+            "format": "uint32",
+            "maximum": 4294967295,
+            "minimum": 0
           }
         },
         "required": [
@@ -16275,7 +16568,9 @@
           },
           "componentCount": {
             "type": "integer",
-            "format": "uint32"
+            "format": "uint32",
+            "maximum": 4294967295,
+            "minimum": 0
           }
         },
         "required": [
@@ -16306,7 +16601,9 @@
           },
           "documentCount": {
             "type": "integer",
-            "format": "uint32"
+            "format": "uint32",
+            "maximum": 4294967295,
+            "minimum": 0
           }
         },
         "required": [
@@ -16336,11 +16633,15 @@
           },
           "artifactCount": {
             "type": "integer",
-            "format": "uint32"
+            "format": "uint32",
+            "maximum": 4294967295,
+            "minimum": 0
           },
           "documentCount": {
             "type": "integer",
-            "format": "uint32"
+            "format": "uint32",
+            "maximum": 4294967295,
+            "minimum": 0
           }
         },
         "required": [
@@ -16418,7 +16719,11 @@
             "type": "string"
           },
           "cvssScore": {
-            "type": "number"
+            "type": [
+              "number",
+              "string"
+            ],
+            "pattern": "^(NaN|[+-]?Infinity)$"
           },
           "description": {
             "type": "string"
@@ -16538,27 +16843,39 @@
         "properties": {
           "critical": {
             "type": "integer",
-            "format": "uint32"
+            "format": "uint32",
+            "maximum": 4294967295,
+            "minimum": 0
           },
           "high": {
             "type": "integer",
-            "format": "uint32"
+            "format": "uint32",
+            "maximum": 4294967295,
+            "minimum": 0
           },
           "medium": {
             "type": "integer",
-            "format": "uint32"
+            "format": "uint32",
+            "maximum": 4294967295,
+            "minimum": 0
           },
           "low": {
             "type": "integer",
-            "format": "uint32"
+            "format": "uint32",
+            "maximum": 4294967295,
+            "minimum": 0
           },
           "info": {
             "type": "integer",
-            "format": "uint32"
+            "format": "uint32",
+            "maximum": 4294967295,
+            "minimum": 0
           },
           "unknown": {
             "type": "integer",
-            "format": "uint32"
+            "format": "uint32",
+            "maximum": 4294967295,
+            "minimum": 0
           }
         },
         "required": [

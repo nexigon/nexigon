@@ -309,7 +309,7 @@ pub async fn run_with_connection(
                         let update = sysinfo_executor.execute(SetDevicePropertyAction::new(
                             sysinfo_device_id.clone(),
                             "dev.nexigon.system.info".to_owned(),
-                            value,
+                            value.into(),
                         ));
                         let update = tokio::select! {
                             () = sysinfo_cancellation.cancelled() => return Ok(()),
@@ -341,7 +341,7 @@ pub async fn run_with_connection(
                 .execute(SetDevicePropertyAction::new(
                     device_id.clone(),
                     "dev.nexigon.commands".to_owned(),
-                    manifest,
+                    manifest.into(),
                 ))
                 .await
             {
@@ -403,7 +403,7 @@ pub async fn run_with_connection(
                             // are about to execute so later work cannot expire while an
                             // earlier handler is still running.
                             .with_limit(Some(1))
-                            .with_kinds(Some(vec![DeviceOperationWorkKind::DeviceCommand])),
+                            .with_kinds(Some(vec![DeviceOperationWorkKind::DeviceCommand].into())),
                     );
                     let result = tokio::select! {
                         biased;
@@ -447,8 +447,8 @@ pub async fn run_with_connection(
                                             output: None,
                                             checkpoint: None,
                                             error: Some(
-                                                "previous command execution was interrupted after dispatch; refusing unsafe automatic replay"
-                                                    .to_owned(),
+                                                ("previous command execution was interrupted after dispatch; refusing unsafe automatic replay"
+                                                    .to_owned()).into(),
                                             ),
                                         };
                                         if let Err(error) = operation_ledger
@@ -468,91 +468,93 @@ pub async fn run_with_connection(
                                         }
                                         report
                                     }
-                                    PreviousExecution::None => match item.step {
-                                        DeviceOperationWorkStep::DeviceCommand(step) => {
-                                            if let Err(error) = operation_ledger
-                                                .mark_in_progress(
-                                                    &device_operation_id,
-                                                    step_index,
-                                                    &claim_id,
-                                                )
-                                                .await
-                                            {
-                                                warn!(
-                                                    ?error,
-                                                    "failed to persist operation dispatch; command not executed"
-                                                );
-                                                continue;
-                                            }
-                                            let done = if let Some(registry) =
-                                                operations_command_registry.as_ref()
-                                            {
-                                                let request = DeviceCommandInvokeData::new(
-                                                    step.command,
-                                                    step.input,
-                                                )
-                                                .with_stream_log(Some(false))
-                                                .with_timeout_secs(Some(
-                                                    step.timeout_secs.unwrap_or(3600),
-                                                ));
-                                                handlers::invoke_registered_command_with_cancellation(
+                                    PreviousExecution::None => {
+                                        match item.step {
+                                            DeviceOperationWorkStep::DeviceCommand(step) => {
+                                                if let Err(error) = operation_ledger
+                                                    .mark_in_progress(
+                                                        &device_operation_id,
+                                                        step_index,
+                                                        &claim_id,
+                                                    )
+                                                    .await
+                                                {
+                                                    warn!(
+                                                        ?error,
+                                                        "failed to persist operation dispatch; command not executed"
+                                                    );
+                                                    continue;
+                                                }
+                                                let done = if let Some(registry) =
+                                                    operations_command_registry.as_ref()
+                                                {
+                                                    let request = DeviceCommandInvokeData::new(
+                                                        step.command,
+                                                        step.input,
+                                                    )
+                                                    .with_stream_log(Some(false))
+                                                    .with_timeout_secs(Some(
+                                                        step.timeout_secs.unwrap_or(3600),
+                                                    ));
+                                                    handlers::invoke_registered_command_with_cancellation(
                                                     registry,
                                                     request,
                                                     &operation_cancellation,
                                                 )
                                                 .await
-                                            } else {
-                                                nexigon_api::types::devices::DeviceCommandDoneData {
+                                                } else {
+                                                    nexigon_api::types::devices::DeviceCommandDoneData {
                                                     status: DeviceCommandStatus::Error,
                                                     output: None,
-                                                    error: Some("commands not enabled".to_owned()),
-                                                    log_tail: Vec::new(),
+                                                    error: Some("commands not enabled".to_owned().into()),
+                                                    log_tail: Vec::new().into(),
                                                     duration_ms: 0,
                                                 }
-                                            };
-                                            if operation_cancellation.is_cancelled() {
-                                                return Ok(());
+                                                };
+                                                if operation_cancellation.is_cancelled() {
+                                                    return Ok(());
+                                                }
+                                                let status = match done.status {
+                                                    DeviceCommandStatus::Ok => {
+                                                        DeviceOperationStepReportStatus::Succeeded
+                                                    }
+                                                    DeviceCommandStatus::Error => {
+                                                        DeviceOperationStepReportStatus::Failed
+                                                    }
+                                                };
+                                                let report = DeviceOperationStepReport {
+                                                    status,
+                                                    output: done.output,
+                                                    checkpoint: None,
+                                                    error: done.error,
+                                                };
+                                                if let Err(error) = operation_ledger
+                                                    .mark_completed(
+                                                        &device_operation_id,
+                                                        step_index,
+                                                        &claim_id,
+                                                        report.clone(),
+                                                    )
+                                                    .await
+                                                {
+                                                    warn!(
+                                                        ?error,
+                                                        "failed to persist operation result; result not reported"
+                                                    );
+                                                    continue;
+                                                }
+                                                report
                                             }
-                                            let status = match done.status {
-                                                DeviceCommandStatus::Ok => {
-                                                    DeviceOperationStepReportStatus::Succeeded
-                                                }
-                                                DeviceCommandStatus::Error => {
-                                                    DeviceOperationStepReportStatus::Failed
-                                                }
-                                            };
-                                            let report = DeviceOperationStepReport {
-                                                status,
-                                                output: done.output,
-                                                checkpoint: None,
-                                                error: done.error,
-                                            };
-                                            if let Err(error) = operation_ledger
-                                                .mark_completed(
-                                                    &device_operation_id,
+                                            DeviceOperationWorkStep::DeviceTask(_) => {
+                                                debug!(
+                                                    device_operation_id = %device_operation_id,
                                                     step_index,
-                                                    &claim_id,
-                                                    report.clone(),
-                                                )
-                                                .await
-                                            {
-                                                warn!(
-                                                    ?error,
-                                                    "failed to persist operation result; result not reported"
+                                                    "device task work is not handled by the agent"
                                                 );
                                                 continue;
                                             }
-                                            report
                                         }
-                                        DeviceOperationWorkStep::DeviceTask(_) => {
-                                            debug!(
-                                                device_operation_id = %device_operation_id,
-                                                step_index,
-                                                "device task work is not handled by the agent"
-                                            );
-                                            continue;
-                                        }
-                                    },
+                                    }
                                 };
                                 found_work = true;
                                 // Retry transport failures promptly while this claim's lease
@@ -976,7 +978,7 @@ impl OperationReporter for ClientExecutor {
             .await
         {
             Ok(Ok(_)) => ReportAttempt::Acknowledged,
-            Ok(Err(error)) => ReportAttempt::Rejected(error.message),
+            Ok(Err(error)) => ReportAttempt::Rejected(error.message.into()),
             Err(error) => ReportAttempt::TransportFailed(error.to_string()),
         }
     }

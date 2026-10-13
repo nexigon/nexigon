@@ -57,7 +57,7 @@ async fn main() -> anyhow::Result<()> {
                 .with_prompt("User or Organization API Token")
                 .interact()?;
             Ok(Config {
-                hub_url,
+                hub_url: hub_url.into(),
                 token: token.parse()?,
             })
         })
@@ -133,7 +133,7 @@ async fn main() -> anyhow::Result<()> {
                 let output = executor
                     .execute(
                         devices::IssueDeviceHttpProxyTokenAction::new(device_id.clone())
-                            .with_hostname(hostname.clone())
+                            .with_hostname(hostname.clone().map(Into::into))
                             .with_port(*port)
                             .with_valid_for_secs(*valid_for),
                     )
@@ -355,7 +355,8 @@ async fn main() -> anyhow::Result<()> {
             DevicesCmd::Rename { device, name } => {
                 let output = executor
                     .execute(
-                        devices::SetDeviceNameAction::new(device.clone()).with_name(name.clone()),
+                        devices::SetDeviceNameAction::new(device.clone())
+                            .with_name(name.clone().map(Into::into)),
                     )
                     .await
                     .context("renaming device")??;

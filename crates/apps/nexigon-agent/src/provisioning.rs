@@ -55,13 +55,22 @@ impl ProvisioningRuntime {
         let endpoints = provisioning
             .and_then(|p| p.endpoints.clone())
             .filter(|endpoints| !endpoints.is_empty())
-            .unwrap_or_else(|| DEFAULT_ENDPOINTS.iter().map(|e| (*e).to_owned()).collect());
+            .unwrap_or_else(|| {
+                DEFAULT_ENDPOINTS
+                    .iter()
+                    .map(|e| (*e).to_owned())
+                    .map(Into::into)
+                    .collect()
+            });
         Self {
-            bind: provisioning
+            bind: (provisioning
                 .and_then(|p| p.bind.clone())
-                .unwrap_or_else(|| DEFAULT_BIND.to_owned()),
-            endpoints,
-            device_name: provisioning.and_then(|p| p.device_name.clone()),
+                .unwrap_or_else(|| DEFAULT_BIND.to_owned().into()))
+            .into(),
+            endpoints: endpoints.into_iter().map(Into::into).collect(),
+            device_name: provisioning
+                .and_then(|p| p.device_name.clone())
+                .map(Into::into),
             credentials_path: credentials_path(config, config_dir),
             dangerous_allow_plaintext: config.dangerous_allow_plaintext.unwrap_or(false),
             dangerous_accept_invalid_certificates: config
@@ -239,7 +248,7 @@ async fn redeem_pairing_key_at(
     url.set_fragment(None);
 
     let action = RedeemDevicePairingKeyAction::new(pairing_key.to_owned(), fingerprint.clone())
-        .with_device_name(runtime.device_name.clone());
+        .with_device_name(runtime.device_name.clone().map(Into::into));
     let body = serde_json::to_vec(&action).context("serializing pairing redemption request")?;
     let client = reqwest::Client::builder()
         .use_rustls_tls()

@@ -164,27 +164,27 @@ mod tests {
         assert!(!terminal_enabled(&config(Some(
             TerminalConfig::new()
                 .with_enabled(Some(true))
-                .with_user(Some("  ".to_owned())),
+                .with_user(Some("  ".to_owned().into())),
         ))));
         assert!(!terminal_enabled(&config(Some(
             TerminalConfig::new()
                 .with_enabled(Some(true))
-                .with_user(Some(" nexigon ".to_owned())),
+                .with_user(Some(" nexigon ".to_owned().into())),
         ))));
         assert!(!terminal_enabled(&config(Some(
             TerminalConfig::new()
                 .with_enabled(Some(false))
-                .with_user(Some("nexigon".to_owned())),
+                .with_user(Some("nexigon".into())),
         ))));
         assert!(terminal_enabled(&config(Some(
             TerminalConfig::new()
                 .with_enabled(Some(true))
-                .with_user(Some("nexigon".to_owned())),
+                .with_user(Some("nexigon".into())),
         ))));
         assert!(terminal_enabled(&config(Some(
             TerminalConfig::new()
                 .with_enabled(Some(true))
-                .with_user(Some("root".to_owned())),
+                .with_user(Some("root".into())),
         ))));
     }
 

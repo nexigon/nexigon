@@ -444,8 +444,8 @@ mod tests {
             Config::new(PathBuf::from("unused-fingerprint")).with_terminal(Some(
                 TerminalConfig::new()
                     .with_enabled(Some(true))
-                    .with_user(Some(user.name))
-                    .with_shell(Some("/bin/sh".to_owned())),
+                    .with_user(Some(user.name.into()))
+                    .with_shell(Some("/bin/sh".to_owned().into())),
             )),
         );
 
@@ -588,8 +588,8 @@ mod tests {
             Config::new(PathBuf::from("unused-fingerprint")).with_terminal(Some(
                 TerminalConfig::new()
                     .with_enabled(Some(true))
-                    .with_user(Some(user.name))
-                    .with_shell(Some(shell_path.to_string_lossy().into_owned())),
+                    .with_user(Some(user.name.into()))
+                    .with_shell(Some(shell_path.to_string_lossy().into_owned().into())),
             )),
         );
 
@@ -661,8 +661,10 @@ mod tests {
             Config::new(PathBuf::from("unused-fingerprint")).with_terminal(Some(
                 TerminalConfig::new()
                     .with_enabled(Some(true))
-                    .with_user(Some(user.name))
-                    .with_shell(Some(completed_shell_path.to_string_lossy().into_owned())),
+                    .with_user(Some(user.name.into()))
+                    .with_shell(Some(
+                        completed_shell_path.to_string_lossy().into_owned().into(),
+                    )),
             )),
         );
         let _hub_channel = hub_ref

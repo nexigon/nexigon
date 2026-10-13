@@ -294,7 +294,7 @@ mod tests {
         assert_eq!(stored["claimId"], first_claim_id.stringify());
 
         let report = DeviceOperationStepReport::new(DeviceOperationStepReportStatus::Succeeded)
-            .with_output(Some(serde_json::json!({"ok": true})));
+            .with_output(Some((serde_json::json!({"ok": true})).into()));
         ledger
             .mark_completed(&first_operation_id, 3, &first_claim_id, report)
             .await
@@ -305,7 +305,7 @@ mod tests {
         let PreviousExecution::Completed(report) = ledger.previous(&first_operation_id, 3) else {
             panic!("completed result was not recovered");
         };
-        assert_eq!(report.output, Some(serde_json::json!({"ok": true})));
+        assert_eq!(report.output, Some(serde_json::json!({"ok": true}).into()));
         assert!(matches!(
             ledger.previous(&second_operation_id, 1),
             PreviousExecution::None

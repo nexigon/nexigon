@@ -8,13 +8,7 @@ authors = ["Silitics GmbH <info@silitics.com>"]
 
 [backend.rust]
 derive = ["Clone", "Debug"]
-plugins = ["builder", "serde", "validate"]
-
-[backend.rust.plugin.serde]
-sidex_serde_path = "::sidex_serde"
-
-[backend.rust.plugin.validate]
-sidex_validate_path = "::sidex_validate"
+plugins = ["builder", "serde"]
 
 [backend.ts]
 plugins = ["validate"]

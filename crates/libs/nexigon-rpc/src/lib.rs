@@ -599,10 +599,7 @@ pub enum ReadError {
 
 /// Write an action result using process-wide default admission.
 #[tracing::instrument(level = Level::DEBUG, skip_all)]
-pub async fn write_action_result<
-    T: Serialize + ::sidex_serde::adapter::SidexType,
-    W: AsyncWrite + Unpin,
->(
+pub async fn write_action_result<T: ::sidex::Shaped + ::sidex::Encode, W: AsyncWrite + Unpin>(
     result: ActionResult<T>,
     tx: W,
 ) -> Result<(), WriteError> {
@@ -612,7 +609,7 @@ pub async fn write_action_result<
 /// Write an action result using explicit shared memory admission.
 #[tracing::instrument(level = Level::DEBUG, skip_all)]
 pub async fn write_action_result_with_admission<
-    T: Serialize + ::sidex_serde::adapter::SidexType,
+    T: ::sidex::Shaped + ::sidex::Encode,
     W: AsyncWrite + Unpin,
 >(
     result: ActionResult<T>,
@@ -1144,9 +1141,12 @@ mod tests {
         let server_task = tokio::spawn(async move {
             let action = read_action(&mut server).await.unwrap();
             assert_eq!(action.name().len(), MAX_ACTION_NAME_SIZE);
-            write_action_result(ActionResult::Ok(()), &mut server)
-                .await
-                .unwrap();
+            write_action_result(
+                ActionResult::Ok(nexigon_api::types::outputs::Empty::new()),
+                &mut server,
+            )
+            .await
+            .unwrap();
         });
         execute(&MaximumNameAction, rx, tx)
             .await
@@ -1173,9 +1173,12 @@ mod tests {
         let server_task = tokio::spawn(async move {
             let action = read_action(&mut server).await.unwrap();
             assert_eq!(action.input().len(), MAX_INPUT_SIZE);
-            write_action_result(ActionResult::Ok(()), &mut server)
-                .await
-                .unwrap();
+            write_action_result(
+                ActionResult::Ok(nexigon_api::types::outputs::Empty::new()),
+                &mut server,
+            )
+            .await
+            .unwrap();
         });
         execute(&action, rx, tx)
             .await
@@ -1383,7 +1386,7 @@ mod tests {
         let admission = RpcAdmission::default();
         let before = admission.available_response_bytes();
         let error = write_action_result_with_admission(
-            ActionResult::Ok(()),
+            ActionResult::Ok(nexigon_api::types::outputs::Empty::new()),
             FailingWriter,
             &admission,
             "actor",
@@ -1406,7 +1409,7 @@ mod tests {
         .unwrap();
         let before = admission.available_response_bytes();
         let write = write_action_result_with_admission(
-            ActionResult::Ok(()),
+            ActionResult::Ok(nexigon_api::types::outputs::Empty::new()),
             PendingWriter,
             &admission,
             "actor",
@@ -1432,9 +1435,12 @@ mod tests {
         let server_task = tokio::spawn(async move {
             let _request = read_action(&mut server).await.unwrap();
             tokio::time::sleep(Duration::from_millis(30)).await;
-            write_action_result(ActionResult::Ok(()), &mut server)
-                .await
-                .unwrap();
+            write_action_result(
+                ActionResult::Ok(nexigon_api::types::outputs::Empty::new()),
+                &mut server,
+            )
+            .await
+            .unwrap();
         });
         execute_with_admission(&action, rx, tx, &admission, "actor")
             .await
@@ -1550,44 +1556,101 @@ mod tests {
         std::future::poll_fn(|cx| Poll::Ready(Pin::new(&mut *future).poll(cx))).await
     }
 
-    #[derive(Debug, Deserialize)]
+    /// Implements the Sidex and Serde traits for a test action type.
+    ///
+    /// Values are decoded with `$decode` and encoded with `$encode`.
+    macro_rules! impl_test_type {
+        ($ty:ident, |$decoder:ident| $decode:expr, |$this:ident| $encode:expr) => {
+            impl sidex::Shaped for $ty {
+                const SHAPE: &'static sidex::Shape =
+                    <sidex::types::JsonValue as sidex::Shaped>::SHAPE;
+            }
+
+            impl sidex::Encode for $ty {
+                fn encode(&self) -> sidex::View<'_> {
+                    let $this = self;
+                    $encode
+                }
+            }
+
+            impl sidex::Decode for $ty {
+                fn decode($decoder: &mut dyn sidex::Decoder) -> Result<Self, sidex::DecodeError> {
+                    Ok($decode)
+                }
+            }
+
+            impl Serialize for $ty {
+                fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+                    sidex::serde::serialize(self, serializer)
+                }
+            }
+
+            impl<'de> Deserialize<'de> for $ty {
+                fn deserialize<D: serde::Deserializer<'de>>(
+                    deserializer: D,
+                ) -> Result<Self, D::Error> {
+                    sidex::serde::deserialize(deserializer)
+                }
+            }
+        };
+    }
+
+    /// Sequence whose encoding fails.
+    struct FailingSeq;
+
+    impl sidex::encode::SeqView for FailingSeq {
+        fn len(&self) -> usize {
+            1
+        }
+
+        fn each(
+            &self,
+            _: &mut dyn FnMut(sidex::View<'_>) -> Result<(), sidex::EncodeError>,
+        ) -> Result<(), sidex::EncodeError> {
+            Err(sidex::EncodeError::new("intentional serialization failure"))
+        }
+    }
+
+    #[derive(Debug)]
     struct FailsSerialization;
 
-    impl Serialize for FailsSerialization {
-        fn serialize<S: Serializer>(&self, _serializer: S) -> Result<S::Ok, S::Error> {
-            Err(serde::ser::Error::custom(
-                "intentional serialization failure",
-            ))
-        }
-    }
+    impl_test_type!(
+        FailsSerialization,
+        |decoder| {
+            decoder.json()?;
+            FailsSerialization
+        },
+        |_this| sidex::View::Seq(&FailingSeq)
+    );
 
-    sidex_serde::impl_sidex_type!(FailsSerialization);
-
-    #[derive(Debug, Deserialize)]
+    #[derive(Debug)]
     struct FailsSerializationAction;
 
-    impl Serialize for FailsSerializationAction {
-        fn serialize<S: Serializer>(&self, _serializer: S) -> Result<S::Ok, S::Error> {
-            Err(serde::ser::Error::custom(
-                "intentional serialization failure",
-            ))
-        }
-    }
-
-    sidex_serde::impl_sidex_type!(FailsSerializationAction);
+    impl_test_type!(
+        FailsSerializationAction,
+        |decoder| {
+            decoder.json()?;
+            FailsSerializationAction
+        },
+        |_this| sidex::View::Seq(&FailingSeq)
+    );
 
     impl Action for FailsSerializationAction {
-        type Output = ();
+        type Output = nexigon_api::types::outputs::Empty;
         const NAME: &'static str = "test_FailsSerialization";
     }
 
-    #[derive(Debug, Serialize, Deserialize)]
+    #[derive(Debug)]
     struct StringAction(String);
 
-    sidex_serde::impl_sidex_type!(StringAction);
+    impl_test_type!(
+        StringAction,
+        |decoder| StringAction(decoder.string()?),
+        |this| sidex::View::String(&this.0)
+    );
 
     impl Action for StringAction {
-        type Output = ();
+        type Output = nexigon_api::types::outputs::Empty;
         const NAME: &'static str = "test_String";
     }
 
@@ -1604,23 +1667,37 @@ mod tests {
         "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
     );
 
-    #[derive(Debug, Serialize, Deserialize)]
+    #[derive(Debug)]
     struct MaximumNameAction;
 
-    sidex_serde::impl_sidex_type!(MaximumNameAction);
+    impl_test_type!(
+        MaximumNameAction,
+        |decoder| {
+            decoder.json()?;
+            MaximumNameAction
+        },
+        |_this| sidex::View::Json(std::borrow::Cow::Owned(sidex::types::JsonValue::Null))
+    );
 
     impl Action for MaximumNameAction {
-        type Output = ();
+        type Output = nexigon_api::types::outputs::Empty;
         const NAME: &'static str = NAME_255;
     }
 
-    #[derive(Debug, Serialize, Deserialize)]
+    #[derive(Debug)]
     struct OverlongNameAction;
 
-    sidex_serde::impl_sidex_type!(OverlongNameAction);
+    impl_test_type!(
+        OverlongNameAction,
+        |decoder| {
+            decoder.json()?;
+            OverlongNameAction
+        },
+        |_this| sidex::View::Json(std::borrow::Cow::Owned(sidex::types::JsonValue::Null))
+    );
 
     impl Action for OverlongNameAction {
-        type Output = ();
+        type Output = nexigon_api::types::outputs::Empty;
         const NAME: &'static str = NAME_256;
     }
 

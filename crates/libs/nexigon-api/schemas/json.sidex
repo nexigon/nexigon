@@ -1,9 +1,7 @@
 //! JSON value types and generic JSON value evaluation/mutation model.
 
 /// JSON value.
-#[rust(type = "serde_json::Value")]
-#[json(type = "any")]
-opaque JsonValue
+alias JsonValue: json
 
 // =============================================================================
 // Expressions

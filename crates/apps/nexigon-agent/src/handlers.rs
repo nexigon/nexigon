@@ -94,9 +94,9 @@ impl ExternalHandlerResult {
             } else {
                 DeviceCommandStatus::Error
             },
-            output: self.output,
-            error: self.error,
-            log_tail: self.log_tail,
+            output: self.output.map(Into::into),
+            error: self.error.map(Into::into),
+            log_tail: self.log_tail.into_iter().map(Into::into).collect(),
             duration_ms: self.duration_ms,
         }
     }
@@ -164,7 +164,7 @@ impl CommandRegistry {
             }
             info!(name = %command_name, ?path, "loaded command");
             loaded_from.insert(command_name.clone(), path);
-            commands.insert(command_name, command);
+            commands.insert(command_name.into(), command);
         }
 
         let registry = Self { commands };
@@ -191,18 +191,22 @@ impl CommandRegistry {
                 name: command.definition.command.name.clone(),
                 description: command.definition.command.description.clone(),
                 category: command.definition.command.category.clone(),
-                input: command
+                input: (command
                     .input_schema
                     .as_ref()
-                    .map(|schema| schema.value.clone()),
-                output: command
+                    .map(|schema| schema.value.clone()))
+                .map(Into::into),
+                output: (command
                     .output_schema
                     .as_ref()
-                    .map(|schema| schema.value.clone()),
+                    .map(|schema| schema.value.clone()))
+                .map(Into::into),
             })
             .collect::<Vec<_>>();
         commands.sort_unstable_by(|left, right| left.name.cmp(&right.name));
-        DeviceCommandManifest { commands }
+        DeviceCommandManifest {
+            commands: commands.into(),
+        }
     }
 }
 
@@ -1040,8 +1044,8 @@ async fn handle_handler_channel_inner(
         let frame = DeviceCommandDeviceFrame::Done(DeviceCommandDoneData {
             status: DeviceCommandStatus::Error,
             output: None,
-            error: Some("invalid command name".to_owned()),
-            log_tail: Vec::new(),
+            error: Some("invalid command name".to_owned().into()),
+            log_tail: Vec::new().into(),
             duration_ms: 0,
         });
         write_command_frame(&mut chan_writer, &frame).await?;
@@ -1059,8 +1063,8 @@ async fn handle_handler_channel_inner(
         let frame = DeviceCommandDeviceFrame::Done(DeviceCommandDoneData {
             status: DeviceCommandStatus::Error,
             output: None,
-            error: Some("command not found".to_owned()),
-            log_tail: Vec::new(),
+            error: Some("command not found".to_owned().into()),
+            log_tail: Vec::new().into(),
             duration_ms: 0,
         });
         write_command_frame(&mut chan_writer, &frame).await?;
@@ -1121,8 +1125,8 @@ async fn invoke_registered_command_inner(
         return DeviceCommandDoneData {
             status: DeviceCommandStatus::Error,
             output: None,
-            error: Some("invalid command name".to_owned()),
-            log_tail: Vec::new(),
+            error: Some("invalid command name".to_owned().into()),
+            log_tail: Vec::new().into(),
             duration_ms: 0,
         };
     }
@@ -1130,8 +1134,8 @@ async fn invoke_registered_command_inner(
         return DeviceCommandDoneData {
             status: DeviceCommandStatus::Error,
             output: None,
-            error: Some("command not found".to_owned()),
-            log_tail: Vec::new(),
+            error: Some("command not found".to_owned().into()),
+            log_tail: Vec::new().into(),
             duration_ms: 0,
         };
     };
@@ -1148,8 +1152,8 @@ async fn invoke_registered_command_inner(
             DeviceCommandDoneData {
                 status: DeviceCommandStatus::Error,
                 output: None,
-                error: Some("failed to execute command".to_owned()),
-                log_tail: Vec::new(),
+                error: Some("failed to execute command".to_owned().into()),
+                log_tail: Vec::new().into(),
                 duration_ms: 0,
             }
         }
@@ -1166,7 +1170,7 @@ async fn execute_external_command(
     let started = std::time::Instant::now();
 
     if let Some(schema) = &command.input_schema
-        && let Err(error) = validate_declared_schema(schema, &request.input).await
+        && let Err(error) = validate_declared_schema(schema, &request.input.clone().into()).await
     {
         return Ok(ExternalHandlerResult {
             succeeded: false,
@@ -1245,7 +1249,10 @@ async fn execute_external_command(
                 .push(&line);
             if stream_log {
                 let log_frame = DeviceCommandDeviceFrame::Log(DeviceCommandLogData {
-                    lines: vec![String::from_utf8_lossy(&line).into_owned()],
+                    lines: (vec![String::from_utf8_lossy(&line).into_owned()])
+                        .into_iter()
+                        .map(Into::into)
+                        .collect(),
                 });
                 stderr_write_in_progress.store(true, Ordering::Release);
                 let write_result = write_command_frame(chan_writer, &log_frame).await;
@@ -1297,7 +1304,8 @@ async fn execute_external_command(
         Ok::<_, anyhow::Error>((status, last_output))
     };
 
-    type CommandWaitResult = anyhow::Result<(std::process::ExitStatus, Option<serde_json::Value>)>;
+    type CommandWaitResult =
+        anyhow::Result<(std::process::ExitStatus, Option<sidex::types::JsonValue>)>;
     enum CommandWait {
         Completed(Result<CommandWaitResult, tokio::time::error::Elapsed>),
         Cancelled,
@@ -1325,7 +1333,7 @@ async fn execute_external_command(
             // The leader may exit while background descendants keep running. The process group is
             // private to this invocation, so clean it up on every completion path.
             kill_command_process_group(process_group);
-            CommandExecution::Completed(status, last_output)
+            CommandExecution::Completed(status, last_output.map(Into::into))
         }
         CommandWait::Completed(Ok(Err(error))) => {
             terminate_command_child(&mut child, process_group).await;
@@ -1722,7 +1730,7 @@ mod tests {
         let oversized = "secret".repeat(MAX_COMMAND_NAME_BYTES);
         let result = invoke_registered_command(
             &registry,
-            DeviceCommandInvokeData::new(oversized.clone(), serde_json::Value::Null),
+            DeviceCommandInvokeData::new(oversized.clone(), serde_json::Value::Null.into()),
         )
         .await;
         assert_eq!(result.error.as_deref(), Some("invalid command name"));
@@ -1730,7 +1738,10 @@ mod tests {
 
         let result = invoke_registered_command(
             &registry,
-            DeviceCommandInvokeData::new("bounded-unknown".to_owned(), serde_json::Value::Null),
+            DeviceCommandInvokeData::new(
+                "bounded-unknown".to_owned(),
+                serde_json::Value::Null.into(),
+            ),
         )
         .await;
         assert_eq!(result.error.as_deref(), Some("command not found"));
@@ -1785,6 +1796,7 @@ mod tests {
                 "$ref": "#/$defs/nonnegative",
                 "pattern": "(?=ignored ref sibling)"
             }))
+            .map(Into::into)
         );
         assert_eq!(
             manifest.commands[0].output,
@@ -1794,6 +1806,7 @@ mod tests {
                 "dependencies": {"pattern": ["$ref"]},
                 "const": {"$ref": 42, "pattern": "(?=literal)"}
             }))
+            .map(Into::into)
         );
     }
 
@@ -1825,7 +1838,7 @@ mod tests {
         assert_eq!(registry.manifest().commands.len(), 1);
         assert_eq!(
             registry.get("duplicate").unwrap().command.description,
-            Some("a file".to_owned())
+            Some("a file".into())
         );
     }
 
@@ -2261,7 +2274,8 @@ mod tests {
         );
         let registry = CommandRegistry::load_external(directory.path()).unwrap();
         std::fs::remove_file(&executable).unwrap();
-        let request = DeviceCommandInvokeData::new("spawn".to_owned(), serde_json::Value::Null);
+        let request =
+            DeviceCommandInvokeData::new("spawn".to_owned(), serde_json::Value::Null.into());
 
         let mut sink = tokio::io::sink();
         let local_error = match execute_external_command(
@@ -2312,7 +2326,10 @@ mod tests {
         let task = tokio::spawn(async move {
             invoke_registered_command_with_cancellation(
                 &task_registry,
-                DeviceCommandInvokeData::new("long-running".to_owned(), serde_json::Value::Null),
+                DeviceCommandInvokeData::new(
+                    "long-running".to_owned(),
+                    serde_json::Value::Null.into(),
+                ),
                 &task_cancellation,
             )
             .await
@@ -2372,7 +2389,7 @@ mod tests {
 
         let result = invoke_registered_command(
             &registry,
-            DeviceCommandInvokeData::new("background".to_owned(), serde_json::Value::Null),
+            DeviceCommandInvokeData::new("background".to_owned(), serde_json::Value::Null.into()),
         )
         .await;
 
@@ -2407,7 +2424,7 @@ mod tests {
 
         let result = invoke_registered_command(
             &registry,
-            DeviceCommandInvokeData::new("validated".to_owned(), json!("not an integer")),
+            DeviceCommandInvokeData::new("validated".to_owned(), (json!("not an integer")).into()),
         )
         .await;
 
@@ -2430,7 +2447,7 @@ mod tests {
         let oversized_scalar = "secret-value".repeat(1024 * 1024 / "secret-value".len());
         let result = invoke_registered_command(
             &registry,
-            DeviceCommandInvokeData::new("validated".to_owned(), json!(oversized_scalar)),
+            DeviceCommandInvokeData::new("validated".to_owned(), (json!(oversized_scalar)).into()),
         )
         .await;
         assert!(matches!(result.status, DeviceCommandStatus::Error));
@@ -2450,7 +2467,7 @@ mod tests {
         );
         let result = invoke_registered_command(
             &registry,
-            DeviceCommandInvokeData::new("validated".to_owned(), oversized_value),
+            DeviceCommandInvokeData::new("validated".to_owned(), oversized_value.into()),
         )
         .await;
         assert!(matches!(result.status, DeviceCommandStatus::Error));
@@ -2484,7 +2501,7 @@ mod tests {
 
         let result = invoke_registered_command(
             &registry,
-            DeviceCommandInvokeData::new("validated".to_owned(), serde_json::Value::Null),
+            DeviceCommandInvokeData::new("validated".to_owned(), serde_json::Value::Null.into()),
         )
         .await;
 
@@ -2519,12 +2536,12 @@ mod tests {
 
         let result = invoke_registered_command(
             &registry,
-            DeviceCommandInvokeData::new("validated".to_owned(), json!(3)),
+            DeviceCommandInvokeData::new("validated".to_owned(), (json!(3)).into()),
         )
         .await;
 
         assert!(matches!(result.status, DeviceCommandStatus::Ok));
-        assert_eq!(result.output, Some(json!(7)));
+        assert_eq!(result.output, Some(json!(7).into()));
     }
 
     #[tokio::test]

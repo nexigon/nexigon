@@ -1,13 +1,13 @@
-use indexmap::IndexMap;
+use sidex::types::Map;
 
 use sidex_types_openapi as openapi;
 
 use nexigon_api::with_actions;
 
 fn main() {
-    let mut schemas = serde_json::from_str(include_str!("../schemas.json")).unwrap();
+    let mut schemas = sidex::formats::json::from_str(include_str!("../schemas.json")).unwrap();
 
-    let mut paths = IndexMap::new();
+    let mut paths = Map::new();
     macro_rules! add_action {
         ($(($name:literal, $variant:ident, $input:path, $output:path),)*) => {
             $(
@@ -55,11 +55,11 @@ fn main() {
 }
 
 pub fn add_action(
-    paths: &mut IndexMap<String, openapi::PathItem>,
+    paths: &mut Map<String, openapi::PathItem>,
     name: &str,
     input: &str,
     output: &str,
-    schemas: &mut IndexMap<String, openapi::schema::SchemaObject>,
+    schemas: &mut Map<String, openapi::schema::SchemaObject>,
 ) {
     let input_parts = input.split("::").map(|p| p.trim()).collect::<Vec<_>>();
     let output_parts = output.split("::").map(|p| p.trim()).collect::<Vec<_>>();
@@ -67,11 +67,7 @@ pub fn add_action(
     let output_type = output_parts.join(".");
     let input_type_name = format!("nexigon_api.{input_type}");
     let input_schema = schemas.get_mut(&input_type_name).unwrap();
-    let docs = input_schema
-        .metadata
-        .as_mut()
-        .and_then(|m| m.description.take())
-        .unwrap_or_default();
+    let docs = input_schema.metadata.description.take().unwrap_or_default();
     let input_ref = format!("#/components/schemas/nexigon_api.{input_type}");
     let output_ref = format!("#/components/schemas/nexigon_api.{output_type}");
     let path = format!("/api/v1/actions/invoke/{name}");
@@ -83,7 +79,7 @@ pub fn add_action(
                 .with_summary(Some(name.rsplit_once("_").unwrap().1.to_owned()))
                 .with_description(Some(openapi::Markdown::new(docs)))
                 .with_request_body(Some(openapi::MaybeRef::Value(openapi::RequestBody::new({
-                    let mut body = IndexMap::new();
+                    let mut body = Map::new();
                     body.insert(
                         "application/json".to_string(),
                         openapi::MediaType::new().with_schema(Some(schema_ref(input_ref))),
@@ -91,13 +87,13 @@ pub fn add_action(
                     body
                 }))))
                 .with_responses(Some(openapi::Responses::new({
-                    let mut responses = IndexMap::new();
+                    let mut responses = Map::new();
                     responses.insert(
                         "200".to_string(),
                         openapi::MaybeRef::Value(
                             openapi::Response::new(openapi::Markdown::new("".to_owned()))
                                 .with_content({
-                                    let mut contents = IndexMap::new();
+                                    let mut contents = Map::new();
                                     contents.insert(
                                         "application/json".to_string(),
                                         openapi::MediaType::new()
@@ -120,7 +116,7 @@ pub fn add_action(
 }
 
 /// Build reusable action error responses for the OpenAPI components section.
-fn action_error_components() -> IndexMap<String, openapi::MaybeRef<openapi::Response>> {
+fn action_error_components() -> Map<String, openapi::MaybeRef<openapi::Response>> {
     [
         ("InvalidAction", "The action input is invalid.", false),
         (
@@ -162,7 +158,7 @@ fn action_error_response(
     description: &str,
     retry_after: bool,
 ) -> openapi::MaybeRef<openapi::Response> {
-    let mut contents = IndexMap::new();
+    let mut contents = Map::new();
     contents.insert(
         "application/json".to_owned(),
         openapi::MediaType::new().with_schema(Some(schema_ref(
@@ -181,7 +177,7 @@ fn action_error_response(
             )))
             .with_required(Some(true))
             .with_schema(Some(schema));
-        let mut headers = IndexMap::new();
+        let mut headers = Map::new();
         headers.insert("Retry-After".to_owned(), openapi::MaybeRef::Value(header));
         response.with_headers(Some(headers))
     } else {

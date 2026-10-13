@@ -11,13 +11,22 @@ pub mod types;
 
 /// Represents an action that can be invoked within Nexigon Hub.
 pub trait Action:
-    Any + Serialize + DeserializeOwned + ::sidex_serde::adapter::SidexType + Send + std::fmt::Debug
+    Any
+    + Serialize
+    + DeserializeOwned
+    + ::sidex::Shaped
+    + ::sidex::Encode
+    + ::sidex::Decode
+    + Send
+    + std::fmt::Debug
 {
     /// Output type of the action.
     type Output: Any
         + Serialize
         + DeserializeOwned
-        + ::sidex_serde::adapter::SidexType
+        + ::sidex::Shaped
+        + ::sidex::Encode
+        + ::sidex::Decode
         + Send
         + std::fmt::Debug;
 
@@ -297,7 +306,7 @@ pub trait Executor {
 
 impl Jwt {
     pub fn from_string(jwt: String) -> Self {
-        Self(jwt)
+        Self(jwt.into())
     }
 
     pub fn as_str(&self) -> &str {
@@ -307,7 +316,7 @@ impl Jwt {
 
 #[cfg(test)]
 mod tests {
-    use sidex_validate::Validate;
+    use sidex::validation::validate;
 
     use crate::types::repositories::AddTagItem;
     use crate::types::repositories::RemoveTagItem;
@@ -319,44 +328,25 @@ mod tests {
     fn repository_version_tags_accept_plus_signs() {
         let tag = "build-2026.3.0-rolling+g7c2de6a".to_owned();
 
+        assert!(validate(&AddTagItem::new(tag.clone())).is_ok());
+        assert!(validate(&RemoveTagItem::new(tag.clone())).is_ok());
         assert!(
-            AddTagItem::new(tag.clone())
-                .validate()
-                .into_errors()
-                .is_empty()
-        );
-        assert!(
-            RemoveTagItem::new(tag.clone())
-                .validate()
-                .into_errors()
-                .is_empty()
-        );
-        assert!(
-            ResolvePackageVersionByPathAction::new(
+            validate(&ResolvePackageVersionByPathAction::new(
                 "repository".to_owned(),
                 "package".to_owned(),
                 tag.clone(),
-            )
-            .validate()
-            .into_errors()
-            .is_empty()
+            ))
+            .is_ok()
         );
         assert!(
-            ResolvePackageVersionAssetByPathAction::new(
+            validate(&ResolvePackageVersionAssetByPathAction::new(
                 "repository".to_owned(),
                 "package".to_owned(),
                 tag,
                 "release.json".to_owned(),
-            )
-            .validate()
-            .into_errors()
-            .is_empty()
+            ))
+            .is_ok()
         );
-        assert!(
-            !AddTagItem::new("build/invalid".to_owned())
-                .validate()
-                .into_errors()
-                .is_empty()
-        );
+        assert!(validate(&AddTagItem::new("build/invalid".to_owned())).is_err());
     }
 }
