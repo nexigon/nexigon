@@ -18,26 +18,6 @@
 
 For documentation and guides, visit [docs.nexigon.dev](https://docs.nexigon.dev).
 
-## Building from Source
-
-Build the agent and CLI with Cargo:
-
-```sh
-cargo build --locked --release --bins
-```
-
-Cargo generates the API and configuration types with Sidex 0.4.0 during the
-build. Use `mise run generate` to regenerate the tracked JSON schemas and
-OpenAPI specification.
-
-## Generated API Types
-
-The Rust API bindings use Sidex's shared strings, sequences, maps, and JSON values.
-Absent optional fields are omitted from JSON. Fields declared as `u64` or `i64`
-encode values outside ±(2^53 − 1) as decimal strings. Arbitrary `json` values
-retain JSON numbers. Non-finite floats encode as `"NaN"`, `"+Infinity"`, or
-`"-Infinity"`. Timestamps retain nanosecond precision and serialize in UTC.
-
 ## NixOS
 
 The flake provides an agent package and NixOS service module. See
