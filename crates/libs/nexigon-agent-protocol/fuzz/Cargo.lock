@@ -570,8 +570,8 @@ checksum = "f8fadd59c855ef2080decdef8ff161eb6661b86933c9d82e5ba29dc602a55aba"
 
 [[package]]
 name = "sidex"
-version = "0.4.0"
-source = "git+https://github.com/silitics/sidex.git?tag=v0.4.0#f8bfaa1e77312395ea9ea6116603db2016acdea8"
+version = "0.4.1"
+source = "git+https://github.com/silitics/sidex.git?tag=v0.4.1#76909d137a1d4baeea27d6c590c81442268d7577"
 dependencies = [
  "base64",
  "indexmap",
@@ -583,8 +583,8 @@ dependencies = [
 
 [[package]]
 name = "sidex-attrs-api"
-version = "0.4.0"
-source = "git+https://github.com/silitics/sidex.git?tag=v0.4.0#f8bfaa1e77312395ea9ea6116603db2016acdea8"
+version = "0.4.1"
+source = "git+https://github.com/silitics/sidex.git?tag=v0.4.1#76909d137a1d4baeea27d6c590c81442268d7577"
 dependencies = [
  "semver",
  "serde",
@@ -596,8 +596,8 @@ dependencies = [
 
 [[package]]
 name = "sidex-attrs-json"
-version = "0.4.0"
-source = "git+https://github.com/silitics/sidex.git?tag=v0.4.0#f8bfaa1e77312395ea9ea6116603db2016acdea8"
+version = "0.4.1"
+source = "git+https://github.com/silitics/sidex.git?tag=v0.4.1#76909d137a1d4baeea27d6c590c81442268d7577"
 dependencies = [
  "serde",
  "serde_json",
@@ -609,8 +609,8 @@ dependencies = [
 
 [[package]]
 name = "sidex-attrs-rust"
-version = "0.4.0"
-source = "git+https://github.com/silitics/sidex.git?tag=v0.4.0#f8bfaa1e77312395ea9ea6116603db2016acdea8"
+version = "0.4.1"
+source = "git+https://github.com/silitics/sidex.git?tag=v0.4.1#76909d137a1d4baeea27d6c590c81442268d7577"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -624,8 +624,8 @@ dependencies = [
 
 [[package]]
 name = "sidex-attrs-validate"
-version = "0.4.0"
-source = "git+https://github.com/silitics/sidex.git?tag=v0.4.0#f8bfaa1e77312395ea9ea6116603db2016acdea8"
+version = "0.4.1"
+source = "git+https://github.com/silitics/sidex.git?tag=v0.4.1#76909d137a1d4baeea27d6c590c81442268d7577"
 dependencies = [
  "serde",
  "serde_json",
@@ -638,8 +638,8 @@ dependencies = [
 
 [[package]]
 name = "sidex-build-rs"
-version = "0.4.0"
-source = "git+https://github.com/silitics/sidex.git?tag=v0.4.0#f8bfaa1e77312395ea9ea6116603db2016acdea8"
+version = "0.4.1"
+source = "git+https://github.com/silitics/sidex.git?tag=v0.4.1#76909d137a1d4baeea27d6c590c81442268d7577"
 dependencies = [
  "serde_json",
  "sidex-core",
@@ -649,8 +649,8 @@ dependencies = [
 
 [[package]]
 name = "sidex-core"
-version = "0.4.0"
-source = "git+https://github.com/silitics/sidex.git?tag=v0.4.0#f8bfaa1e77312395ea9ea6116603db2016acdea8"
+version = "0.4.1"
+source = "git+https://github.com/silitics/sidex.git?tag=v0.4.1#76909d137a1d4baeea27d6c590c81442268d7577"
 dependencies = [
  "eyre",
  "hashbrown 0.13.2",
@@ -670,8 +670,8 @@ dependencies = [
 
 [[package]]
 name = "sidex-diagnostics"
-version = "0.4.0"
-source = "git+https://github.com/silitics/sidex.git?tag=v0.4.0#f8bfaa1e77312395ea9ea6116603db2016acdea8"
+version = "0.4.1"
+source = "git+https://github.com/silitics/sidex.git?tag=v0.4.1#76909d137a1d4baeea27d6c590c81442268d7577"
 dependencies = [
  "anyhow",
  "ariadne",
@@ -682,8 +682,8 @@ dependencies = [
 
 [[package]]
 name = "sidex-gen"
-version = "0.4.0"
-source = "git+https://github.com/silitics/sidex.git?tag=v0.4.0#f8bfaa1e77312395ea9ea6116603db2016acdea8"
+version = "0.4.1"
+source = "git+https://github.com/silitics/sidex.git?tag=v0.4.1#76909d137a1d4baeea27d6c590c81442268d7577"
 dependencies = [
  "serde_json",
  "sidex-diagnostics",
@@ -693,8 +693,8 @@ dependencies = [
 
 [[package]]
 name = "sidex-gen-rs"
-version = "0.4.0"
-source = "git+https://github.com/silitics/sidex.git?tag=v0.4.0#f8bfaa1e77312395ea9ea6116603db2016acdea8"
+version = "0.4.1"
+source = "git+https://github.com/silitics/sidex.git?tag=v0.4.1#76909d137a1d4baeea27d6c590c81442268d7577"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -711,16 +711,16 @@ dependencies = [
 
 [[package]]
 name = "sidex-ir"
-version = "0.4.0"
-source = "git+https://github.com/silitics/sidex.git?tag=v0.4.0#f8bfaa1e77312395ea9ea6116603db2016acdea8"
+version = "0.4.1"
+source = "git+https://github.com/silitics/sidex.git?tag=v0.4.1#76909d137a1d4baeea27d6c590c81442268d7577"
 dependencies = [
  "sidex",
 ]
 
 [[package]]
 name = "sidex-syntax"
-version = "0.4.0"
-source = "git+https://github.com/silitics/sidex.git?tag=v0.4.0#f8bfaa1e77312395ea9ea6116603db2016acdea8"
+version = "0.4.1"
+source = "git+https://github.com/silitics/sidex.git?tag=v0.4.1#76909d137a1d4baeea27d6c590c81442268d7577"
 dependencies = [
  "sidex-diagnostics",
  "sidex-ir",
@@ -728,8 +728,8 @@ dependencies = [
 
 [[package]]
 name = "sidex-validate-expr"
-version = "0.4.0"
-source = "git+https://github.com/silitics/sidex.git?tag=v0.4.0#f8bfaa1e77312395ea9ea6116603db2016acdea8"
+version = "0.4.1"
+source = "git+https://github.com/silitics/sidex.git?tag=v0.4.1#76909d137a1d4baeea27d6c590c81442268d7577"
 dependencies = [
  "regex",
  "sidex-diagnostics",
