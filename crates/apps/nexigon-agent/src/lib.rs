@@ -347,7 +347,7 @@ async fn resolve_credentials(
     match (&config.hub_url, &config.token) {
         (Some(hub_url), Some(token)) => {
             return Ok(Some(ResolvedCredentials {
-                hub_url: hub_url.clone(),
+                hub_url: hub_url.clone().into(),
                 token: token.clone(),
             }));
         }

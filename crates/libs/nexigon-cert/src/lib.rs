@@ -162,6 +162,8 @@ pub type Sha1Fingerprint = Fingerprint<[u8; 20]>;
 /// SHA256 fingerprint.
 pub type Sha256Fingerprint = Fingerprint<[u8; 32]>;
 
+sidex::types::impl_text!(Sha256Fingerprint);
+
 /// Invalid fingerprint error.
 #[derive(Debug)]
 pub struct InvalidFingerprintError(());

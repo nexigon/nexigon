@@ -34,7 +34,7 @@ pub async fn connect_local_executor(
     let mut stream = UnixStream::connect(socket_path).await?;
     let hello = ClientHello {
         version: VERSION,
-        endpoint: "executor".to_owned(),
+        endpoint: "executor".into(),
         options: None,
     };
     write_hello(&mut stream, &hello).await?;

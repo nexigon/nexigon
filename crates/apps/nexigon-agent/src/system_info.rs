@@ -25,21 +25,22 @@ pub fn get_system_info(config: &Config) -> SystemInfo {
     let networks = sysinfo::Networks::new_with_refreshed_list()
         .iter()
         .map(|(name, network)| NetworkInterfaceInfo {
-            name: name.clone(),
-            mac_address: network.mac_address().to_string(),
+            name: name.clone().into(),
+            mac_address: network.mac_address().to_string().into(),
             ip_addresses: network
                 .ip_networks()
                 .iter()
                 .map(|ip| format!("{}/{}", ip.addr, ip.prefix))
+                .map(Into::into)
                 .collect(),
         })
         .collect();
     let disks = sysinfo::Disks::new_with_refreshed_list()
         .iter()
         .map(|disk| DiskInfo {
-            name: disk.name().to_string_lossy().into_owned(),
-            filesystem: disk.file_system().to_string_lossy().into_owned(),
-            mount_point: disk.mount_point().to_string_lossy().into_owned(),
+            name: disk.name().to_string_lossy().into_owned().into(),
+            filesystem: disk.file_system().to_string_lossy().into_owned().into(),
+            mount_point: disk.mount_point().to_string_lossy().into_owned().into(),
             total_space: disk.total_space(),
             available_space: disk.available_space(),
         })
@@ -49,15 +50,15 @@ pub fn get_system_info(config: &Config) -> SystemInfo {
         .as_ref()
         .map(|exports| exports.iter().map(convert_export).collect::<Vec<_>>());
     SystemInfo {
-        name: sysinfo::System::name(),
-        version: sysinfo::System::long_os_version(),
-        kernel: Some(sysinfo::System::kernel_long_version()),
-        hostname: sysinfo::System::host_name(),
-        arch: Some(sysinfo::System::cpu_arch()),
+        name: sysinfo::System::name().map(Into::into),
+        version: sysinfo::System::long_os_version().map(Into::into),
+        kernel: Some(sysinfo::System::kernel_long_version().into()),
+        hostname: sysinfo::System::host_name().map(Into::into),
+        arch: Some(sysinfo::System::cpu_arch().into()),
         memory,
         networks,
         disks,
-        exports,
+        exports: exports.map(Into::into),
         rugix: get_rugix_info(),
         yocto: get_yocto_info(),
         agent: Some(AgentInfo::new(
@@ -107,7 +108,9 @@ fn build_agent_config(config: &Config) -> AgentConfig {
         .with_terminal(Some(
             AgentTerminalConfig::new()
                 .with_enabled(Some(terminal_enabled))
-                .with_users(terminal_users(config)),
+                .with_users(
+                    terminal_users(config).map(|value| value.into_iter().map(Into::into).collect()),
+                ),
         ))
         .with_commands(Some(
             AgentCommandsConfig::new().with_enabled(Some(commands_enabled)),
@@ -124,8 +127,8 @@ fn terminal_users(config: &Config) -> Option<Vec<String>> {
     let mut users = vec![default_user];
     if let Some(allowed) = &terminal.allowed_users {
         for user in allowed {
-            if !users.contains(user) {
-                users.push(user.clone());
+            if !users.iter().any(|existing| existing == user) {
+                users.push(user.clone().into());
             }
         }
     }
@@ -143,6 +146,7 @@ fn get_yocto_info() -> Option<YoctoSystemInfo> {
                     line.split_once('=')
                         .map(|(key, value)| (key.to_owned(), value.to_owned()))
                 })
+                .map(|(key, value)| (key.into(), value.into()))
                 .collect(),
         })
 }

@@ -208,7 +208,14 @@ async fn reject(
     code: ServerErrorCode,
     message: String,
 ) -> anyhow::Result<()> {
-    send_hello(stream, ServerHello::Error(ServerError { code, message })).await
+    send_hello(
+        stream,
+        ServerHello::Error(ServerError {
+            code,
+            message: message.into(),
+        }),
+    )
+    .await
 }
 
 async fn send_hello(stream: &mut UnixStream, hello: ServerHello) -> anyhow::Result<()> {

@@ -4,7 +4,6 @@
 //! initialises process-global state (logging + crypto provider) once, and
 //! dispatches to the library or to one-shot CLI handlers.
 
-use std::collections::HashMap;
 use std::path::Path;
 use std::path::PathBuf;
 
@@ -195,7 +194,7 @@ async fn run_device_cmd(
             let output = executor
                 .execute(
                     IssueDeviceTokenAction::new(actor.device_id.clone())
-                        .with_claims(Some(claims))
+                        .with_claims(Some(claims.into()))
                         .with_valid_for_secs(valid_for),
                 )
                 .await
@@ -243,25 +242,26 @@ async fn run_events_cmd(
             };
             let publish_events = PublishDeviceEventsAction::new(
                 actor.device_id.clone(),
-                vec![
+                (vec![
                     DeviceEvent::new(
                         DeviceEventId::generate(),
                         severity,
                         serde_json::from_str(&body).context("unable to parse event body")?,
                         {
-                            let mut map = HashMap::new();
+                            let mut map = sidex::types::Map::new();
                             for attribute in attributes {
                                 let Some((key, value)) = attribute.split_once('=') else {
                                     bail!("invalid attribute: {attribute}")
                                 };
-                                map.insert(key.to_owned(), serde_json::from_str(value)?);
+                                map.insert(key.into(), serde_json::from_str(value)?);
                             }
                             map
                         },
                         timestamp,
                     )
-                    .with_category(category),
-                ],
+                    .with_category(category.map(Into::into)),
+                ])
+                .into(),
             );
             executor
                 .execute(publish_events)

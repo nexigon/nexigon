@@ -286,7 +286,7 @@ async fn upload_repository_asset_with_settings(
         .execute(CreateAssetAction::new(
             repository_id,
             size,
-            prepared.digest.clone(),
+            prepared.digest.clone().into(),
         ))
         .await
         .context("creating asset")?
@@ -324,12 +324,15 @@ async fn upload_repository_asset_with_settings(
     let upload_url = upload
         .verified_url
         .context("hub did not provide a verified upload URL")?;
-    let headers = upload
+    let headers: std::collections::HashMap<String, String> = upload
         .headers
-        .context("hub did not provide verified upload headers")?;
+        .context("hub did not provide verified upload headers")?
+        .into_iter()
+        .map(|(name, value)| (name.into(), value.into()))
+        .collect();
     require_verified_headers(&headers)?;
 
-    put_prepared_upload(prepared, upload_url, headers, &settings).await?;
+    put_prepared_upload(prepared, upload_url.into(), headers, &settings).await?;
 
     executor
         .execute(FinalizeAssetUploadAction::new(asset_id.clone()))
@@ -976,14 +979,14 @@ mod tests {
                 self.create_calls += 1;
                 if self.created {
                     assert_eq!(self.size, Some(create.size));
-                    assert_eq!(self.digest.as_ref(), Some(&create.digest));
+                    assert_eq!(self.digest.as_ref(), Some(&create.digest.0));
                     return Ok(Ok(output::<A, _>(CreateAssetOutput::AssetAlreadyExists(
                         self.asset_id.clone(),
                     ))));
                 }
                 self.created = true;
                 self.size = Some(create.size);
-                self.digest = Some(create.digest.clone());
+                self.digest = Some(create.digest.clone().0);
                 return Ok(Ok(output::<A, _>(CreateAssetOutput::Created(
                     self.asset_id.clone(),
                 ))));
@@ -997,7 +1000,7 @@ mod tests {
                 return Ok(Ok(output::<A, _>(GetAssetDetailsOutput::new(
                     self.asset_id.clone(),
                     self.size.expect("created asset size"),
-                    self.digest.clone().expect("created asset digest"),
+                    self.digest.clone().expect("created asset digest").into(),
                     status,
                     0,
                 ))));
@@ -1015,9 +1018,14 @@ mod tests {
             }
             if action.downcast_ref::<IssueAssetUploadUrlAction>().is_some() {
                 return Ok(Ok(output::<A, _>(IssueAssetUploadUrlOutput {
-                    url: self.upload_url.clone(),
-                    verified_url: Some(self.upload_url.clone()),
-                    headers: Some(required_headers()),
+                    url: self.upload_url.clone().into(),
+                    verified_url: Some(self.upload_url.clone().into()),
+                    headers: Some(
+                        required_headers()
+                            .into_iter()
+                            .map(|(key, value)| (key.into(), value.into()))
+                            .collect(),
+                    ),
                 })));
             }
             panic!("unexpected mock action {}", A::NAME);

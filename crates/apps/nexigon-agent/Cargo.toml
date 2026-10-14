@@ -37,7 +37,6 @@ serde.workspace = true
 serde_json.workspace = true
 si-observability.workspace = true
 sidex.workspace = true
-sidex-serde.workspace = true
 sysinfo.workspace = true
 tempfile = "3"
 tokio.workspace = true

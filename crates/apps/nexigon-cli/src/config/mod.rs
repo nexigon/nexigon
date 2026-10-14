@@ -75,6 +75,11 @@ impl<'de> Deserialize<'de> for AuthenticationToken {
     }
 }
 
+sidex::types::impl_text!(AuthenticationToken, |token| match token {
+    AuthenticationToken::OrganizationApiToken(token) => token.stringify(),
+    AuthenticationToken::UserToken(token) => token.stringify(),
+});
+
 impl From<AuthenticationToken> for ClientToken {
     fn from(token: AuthenticationToken) -> Self {
         match token {
@@ -106,7 +111,7 @@ mod tests {
     fn user_token_config_round_trips() {
         let token = UserToken::generate();
         let config = Config {
-            hub_url: "https://hub.example.test".to_owned(),
+            hub_url: "https://hub.example.test".to_owned().into(),
             token: AuthenticationToken::UserToken(token.clone()),
         };
 
@@ -121,7 +126,7 @@ mod tests {
     fn organization_api_token_config_round_trips() {
         let token = OrganizationApiToken::generate();
         let config = Config {
-            hub_url: "https://hub.example.test".to_owned(),
+            hub_url: "https://hub.example.test".to_owned().into(),
             token: AuthenticationToken::OrganizationApiToken(token.clone()),
         };
 

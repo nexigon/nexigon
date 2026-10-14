@@ -65,7 +65,6 @@
   "unevaluatedProperties": false,
   "$defs": {
     "nexigon_agent.config.CommandsConfig": {
-      "$id": "nexigon_agent.config.CommandsConfig",
       "type": "object",
       "description": "On-demand command configuration.",
       "properties": {
@@ -80,14 +79,10 @@
       "unevaluatedProperties": false
     },
     "nexigon_agent.config.DeploymentToken": {
-      "$id": "nexigon_agent.config.DeploymentToken",
-      "type": [
-        "string"
-      ],
+      "type": "string",
       "description": "Deployment token."
     },
     "nexigon_agent.config.ExportConfig": {
-      "$id": "nexigon_agent.config.ExportConfig",
       "description": "Service exports. Each HTTP export permits raw TCP access to its localhost port.",
       "oneOf": [
         {
@@ -99,7 +94,11 @@
             "name": {
               "type": "string"
             },
-            "port": {},
+            "port": {
+              "type": "integer",
+              "maximum": 65535,
+              "minimum": 0
+            },
             "path": {
               "type": "string"
             }
@@ -113,7 +112,6 @@
       ]
     },
     "nexigon_agent.config.ForwardingConfig": {
-      "$id": "nexigon_agent.config.ForwardingConfig",
       "type": "object",
       "description": "Additional TCP ports for CLI tunnels and Hub HTTP proxy access.",
       "properties": {
@@ -134,7 +132,6 @@
       "unevaluatedProperties": false
     },
     "nexigon_agent.config.LocalApiConfig": {
-      "$id": "nexigon_agent.config.LocalApiConfig",
       "type": "object",
       "description": "Local API configuration.\n\nControls the Unix socket exposed by the agent for in-host clients\n(CLI, SDKs) to invoke hub actions over the agent's existing\nconnection without establishing a fresh one.",
       "properties": {
@@ -149,28 +146,32 @@
       "unevaluatedProperties": false
     },
     "nexigon_agent.config.MultiplexConfig": {
-      "$id": "nexigon_agent.config.MultiplexConfig",
       "type": "object",
       "description": "Multiplex connection capacity and burst handling.",
       "properties": {
         "max-channels": {
           "type": "integer",
-          "format": "uint32"
+          "format": "uint32",
+          "maximum": 4294967295,
+          "minimum": 0
         },
         "reserved-channels": {
           "type": "integer",
-          "format": "uint32"
+          "format": "uint32",
+          "maximum": 4294967295,
+          "minimum": 0
         },
         "max-channel-requests-per-second": {
           "type": "integer",
-          "format": "uint32"
+          "format": "uint32",
+          "maximum": 4294967295,
+          "minimum": 0
         }
       },
       "required": [],
       "unevaluatedProperties": false
     },
     "nexigon_agent.config.OperationsConfig": {
-      "$id": "nexigon_agent.config.OperationsConfig",
       "type": "object",
       "description": "Device-polled operation configuration.",
       "properties": {
@@ -178,22 +179,23 @@
           "type": "boolean"
         },
         "poll-interval-secs": {
-          "type": "integer",
-          "format": "uint64"
+          "type": [
+            "integer",
+            "string"
+          ],
+          "format": "uint64",
+          "minimum": 0,
+          "pattern": "^[0-9]+$"
         }
       },
       "required": [],
       "unevaluatedProperties": false
     },
     "nexigon_agent.config.PathBuf": {
-      "$id": "nexigon_agent.config.PathBuf",
-      "type": [
-        "string"
-      ],
+      "type": "string",
       "description": "Filesystem path."
     },
     "nexigon_agent.config.ProvisioningConfig": {
-      "$id": "nexigon_agent.config.ProvisioningConfig",
       "type": "object",
       "description": "Pairing-key provisioning configuration.\n\nWhen static credentials and provisioned credentials are both absent,\nthe agent can expose a minimal local HTTP endpoint to accept a one-time\npairing key and redeem it into device credentials.",
       "properties": {
@@ -217,14 +219,10 @@
       "unevaluatedProperties": false
     },
     "nexigon_agent.config.TcpPort": {
-      "$id": "nexigon_agent.config.TcpPort",
-      "type": [
-        "number"
-      ],
+      "type": "number",
       "description": "TCP destination port (1–65535)."
     },
     "nexigon_agent.config.TelemetryConfig": {
-      "$id": "nexigon_agent.config.TelemetryConfig",
       "type": "object",
       "description": "Telemetry configuration.\n\nControls automatic data collection the agent performs in the background.\nEach toggle is opt-out: defaults preserve historical behavior. Disabling\nthese is primarily useful for tests and tightly controlled deployments\nwhere the operator pushes the equivalent data manually via the CLI.",
       "properties": {
@@ -236,7 +234,6 @@
       "unevaluatedProperties": false
     },
     "nexigon_agent.config.TerminalConfig": {
-      "$id": "nexigon_agent.config.TerminalConfig",
       "type": "object",
       "description": "Remote terminal configuration.",
       "properties": {
