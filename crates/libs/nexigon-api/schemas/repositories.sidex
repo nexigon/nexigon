@@ -74,7 +74,7 @@ variant RepositoryVisibility {
     Private,
 }
 
-/// Repository S3 config.
+/// S3 connection settings for a repository or organization.
 record RepositoryS3Config {
     /// S3 endpoint (e.g., https://s3.amazonaws.com or https://minio.local:9000).
     #[validate(
@@ -104,7 +104,7 @@ record RepositoryS3Config {
         message = "AWS region must be between 1 and 64 characters."
     )]
     region?: string,
-    /// Optional prefix inside the bucket to scope this repository.
+    /// Optional bucket prefix. Organization storage adds `repositories/<repository-id>/`.
     #[validate(
         { _.size <= 1024 },
         message = "Bucket prefix must be at most 1024 characters."
@@ -303,6 +303,8 @@ record QueryRepositoryPackagesOutput {
 
 /// Package query item.
 record QueryRepositoryPackagesItem {
+    /// Human-readable name, falling back to `name` when absent.
+    display_name?: string,
     /// ID of the package.
     package_id: PackageId,
     /// Name of the package.
@@ -321,22 +323,128 @@ record QueryRepositoryPackagesItem {
 record QueryRepositoryAssetsAction {
     /// ID of the repository.
     repository_id: RepositoryId,
+    /// Bounded cursor page. Omission preserves the legacy unbounded response.
+    page?: PageRequest,
+    /// Defaults to all assets. Totals always cover the whole repository.
+    filter?: RepositoryAssetFilter,
+    /// Defaults to largest first for pages, creation order for legacy requests.
+    sort?: RepositoryAssetSort,
+}
+
+/// Restrict the asset inventory without changing repository totals.
+#[json(tagged = externally)]
+variant RepositoryAssetFilter {
+    All,
+    Unused,
+    Issues,
+}
+
+/// Asset ordering, with a stable internal ID as the tie breaker.
+#[json(tagged = externally)]
+variant RepositoryAssetSort {
+    Largest,
+    CleanupDate,
 }
 
 /// Output of querying the assets of a repository.
 record QueryRepositoryAssetsOutput {
     /// List of assets.
     assets: [QueryRepositoryAssetsItem],
+    /// Repository-wide storage totals. Absent on older Hubs.
+    usage?: RepositoryAssetUsage,
+    /// Automatic cleanup policy. Absent on older Hubs.
+    cleanup?: RepositoryAssetCleanupSettings,
+    /// Continuation for a requested page. Absent for legacy requests.
+    page?: PageInfo,
+}
+
+/// Automatic cleanup policy for unused repository assets.
+record RepositoryAssetCleanupSettings {
+    enabled: bool,
+    /// Whole days without package references before automatic deletion.
+    grace_days: u16,
+    /// Most recent enablement. Existing unused assets receive a full grace period.
+    enabled_at?: Timestamp,
+}
+
+/// Storage totals count each asset once, regardless of its reference count.
+record RepositoryAssetUsage {
+    asset_count: u64,
+    /// Bytes of objects last observed present or verified, including pending deletions.
+    stored_bytes: u64,
+    /// Stored bytes with at least one package or version attachment.
+    referenced_bytes: u64,
+    /// Stored bytes without package or version attachments.
+    unused_bytes: u64,
+    /// Declared bytes whose presence is unknown, missing, or inconsistent.
+    unconfirmed_bytes: u64,
+    /// Number of assets with unknown, missing, inconsistent, or failed storage checks.
+    unconfirmed_count: u64,
+    /// Number of assets with a failed deletion attempt.
+    cleanup_error_count: u64,
+    /// Oldest storage observation among stored assets.
+    checked_at?: Timestamp,
+}
+
+/// Retention information, independent of object-storage verification.
+record RepositoryAssetLifecycle {
+    reference_count: u64,
+    unreferenced_since?: Timestamp,
+    /// Earliest automatic deletion time; absent while cleanup is disabled or referenced.
+    eligible_at?: Timestamp,
+    deletion_started_at?: Timestamp,
+    /// Sanitized reason for the latest cleanup failure.
+    deletion_error?: string,
+}
+
+/// Configure automatic cleanup. Requires permission to manage repository settings.
+#[request(name = "repositories_SetAssetCleanup", response = Empty)]
+record SetRepositoryAssetCleanupAction {
+    repository_id: RepositoryId,
+    enabled: bool,
+    #[validate({ 1 <= _ }, message = "Grace period must be at least one day.")]
+    grace_days: u16,
+}
+
+/// List the package attachments retaining a repository asset.
+#[request(
+    name = "repositories_GetAssetReferences",
+    response = GetAssetReferencesOutput
+)]
+record GetAssetReferencesAction {
+    asset_id: RepositoryAssetId,
+    /// Bounded cursor page. Omission preserves the legacy unbounded response.
+    page?: PageRequest,
+}
+
+record GetAssetReferencesOutput {
+    references: [RepositoryAssetReference],
+    /// Package attachments precede version attachments, each in stable ID order.
+    page?: PageInfo,
+}
+
+/// One retaining package or version attachment.
+record RepositoryAssetReference {
+    package_id: PackageId,
+    package_name: string,
+    /// Absent for a package-level attachment.
+    version_id?: PackageVersionId,
+    version_name?: string,
+    filename: string,
 }
 
 /// Asset query item.
 record QueryRepositoryAssetsItem {
+    /// Reference count and cleanup status. Absent on older Hubs.
+    lifecycle?: RepositoryAssetLifecycle,
     /// ID of the asset.
     asset_id: RepositoryAssetId,
     /// Size of the asset.
     size: u64,
     /// Digest of the asset.
     digest: Digest,
+    /// Latest storage check. Absent when connected to an older Hub.
+    storage?: RepositoryAssetStorage,
 }
 
 /// Query repository projects.
@@ -422,6 +530,10 @@ record GetPackageDetailsAction {
 
 /// Output of getting information about a package.
 record GetPackageDetailsOutput {
+    /// Optional display information. Absent on older Hub versions.
+    presentation?: PackagePresentation,
+    /// Image upload limits configured by this Hub. Absent on older Hub versions.
+    image_limits?: PackageImageLimits,
     /// ID of the package.
     package_id: PackageId,
     /// Name of the package.
@@ -430,6 +542,8 @@ record GetPackageDetailsOutput {
     kind?: string,
     /// Number of versions of the package.
     version_count: u64,
+    /// Package retention policy. Absent on older Hub versions.
+    retention?: PackageVersionRetention,
     /// Package-level metadata.
     metadata: [string: JsonValue],
     /// Assets attached to the package itself (independent of versions).
@@ -506,6 +620,8 @@ record SetPackageAssetMetadataAction {
 /// Create a new package.
 #[request(name = "repositories_CreatePackage", response = CreatePackageOutput)]
 record CreatePackageAction {
+    /// Optional initial display information.
+    presentation?: PackagePresentationUpdate,
     /// ID of the repository.
     repository_id: RepositoryId,
     /// Name of the package.
@@ -527,6 +643,61 @@ record CreatePackageAction {
     kind?: string,
     /// Optional initial metadata.
     metadata?: [string: JsonValue],
+}
+
+/// Display information for a package, independent of its URL-safe name.
+record PackagePresentation {
+    /// Human-readable name. Absent when the URL-safe package name is used.
+    display_name?: string,
+    /// CommonMark description. Raw HTML is not rendered by the Hub UI.
+    description?: string,
+    /// Root-relative URL for the PNG on this Hub. Absent when no image is set.
+    /// Fetch with the same credentials as package details. Supports ETag validation.
+    image_url?: string,
+}
+
+/// Replace display text and optionally change the package image.
+record PackagePresentationUpdate {
+    /// Human-readable name. Omit to display the URL-safe package name.
+    #[validate(
+        { 1 <= _.size <= 128 },
+        message = "Display name must be between 1 and 128 characters."
+    )]
+    display_name?: string,
+    /// CommonMark description. Raw HTML is not rendered by the Hub UI.
+    #[validate(
+        { _.size <= 65536 },
+        message = "Description must be at most 65536 characters."
+    )]
+    description?: string,
+    /// Omit to preserve the current image, or leave a new package without an image.
+    image?: PackageImageUpdate,
+}
+
+/// Change the image while saving package display information.
+variant PackageImageUpdate {
+    /// Replace with a base64-encoded static PNG, without a data URL prefix.
+    /// Defaults to at most 1 MiB and 1024 pixels per side; see `image_limits`.
+    #[json(content = "imagePng")]
+    Replace: string,
+    /// Remove the current image.
+    Remove,
+}
+
+/// Limits for a package image, applied before it is stored.
+record PackageImageLimits {
+    /// Maximum decoded file size in bytes.
+    max_bytes: u32,
+    /// Maximum width and height in pixels.
+    max_dimension: u32,
+}
+
+/// Replace display text and optionally change the image.
+/// Omitted display name and description are cleared; an omitted image is preserved.
+#[request(name = "repositories_SetPackagePresentation", response = Empty)]
+record SetPackagePresentationAction {
+    package_id: PackageId,
+    presentation: PackagePresentationUpdate,
 }
 
 /// Output of creating a package.
@@ -624,8 +795,14 @@ record QueryPackageVersionsItem {
     name?: string,
     /// Timestamp when the package version was created.
     created_at: Timestamp,
+    /// Explicit deletion deadline. Package retention can delete the version earlier.
+    delete_at?: Timestamp,
+    /// Sealed versions reject content changes and all deletion. Absent on older Hub versions.
+    sealed?: bool,
     /// Tags of the package version.
     tags: [PackageVersionTag],
+    /// Version that a device must run before installing this version.
+    base_version_id?: PackageVersionId,
 }
 
 /// Package version tag.
@@ -634,6 +811,8 @@ record PackageVersionTag {
     tag: string,
     /// Indicates whether the tag is locked.
     locked: bool,
+    /// Time at which the tag was assigned to the version. Absent on older Hub versions.
+    assigned_at?: Timestamp,
 }
 
 /// Add tag item.
@@ -778,6 +957,12 @@ record GetPackageVersionDetailsOutput {
     tags: [PackageVersionTag],
     /// Version-level metadata.
     metadata: [string: JsonValue],
+    /// Explicit deletion deadline. Package retention can delete the version earlier.
+    delete_at?: Timestamp,
+    /// Sealed versions reject content changes and all deletion. Absent on older Hub versions.
+    sealed?: bool,
+    /// Version that a device must run before installing this version.
+    base_version_id?: PackageVersionId,
 }
 
 /// Create a new package version.
@@ -794,10 +979,17 @@ record CreatePackageVersionAction {
         message = "Version name must be between 1 and 128 characters."
     )]
     name?: string,
+    /// Earliest automatic deletion time; must be in the future. Package retention applies independently.
+    /// Removes the version and all tags. Unused assets follow repository cleanup policy.
+    delete_at?: Timestamp,
     /// Tags to add to the package version.
     tags?: [AddTagItem],
     /// Optional initial metadata.
     metadata?: [string: JsonValue],
+    /// Version that a device must run before installing this version.
+    ///
+    /// Must belong to the same package and must not be scheduled for deletion.
+    base_version_id?: PackageVersionId,
 }
 
 /// Output of creating a package version.
@@ -814,10 +1006,24 @@ record CreatePackageVersionSuccess {
 }
 
 /// Delete a package version.
+///
+/// A version that is the base of another version cannot be deleted.
 #[request(name = "repositories_DeleteVersion", response = Empty)]
 record DeletePackageVersionAction {
     /// ID of the package version.
     version_id: PackageVersionId,
+}
+
+/// Schedule or cancel automatic deletion. Requires permission to manage versions.
+/// Deletion removes the version and all tags, including locked tags. It does not
+/// check device installations. Unused assets follow the repository cleanup policy.
+/// A version that is the base of another version cannot be scheduled.
+#[request(name = "repositories_SetVersionDeletionSchedule", response = Empty)]
+record SetPackageVersionDeletionScheduleAction {
+    version_id: PackageVersionId,
+    /// Future deadline. Null or omission cancels this schedule; package retention still applies.
+    /// A deadline makes deletion eligible; background processing may delay it.
+    delete_at?: Timestamp,
 }
 
 /// Set the name of a package version.
@@ -831,6 +1037,19 @@ record SetPackageVersionNameAction {
         message = "Version name must be between 1 and 128 characters."
     )]
     name?: string,
+}
+
+/// Set or clear the base of a package version. Requires permission to manage versions.
+///
+/// The base must belong to the same package, must not be scheduled for deletion, and
+/// must not lead back to the version through its own bases. Sealed versions reject
+/// changes to their base.
+#[request(name = "repositories_SetVersionBase", response = Empty)]
+record SetPackageVersionBaseAction {
+    /// ID of the package version.
+    version_id: PackageVersionId,
+    /// New base version. Omit to clear the base.
+    base_version_id?: PackageVersionId,
 }
 
 /// Set metadata on a package version.
@@ -1008,6 +1227,8 @@ record GetRepositoryS3ConfigAction {
 /// 
 /// This intentionally does not include the secret access key.
 record GetRepositoryS3ConfigOutput {
+    /// Effective storage source. Inherited credentials are not exposed here.
+    source: RepositoryStorageSource,
     /// S3 config for the repository.
     s3_config: RepositoryS3Config,
 }
@@ -1034,7 +1255,7 @@ record GetAssetDetailsOutput {
     status: RepositoryAssetStatus,
     /// Latest storage check. Absent when connected to an older Hub.
     storage?: RepositoryAssetStorage,
-    /// Number of package versions that refer to the asset.
+    /// Number of package and package-version attachments that retain the asset.
     reference_count: u64,
 }
 
@@ -1060,7 +1281,8 @@ variant CreateAssetOutput {
     Created: RepositoryAssetId,
 }
 
-/// Delete an asset.
+/// Schedule deletion of an unused asset. Referenced assets are rejected.
+/// The asset remains visible until object-storage deletion completes.
 #[request(name = "repositories_DeleteAsset", response = Empty)]
 record DeleteAssetAction {
     /// ID of the asset.
@@ -1139,4 +1361,54 @@ record QueryAuditLogEventsOutput {
     page?: PageInfo,
     /// List of audit log events.
     events: [AuditLogEvent],
+}
+
+/// The scope supplying repository storage.
+#[json(tagged = externally)]
+variant RepositoryStorageSource {
+    Unconfigured,
+    Repository,
+    Organization,
+}
+
+/// Remove a repository override and use organization storage when configured.
+#[request(name = "repositories_DeleteS3Config", response = Empty)]
+record DeleteRepositoryS3ConfigAction {
+    repository_id: RepositoryId,
+}
+
+/// Opt-in retention of unsealed versions, evaluated per package by creation time.
+/// Either exceeded limit makes a version eligible for deletion, including existing versions.
+/// Retention skips versions that are the base of another version.
+record PackageVersionRetention {
+    enabled: bool,
+    /// Maximum number of newest unsealed versions to keep. Sealed versions do not count.
+    #[validate(
+        { 1 <= _ <= 2147483647 },
+        message = "Version count must be a positive integer."
+    )]
+    max_versions?: u32,
+    /// Maximum age in fixed 24-hour days. This can expire every unsealed version.
+    #[validate(
+        { 1 <= _ <= 2147483647 },
+        message = "Maximum age must be a positive number of days."
+    )]
+    max_age_days?: u32,
+}
+
+/// Replace the package retention policy. Requires permission to manage versions.
+#[request(name = "repositories_SetPackageVersionRetention", response = Empty)]
+record SetPackageVersionRetentionAction {
+    package_id: PackageId,
+    retention: PackageVersionRetention,
+}
+
+/// Permanently seal a version. Requires permission to manage versions.
+/// Sealing cancels scheduled deletion and blocks changes to the name, metadata,
+/// base version, and attachments, as well as deletion of the version, package,
+/// or repository.
+/// Tags remain editable. Sealing cannot be reversed.
+#[request(name = "repositories_SealVersion", response = Empty)]
+record SealPackageVersionAction {
+    version_id: PackageVersionId,
 }

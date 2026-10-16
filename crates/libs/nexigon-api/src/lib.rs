@@ -121,6 +121,10 @@ macro_rules! with_actions {
             // ## Repositories
             ("projects_LinkRepository", AddProjectRepository, projects::AddProjectRepositoryAction, outputs::Empty),
             ("projects_UnlinkRepository", RemoveProjectRepository, projects::RemoveProjectRepositoryAction, outputs::Empty),
+            // ## Property Schemas
+            ("projects_QueryPropertySchemas", QueryPropertySchemas, projects::QueryPropertySchemasAction, projects::QueryPropertySchemasOutput),
+            ("projects_SetPropertySchema", SetPropertySchema, projects::SetPropertySchemaAction, outputs::Empty),
+            ("projects_RemovePropertySchema", RemovePropertySchema, projects::RemovePropertySchemaAction, outputs::Empty),
             // ## OTLP Config
             ("projects_GetOtlpConfig", GetProjectOtlpConfig, projects::GetProjectOtlpConfigAction, projects::GetProjectOtlpConfigOutput),
             ("projects_SetOtlpConfig", SetProjectOtlpConfig, projects::SetProjectOtlpConfigAction, outputs::Empty),
@@ -197,6 +201,8 @@ macro_rules! with_actions {
             ("repositories_SetSlug", SetRepositorySlug, repositories::SetRepositorySlugAction, repositories::SetRepositorySlugOutput),
             ("repositories_QueryPackages", QueryRepositoryPackages, repositories::QueryRepositoryPackagesAction, repositories::QueryRepositoryPackagesOutput),
             ("repositories_QueryAssets", QueryRepositoryAssets, repositories::QueryRepositoryAssetsAction, repositories::QueryRepositoryAssetsOutput),
+            ("repositories_SetAssetCleanup", SetRepositoryAssetCleanup, repositories::SetRepositoryAssetCleanupAction, outputs::Empty),
+            ("repositories_GetAssetReferences", GetAssetReferences, repositories::GetAssetReferencesAction, repositories::GetAssetReferencesOutput),
             ("repositories_QueryLinkedProjects", QueryRepositoryProjects, repositories::QueryRepositoryProjectsAction, repositories::QueryRepositoryProjectsOutput),
             // ## Packages
             ("repositories_ResolvePackageByPath", ResolvePackageByPath, repositories::ResolvePackageByPathAction, repositories::ResolvePackageByPathOutput),
@@ -206,6 +212,7 @@ macro_rules! with_actions {
             ("repositories_SetPackageName", SetPackageName, repositories::SetPackageNameAction, repositories::SetPackageNameOutput),
             ("repositories_SetPackageKind", SetPackageKind, repositories::SetPackageKindAction, outputs::Empty),
             ("repositories_SetPackageMetadata", SetPackageMetadata, repositories::SetPackageMetadataAction, outputs::Empty),
+            ("repositories_SetPackagePresentation", SetPackagePresentation, repositories::SetPackagePresentationAction, outputs::Empty),
             ("repositories_AddPackageAsset", AddPackageAsset, repositories::AddPackageAssetAction, repositories::AddPackageAssetOutput),
             ("repositories_RemovePackageAsset", RemovePackageAsset, repositories::RemovePackageAssetAction, outputs::Empty),
             ("repositories_SetPackageAssetMetadata", SetPackageAssetMetadata, repositories::SetPackageAssetMetadataAction, outputs::Empty),
@@ -215,7 +222,11 @@ macro_rules! with_actions {
             ("repositories_GetVersionDetails", GetPackageVersionDetails, repositories::GetPackageVersionDetailsAction, repositories::GetPackageVersionDetailsOutput),
             ("repositories_CreateVersion", CreatePackageVersion, repositories::CreatePackageVersionAction, repositories::CreatePackageVersionOutput),
             ("repositories_DeleteVersion", DeletePackageVersion, repositories::DeletePackageVersionAction, outputs::Empty),
+            ("repositories_SealVersion", SealPackageVersion, repositories::SealPackageVersionAction, outputs::Empty),
+            ("repositories_SetPackageVersionRetention", SetPackageVersionRetention, repositories::SetPackageVersionRetentionAction, outputs::Empty),
+            ("repositories_SetVersionDeletionSchedule", SetPackageVersionDeletionSchedule, repositories::SetPackageVersionDeletionScheduleAction, outputs::Empty),
             ("repositories_SetVersionName", SetPackageVersionName, repositories::SetPackageVersionNameAction, outputs::Empty),
+            ("repositories_SetVersionBase", SetPackageVersionBase, repositories::SetPackageVersionBaseAction, outputs::Empty),
             ("repositories_SetVersionMetadata", SetPackageVersionMetadata, repositories::SetPackageVersionMetadataAction, outputs::Empty),
             ("repositories_AddVersionAsset", AddPackageVersionAsset, repositories::AddPackageVersionAssetAction, repositories::AddPackageVersionAssetOutput),
             ("repositories_RemoveVersionAsset", RemovePackageVersionAsset, repositories::RemovePackageVersionAssetAction, outputs::Empty),
@@ -224,6 +235,10 @@ macro_rules! with_actions {
             ("repositories_UntagVersion", UntagPackageVersion, repositories::UntagPackageVersionAction, outputs::Empty),
             ("repositories_ResolveVersionAssetByPath", ResolvePackageVersionAssetByPath, repositories::ResolvePackageVersionAssetByPathAction, repositories::ResolvePackageVersionAssetByPathOutput),
             // ## S3 Config
+            ("organizations_SetS3Config", SetOrganizationS3Config, organizations::SetOrganizationS3ConfigAction, outputs::Empty),
+            ("organizations_GetS3Config", GetOrganizationS3Config, organizations::GetOrganizationS3ConfigAction, organizations::GetOrganizationS3ConfigOutput),
+            ("organizations_DeleteS3Config", DeleteOrganizationS3Config, organizations::DeleteOrganizationS3ConfigAction, outputs::Empty),
+            ("repositories_DeleteS3Config", DeleteRepositoryS3Config, repositories::DeleteRepositoryS3ConfigAction, outputs::Empty),
             ("repositories_SetS3Config", SetRepositoryS3Credentials, repositories::SetRepositoryS3ConfigAction, outputs::Empty),
             ("repositories_GetS3Config", GetRepositoryS3Credentials, repositories::GetRepositoryS3ConfigAction, repositories::GetRepositoryS3ConfigOutput),
             // ## Assets

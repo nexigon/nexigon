@@ -31,6 +31,7 @@ use nexigon_api::types::devices::DeviceOperationWorkKind;
 use nexigon_api::types::devices::DeviceOperationWorkStep;
 use nexigon_api::types::devices::ReportDeviceOperationStepAction;
 use nexigon_api::types::devices::SetDevicePropertyAction;
+use nexigon_api::types::properties::DeviceCommandDescriptor;
 use nexigon_client::ClientExecutor;
 use nexigon_client::WebsocketConnection;
 use nexigon_client::connect_executor;
@@ -38,12 +39,14 @@ use nexigon_ids::ids::DeviceId;
 use nexigon_ids::ids::DeviceOperationWorkClaimId;
 use nexigon_multiplex::ConnectionEvent;
 use tokio::net::TcpStream;
+use tokio::sync::Notify;
 use tokio::sync::Semaphore;
 use tokio::sync::mpsc;
 use tokio::sync::oneshot;
 use tokio::task::JoinSet;
 use tokio_util::sync::CancellationToken;
 use tracing::debug;
+use tracing::error;
 use tracing::info;
 use tracing::warn;
 
@@ -136,7 +139,7 @@ impl EndpointLimits {
     }
 }
 
-fn panic_message(payload: Box<dyn std::any::Any + Send>) -> String {
+pub(crate) fn panic_message(payload: Box<dyn std::any::Any + Send>) -> String {
     if let Some(message) = payload.downcast_ref::<&str>() {
         (*message).to_owned()
     } else if let Some(message) = payload.downcast_ref::<String>() {
@@ -206,6 +209,15 @@ pub async fn run_with_connection(
 ) -> anyhow::Result<()> {
     let mut connection_ref = connection.make_ref();
 
+    // Without valid settings, the agent runs without system updates.
+    let system_updates = crate::system_updates::settings(&config).unwrap_or_else(|error| {
+        error!(
+            error = format!("{error:#}"),
+            "invalid system update integration configuration, system updates are disabled"
+        );
+        None
+    });
+    let check_requested = Arc::new(Notify::new());
     let commands_enabled = config
         .commands
         .as_ref()
@@ -217,7 +229,16 @@ pub async fn run_with_connection(
             .as_ref()
             .and_then(|h| h.directory.as_deref())
             .unwrap_or(Path::new("/etc/nexigon/agent/commands"));
-        let registry = load_command_registry(commands_dir);
+        let mut registry = load_command_registry(commands_dir);
+        if system_updates.is_some() {
+            let check_requested = check_requested.clone();
+            registry.register_builtin(
+                DeviceCommandDescriptor::new(crate::system_updates::CHECK_COMMAND)
+                    .with_description(Some("Request an immediate system update check.".into()))
+                    .with_category(Some("OTA".into())),
+                Arc::new(move || check_requested.notify_one()),
+            );
+        }
         Some(Arc::new(registry))
     } else {
         None
@@ -231,12 +252,23 @@ pub async fn run_with_connection(
     let (task_tx, mut task_rx) = mpsc::channel(supervisor_queue_capacity);
     let mut tasks = JoinSet::new();
 
+    // The shutdown signal outlives the task group, so that the system update
+    // loop can tell a shutdown from a lost connection while it finishes.
+    let shutdown_requested = CancellationToken::new();
+    let shutdown_watcher = tokio::spawn({
+        let shutdown_requested = shutdown_requested.clone();
+        async move {
+            shutdown.await;
+            shutdown_requested.cancel();
+        }
+    });
     let shutdown_cancellation = cancellation.clone();
+    let shutdown_signal = shutdown_requested.clone();
     spawn_supervised(
         &mut tasks,
         SupervisedTask::new(TaskKind::ShutdownSignal, async move {
             tokio::select! {
-                () = shutdown => {
+                () = shutdown_signal.cancelled() => {
                     debug!("shutdown signaled, stopping agent task group");
                     shutdown_cancellation.cancel();
                 }
@@ -265,6 +297,9 @@ pub async fn run_with_connection(
         }),
     );
 
+    // The system update loop finishes an installation in progress when the
+    // agent stops, so it runs outside the task group and its shutdown deadline.
+    let mut system_updates_task = None;
     let agent_run = async {
         let mut executor = connect_executor(&mut connection_ref)
             .await
@@ -331,6 +366,25 @@ pub async fn run_with_connection(
                     }
                 }),
             );
+        }
+
+        if let Some(settings) = system_updates {
+            match connect_executor(&mut connection_ref).await {
+                Ok(executor) => {
+                    system_updates_task = Some(tokio::spawn(crate::system_updates::run(
+                        settings,
+                        executor,
+                        device_id.clone(),
+                        check_requested,
+                        cancellation.clone(),
+                        shutdown_requested.clone(),
+                    )));
+                }
+                Err(error) => error!(
+                    error = format!("{error:#}"),
+                    "cannot open the system update executor channel, system updates are disabled"
+                ),
+            }
         }
 
         if let Some(registry) = &command_registry {
@@ -468,93 +522,91 @@ pub async fn run_with_connection(
                                         }
                                         report
                                     }
-                                    PreviousExecution::None => {
-                                        match item.step {
-                                            DeviceOperationWorkStep::DeviceCommand(step) => {
-                                                if let Err(error) = operation_ledger
-                                                    .mark_in_progress(
-                                                        &device_operation_id,
-                                                        step_index,
-                                                        &claim_id,
-                                                    )
-                                                    .await
-                                                {
-                                                    warn!(
-                                                        ?error,
-                                                        "failed to persist operation dispatch; command not executed"
-                                                    );
-                                                    continue;
-                                                }
-                                                let done = if let Some(registry) =
-                                                    operations_command_registry.as_ref()
-                                                {
-                                                    let request = DeviceCommandInvokeData::new(
-                                                        step.command,
-                                                        step.input,
-                                                    )
-                                                    .with_stream_log(Some(false))
-                                                    .with_timeout_secs(Some(
-                                                        step.timeout_secs.unwrap_or(3600),
-                                                    ));
-                                                    handlers::invoke_registered_command_with_cancellation(
+                                    PreviousExecution::None => match item.step {
+                                        DeviceOperationWorkStep::DeviceCommand(step) => {
+                                            if let Err(error) = operation_ledger
+                                                .mark_in_progress(
+                                                    &device_operation_id,
+                                                    step_index,
+                                                    &claim_id,
+                                                )
+                                                .await
+                                            {
+                                                warn!(
+                                                    ?error,
+                                                    "failed to persist operation dispatch; command not executed"
+                                                );
+                                                continue;
+                                            }
+                                            let done = if let Some(registry) =
+                                                operations_command_registry.as_ref()
+                                            {
+                                                let request = DeviceCommandInvokeData::new(
+                                                    step.command,
+                                                    step.input,
+                                                )
+                                                .with_stream_log(Some(false))
+                                                .with_timeout_secs(Some(
+                                                    step.timeout_secs.unwrap_or(3600),
+                                                ));
+                                                handlers::invoke_registered_command_with_cancellation(
                                                     registry,
                                                     request,
                                                     &operation_cancellation,
                                                 )
                                                 .await
-                                                } else {
-                                                    nexigon_api::types::devices::DeviceCommandDoneData {
+                                            } else {
+                                                nexigon_api::types::devices::DeviceCommandDoneData {
                                                     status: DeviceCommandStatus::Error,
                                                     output: None,
-                                                    error: Some("commands not enabled".to_owned().into()),
+                                                    error: Some("commands not enabled".into()),
                                                     log_tail: Vec::new().into(),
                                                     duration_ms: 0,
                                                 }
-                                                };
-                                                if operation_cancellation.is_cancelled() {
-                                                    return Ok(());
-                                                }
-                                                let status = match done.status {
-                                                    DeviceCommandStatus::Ok => {
-                                                        DeviceOperationStepReportStatus::Succeeded
-                                                    }
-                                                    DeviceCommandStatus::Error => {
-                                                        DeviceOperationStepReportStatus::Failed
-                                                    }
-                                                };
-                                                let report = DeviceOperationStepReport {
-                                                    status,
-                                                    output: done.output,
-                                                    checkpoint: None,
-                                                    error: done.error,
-                                                };
-                                                if let Err(error) = operation_ledger
-                                                    .mark_completed(
-                                                        &device_operation_id,
-                                                        step_index,
-                                                        &claim_id,
-                                                        report.clone(),
-                                                    )
-                                                    .await
-                                                {
-                                                    warn!(
-                                                        ?error,
-                                                        "failed to persist operation result; result not reported"
-                                                    );
-                                                    continue;
-                                                }
-                                                report
+                                            };
+                                            if operation_cancellation.is_cancelled() {
+                                                return Ok(());
                                             }
-                                            DeviceOperationWorkStep::DeviceTask(_) => {
-                                                debug!(
-                                                    device_operation_id = %device_operation_id,
+                                            let status = match done.status {
+                                                DeviceCommandStatus::Ok => {
+                                                    DeviceOperationStepReportStatus::Succeeded
+                                                }
+                                                DeviceCommandStatus::Error => {
+                                                    DeviceOperationStepReportStatus::Failed
+                                                }
+                                            };
+                                            let report = DeviceOperationStepReport {
+                                                status,
+                                                output: done.output,
+                                                checkpoint: None,
+                                                error: done.error,
+                                            };
+                                            if let Err(error) = operation_ledger
+                                                .mark_completed(
+                                                    &device_operation_id,
                                                     step_index,
-                                                    "device task work is not handled by the agent"
+                                                    &claim_id,
+                                                    report.clone(),
+                                                )
+                                                .await
+                                            {
+                                                warn!(
+                                                    ?error,
+                                                    "failed to persist operation result; result not reported"
                                                 );
                                                 continue;
                                             }
+                                            report
                                         }
-                                    }
+                                        DeviceOperationWorkStep::DeviceTask(_) => {
+                                            debug!(
+                                                device_operation_id = %device_operation_id,
+                                                step_index,
+                                                "device task work is not handled by the agent"
+                                            );
+                                            continue;
+                                        }
+                                    },
                                 };
                                 found_work = true;
                                 // Retry transport failures promptly while this claim's lease
@@ -623,6 +675,14 @@ pub async fn run_with_connection(
     while task_rx.try_recv().is_ok() {}
     drop(task_rx);
     shutdown_tasks(&mut tasks).await;
+    if let Some(task) = system_updates_task {
+        match task.await {
+            Ok(Ok(())) => {}
+            Ok(Err(error)) => error!(?error, "system update integration failed"),
+            Err(error) => error!(?error, "system update integration panicked"),
+        }
+    }
+    shutdown_watcher.abort();
     result
 }
 

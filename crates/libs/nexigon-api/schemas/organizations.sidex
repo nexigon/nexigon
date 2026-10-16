@@ -6,6 +6,7 @@ import pagination::PageInfo
 import pagination::PageRequest
 import projects::ProjectId
 import repositories::RepositoryId
+import repositories::RepositoryS3Config
 import users::UserId
 
 /// Unique ID of an organization
@@ -264,4 +265,30 @@ record QueryOrganizationAuditLogOutput {
     page?: PageInfo,
     /// List of audit log events.
     events: [AuditLogEvent],
+}
+
+/// Organization S3 defaults for repositories without their own configuration.
+#[request(name = "organizations_SetS3Config", response = Empty)]
+record SetOrganizationS3ConfigAction {
+    organization_id: OrganizationId,
+    s3_config: RepositoryS3Config,
+}
+
+/// Get organization storage settings. Secret credentials are never returned.
+#[request(
+    name = "organizations_GetS3Config",
+    response = GetOrganizationS3ConfigOutput
+)]
+record GetOrganizationS3ConfigAction {
+    organization_id: OrganizationId,
+}
+
+record GetOrganizationS3ConfigOutput {
+    s3_config?: RepositoryS3Config,
+}
+
+/// Remove organization storage defaults without deleting stored objects.
+#[request(name = "organizations_DeleteS3Config", response = Empty)]
+record DeleteOrganizationS3ConfigAction {
+    organization_id: OrganizationId,
 }

@@ -9,6 +9,10 @@
 //!
 //! The operation protocol also defines durable `DeviceTask` work, but this agent does not
 //! currently poll for or execute task steps.
+//!
+//! With a system update integration enabled, the agent installs system updates with
+//! Rugix Ctrl or RAUC. It reconciles the desired state in `dev.nexigon.ota.config` and
+//! reports progress in `dev.nexigon.ota.status`.
 
 use std::future::Future;
 use std::io::ErrorKind;
@@ -45,6 +49,7 @@ pub mod local_api;
 mod operation_ledger;
 pub mod provisioning;
 pub mod system_info;
+mod system_updates;
 #[cfg(target_os = "linux")]
 pub mod terminal;
 

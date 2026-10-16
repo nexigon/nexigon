@@ -58,6 +58,86 @@ record Config {
     local_api?: LocalApiConfig,
     /// Pairing-key provisioning configuration.
     provisioning?: ProvisioningConfig,
+    /// Integrations with update systems on the device.
+    integrations?: IntegrationsConfig,
+}
+
+/// Integrations with update systems on the device.
+///
+/// At most one system update integration may be enabled.
+#[json(rename_all = "kebab-case")]
+record IntegrationsConfig {
+    /// Rugix integration.
+    rugix?: RugixIntegrationConfig,
+    /// RAUC integration.
+    rauc?: RaucIntegrationConfig,
+}
+
+/// Rugix integration.
+#[json(rename_all = "kebab-case")]
+record RugixIntegrationConfig {
+    /// System updates with Rugix Ctrl.
+    system_updates?: RugixSystemUpdatesConfig,
+}
+
+/// System updates with Rugix Ctrl.
+///
+/// Implements the OTA update contract of Nexigon Hub: the agent converges toward
+/// the desired state in `dev.nexigon.ota.config` and reports its progress in
+/// `dev.nexigon.ota.status`.
+#[json(rename_all = "kebab-case")]
+record RugixSystemUpdatesConfig {
+    /// Whether system updates are enabled (defaults to false).
+    enabled?: bool,
+    /// Default version path in the format `<repository>/<package>/<version>`.
+    ///
+    /// The `path` in `dev.nexigon.ota.config` overrides it. Without either, the
+    /// device does not update.
+    path?: string,
+    /// Seconds between update checks (defaults to 14400).
+    check_interval_secs?: u64,
+    /// Maximum random delay of scheduled update checks in seconds (defaults
+    /// to 300).
+    ///
+    /// The delay spreads the checks of many devices, for example when their
+    /// maintenance windows open at the same time.
+    check_jitter_secs?: u64,
+    /// Verify bundles with the hash from the asset metadata when present
+    /// (defaults to false).
+    ///
+    /// Without a hash, Rugix Ctrl verifies the bundle signature.
+    use_bundle_hash?: bool,
+}
+
+/// RAUC integration.
+#[json(rename_all = "kebab-case")]
+record RaucIntegrationConfig {
+    /// System updates with RAUC.
+    system_updates?: RaucSystemUpdatesConfig,
+}
+
+/// System updates with RAUC.
+///
+/// Implements the OTA update contract of Nexigon Hub: the agent converges toward
+/// the desired state in `dev.nexigon.ota.config` and reports its progress in
+/// `dev.nexigon.ota.status`.
+#[json(rename_all = "kebab-case")]
+record RaucSystemUpdatesConfig {
+    /// Whether system updates are enabled (defaults to false).
+    enabled?: bool,
+    /// Default version path in the format `<repository>/<package>/<version>`.
+    ///
+    /// The `path` in `dev.nexigon.ota.config` overrides it. Without either, the
+    /// device does not update.
+    path?: string,
+    /// Seconds between update checks (defaults to 14400).
+    check_interval_secs?: u64,
+    /// Maximum random delay of scheduled update checks in seconds (defaults
+    /// to 300).
+    ///
+    /// The delay spreads the checks of many devices, for example when their
+    /// maintenance windows open at the same time.
+    check_jitter_secs?: u64,
 }
 
 /// Pairing-key provisioning configuration.

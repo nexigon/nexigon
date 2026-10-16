@@ -1,3 +1,8 @@
+//! Shared repository commands and path resolution for Nexigon clients.
+//!
+//! [`execute_repositories_cmd`] and [`execute_versions_cmd`] invoke typed API
+//! actions for package contents, version protection, and retention.
+
 use std::path::PathBuf;
 use std::str::FromStr;
 
@@ -24,6 +29,7 @@ use nexigon_api::types::repositories::GetRepositoryDetailsAction;
 use nexigon_api::types::repositories::GetRepositoryS3ConfigAction;
 use nexigon_api::types::repositories::IssueAssetDownloadUrlAction;
 use nexigon_api::types::repositories::IssueAssetUploadUrlAction;
+use nexigon_api::types::repositories::PackageVersionRetention;
 use nexigon_api::types::repositories::QueryPackageVersionsAction;
 use nexigon_api::types::repositories::QueryRepositoryAssetsAction;
 use nexigon_api::types::repositories::QueryRepositoryPackagesAction;
@@ -40,13 +46,17 @@ use nexigon_api::types::repositories::ResolvePackageVersionByPathAction;
 use nexigon_api::types::repositories::ResolvePackageVersionByPathOutput;
 use nexigon_api::types::repositories::ResolveRepositoryNameAction;
 use nexigon_api::types::repositories::ResolveRepositoryNameOutput;
+use nexigon_api::types::repositories::SealPackageVersionAction;
 use nexigon_api::types::repositories::SetPackageAssetMetadataAction;
 use nexigon_api::types::repositories::SetPackageKindAction;
 use nexigon_api::types::repositories::SetPackageMetadataAction;
 use nexigon_api::types::repositories::SetPackageNameAction;
 use nexigon_api::types::repositories::SetPackageVersionAssetMetadataAction;
+use nexigon_api::types::repositories::SetPackageVersionBaseAction;
+use nexigon_api::types::repositories::SetPackageVersionDeletionScheduleAction;
 use nexigon_api::types::repositories::SetPackageVersionMetadataAction;
 use nexigon_api::types::repositories::SetPackageVersionNameAction;
+use nexigon_api::types::repositories::SetPackageVersionRetentionAction;
 use nexigon_api::types::repositories::SetRepositoryDisplayNameAction;
 use nexigon_api::types::repositories::SetRepositoryS3ConfigAction;
 use nexigon_api::types::repositories::SetRepositorySlugAction;
@@ -440,6 +450,21 @@ pub enum RepositoryS3Cmd {
 /// Packages subcommand.
 #[derive(Debug, Subcommand)]
 pub enum PackagesCmd {
+    /// Replace version retention limits. Existing versions are affected immediately.
+    SetRetention {
+        /// Package path or ID.
+        package: String,
+        /// Maximum number of newest unsealed versions to keep.
+        #[clap(long, value_parser = clap::value_parser!(u32).range(1..=2147483647), required_unless_present_any = ["max_age_days", "disable"], conflicts_with = "disable")]
+        max_versions: Option<u32>,
+        /// Maximum age of unsealed versions in fixed 24-hour days.
+        #[clap(long, value_parser = clap::value_parser!(u32).range(1..=2147483647), conflicts_with = "disable")]
+        max_age_days: Option<u32>,
+        /// Disable package retention. Explicit version schedules still apply.
+        #[clap(long)]
+        disable: bool,
+    },
+
     /// List packages in a repository.
     List {
         /// Repository name or ID.
@@ -545,6 +570,13 @@ pub enum PackageVersionsCmd {
 /// Package versions subcommand.
 #[derive(Debug, Subcommand)]
 pub enum VersionsCmd {
+    /// Permanently protect a version from content changes and deletion; cancel its
+    /// deadline.
+    Seal {
+        /// Version path or ID.
+        version: String,
+    },
+
     /// Resolve a package version by path (repository/package/tag).
     Resolve {
         /// Version path (repository/package/tag) to resolve.
@@ -562,17 +594,55 @@ pub enum VersionsCmd {
         /// Optional version name.
         #[clap(long)]
         name: Option<String>,
+        /// Earliest deletion time (RFC 3339 with timezone), e.g. 2027-01-31T00:00:00Z.
+        #[clap(long, conflicts_with = "delete_after")]
+        delete_at: Option<jiff::Timestamp>,
+        /// Delete after a positive duration from now, e.g. 7d or 2h30m (days are 24h).
+        #[clap(long, value_name = "DURATION", value_parser = parse_deletion_duration)]
+        delete_after: Option<jiff::SignedDuration>,
         /// Tags to add.
         #[clap(long = "tag")]
         tags: Vec<AddTagArg>,
         /// Optional JSON metadata.
         #[clap(long, value_parser = parse_json_object)]
         metadata: Option<serde_json::Value>,
+        /// Base version path or ID, which devices must have run before this version.
+        #[clap(long)]
+        base: Option<String>,
+    },
+    /// Set or clear the base version, which devices must have run before a version.
+    SetBase {
+        /// Package version path or ID.
+        version: String,
+        /// Base version path or ID.
+        #[clap(required_unless_present = "clear", conflicts_with = "clear")]
+        base: Option<String>,
+        /// Clear the base version.
+        #[clap(long)]
+        clear: bool,
     },
     /// Delete a package version.
     Delete {
         /// Package version path or ID.
         version: String,
+    },
+    /// Schedule deletion of a version and all its tags, or cancel its deadline.
+    ScheduleDeletion {
+        /// Package version path or ID.
+        version: String,
+        /// Future deletion time (RFC 3339 with timezone).
+        #[clap(
+            long,
+            required_unless_present_any = ["cancel", "delete_after"],
+            conflicts_with_all = ["cancel", "delete_after"]
+        )]
+        at: Option<jiff::Timestamp>,
+        /// Delete after a positive duration from now, e.g. 7d or 2h30m (days are 24h).
+        #[clap(long, value_name = "DURATION", value_parser = parse_deletion_duration, conflicts_with = "cancel")]
+        delete_after: Option<jiff::SignedDuration>,
+        /// Cancel the deadline. Package retention still applies.
+        #[clap(long)]
+        cancel: bool,
     },
     /// Rename a package version.
     Rename {
@@ -797,6 +867,25 @@ pub async fn execute_repositories_cmd(
             }
         },
         RepositoriesCmd::Packages(cmd) => match cmd {
+            PackagesCmd::SetRetention {
+                package,
+                max_versions,
+                max_age_days,
+                disable,
+            } => {
+                let package_id = resolve_package(executor, package).await?;
+                let output = executor
+                    .execute(SetPackageVersionRetentionAction::new(
+                        package_id,
+                        PackageVersionRetention::new(!disable)
+                            .with_max_versions(*max_versions)
+                            .with_max_age_days(*max_age_days),
+                    ))
+                    .await
+                    .context("setting package version retention")??;
+                write_json(&output);
+            }
+
             PackagesCmd::List { repository } => {
                 let repository_id = resolve_repository(executor, repository).await?;
                 let output = executor
@@ -995,6 +1084,15 @@ pub async fn execute_versions_cmd(
     executor: &mut impl Execute,
 ) -> anyhow::Result<()> {
     match cmd {
+        VersionsCmd::Seal { version } => {
+            let version_id = resolve_version(executor, version).await?;
+            let output = executor
+                .execute(SealPackageVersionAction::new(version_id))
+                .await
+                .context("setting package version protection")??;
+            write_json(&output);
+        }
+
         VersionsCmd::Resolve { version } => {
             let path = parse_version_path(version)?;
             let output = executor
@@ -1015,14 +1113,24 @@ pub async fn execute_versions_cmd(
         VersionsCmd::Create {
             package,
             name,
+            delete_at,
+            delete_after,
             tags,
             metadata,
+            base,
         } => {
             let package_id = resolve_package(executor, package).await?;
             let metadata = metadata.as_ref().map(json_value_to_map);
+            let base_version_id = match base {
+                Some(base) => Some(resolve_version(executor, base).await?),
+                None => None,
+            };
             let output = executor
                 .execute(
                     CreatePackageVersionAction::new(package_id.clone())
+                        .with_delete_at(
+                            deletion_deadline(*delete_at, *delete_after)?.map(Into::into),
+                        )
                         .with_name(name.clone().map(Into::into))
                         .with_tags(Some(tags.iter().map(|tag| tag.0.clone()).collect()))
                         .with_metadata(metadata.map(|value| {
@@ -1030,10 +1138,26 @@ pub async fn execute_versions_cmd(
                                 .into_iter()
                                 .map(|(key, value)| (key.into(), value.into()))
                                 .collect()
-                        })),
+                        }))
+                        .with_base_version_id(base_version_id),
                 )
                 .await
                 .context("creating package version")??;
+            write_json(&output);
+        }
+        VersionsCmd::SetBase { version, base, .. } => {
+            let version_id = resolve_version(executor, version).await?;
+            let base_version_id = match base {
+                Some(base) => Some(resolve_version(executor, base).await?),
+                None => None,
+            };
+            let output = executor
+                .execute(
+                    SetPackageVersionBaseAction::new(version_id)
+                        .with_base_version_id(base_version_id),
+                )
+                .await
+                .context("setting package version base")??;
             write_json(&output);
         }
         VersionsCmd::Delete { version } => {
@@ -1042,6 +1166,22 @@ pub async fn execute_versions_cmd(
                 .execute(DeletePackageVersionAction::new(version_id.clone()))
                 .await
                 .context("deleting package version")??;
+            write_json(&output);
+        }
+        VersionsCmd::ScheduleDeletion {
+            version,
+            at,
+            delete_after,
+            ..
+        } => {
+            let version_id = resolve_version(executor, version).await?;
+            let output = executor
+                .execute(
+                    SetPackageVersionDeletionScheduleAction::new(version_id)
+                        .with_delete_at(deletion_deadline(*at, *delete_after)?.map(Into::into)),
+                )
+                .await
+                .context("setting package version deletion schedule")??;
             write_json(&output);
         }
         VersionsCmd::Rename { version, name } => {
@@ -1149,6 +1289,34 @@ pub async fn execute_versions_cmd(
         },
     }
     Ok(())
+}
+
+/// Parse a positive retention duration with fixed-length days and weeks.
+fn parse_deletion_duration(value: &str) -> Result<jiff::SignedDuration, String> {
+    let span: jiff::Span = value
+        .parse()
+        .map_err(|error| format!("invalid duration (use e.g. 7d or 2h30m): {error}"))?;
+    let duration = span
+        .to_duration(jiff::SpanRelativeTo::days_are_24_hours())
+        .map_err(|error| format!("duration must use fixed units, not months or years: {error}"))?;
+    if !duration.is_positive() {
+        return Err("duration must be greater than zero".to_owned());
+    }
+    Ok(duration)
+}
+
+/// Resolve a relative deadline immediately before submitting the mutation.
+fn deletion_deadline(
+    at: Option<jiff::Timestamp>,
+    after: Option<jiff::SignedDuration>,
+) -> anyhow::Result<Option<jiff::Timestamp>> {
+    match after {
+        Some(duration) => jiff::Timestamp::now()
+            .checked_add(duration)
+            .map(Some)
+            .context("deletion deadline is out of range"),
+        None => Ok(at),
+    }
 }
 
 fn parse_repository_visibility(visibility: &str) -> Result<RepositoryVisibility, String> {
