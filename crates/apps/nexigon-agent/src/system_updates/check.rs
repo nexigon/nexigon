@@ -16,7 +16,7 @@ use anyhow::Context;
 use anyhow::anyhow;
 use anyhow::bail;
 use jiff::Timestamp;
-use jiff::Zoned;
+use jiff::tz::TimeZone;
 use nexigon_api::Action;
 use nexigon_api::types::devices::DeviceEvent;
 use nexigon_api::types::devices::DeviceEventSeverity;
@@ -50,7 +50,7 @@ use tokio_util::sync::CancellationToken;
 use tracing::info;
 use tracing::warn;
 
-use super::Settings;
+use super::SystemUpdates;
 use super::planning::ChainEntry;
 use super::planning::NextVersion;
 use super::planning::Running;
@@ -63,6 +63,7 @@ use super::policy::retry_policy_with_defaults;
 use super::policy::spread_position;
 use super::policy::spread_state;
 use super::policy::window_state;
+use super::updater::Bundle;
 use super::updater::SystemIdentity;
 
 /// Device property holding the desired state.
@@ -96,7 +97,7 @@ pub(crate) struct CheckOutcome {
 
 /// Executes checks against Nexigon Hub for one device.
 pub(crate) struct Checker {
-    settings: Settings,
+    settings: SystemUpdates,
     executor: ClientExecutor,
     device_id: DeviceId,
     /// Signals a lost connection or a shutdown, which prevents new installations.
@@ -108,7 +109,7 @@ pub(crate) struct Checker {
 
 impl Checker {
     pub(crate) fn new(
-        settings: Settings,
+        settings: SystemUpdates,
         executor: ClientExecutor,
         device_id: DeviceId,
         cancellation: CancellationToken,
@@ -348,7 +349,7 @@ impl Checker {
             Some(_) => {}
         }
 
-        if let Some(deferral) = window_closed(&status, config.window.as_ref()) {
+        if let Some(deferral) = window_closed(&status, config.window.as_ref(), self.time_zone()) {
             return self.finish_deferred(deferral).await;
         }
 
@@ -405,12 +406,13 @@ impl Checker {
             None,
         )
         .await;
-        if let Err(error) = self
-            .settings
-            .updater
-            .install(&url, bundle_hash.as_deref())
-            .await
-        {
+        let image_version = image_version(&details);
+        let installation = self.settings.updater.install(Bundle {
+            url: &url,
+            hash: bundle_hash.as_deref(),
+            image_version: image_version.as_deref(),
+        });
+        if let Err(error) = installation.await {
             return self
                 .fail_attempt(status, identity, retry, failures, error)
                 .await;
@@ -432,7 +434,7 @@ impl Checker {
                 config.clone()
             }
         };
-        if let Some(deferral) = window_closed(&status, config.window.as_ref()) {
+        if let Some(deferral) = window_closed(&status, config.window.as_ref(), self.time_zone()) {
             self.settings.updater.deactivate().await?;
             return self.finish_deferred(deferral).await;
         }
@@ -582,10 +584,9 @@ impl Checker {
             path.package.clone(),
             path.version.clone(),
         );
-        // Version strings that are not valid tags cannot resolve.
-        match self
-            .executor
-            .execute(action)
+        // Version strings that are not valid tags cannot resolve. The future is
+        // boxed for the reason given at `call`.
+        match Box::pin(self.executor.execute(action))
             .await
             .context("failed to reach Nexigon Hub")?
         {
@@ -613,6 +614,14 @@ impl Checker {
     async fn config(&mut self) -> anyhow::Result<OtaUpdateConfig> {
         let property = self.property(CONFIG_PROPERTY).await?;
         effective_config(self.settings.default_path.as_deref(), property.as_ref())
+    }
+
+    /// Time zone in which maintenance windows apply.
+    fn time_zone(&self) -> TimeZone {
+        self.settings
+            .time_zone
+            .clone()
+            .unwrap_or_else(TimeZone::system)
     }
 
     /// Describe the update system, logging failures instead of failing the check.
@@ -785,7 +794,11 @@ struct Deferral {
 }
 
 /// Defer an update while the maintenance window is closed.
-fn window_closed(status: &OtaUpdateStatus, window: Option<&OtaUpdateWindow>) -> Option<Deferral> {
+fn window_closed(
+    status: &OtaUpdateStatus,
+    window: Option<&OtaUpdateWindow>,
+    time_zone: TimeZone,
+) -> Option<Deferral> {
     let window = window?;
     if !clock_synchronized() {
         // The clock usually synchronizes shortly after boot.
@@ -800,7 +813,7 @@ fn window_closed(status: &OtaUpdateStatus, window: Option<&OtaUpdateWindow>) -> 
             recheck_at: Timestamp::now().checked_add(CLOCK_RECHECK_DELAY).ok(),
         });
     }
-    let status = match window_state(window, &Zoned::now()) {
+    let status = match window_state(window, &Timestamp::now().to_zoned(time_zone)) {
         Ok(WindowState::Open) => return None,
         Ok(WindowState::Closed { opens_at }) => blocked(status.clone(), "window", opens_at),
         Err(error) => status
@@ -843,9 +856,11 @@ fn failed(status: OtaUpdateStatus, error: &anyhow::Error) -> OtaUpdateStatus {
 }
 
 /// Execute an action, failing if Nexigon Hub is unreachable or rejects it.
+///
+/// Action futures are large. Boxing them keeps the futures of checks small,
+/// which would otherwise overflow the stack of unoptimized builds.
 async fn call<A: Action>(executor: &mut ClientExecutor, action: A) -> anyhow::Result<A::Output> {
-    executor
-        .execute(action)
+    Box::pin(executor.execute(action))
         .await
         .context("failed to reach Nexigon Hub")?
         .map_err(|error| anyhow!("Nexigon Hub rejected the request: {}", error.message))

@@ -57,6 +57,7 @@ use crate::handlers::CommandRegistry;
 use crate::operation_ledger::OperationLedger;
 use crate::operation_ledger::PreviousExecution;
 use crate::system_info::get_system_info;
+use crate::system_updates::SystemUpdates;
 
 #[cfg(target_os = "linux")]
 const MAX_CONCURRENT_TERMINALS: usize = 4;
@@ -194,28 +195,41 @@ pub async fn run(
     crate::run_agent(config_path.to_path_buf(), shutdown, None).await
 }
 
+/// Options of an agent running in-process on an established connection.
+#[derive(Default)]
+pub struct RunOptions {
+    /// Fulfilled with the agent's [`DeviceId`] as soon as the agent has
+    /// registered with the hub. In-process hosts use it to expose the device
+    /// id, for example to a test harness, before the agent's long-running loop
+    /// returns.
+    pub ready: Option<oneshot::Sender<DeviceId>>,
+    /// System updates replacing the integration in the agent configuration.
+    pub system_updates: Option<SystemUpdates>,
+}
+
 /// Run the agent loop on an already-established connection.
-///
-/// `ready`, if provided, is fulfilled with the agent's [`DeviceId`] as soon
-/// as the agent has registered with the hub — useful for in-process hosts
-/// that need to expose the device id to a test harness before the agent's
-/// long-running loop returns.
 pub async fn run_with_connection(
     config: Arc<Config>,
     config_dir: &Path,
     connection: WebsocketConnection,
     shutdown: impl Future<Output = ()> + Send + 'static,
-    ready: Option<oneshot::Sender<DeviceId>>,
+    options: RunOptions,
 ) -> anyhow::Result<()> {
+    let RunOptions {
+        ready,
+        system_updates,
+    } = options;
     let mut connection_ref = connection.make_ref();
 
     // Without valid settings, the agent runs without system updates.
-    let system_updates = crate::system_updates::settings(&config).unwrap_or_else(|error| {
-        error!(
-            error = format!("{error:#}"),
-            "invalid system update integration configuration, system updates are disabled"
-        );
-        None
+    let system_updates = system_updates.or_else(|| {
+        crate::system_updates::settings(&config).unwrap_or_else(|error| {
+            error!(
+                error = format!("{error:#}"),
+                "invalid system update integration configuration, system updates are disabled"
+            );
+            None
+        })
     });
     let check_requested = Arc::new(Notify::new());
     let commands_enabled = config

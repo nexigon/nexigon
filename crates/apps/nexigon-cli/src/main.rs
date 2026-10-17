@@ -14,6 +14,7 @@ use tracing::error;
 use tracing::info;
 
 use nexigon_api::types::actor::GetActorAction;
+use nexigon_api::types::pagination::PageRequest;
 use nexigon_api::with_actions;
 use nexigon_client::ClientToken;
 use nexigon_client::connect_executor;
@@ -189,9 +190,21 @@ async fn main() -> anyhow::Result<()> {
                 write_json(&output);
             }
             ProjectsCmd::Devices(cmd) => match cmd {
-                ProjectDevicesCmd::List { project } => {
+                ProjectDevicesCmd::List {
+                    project,
+                    limit,
+                    cursor,
+                } => {
                     let output = executor
-                        .execute(projects::QueryProjectDevicesAction::new(project.clone()))
+                        .execute(
+                            projects::QueryProjectDevicesAction::new(project.clone()).with_page(
+                                Some(
+                                    PageRequest::new()
+                                        .with_limit(*limit)
+                                        .with_cursor(cursor.clone().map(Into::into)),
+                                ),
+                            ),
+                        )
                         .await
                         .context("querying project devices")??;
                     write_json(&output);
@@ -630,10 +643,16 @@ pub enum ProjectsCmd {
 /// Project devices subcommand.
 #[derive(Debug, Parser)]
 pub enum ProjectDevicesCmd {
-    /// List devices of a project.
+    /// List a page of the devices of a project, newest first.
     List {
         /// Project ID.
         project: ProjectId,
+        /// Maximum number of devices to return.
+        #[clap(long)]
+        limit: Option<u32>,
+        /// Cursor from a previous page's `nextCursor`.
+        #[clap(long)]
+        cursor: Option<String>,
     },
 }
 

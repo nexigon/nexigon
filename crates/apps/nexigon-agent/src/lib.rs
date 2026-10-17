@@ -12,7 +12,8 @@
 //!
 //! With a system update integration enabled, the agent installs system updates with
 //! Rugix Ctrl or RAUC. It reconciles the desired state in `dev.nexigon.ota.config` and
-//! reports progress in `dev.nexigon.ota.status`.
+//! reports progress in `dev.nexigon.ota.status`. Hosts running the agent in-process
+//! with [`run_with_connection`] may provide their own [`system_updates::SystemUpdater`].
 
 use std::future::Future;
 use std::io::ErrorKind;
@@ -49,12 +50,13 @@ pub mod local_api;
 mod operation_ledger;
 pub mod provisioning;
 pub mod system_info;
-mod system_updates;
+pub mod system_updates;
 #[cfg(target_os = "linux")]
 pub mod terminal;
 
 mod run;
 
+pub use run::RunOptions;
 pub use run::run;
 pub use run::run_with_connection;
 
@@ -452,7 +454,10 @@ pub(crate) async fn run_agent(
             &config_dir,
             connection,
             shutdown_signal(shutdown_rx.clone()),
-            ready,
+            RunOptions {
+                ready,
+                ..RunOptions::default()
+            },
         )
         .await
     }

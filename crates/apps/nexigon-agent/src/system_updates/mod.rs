@@ -1,9 +1,11 @@
-//! System updates through Rugix Ctrl or RAUC.
+//! System updates through Rugix Ctrl, RAUC, or an updater of the host.
 //!
 //! When enabled in the agent configuration, the agent implements the OTA update
 //! contract of Nexigon Hub: it converges toward the desired state in
 //! `dev.nexigon.ota.config` and reports its progress in `dev.nexigon.ota.status`.
-//! [`settings`] reads the integration from the configuration, and [`run`] checks
+//! `settings` reads the integration from the configuration. Hosts running the
+//! agent in-process may instead provide [`SystemUpdates`] with their own
+//! [`SystemUpdater`] through [`RunOptions`](crate::RunOptions). `run` checks
 //! for updates periodically, when a scheduled attempt is due, and when the
 //! `nexigon.ota.check` command requests a check. Scheduled checks are delayed
 //! randomly, so that devices whose checks are due at the same time, for example
@@ -16,6 +18,7 @@ use std::time::Duration;
 use anyhow::bail;
 use futures::FutureExt;
 use jiff::Timestamp;
+use jiff::tz::TimeZone;
 use nexigon_client::ClientExecutor;
 use nexigon_ids::ids::DeviceId;
 use tokio::sync::Notify;
@@ -34,6 +37,10 @@ mod updater;
 use check::Checker;
 use updater::Updater;
 
+pub use updater::Bundle;
+pub use updater::SystemIdentity;
+pub use updater::SystemUpdater;
+
 /// Device command that requests an immediate check.
 pub(crate) const CHECK_COMMAND: &str = "nexigon.ota.check";
 
@@ -49,21 +56,60 @@ const MIN_CHECK_DELAY: Duration = Duration::from_secs(10);
 /// Time to wait for a requested reboot before checking again.
 const REBOOT_TIMEOUT: Duration = Duration::from_secs(10 * 60);
 
-/// Settings of the enabled system update integration.
-#[derive(Debug, Clone)]
-pub(crate) struct Settings {
-    updater: Updater,
+/// System updates through an updater, with the schedule of their checks.
+#[derive(Clone)]
+pub struct SystemUpdates {
+    updater: Arc<dyn SystemUpdater>,
     /// Version path built into the image.
     default_path: Option<String>,
     check_interval: Duration,
     /// Maximum random delay of scheduled checks.
     check_jitter: Duration,
+    /// Time zone of maintenance windows, or the system time zone if absent.
+    time_zone: Option<TimeZone>,
+}
+
+impl SystemUpdates {
+    /// System updates through `updater` with the default check schedule.
+    pub fn new(updater: Arc<dyn SystemUpdater>) -> Self {
+        Self {
+            updater,
+            default_path: None,
+            check_interval: DEFAULT_CHECK_INTERVAL,
+            check_jitter: DEFAULT_CHECK_JITTER,
+            time_zone: None,
+        }
+    }
+
+    /// Set the version path that applies without a configured path.
+    pub fn with_default_path(mut self, path: Option<String>) -> Self {
+        self.default_path = path;
+        self
+    }
+
+    /// Set the time between update checks.
+    pub fn with_check_interval(mut self, interval: Duration) -> Self {
+        self.check_interval = interval;
+        self
+    }
+
+    /// Set the maximum random delay of scheduled checks.
+    pub fn with_check_jitter(mut self, jitter: Duration) -> Self {
+        self.check_jitter = jitter;
+        self
+    }
+
+    /// Set the time zone in which maintenance windows apply.
+    pub fn with_time_zone(mut self, time_zone: TimeZone) -> Self {
+        self.time_zone = Some(time_zone);
+        self
+    }
 }
 
 /// Read the enabled system update integration from the agent configuration.
 ///
 /// Fails if more than one integration is enabled.
-pub(crate) fn settings(config: &Config) -> anyhow::Result<Option<Settings>> {
+pub(crate) fn settings(config: &Config) -> anyhow::Result<Option<SystemUpdates>> {
     let integrations = config.integrations.as_ref();
     let rugix = integrations
         .and_then(|integrations| integrations.rugix.as_ref())
@@ -77,20 +123,20 @@ pub(crate) fn settings(config: &Config) -> anyhow::Result<Option<Settings>> {
     let jitter = |secs: Option<u64>| secs.map_or(DEFAULT_CHECK_JITTER, Duration::from_secs);
     match (rugix, rauc) {
         (Some(_), Some(_)) => bail!("only one system update integration can be enabled"),
-        (Some(rugix), None) => Ok(Some(Settings {
-            updater: Updater::Rugix {
+        (Some(rugix), None) => Ok(Some(
+            SystemUpdates::new(Arc::new(Updater::Rugix {
                 use_bundle_hash: rugix.use_bundle_hash.unwrap_or(false),
-            },
-            default_path: rugix.path.as_deref().map(str::to_owned),
-            check_interval: interval(rugix.check_interval_secs),
-            check_jitter: jitter(rugix.check_jitter_secs),
-        })),
-        (None, Some(rauc)) => Ok(Some(Settings {
-            updater: Updater::Rauc,
-            default_path: rauc.path.as_deref().map(str::to_owned),
-            check_interval: interval(rauc.check_interval_secs),
-            check_jitter: jitter(rauc.check_jitter_secs),
-        })),
+            }))
+            .with_default_path(rugix.path.as_deref().map(str::to_owned))
+            .with_check_interval(interval(rugix.check_interval_secs))
+            .with_check_jitter(jitter(rugix.check_jitter_secs)),
+        )),
+        (None, Some(rauc)) => Ok(Some(
+            SystemUpdates::new(Arc::new(Updater::Rauc))
+                .with_default_path(rauc.path.as_deref().map(str::to_owned))
+                .with_check_interval(interval(rauc.check_interval_secs))
+                .with_check_jitter(jitter(rauc.check_jitter_secs)),
+        )),
         (None, None) => Ok(None),
     }
 }
@@ -105,7 +151,7 @@ pub(crate) fn settings(config: &Config) -> anyhow::Result<Option<Settings>> {
 /// the device reboots into the installed version unless `shutdown` signals
 /// that the agent stops.
 pub(crate) async fn run(
-    settings: Settings,
+    settings: SystemUpdates,
     executor: ClientExecutor,
     device_id: DeviceId,
     check_requested: Arc<Notify>,

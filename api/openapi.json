@@ -2174,7 +2174,7 @@
           "projects"
         ],
         "summary": "QueryDevices",
-        "description": "Query the devices of a project.",
+        "description": "Query a page of the devices of a project, newest first.",
         "operationId": "projects_QueryDevices",
         "requestBody": {
           "content": {
@@ -2192,6 +2192,52 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/nexigon_api.projects.QueryProjectDevicesOutput"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
+          }
+        }
+      }
+    },
+    "/api/v1/actions/invoke/projects_CountDevices": {
+      "post": {
+        "tags": [
+          "projects"
+        ],
+        "summary": "CountDevices",
+        "description": "Count the devices of a project.",
+        "operationId": "projects_CountDevices",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/nexigon_api.projects.CountProjectDevicesAction"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/nexigon_api.projects.CountProjectDevicesOutput"
                 }
               }
             }
@@ -4492,6 +4538,52 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/nexigon_api.fleet.CreateFleetOperationOutput"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
+          }
+        }
+      }
+    },
+    "/api/v1/actions/invoke/fleet_PreviewOperationTargets": {
+      "post": {
+        "tags": [
+          "fleet"
+        ],
+        "summary": "PreviewOperationTargets",
+        "description": "Preview the devices a target selector currently matches.\n\nEvaluates the selector against the current state of every device in the\nproject. A preview does not freeze membership; operations resolve their\ntargets when they enroll devices.",
+        "operationId": "fleet_PreviewOperationTargets",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/nexigon_api.fleet.PreviewFleetOperationTargetsAction"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/nexigon_api.fleet.PreviewFleetOperationTargetsOutput"
                 }
               }
             }
@@ -9147,6 +9239,23 @@
         ],
         "description": "Severity of a device event."
       },
+      "nexigon_api.devices.DeviceFilter": {
+        "type": "object",
+        "description": "Device list filter. All supplied conditions must hold.",
+        "properties": {
+          "search": {
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/nexigon_api.devices.DeviceStatus"
+          },
+          "groups": {
+            "$ref": "#/components/schemas/nexigon_api.devices.DeviceGroupSelector"
+          }
+        },
+        "required": [],
+        "unevaluatedProperties": false
+      },
       "nexigon_api.devices.DeviceFingerprint": {
         "type": "string",
         "description": "Device fingerprint."
@@ -11865,6 +11974,65 @@
         ],
         "unevaluatedProperties": false
       },
+      "nexigon_api.fleet.PreviewFleetOperationTargetsAction": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+          },
+          "selector": {
+            "$ref": "#/components/schemas/nexigon_api.fleet.FleetOperationTargetSelector"
+          },
+          "limit": {
+            "type": "integer",
+            "format": "uint32",
+            "maximum": 4294967295,
+            "minimum": 0
+          }
+        },
+        "required": [
+          "projectId",
+          "selector"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.fleet.PreviewFleetOperationTargetsOutput": {
+        "type": "object",
+        "description": "Output of previewing fleet operation targets.",
+        "properties": {
+          "matchingCount": {
+            "type": "integer",
+            "format": "uint32",
+            "maximum": 4294967295,
+            "minimum": 0
+          },
+          "devices": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/nexigon_api.projects.QueryProjectDevicesItem"
+            }
+          },
+          "errorCount": {
+            "type": "integer",
+            "format": "uint32",
+            "maximum": 4294967295,
+            "minimum": 0
+          },
+          "selectionErrors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/nexigon_api.devices.DeviceSelectionError"
+            }
+          }
+        },
+        "required": [
+          "matchingCount",
+          "devices",
+          "errorCount",
+          "selectionErrors"
+        ],
+        "unevaluatedProperties": false
+      },
       "nexigon_api.fleet.QueryComputedFleetPropertyDefinitionsAction": {
         "type": "object",
         "properties": {
@@ -13305,6 +13473,44 @@
         ],
         "unevaluatedProperties": false
       },
+      "nexigon_api.projects.CountProjectDevicesAction": {
+        "type": "object",
+        "properties": {
+          "projectId": {
+            "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+          },
+          "filter": {
+            "$ref": "#/components/schemas/nexigon_api.devices.DeviceFilter"
+          }
+        },
+        "required": [
+          "projectId"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.projects.CountProjectDevicesOutput": {
+        "type": "object",
+        "description": "Output of counting the devices of a project.",
+        "properties": {
+          "total": {
+            "type": "integer",
+            "format": "uint32",
+            "maximum": 4294967295,
+            "minimum": 0
+          },
+          "matching": {
+            "type": "integer",
+            "format": "uint32",
+            "maximum": 4294967295,
+            "minimum": 0
+          }
+        },
+        "required": [
+          "total",
+          "matching"
+        ],
+        "unevaluatedProperties": false
+      },
       "nexigon_api.projects.CreateDeploymentTokenAction": {
         "type": "object",
         "properties": {
@@ -13756,11 +13962,14 @@
       "nexigon_api.projects.QueryProjectDevicesAction": {
         "type": "object",
         "properties": {
-          "selector": {
-            "$ref": "#/components/schemas/nexigon_api.fleet.FleetOperationTargetSelector"
-          },
           "projectId": {
             "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+          },
+          "filter": {
+            "$ref": "#/components/schemas/nexigon_api.devices.DeviceFilter"
+          },
+          "page": {
+            "$ref": "#/components/schemas/nexigon_api.pagination.PageRequest"
           }
         },
         "required": [
@@ -13826,22 +14035,19 @@
         "type": "object",
         "description": "Output of querying the devices of a project.",
         "properties": {
-          "selectionErrors": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/nexigon_api.devices.DeviceSelectionError"
-            }
-          },
           "devices": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/nexigon_api.projects.QueryProjectDevicesItem"
             }
+          },
+          "page": {
+            "$ref": "#/components/schemas/nexigon_api.pagination.PageInfo"
           }
         },
         "required": [
-          "selectionErrors",
-          "devices"
+          "devices",
+          "page"
         ],
         "unevaluatedProperties": false
       },

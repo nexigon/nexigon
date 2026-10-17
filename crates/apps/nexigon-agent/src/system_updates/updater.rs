@@ -1,13 +1,16 @@
 //! Update systems that install system images on the device.
 //!
-//! [`Updater`] drives Rugix Ctrl or RAUC to determine the running system,
-//! install bundles, reboot into them, and commit them.
+//! [`SystemUpdater`] is the interface through which the update checks drive an
+//! update system. [`Updater`] implements it with Rugix Ctrl or RAUC to determine
+//! the running system, install bundles, reboot into them, and commit them.
 
 use std::collections::BTreeMap;
 use std::path::Path;
 
 use anyhow::Context;
 use anyhow::bail;
+use futures::FutureExt;
+use futures::future::BoxFuture;
 use nexigon_api::types::properties::OtaUpdater;
 use nexigon_api::types::properties::OtaUpdaterSlot;
 use serde::Deserialize;
@@ -18,6 +21,69 @@ use tokio::process::Command;
 const RUGIX_BUILD_INFO_PATH: &str = "/etc/rugix/system-build-info.json";
 /// Path of the operating system identification file.
 const OS_RELEASE_PATH: &str = "/etc/os-release";
+
+/// Update system that installs bundles and boots into them.
+///
+/// A check commits a newly booted system that awaits its commit, installs a
+/// bundle, and reboots into it. If the agent stops or the maintenance window
+/// closes between the installation and the reboot, the check deactivates the
+/// installed bundle instead. The methods follow these steps of the update
+/// checks, so they may change with them; implementations belong to hosts that
+/// run the agent in-process, such as simulators.
+pub trait SystemUpdater: Send + Sync {
+    /// Filename of the bundle for a system in a package version.
+    fn bundle_filename(&self, system: &str) -> String;
+
+    /// Determine the name and version of the running system.
+    fn identity(&self) -> BoxFuture<'_, anyhow::Result<SystemIdentity>>;
+
+    /// Whether a newly booted system awaits its commit.
+    fn awaits_commit(&self) -> BoxFuture<'_, anyhow::Result<bool>>;
+
+    /// Commit the newly booted system.
+    fn commit(&self) -> BoxFuture<'_, anyhow::Result<()>>;
+
+    /// Install a bundle without rebooting.
+    fn install<'a>(&'a self, bundle: Bundle<'a>) -> BoxFuture<'a, anyhow::Result<()>>;
+
+    /// Keep the running system active after installing a bundle.
+    fn deactivate(&self) -> BoxFuture<'_, anyhow::Result<()>>;
+
+    /// Describe the update system, its slots, and the boot state.
+    fn info(&self) -> BoxFuture<'_, anyhow::Result<OtaUpdater>>;
+
+    /// Reboot into the installed bundle.
+    ///
+    /// After the reboot has been initiated, the check waits for the agent to
+    /// stop. A host running the agent in-process must stop it by resolving the
+    /// `shutdown` future of [`run_with_connection`](crate::run_with_connection).
+    /// Otherwise, the check reports a rollback after a timeout.
+    fn reboot(&self) -> BoxFuture<'_, anyhow::Result<()>>;
+}
+
+/// Bundle of a package version to install.
+#[derive(Debug, Clone, Copy)]
+pub struct Bundle<'a> {
+    /// Download URL of the bundle.
+    pub url: &'a str,
+    /// Hash of the bundle from the asset metadata, if any.
+    pub hash: Option<&'a str>,
+    /// Image version that the bundle installs, from the `imageVersion` metadata
+    /// of the package version, if any.
+    ///
+    /// After the reboot, the check compares it with the version of
+    /// [`SystemUpdater::identity`] to detect a completed update or a rollback.
+    pub image_version: Option<&'a str>,
+}
+
+/// Name and version of the running system.
+#[derive(Debug, Clone)]
+pub struct SystemIdentity {
+    /// System name, which identifies the bundle in a package version.
+    pub name: String,
+    /// Version string built into the image.
+    pub version: String,
+}
 
 /// Update system installing bundles on the device.
 #[derive(Debug, Clone)]
@@ -31,129 +97,130 @@ pub(crate) enum Updater {
     Rauc,
 }
 
-/// Name and version of the running system.
-#[derive(Debug, Clone)]
-pub(crate) struct SystemIdentity {
-    /// System name, which identifies the bundle in a package version.
-    pub name: String,
-    /// Version string built into the image.
-    pub version: String,
-}
-
-impl Updater {
-    /// Filename of the bundle for a system in a package version.
-    pub(crate) fn bundle_filename(&self, system: &str) -> String {
+impl SystemUpdater for Updater {
+    fn bundle_filename(&self, system: &str) -> String {
         match self {
             Self::Rugix { .. } => format!("{system}.rugixb"),
             Self::Rauc => format!("{system}.raucb"),
         }
     }
 
-    /// Determine the name and version of the running system.
-    ///
     /// Rugix systems built with Rugix Bakery provide their build information.
     /// Otherwise, `IMAGE_ID` and `IMAGE_VERSION` from `/etc/os-release` apply.
-    pub(crate) async fn identity(&self) -> anyhow::Result<SystemIdentity> {
-        if matches!(self, Self::Rugix { .. }) && Path::new(RUGIX_BUILD_INFO_PATH).exists() {
-            let content = tokio::fs::read_to_string(RUGIX_BUILD_INFO_PATH)
+    fn identity(&self) -> BoxFuture<'_, anyhow::Result<SystemIdentity>> {
+        async move {
+            if matches!(self, Self::Rugix { .. }) && Path::new(RUGIX_BUILD_INFO_PATH).exists() {
+                let content = tokio::fs::read_to_string(RUGIX_BUILD_INFO_PATH)
+                    .await
+                    .context("failed to read Rugix build information")?;
+                let info: RugixBuildInfo = serde_json::from_str(&content)
+                    .context("failed to parse Rugix build information")?;
+                return Ok(SystemIdentity {
+                    name: info.name,
+                    version: info.release.version,
+                });
+            }
+            let content = tokio::fs::read_to_string(OS_RELEASE_PATH)
                 .await
-                .context("failed to read Rugix build information")?;
-            let info: RugixBuildInfo = serde_json::from_str(&content)
-                .context("failed to parse Rugix build information")?;
-            return Ok(SystemIdentity {
-                name: info.name,
-                version: info.release.version,
-            });
+                .context("failed to read /etc/os-release")?;
+            let field = |name: &str| {
+                os_release_field(&content, name)
+                    .with_context(|| format!("{name} is not set in /etc/os-release"))
+            };
+            Ok(SystemIdentity {
+                name: field("IMAGE_ID")?,
+                version: field("IMAGE_VERSION")?,
+            })
         }
-        let content = tokio::fs::read_to_string(OS_RELEASE_PATH)
-            .await
-            .context("failed to read /etc/os-release")?;
-        let field = |name: &str| {
-            os_release_field(&content, name)
-                .with_context(|| format!("{name} is not set in /etc/os-release"))
-        };
-        Ok(SystemIdentity {
-            name: field("IMAGE_ID")?,
-            version: field("IMAGE_VERSION")?,
-        })
+        .boxed()
     }
 
-    /// Whether a newly booted system awaits its commit.
-    ///
     /// RAUC systems are marked good by RAUC itself, so they never await a
     /// commit from the agent.
-    pub(crate) async fn awaits_commit(&self) -> anyhow::Result<bool> {
-        match self {
-            Self::Rugix { .. } => {
-                let output = run("rugix-ctrl", &["system", "info"]).await?;
-                let info: RugixSystemInfo = serde_json::from_str(&output)
-                    .context("failed to parse Rugix system information")?;
-                Ok(info
-                    .boot
-                    .is_some_and(|boot| boot.active_group != boot.default_group))
-            }
-            Self::Rauc => Ok(false),
-        }
-    }
-
-    /// Commit the newly booted system.
-    pub(crate) async fn commit(&self) -> anyhow::Result<()> {
-        match self {
-            Self::Rugix { .. } => run("rugix-ctrl", &["system", "commit"]).await.map(drop),
-            Self::Rauc => Ok(()),
-        }
-    }
-
-    /// Install a bundle from a URL without rebooting.
-    pub(crate) async fn install(&self, url: &str, bundle_hash: Option<&str>) -> anyhow::Result<()> {
-        match self {
-            Self::Rugix { use_bundle_hash } => {
-                let mut args = vec!["update", "install", "--reboot", "no"];
-                if let Some(hash) = bundle_hash.filter(|_| *use_bundle_hash) {
-                    args.extend(["--bundle-hash", hash]);
+    fn awaits_commit(&self) -> BoxFuture<'_, anyhow::Result<bool>> {
+        async move {
+            match self {
+                Self::Rugix { .. } => {
+                    let output = run("rugix-ctrl", &["system", "info"]).await?;
+                    let info: RugixSystemInfo = serde_json::from_str(&output)
+                        .context("failed to parse Rugix system information")?;
+                    Ok(info
+                        .boot
+                        .is_some_and(|boot| boot.active_group != boot.default_group))
                 }
-                args.push(url);
-                run("rugix-ctrl", &args).await.map(drop)
+                Self::Rauc => Ok(false),
             }
-            Self::Rauc => run("rauc", &["install", url]).await.map(drop),
         }
+        .boxed()
     }
 
-    /// Keep the running system active after installing a bundle.
-    ///
+    fn commit(&self) -> BoxFuture<'_, anyhow::Result<()>> {
+        async move {
+            match self {
+                Self::Rugix { .. } => run("rugix-ctrl", &["system", "commit"]).await.map(drop),
+                Self::Rauc => Ok(()),
+            }
+        }
+        .boxed()
+    }
+
+    fn install<'a>(&'a self, bundle: Bundle<'a>) -> BoxFuture<'a, anyhow::Result<()>> {
+        async move {
+            match self {
+                Self::Rugix { use_bundle_hash } => {
+                    let mut args = vec!["update", "install", "--reboot", "no"];
+                    if let Some(hash) = bundle.hash.filter(|_| *use_bundle_hash) {
+                        args.extend(["--bundle-hash", hash]);
+                    }
+                    args.push(bundle.url);
+                    run("rugix-ctrl", &args).await.map(drop)
+                }
+                Self::Rauc => run("rauc", &["install", bundle.url]).await.map(drop),
+            }
+        }
+        .boxed()
+    }
+
     /// Rugix Ctrl activates an installed bundle only when rebooting into it,
     /// while RAUC marks it as the system to boot next.
-    pub(crate) async fn deactivate(&self) -> anyhow::Result<()> {
-        match self {
-            Self::Rugix { .. } => Ok(()),
-            Self::Rauc => run("rauc", &["status", "mark-active", "booted"])
-                .await
-                .map(drop),
+    fn deactivate(&self) -> BoxFuture<'_, anyhow::Result<()>> {
+        async move {
+            match self {
+                Self::Rugix { .. } => Ok(()),
+                Self::Rauc => run("rauc", &["status", "mark-active", "booted"])
+                    .await
+                    .map(drop),
+            }
         }
+        .boxed()
     }
 
-    /// Describe the update system, its slots, and the boot state.
-    pub(crate) async fn info(&self) -> anyhow::Result<OtaUpdater> {
-        match self {
-            Self::Rugix { .. } => rugix_updater(
-                &run("rugix-ctrl", &["--version"]).await?,
-                &run("rugix-ctrl", &["system", "info"]).await?,
-            ),
-            Self::Rauc => rauc_updater(
-                &run("rauc", &["--version"]).await?,
-                &run("rauc", &["status", "--detailed", "--output-format=json"]).await?,
-            ),
+    fn info(&self) -> BoxFuture<'_, anyhow::Result<OtaUpdater>> {
+        async move {
+            match self {
+                Self::Rugix { .. } => rugix_updater(
+                    &run("rugix-ctrl", &["--version"]).await?,
+                    &run("rugix-ctrl", &["system", "info"]).await?,
+                ),
+                Self::Rauc => rauc_updater(
+                    &run("rauc", &["--version"]).await?,
+                    &run("rauc", &["status", "--detailed", "--output-format=json"]).await?,
+                ),
+            }
         }
+        .boxed()
     }
 
-    /// Reboot into the installed bundle.
-    pub(crate) async fn reboot(&self) -> anyhow::Result<()> {
-        match self {
-            Self::Rugix { .. } => run("rugix-ctrl", &["system", "reboot", "--spare"])
-                .await
-                .map(drop),
-            Self::Rauc => run("systemctl", &["reboot"]).await.map(drop),
+    fn reboot(&self) -> BoxFuture<'_, anyhow::Result<()>> {
+        async move {
+            match self {
+                Self::Rugix { .. } => run("rugix-ctrl", &["system", "reboot", "--spare"])
+                    .await
+                    .map(drop),
+                Self::Rauc => run("systemctl", &["reboot"]).await.map(drop),
+            }
         }
+        .boxed()
     }
 }
 

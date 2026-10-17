@@ -2,12 +2,11 @@
 
 import audit::AuditLogEvent
 import datetime::Timestamp
+import devices::DeviceFilter
 import devices::DeviceFingerprint
 import devices::DeviceGroup
 import devices::DeviceId
-import devices::DeviceSelectionError
 import devices::DeviceStatus
-import fleet::FleetOperationTargetSelector
 import json::JsonValue
 import organizations::OrganizationId
 import outputs::Empty
@@ -181,21 +180,40 @@ record RemovePropertySchemaAction {
     name: string,
 }
 
-/// Query the devices of a project.
+/// Query a page of the devices of a project, newest first.
 #[request(name = "projects_QueryDevices", response = QueryProjectDevicesOutput)]
 record QueryProjectDevicesAction {
-    /// Shared filter, also accepted by fleet operations.
-    selector?: FleetOperationTargetSelector,
     /// ID of the project.
     project_id: ProjectId,
+    /// Only return devices matching this filter.
+    filter?: DeviceFilter,
+    /// Page to return. Without this field, the first page is returned.
+    page?: PageRequest,
 }
 
 /// Output of querying the devices of a project.
 record QueryProjectDevicesOutput {
-    /// Devices whose property predicates failed evaluation.
-    selection_errors: [DeviceSelectionError],
-    /// List of devices.
+    /// Devices on this page.
     devices: [QueryProjectDevicesItem],
+    /// Continuation of the traversal.
+    page: PageInfo,
+}
+
+/// Count the devices of a project.
+#[request(name = "projects_CountDevices", response = CountProjectDevicesOutput)]
+record CountProjectDevicesAction {
+    /// ID of the project.
+    project_id: ProjectId,
+    /// Only count devices matching this filter in `matching`.
+    filter?: DeviceFilter,
+}
+
+/// Output of counting the devices of a project.
+record CountProjectDevicesOutput {
+    /// Number of devices in the project.
+    total: u32,
+    /// Number of devices matching the filter.
+    matching: u32,
 }
 
 /// Device item.

@@ -7,11 +7,13 @@ import devices::DeviceOperationId
 import devices::DeviceOperationStatus
 import devices::DeviceOperationStep
 import devices::DeviceOperationStepState
+import devices::DeviceSelectionError
 import devices::DeviceStatus
 import json::JsonExpr
 import json::JsonValue
 import outputs::Empty
 import projects::ProjectId
+import projects::QueryProjectDevicesItem
 
 /// Set a fleet property manually.
 #[request(name = "fleet_SetProperty", response = Empty)]
@@ -491,6 +493,38 @@ record CreateFleetOperationAction {
 record CreateFleetOperationOutput {
     /// ID of the created fleet operation.
     fleet_operation_id: FleetOperationId,
+}
+
+/// Preview the devices a target selector currently matches.
+///
+/// Evaluates the selector against the current state of every device in the
+/// project. A preview does not freeze membership; operations resolve their
+/// targets when they enroll devices.
+#[request(
+    name = "fleet_PreviewOperationTargets",
+    response = PreviewFleetOperationTargetsOutput
+)]
+record PreviewFleetOperationTargetsAction {
+    /// Project to evaluate the selector against.
+    project_id: ProjectId,
+    /// Target selector.
+    selector: FleetOperationTargetSelector,
+    /// Maximum number of devices and errors to return. Defaults to `20`.
+    #[validate({ 1 <= _ <= 1000 }, message = "Limit must be between 1 and 1000.")]
+    limit?: u32,
+}
+
+/// Output of previewing fleet operation targets.
+record PreviewFleetOperationTargetsOutput {
+    /// Number of matching devices.
+    matching_count: u32,
+    /// Newest matching devices, up to the requested limit.
+    devices: [QueryProjectDevicesItem],
+    /// Number of devices whose property predicates failed evaluation.
+    error_count: u32,
+    /// Devices whose property predicates failed evaluation, up to the requested
+    /// limit.
+    selection_errors: [DeviceSelectionError],
 }
 
 /// Start a draft fleet operation.
