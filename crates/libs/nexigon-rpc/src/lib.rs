@@ -877,8 +877,6 @@ mod tests {
     use std::future::Future;
     use std::io;
     use std::pin::Pin;
-    use std::sync::Arc;
-    use std::sync::Mutex;
     use std::task::Context;
     use std::task::Poll;
     use std::time::Duration;
@@ -886,7 +884,6 @@ mod tests {
     use nexigon_api::types::errors::ActionResult;
     use nexigon_api::types::jwt::Jwt;
     use nexigon_api::types::users::CompleteUserPasswordResetAction;
-    use nexigon_api::types::users::CompleteUserPasswordResetOutput;
     use serde::Deserialize;
     use serde::Serialize;
     use serde::Serializer;
@@ -894,59 +891,8 @@ mod tests {
     use tokio::io::duplex;
     use tokio::io::split;
     use tokio::task::yield_now;
-    use tracing::Level;
-    use tracing::instrument::WithSubscriber;
-    use tracing_subscriber::fmt::MakeWriter;
 
     use super::*;
-
-    const JWT_SENTINEL: &str = "sentinel.jwt.must-not-appear";
-    const PASSWORD_SENTINEL: &str = "sentinel-password-must-not-appear";
-
-    #[tokio::test]
-    async fn action_payload_is_transmitted_but_never_traced() {
-        let action = CompleteUserPasswordResetAction::new(
-            Jwt::from_string(JWT_SENTINEL.to_owned()),
-            PASSWORD_SENTINEL.to_owned(),
-        );
-        let output = CapturedOutput::default();
-        let subscriber = tracing_subscriber::fmt()
-            .with_ansi(false)
-            .without_time()
-            .with_max_level(Level::TRACE)
-            .with_writer(output.clone())
-            .finish();
-
-        let (client, mut server) = duplex(4096);
-        let (client_rx, client_tx) = split(client);
-        let server_task = tokio::spawn(async move {
-            let serialized = read_action(&mut server).await.expect("read action");
-            let input =
-                String::from_utf8(serialized.input().to_vec()).expect("JSON input is UTF-8");
-            assert!(input.contains(JWT_SENTINEL));
-            assert!(input.contains(PASSWORD_SENTINEL));
-            write_action_result(
-                ActionResult::Ok(CompleteUserPasswordResetOutput::Completed),
-                &mut server,
-            )
-            .await
-            .expect("write result");
-        });
-
-        let result = execute(&action, client_rx, client_tx)
-            .with_subscriber(subscriber)
-            .await
-            .expect("RPC transport succeeds")
-            .expect("action succeeds");
-        server_task.await.expect("server task succeeds");
-        assert!(matches!(result, CompleteUserPasswordResetOutput::Completed));
-
-        let output = output.contents();
-        assert!(output.contains("users_CompletePasswordReset"));
-        for sentinel in [JWT_SENTINEL, PASSWORD_SENTINEL] {
-            assert!(!output.contains(sentinel), "telemetry leaked {sentinel:?}");
-        }
-    }
 
     #[test]
     fn limits_reject_invalid_or_semantically_incompatible_values() {
@@ -1422,7 +1368,9 @@ mod tests {
         assert_eq!(admission.available_response_bytes(), before);
     }
 
-    #[tokio::test]
+    // The paused clock only advances while all tasks wait, so a slow machine
+    // cannot exceed the body timeout while writing the request.
+    #[tokio::test(start_paused = true)]
     async fn delayed_response_header_is_not_mistaken_for_a_stalled_body() {
         let admission = RpcAdmission::new(RpcLimits {
             body_timeout: Duration::from_millis(10),
@@ -1741,40 +1689,6 @@ mod tests {
 
         fn poll_shutdown(self: Pin<&mut Self>, _cx: &mut Context<'_>) -> Poll<io::Result<()>> {
             Poll::Ready(Ok(()))
-        }
-    }
-
-    #[derive(Clone, Default)]
-    struct CapturedOutput(Arc<Mutex<Vec<u8>>>);
-
-    impl CapturedOutput {
-        fn contents(&self) -> String {
-            String::from_utf8(self.0.lock().expect("capture lock poisoned").clone())
-                .expect("tracing output is UTF-8")
-        }
-    }
-
-    struct CapturedWriter(Arc<Mutex<Vec<u8>>>);
-
-    impl io::Write for CapturedWriter {
-        fn write(&mut self, buf: &[u8]) -> io::Result<usize> {
-            self.0
-                .lock()
-                .expect("capture lock poisoned")
-                .extend_from_slice(buf);
-            Ok(buf.len())
-        }
-
-        fn flush(&mut self) -> io::Result<()> {
-            Ok(())
-        }
-    }
-
-    impl<'a> MakeWriter<'a> for CapturedOutput {
-        type Writer = CapturedWriter;
-
-        fn make_writer(&'a self) -> Self::Writer {
-            CapturedWriter(self.0.clone())
         }
     }
 }

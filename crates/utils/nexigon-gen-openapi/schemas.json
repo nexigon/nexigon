@@ -1053,6 +1053,23 @@
     ],
     "description": "Severity of a device event."
   },
+  "nexigon_api.devices.DeviceFilter": {
+    "type": "object",
+    "description": "Device list filter. All supplied conditions must hold.",
+    "properties": {
+      "search": {
+        "type": "string"
+      },
+      "status": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceStatus"
+      },
+      "groups": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceGroupSelector"
+      }
+    },
+    "required": [],
+    "unevaluatedProperties": false
+  },
   "nexigon_api.devices.DeviceFingerprint": {
     "type": "string",
     "description": "Device fingerprint."
@@ -3804,6 +3821,66 @@
     ],
     "unevaluatedProperties": false
   },
+  "nexigon_api.fleet.PreviewFleetOperationTargetsAction": {
+    "type": "object",
+    "description": "Preview the devices a target selector currently matches.\n\nEvaluates the selector against the current state of every device in the\nproject. A preview does not freeze membership; operations resolve their\ntargets when they enroll devices.",
+    "properties": {
+      "projectId": {
+        "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+      },
+      "selector": {
+        "$ref": "#/components/schemas/nexigon_api.fleet.FleetOperationTargetSelector"
+      },
+      "limit": {
+        "type": "integer",
+        "format": "uint32",
+        "maximum": 4294967295,
+        "minimum": 0
+      }
+    },
+    "required": [
+      "projectId",
+      "selector"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.fleet.PreviewFleetOperationTargetsOutput": {
+    "type": "object",
+    "description": "Output of previewing fleet operation targets.",
+    "properties": {
+      "matchingCount": {
+        "type": "integer",
+        "format": "uint32",
+        "maximum": 4294967295,
+        "minimum": 0
+      },
+      "devices": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.projects.QueryProjectDevicesItem"
+        }
+      },
+      "errorCount": {
+        "type": "integer",
+        "format": "uint32",
+        "maximum": 4294967295,
+        "minimum": 0
+      },
+      "selectionErrors": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.devices.DeviceSelectionError"
+        }
+      }
+    },
+    "required": [
+      "matchingCount",
+      "devices",
+      "errorCount",
+      "selectionErrors"
+    ],
+    "unevaluatedProperties": false
+  },
   "nexigon_api.fleet.QueryComputedFleetPropertyDefinitionsAction": {
     "type": "object",
     "description": "**Unstable (feature `fleet_computed_properties`).**\n\nQuery computed fleet property definitions for a project.",
@@ -4808,6 +4885,42 @@
     ],
     "unevaluatedProperties": false
   },
+  "nexigon_api.organizations.DeleteOrganizationS3ConfigAction": {
+    "type": "object",
+    "description": "Remove organization storage defaults without deleting stored objects.",
+    "properties": {
+      "organizationId": {
+        "$ref": "#/components/schemas/nexigon_api.organizations.OrganizationId"
+      }
+    },
+    "required": [
+      "organizationId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.organizations.GetOrganizationS3ConfigAction": {
+    "type": "object",
+    "description": "Get organization storage settings. Secret credentials are never returned.",
+    "properties": {
+      "organizationId": {
+        "$ref": "#/components/schemas/nexigon_api.organizations.OrganizationId"
+      }
+    },
+    "required": [
+      "organizationId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.organizations.GetOrganizationS3ConfigOutput": {
+    "type": "object",
+    "properties": {
+      "s3Config": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryS3Config"
+      }
+    },
+    "required": [],
+    "unevaluatedProperties": false
+  },
   "nexigon_api.organizations.InviteOrganizationMemberAction": {
     "type": "object",
     "description": "Invite a user to an organization.",
@@ -5164,6 +5277,23 @@
     ],
     "unevaluatedProperties": false
   },
+  "nexigon_api.organizations.SetOrganizationS3ConfigAction": {
+    "type": "object",
+    "description": "Organization S3 defaults for repositories without their own configuration.",
+    "properties": {
+      "organizationId": {
+        "$ref": "#/components/schemas/nexigon_api.organizations.OrganizationId"
+      },
+      "s3Config": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryS3Config"
+      }
+    },
+    "required": [
+      "organizationId",
+      "s3Config"
+    ],
+    "unevaluatedProperties": false
+  },
   "nexigon_api.outputs.Empty": {
     "type": "object",
     "description": "Empty output.",
@@ -5217,6 +5347,45 @@
     "required": [
       "projectId",
       "repositoryId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.projects.CountProjectDevicesAction": {
+    "type": "object",
+    "description": "Count the devices of a project.",
+    "properties": {
+      "projectId": {
+        "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+      },
+      "filter": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceFilter"
+      }
+    },
+    "required": [
+      "projectId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.projects.CountProjectDevicesOutput": {
+    "type": "object",
+    "description": "Output of counting the devices of a project.",
+    "properties": {
+      "total": {
+        "type": "integer",
+        "format": "uint32",
+        "maximum": 4294967295,
+        "minimum": 0
+      },
+      "matching": {
+        "type": "integer",
+        "format": "uint32",
+        "maximum": 4294967295,
+        "minimum": 0
+      }
+    },
+    "required": [
+      "total",
+      "matching"
     ],
     "unevaluatedProperties": false
   },
@@ -5497,6 +5666,27 @@
     ],
     "unevaluatedProperties": false
   },
+  "nexigon_api.projects.PropertySchema": {
+    "type": "object",
+    "description": "A schema for an exact property name. Schemas never constrain property writes.",
+    "properties": {
+      "name": {
+        "type": "string"
+      },
+      "schema": {
+        "$ref": "#/components/schemas/nexigon_api.json.JsonValue"
+      },
+      "builtin": {
+        "type": "boolean"
+      }
+    },
+    "required": [
+      "name",
+      "schema",
+      "builtin"
+    ],
+    "unevaluatedProperties": false
+  },
   "nexigon_api.projects.QueryAuditLogEventsAction": {
     "type": "object",
     "description": "Query the audit log of the project.",
@@ -5659,13 +5849,16 @@
   },
   "nexigon_api.projects.QueryProjectDevicesAction": {
     "type": "object",
-    "description": "Query the devices of a project.",
+    "description": "Query a page of the devices of a project, newest first.",
     "properties": {
-      "selector": {
-        "$ref": "#/components/schemas/nexigon_api.fleet.FleetOperationTargetSelector"
-      },
       "projectId": {
         "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+      },
+      "filter": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceFilter"
+      },
+      "page": {
+        "$ref": "#/components/schemas/nexigon_api.pagination.PageRequest"
       }
     },
     "required": [
@@ -5731,22 +5924,19 @@
     "type": "object",
     "description": "Output of querying the devices of a project.",
     "properties": {
-      "selectionErrors": {
-        "type": "array",
-        "items": {
-          "$ref": "#/components/schemas/nexigon_api.devices.DeviceSelectionError"
-        }
-      },
       "devices": {
         "type": "array",
         "items": {
           "$ref": "#/components/schemas/nexigon_api.projects.QueryProjectDevicesItem"
         }
+      },
+      "page": {
+        "$ref": "#/components/schemas/nexigon_api.pagination.PageInfo"
       }
     },
     "required": [
-      "selectionErrors",
-      "devices"
+      "devices",
+      "page"
     ],
     "unevaluatedProperties": false
   },
@@ -5843,6 +6033,35 @@
     ],
     "unevaluatedProperties": false
   },
+  "nexigon_api.projects.QueryPropertySchemasAction": {
+    "type": "object",
+    "description": "List project definitions and the read-only built-in definitions.",
+    "properties": {
+      "projectId": {
+        "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+      }
+    },
+    "required": [
+      "projectId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.projects.QueryPropertySchemasOutput": {
+    "type": "object",
+    "description": "Available property schemas, ordered by name.",
+    "properties": {
+      "schemas": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.projects.PropertySchema"
+        }
+      }
+    },
+    "required": [
+      "schemas"
+    ],
+    "unevaluatedProperties": false
+  },
   "nexigon_api.projects.RedeemDevicePairingKeyAction": {
     "type": "object",
     "description": "Redeem a device pairing key.",
@@ -5902,6 +6121,23 @@
     "required": [
       "projectId",
       "repositoryId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.projects.RemovePropertySchemaAction": {
+    "type": "object",
+    "description": "Remove a project definition without changing property values.\n\nRequires permission to manage project settings. Built-in definitions are read-only.",
+    "properties": {
+      "projectId": {
+        "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+      },
+      "name": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "projectId",
+      "name"
     ],
     "unevaluatedProperties": false
   },
@@ -5966,6 +6202,27 @@
     "required": [
       "projectId",
       "config"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.projects.SetPropertySchemaAction": {
+    "type": "object",
+    "description": "Create or replace a project schema without validating existing property values.\n\nRequires permission to manage project settings. Built-in definitions are read-only.\nThe schema must be a JSON object or boolean. Editors report unsupported or invalid\nschemas and allow explicit overrides; APIs do not enforce schemas on property writes.",
+    "properties": {
+      "projectId": {
+        "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+      },
+      "name": {
+        "type": "string"
+      },
+      "schema": {
+        "$ref": "#/components/schemas/nexigon_api.json.JsonValue"
+      }
+    },
+    "required": [
+      "projectId",
+      "name",
+      "schema"
     ],
     "unevaluatedProperties": false
   },
@@ -6225,12 +6482,106 @@
     ],
     "unevaluatedProperties": false
   },
+  "nexigon_api.properties.OtaUpdateBlocked": {
+    "type": "object",
+    "description": "**Unstable (feature `ota_updates`).**\n\nInformation about a blocked update.",
+    "properties": {
+      "code": {
+        "type": "string"
+      },
+      "message": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "code"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.properties.OtaUpdateCapability": {
+    "enum": [
+      "window",
+      "retry",
+      "checkpoints",
+      "spread",
+      "hold"
+    ],
+    "description": "**Unstable (feature `ota_updates`).**\n\nOptional feature of the OTA update contract."
+  },
   "nexigon_api.properties.OtaUpdateConfig": {
     "type": "object",
-    "description": "**Unstable (feature `ota_updates`).**\n\nOTA update configuration identifying the update source.\n\nUsed as the shape of `/etc/nexigon-rugix-ota.json` and the\n`dev.nexigon.ota.config` device property. The device property is\nmerged on top of the file-based defaults.",
+    "description": "**Unstable (feature `ota_updates`).**\n\nOTA update configuration (`dev.nexigon.ota.config`).\n\nDesired state of a device. Integrations apply the property to defaults\nbuilt into the image as a JSON merge patch (RFC 7396): objects merge\nrecursively, `null` removes a default, and any other value, including an\narray, replaces the default.",
     "properties": {
       "path": {
         "type": "string"
+      },
+      "hold": {
+        "type": "boolean"
+      },
+      "window": {
+        "$ref": "#/components/schemas/nexigon_api.properties.OtaUpdateWindow"
+      },
+      "retry": {
+        "$ref": "#/components/schemas/nexigon_api.properties.OtaUpdateRetryPolicy"
+      },
+      "spread": {
+        "$ref": "#/components/schemas/nexigon_api.properties.OtaUpdateSpread"
+      }
+    },
+    "required": [],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.properties.OtaUpdateRetryPolicy": {
+    "type": "object",
+    "description": "**Unstable (feature `ota_updates`).**\n\nRetry policy for failed update attempts.\n\nAn attempt starts when the device begins downloading a version. Failures\nbefore that, such as an unreachable Nexigon Hub, do not count as attempts.\nThe delay between attempts starts at `initial_delay_secs` and doubles after\neach failed attempt, up to `max_delay_secs`.",
+    "properties": {
+      "maxAttempts": {
+        "type": "integer",
+        "format": "uint32",
+        "maximum": 4294967295,
+        "minimum": 0
+      },
+      "initialDelaySecs": {
+        "type": "integer",
+        "format": "uint32",
+        "maximum": 4294967295,
+        "minimum": 0
+      },
+      "maxDelaySecs": {
+        "type": "integer",
+        "format": "uint32",
+        "maximum": 4294967295,
+        "minimum": 0
+      },
+      "cooldownSecs": {
+        "type": "integer",
+        "format": "uint32",
+        "maximum": 4294967295,
+        "minimum": 0
+      }
+    },
+    "required": [],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.properties.OtaUpdateSpread": {
+    "type": "object",
+    "description": "**Unstable (feature `ota_updates`).**\n\nSpreading of updates across devices.\n\nEach device derives its position `u` from the SHA-256 hash of\n`<device-id>/<target-version-id>`: the first 8 bytes, read as a big-endian\nunsigned integer `n`, give `u = floor(n / 2^11) / 2^53`, which a\ndouble-precision number represents exactly. A device may start updating to the\ntarget once both of the following hold:\n\n- With `duration_secs`, its turn has begun at\n`start + floor(duration_secs * sqrt(u))`. The share of eligible devices\nthus grows quadratically from 0 at the start to 1 after `duration_secs`.\n- With `percentage`, its position is below `percentage / 100`.",
+    "properties": {
+      "durationSecs": {
+        "type": "integer",
+        "format": "uint32",
+        "maximum": 4294967295,
+        "minimum": 0
+      },
+      "startAt": {
+        "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
+      },
+      "percentage": {
+        "type": [
+          "number",
+          "string"
+        ],
+        "pattern": "^(NaN|[+-]?Infinity)$"
       }
     },
     "required": [],
@@ -6247,23 +6598,50 @@
       "blocked",
       "rollback"
     ],
-    "description": "**Unstable (feature `ota_updates`).**\n\nOTA update state.\n\nThe resting states are `idle`, `completed`, `failed`, and `blocked`.\nThe agent remains in one of these until the next check cycle begins\nor the blocking condition clears. `idle` means no update has been\nattempted yet; `completed` and `failed` retain the outcome of the\nlast cycle; `blocked` indicates an update is available but deferred."
+    "description": "**Unstable (feature `ota_updates`).**\n\nOTA update state.\n\nThe resting states are `idle`, `completed`, `failed`, and `blocked`.\nThe integration remains in one of these until the next check begins or\nthe blocking condition clears."
   },
   "nexigon_api.properties.OtaUpdateStatus": {
     "type": "object",
-    "description": "**Unstable (feature `ota_updates`).**\n\nOTA update status (`dev.nexigon.ota.status`).\n\nPublished by the device agent to report the effective OTA configuration\nand the current state of the update process.",
+    "description": "**Unstable (feature `ota_updates`).**\n\nOTA update status (`dev.nexigon.ota.status`).\n\nActual state of a device, published by its update integration.",
     "properties": {
+      "capabilities": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.properties.OtaUpdateCapability"
+        }
+      },
       "config": {
         "$ref": "#/components/schemas/nexigon_api.properties.OtaUpdateConfig"
+      },
+      "configVersion": {
+        "type": [
+          "integer",
+          "string"
+        ],
+        "format": "uint64",
+        "minimum": 0,
+        "pattern": "^[0-9]+$"
       },
       "currentVersion": {
         "type": "string"
       },
+      "currentVersionId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.PackageVersionId"
+      },
       "state": {
         "$ref": "#/components/schemas/nexigon_api.properties.OtaUpdateState"
       },
+      "blocked": {
+        "$ref": "#/components/schemas/nexigon_api.properties.OtaUpdateBlocked"
+      },
       "targetVersion": {
         "type": "string"
+      },
+      "targetVersionId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.PackageVersionId"
+      },
+      "nextVersionId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.PackageVersionId"
       },
       "failureCount": {
         "type": "integer",
@@ -6273,9 +6651,107 @@
       },
       "lastError": {
         "type": "string"
+      },
+      "nextAttemptAt": {
+        "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
+      },
+      "updater": {
+        "$ref": "#/components/schemas/nexigon_api.properties.OtaUpdater"
       }
     },
     "required": [],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.properties.OtaUpdateWindow": {
+    "type": "object",
+    "description": "**Unstable (feature `ota_updates`).**\n\nMaintenance window in the device's local time.\n\nThe window restricts activation, the step that interrupts the device's\noperation, such as the reboot into the new version. Integrations may\ndownload and install an update outside the window if doing so does not\ninterrupt operation.",
+    "properties": {
+      "ranges": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.properties.OtaUpdateWindowRange"
+        }
+      }
+    },
+    "required": [
+      "ranges"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.properties.OtaUpdateWindowRange": {
+    "type": "object",
+    "description": "**Unstable (feature `ota_updates`).**\n\nRecurring time range of a maintenance window.",
+    "properties": {
+      "days": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.properties.Weekday"
+        }
+      },
+      "start": {
+        "$ref": "#/components/schemas/nexigon_api.properties.TimeOfDay"
+      },
+      "end": {
+        "$ref": "#/components/schemas/nexigon_api.properties.TimeOfDay"
+      }
+    },
+    "required": [
+      "start",
+      "end"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.properties.OtaUpdater": {
+    "type": "object",
+    "description": "**Unstable (feature `ota_updates`).**\n\nUpdate system that installs versions on a device, such as Rugix Ctrl or RAUC.\n\nSlot names, states, and health values are those of the update system.",
+    "properties": {
+      "name": {
+        "type": "string"
+      },
+      "version": {
+        "type": "string"
+      },
+      "bootedSlot": {
+        "type": "string"
+      },
+      "primarySlot": {
+        "type": "string"
+      },
+      "awaitingCommit": {
+        "type": "boolean"
+      },
+      "slots": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.properties.OtaUpdaterSlot"
+        }
+      }
+    },
+    "required": [
+      "name"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.properties.OtaUpdaterSlot": {
+    "type": "object",
+    "description": "**Unstable (feature `ota_updates`).**\n\nSlot of an update system.",
+    "properties": {
+      "name": {
+        "type": "string"
+      },
+      "state": {
+        "type": "string"
+      },
+      "health": {
+        "type": "string"
+      },
+      "version": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "name"
+    ],
     "unevaluatedProperties": false
   },
   "nexigon_api.properties.RugixActiveStateManagementInfo": {
@@ -6509,6 +6985,22 @@
     ],
     "unevaluatedProperties": false
   },
+  "nexigon_api.properties.TimeOfDay": {
+    "type": "string",
+    "description": "**Unstable (feature `ota_updates`).**\n\nTime of day in the format `HH:MM` (24-hour clock)."
+  },
+  "nexigon_api.properties.Weekday": {
+    "enum": [
+      "monday",
+      "tuesday",
+      "wednesday",
+      "thursday",
+      "friday",
+      "saturday",
+      "sunday"
+    ],
+    "description": "**Unstable (feature `ota_updates`).**\n\nDay of the week."
+  },
   "nexigon_api.properties.YoctoSystemInfo": {
     "type": "object",
     "description": "Yocto-specific system information.",
@@ -6686,6 +7178,9 @@
     "type": "object",
     "description": "Create a new package.",
     "properties": {
+      "presentation": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.PackagePresentationUpdate"
+      },
       "repositoryId": {
         "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryId"
       },
@@ -6762,6 +7257,9 @@
       "name": {
         "type": "string"
       },
+      "deleteAt": {
+        "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
+      },
       "tags": {
         "type": "array",
         "items": {
@@ -6773,6 +7271,9 @@
         "additionalProperties": {
           "$ref": "#/components/schemas/nexigon_api.json.JsonValue"
         }
+      },
+      "baseVersionId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.PackageVersionId"
       }
     },
     "required": [
@@ -6879,7 +7380,7 @@
   },
   "nexigon_api.repositories.DeleteAssetAction": {
     "type": "object",
-    "description": "Delete an asset.",
+    "description": "Schedule deletion of an unused asset. Referenced assets are rejected.\nThe asset remains visible until object-storage deletion completes.",
     "properties": {
       "assetId": {
         "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryAssetId"
@@ -6905,7 +7406,7 @@
   },
   "nexigon_api.repositories.DeletePackageVersionAction": {
     "type": "object",
-    "description": "Delete a package version.",
+    "description": "Delete a package version.\n\nA version that is the base of another version cannot be deleted.",
     "properties": {
       "versionId": {
         "$ref": "#/components/schemas/nexigon_api.repositories.PackageVersionId"
@@ -6919,6 +7420,19 @@
   "nexigon_api.repositories.DeleteRepositoryAction": {
     "type": "object",
     "description": "Delete a repository.",
+    "properties": {
+      "repositoryId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryId"
+      }
+    },
+    "required": [
+      "repositoryId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.repositories.DeleteRepositoryS3ConfigAction": {
+    "type": "object",
+    "description": "Remove a repository override and use organization storage when configured.",
     "properties": {
       "repositoryId": {
         "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryId"
@@ -6999,6 +7513,40 @@
     ],
     "unevaluatedProperties": false
   },
+  "nexigon_api.repositories.GetAssetReferencesAction": {
+    "type": "object",
+    "description": "List the package attachments retaining a repository asset.",
+    "properties": {
+      "assetId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryAssetId"
+      },
+      "page": {
+        "$ref": "#/components/schemas/nexigon_api.pagination.PageRequest"
+      }
+    },
+    "required": [
+      "assetId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.repositories.GetAssetReferencesOutput": {
+    "type": "object",
+    "properties": {
+      "references": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryAssetReference"
+        }
+      },
+      "page": {
+        "$ref": "#/components/schemas/nexigon_api.pagination.PageInfo"
+      }
+    },
+    "required": [
+      "references"
+    ],
+    "unevaluatedProperties": false
+  },
   "nexigon_api.repositories.GetPackageDetailsAction": {
     "type": "object",
     "description": "Get information about a package.",
@@ -7016,6 +7564,12 @@
     "type": "object",
     "description": "Output of getting information about a package.",
     "properties": {
+      "presentation": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.PackagePresentation"
+      },
+      "imageLimits": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.PackageImageLimits"
+      },
       "packageId": {
         "$ref": "#/components/schemas/nexigon_api.repositories.PackageId"
       },
@@ -7033,6 +7587,9 @@
         "format": "uint64",
         "minimum": 0,
         "pattern": "^[0-9]+$"
+      },
+      "retention": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.PackageVersionRetention"
       },
       "metadata": {
         "type": "object",
@@ -7102,6 +7659,15 @@
         "additionalProperties": {
           "$ref": "#/components/schemas/nexigon_api.json.JsonValue"
         }
+      },
+      "deleteAt": {
+        "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
+      },
+      "sealed": {
+        "type": "boolean"
+      },
+      "baseVersionId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.PackageVersionId"
       }
     },
     "required": [
@@ -7192,11 +7758,15 @@
     "type": "object",
     "description": "Output of getting the S3 configuration for the repository.\n\nThis intentionally does not include the secret access key.",
     "properties": {
+      "source": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryStorageSource"
+      },
       "s3Config": {
         "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryS3Config"
       }
     },
     "required": [
+      "source",
       "s3Config"
     ],
     "unevaluatedProperties": false
@@ -7314,6 +7884,94 @@
     "type": "string",
     "description": "Unique ID of a package."
   },
+  "nexigon_api.repositories.PackageImageLimits": {
+    "type": "object",
+    "description": "Limits for a package image, applied before it is stored.",
+    "properties": {
+      "maxBytes": {
+        "type": "integer",
+        "format": "uint32",
+        "maximum": 4294967295,
+        "minimum": 0
+      },
+      "maxDimension": {
+        "type": "integer",
+        "format": "uint32",
+        "maximum": 4294967295,
+        "minimum": 0
+      }
+    },
+    "required": [
+      "maxBytes",
+      "maxDimension"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.repositories.PackageImageUpdate": {
+    "description": "Change the image while saving package display information.",
+    "oneOf": [
+      {
+        "type": "object",
+        "properties": {
+          "tag": {
+            "const": "Replace"
+          },
+          "imagePng": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "tag",
+          "imagePng"
+        ]
+      },
+      {
+        "type": "object",
+        "properties": {
+          "tag": {
+            "const": "Remove"
+          }
+        },
+        "required": [
+          "tag"
+        ]
+      }
+    ]
+  },
+  "nexigon_api.repositories.PackagePresentation": {
+    "type": "object",
+    "description": "Display information for a package, independent of its URL-safe name.",
+    "properties": {
+      "displayName": {
+        "type": "string"
+      },
+      "description": {
+        "type": "string"
+      },
+      "imageUrl": {
+        "type": "string"
+      }
+    },
+    "required": [],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.repositories.PackagePresentationUpdate": {
+    "type": "object",
+    "description": "Replace display text and optionally change the package image.",
+    "properties": {
+      "displayName": {
+        "type": "string"
+      },
+      "description": {
+        "type": "string"
+      },
+      "image": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.PackageImageUpdate"
+      }
+    },
+    "required": [],
+    "unevaluatedProperties": false
+  },
   "nexigon_api.repositories.PackageVersionAsset": {
     "type": "object",
     "description": "Package version asset.",
@@ -7363,6 +8021,31 @@
     "type": "string",
     "description": "Unique ID of a package version."
   },
+  "nexigon_api.repositories.PackageVersionRetention": {
+    "type": "object",
+    "description": "Opt-in retention of unsealed versions, evaluated per package by creation time.\nEither exceeded limit makes a version eligible for deletion, including existing versions.\nRetention skips versions that are the base of another version.",
+    "properties": {
+      "enabled": {
+        "type": "boolean"
+      },
+      "maxVersions": {
+        "type": "integer",
+        "format": "uint32",
+        "maximum": 4294967295,
+        "minimum": 0
+      },
+      "maxAgeDays": {
+        "type": "integer",
+        "format": "uint32",
+        "maximum": 4294967295,
+        "minimum": 0
+      }
+    },
+    "required": [
+      "enabled"
+    ],
+    "unevaluatedProperties": false
+  },
   "nexigon_api.repositories.PackageVersionTag": {
     "type": "object",
     "description": "Package version tag.",
@@ -7372,6 +8055,9 @@
       },
       "locked": {
         "type": "boolean"
+      },
+      "assignedAt": {
+        "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
       }
     },
     "required": [
@@ -7441,11 +8127,20 @@
       "createdAt": {
         "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
       },
+      "deleteAt": {
+        "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
+      },
+      "sealed": {
+        "type": "boolean"
+      },
       "tags": {
         "type": "array",
         "items": {
           "$ref": "#/components/schemas/nexigon_api.repositories.PackageVersionTag"
         }
+      },
+      "baseVersionId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.PackageVersionId"
       }
     },
     "required": [
@@ -7477,6 +8172,15 @@
     "properties": {
       "repositoryId": {
         "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryId"
+      },
+      "page": {
+        "$ref": "#/components/schemas/nexigon_api.pagination.PageRequest"
+      },
+      "filter": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryAssetFilter"
+      },
+      "sort": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryAssetSort"
       }
     },
     "required": [
@@ -7488,6 +8192,9 @@
     "type": "object",
     "description": "Asset query item.",
     "properties": {
+      "lifecycle": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryAssetLifecycle"
+      },
       "assetId": {
         "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryAssetId"
       },
@@ -7502,6 +8209,9 @@
       },
       "digest": {
         "$ref": "#/components/schemas/nexigon_api.digest.Digest"
+      },
+      "storage": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryAssetStorage"
       }
     },
     "required": [
@@ -7520,6 +8230,15 @@
         "items": {
           "$ref": "#/components/schemas/nexigon_api.repositories.QueryRepositoryAssetsItem"
         }
+      },
+      "usage": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryAssetUsage"
+      },
+      "cleanup": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryAssetCleanupSettings"
+      },
+      "page": {
+        "$ref": "#/components/schemas/nexigon_api.pagination.PageInfo"
       }
     },
     "required": [
@@ -7544,6 +8263,9 @@
     "type": "object",
     "description": "Package query item.",
     "properties": {
+      "displayName": {
+        "type": "string"
+      },
       "packageId": {
         "$ref": "#/components/schemas/nexigon_api.repositories.PackageId"
       },
@@ -7673,9 +8395,104 @@
     ],
     "unevaluatedProperties": false
   },
+  "nexigon_api.repositories.RepositoryAssetCleanupSettings": {
+    "type": "object",
+    "description": "Automatic cleanup policy for unused repository assets.",
+    "properties": {
+      "enabled": {
+        "type": "boolean"
+      },
+      "graceDays": {
+        "type": "integer",
+        "maximum": 65535,
+        "minimum": 0
+      },
+      "enabledAt": {
+        "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
+      }
+    },
+    "required": [
+      "enabled",
+      "graceDays"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.repositories.RepositoryAssetFilter": {
+    "enum": [
+      "All",
+      "Unused",
+      "Issues"
+    ],
+    "description": "Restrict the asset inventory without changing repository totals."
+  },
   "nexigon_api.repositories.RepositoryAssetId": {
     "type": "string",
     "description": "Unique ID of a repository asset."
+  },
+  "nexigon_api.repositories.RepositoryAssetLifecycle": {
+    "type": "object",
+    "description": "Retention information, independent of object-storage verification.",
+    "properties": {
+      "referenceCount": {
+        "type": [
+          "integer",
+          "string"
+        ],
+        "format": "uint64",
+        "minimum": 0,
+        "pattern": "^[0-9]+$"
+      },
+      "unreferencedSince": {
+        "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
+      },
+      "eligibleAt": {
+        "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
+      },
+      "deletionStartedAt": {
+        "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
+      },
+      "deletionError": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "referenceCount"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.repositories.RepositoryAssetReference": {
+    "type": "object",
+    "description": "One retaining package or version attachment.",
+    "properties": {
+      "packageId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.PackageId"
+      },
+      "packageName": {
+        "type": "string"
+      },
+      "versionId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.PackageVersionId"
+      },
+      "versionName": {
+        "type": "string"
+      },
+      "filename": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "packageId",
+      "packageName",
+      "filename"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.repositories.RepositoryAssetSort": {
+    "enum": [
+      "Largest",
+      "CleanupDate"
+    ],
+    "description": "Asset ordering, with a stable internal ID as the tie breaker."
   },
   "nexigon_api.repositories.RepositoryAssetStatus": {
     "enum": [
@@ -7715,13 +8532,95 @@
     ],
     "description": "Result of the latest non-destructive object-storage check."
   },
+  "nexigon_api.repositories.RepositoryAssetUsage": {
+    "type": "object",
+    "description": "Storage totals count each asset once, regardless of its reference count.",
+    "properties": {
+      "assetCount": {
+        "type": [
+          "integer",
+          "string"
+        ],
+        "format": "uint64",
+        "minimum": 0,
+        "pattern": "^[0-9]+$"
+      },
+      "storedBytes": {
+        "type": [
+          "integer",
+          "string"
+        ],
+        "format": "uint64",
+        "minimum": 0,
+        "pattern": "^[0-9]+$"
+      },
+      "referencedBytes": {
+        "type": [
+          "integer",
+          "string"
+        ],
+        "format": "uint64",
+        "minimum": 0,
+        "pattern": "^[0-9]+$"
+      },
+      "unusedBytes": {
+        "type": [
+          "integer",
+          "string"
+        ],
+        "format": "uint64",
+        "minimum": 0,
+        "pattern": "^[0-9]+$"
+      },
+      "unconfirmedBytes": {
+        "type": [
+          "integer",
+          "string"
+        ],
+        "format": "uint64",
+        "minimum": 0,
+        "pattern": "^[0-9]+$"
+      },
+      "unconfirmedCount": {
+        "type": [
+          "integer",
+          "string"
+        ],
+        "format": "uint64",
+        "minimum": 0,
+        "pattern": "^[0-9]+$"
+      },
+      "cleanupErrorCount": {
+        "type": [
+          "integer",
+          "string"
+        ],
+        "format": "uint64",
+        "minimum": 0,
+        "pattern": "^[0-9]+$"
+      },
+      "checkedAt": {
+        "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
+      }
+    },
+    "required": [
+      "assetCount",
+      "storedBytes",
+      "referencedBytes",
+      "unusedBytes",
+      "unconfirmedBytes",
+      "unconfirmedCount",
+      "cleanupErrorCount"
+    ],
+    "unevaluatedProperties": false
+  },
   "nexigon_api.repositories.RepositoryId": {
     "type": "string",
     "description": "Unique ID of a repository."
   },
   "nexigon_api.repositories.RepositoryS3Config": {
     "type": "object",
-    "description": "Repository S3 config.",
+    "description": "S3 connection settings for a repository or organization.",
     "properties": {
       "endpoint": {
         "type": "string"
@@ -7751,6 +8650,14 @@
       "accessKeyId"
     ],
     "unevaluatedProperties": false
+  },
+  "nexigon_api.repositories.RepositoryStorageSource": {
+    "enum": [
+      "Unconfigured",
+      "Repository",
+      "Organization"
+    ],
+    "description": "The scope supplying repository storage."
   },
   "nexigon_api.repositories.RepositoryVisibility": {
     "enum": [
@@ -8046,6 +8953,19 @@
       }
     ]
   },
+  "nexigon_api.repositories.SealPackageVersionAction": {
+    "type": "object",
+    "description": "Permanently seal a version. Requires permission to manage versions.\nSealing cancels scheduled deletion and blocks changes to the name, metadata,\nbase version, and attachments, as well as deletion of the version, package,\nor repository.\nTags remain editable. Sealing cannot be reversed.",
+    "properties": {
+      "versionId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.PackageVersionId"
+      }
+    },
+    "required": [
+      "versionId"
+    ],
+    "unevaluatedProperties": false
+  },
   "nexigon_api.repositories.SetPackageAssetMetadataAction": {
     "type": "object",
     "description": "Replace the metadata on a package asset.",
@@ -8134,6 +9054,23 @@
     ],
     "description": "Output of setting the name of a package."
   },
+  "nexigon_api.repositories.SetPackagePresentationAction": {
+    "type": "object",
+    "description": "Replace display text and optionally change the image.\nOmitted display name and description are cleared; an omitted image is preserved.",
+    "properties": {
+      "packageId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.PackageId"
+      },
+      "presentation": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.PackagePresentationUpdate"
+      }
+    },
+    "required": [
+      "packageId",
+      "presentation"
+    ],
+    "unevaluatedProperties": false
+  },
   "nexigon_api.repositories.SetPackageVersionAssetMetadataAction": {
     "type": "object",
     "description": "Set metadata on a package version asset.",
@@ -8155,6 +9092,38 @@
       "versionId",
       "filename",
       "metadata"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.repositories.SetPackageVersionBaseAction": {
+    "type": "object",
+    "description": "Set or clear the base of a package version. Requires permission to manage versions.\n\nThe base must belong to the same package, must not be scheduled for deletion, and\nmust not lead back to the version through its own bases. Sealed versions reject\nchanges to their base.",
+    "properties": {
+      "versionId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.PackageVersionId"
+      },
+      "baseVersionId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.PackageVersionId"
+      }
+    },
+    "required": [
+      "versionId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.repositories.SetPackageVersionDeletionScheduleAction": {
+    "type": "object",
+    "description": "Schedule or cancel automatic deletion. Requires permission to manage versions.\nDeletion removes the version and all tags, including locked tags. It does not\ncheck device installations. Unused assets follow the repository cleanup policy.\nA version that is the base of another version cannot be scheduled.",
+    "properties": {
+      "versionId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.PackageVersionId"
+      },
+      "deleteAt": {
+        "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
+      }
+    },
+    "required": [
+      "versionId"
     ],
     "unevaluatedProperties": false
   },
@@ -8191,6 +9160,46 @@
     },
     "required": [
       "versionId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.repositories.SetPackageVersionRetentionAction": {
+    "type": "object",
+    "description": "Replace the package retention policy. Requires permission to manage versions.",
+    "properties": {
+      "packageId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.PackageId"
+      },
+      "retention": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.PackageVersionRetention"
+      }
+    },
+    "required": [
+      "packageId",
+      "retention"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.repositories.SetRepositoryAssetCleanupAction": {
+    "type": "object",
+    "description": "Configure automatic cleanup. Requires permission to manage repository settings.",
+    "properties": {
+      "repositoryId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryId"
+      },
+      "enabled": {
+        "type": "boolean"
+      },
+      "graceDays": {
+        "type": "integer",
+        "maximum": 65535,
+        "minimum": 0
+      }
+    },
+    "required": [
+      "repositoryId",
+      "enabled",
+      "graceDays"
     ],
     "unevaluatedProperties": false
   },

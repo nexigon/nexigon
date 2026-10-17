@@ -747,6 +747,16 @@ mod tests {
                 writer.seek(SeekFrom::End(-1)).expect("seek mutation");
                 writer.write_all(&[9]).expect("mutate fixture");
                 writer.flush().expect("flush mutation");
+                // A write that keeps the size only shows in the modification
+                // time, which some filesystems update late, for example on
+                // Windows. Move it explicitly to keep the test deterministic.
+                let modified = writer
+                    .metadata()
+                    .and_then(|metadata| metadata.modified())
+                    .expect("fixture modification time");
+                writer
+                    .set_modified(modified + Duration::from_secs(1))
+                    .expect("move fixture modification time");
             }
         })
         .expect_err("hash must reject mutation");

@@ -57,6 +57,9 @@
     },
     "provisioning": {
       "$ref": "#/$defs/nexigon_agent.config.ProvisioningConfig"
+    },
+    "integrations": {
+      "$ref": "#/$defs/nexigon_agent.config.IntegrationsConfig"
     }
   },
   "required": [
@@ -126,6 +129,20 @@
           "items": {
             "$ref": "#/$defs/nexigon_agent.config.TcpPort"
           }
+        }
+      },
+      "required": [],
+      "unevaluatedProperties": false
+    },
+    "nexigon_agent.config.IntegrationsConfig": {
+      "type": "object",
+      "description": "Integrations with update systems on the device.\n\nAt most one system update integration may be enabled.",
+      "properties": {
+        "rugix": {
+          "$ref": "#/$defs/nexigon_agent.config.RugixIntegrationConfig"
+        },
+        "rauc": {
+          "$ref": "#/$defs/nexigon_agent.config.RaucIntegrationConfig"
         }
       },
       "required": [],
@@ -213,6 +230,95 @@
         },
         "device-name": {
           "type": "string"
+        }
+      },
+      "required": [],
+      "unevaluatedProperties": false
+    },
+    "nexigon_agent.config.RaucIntegrationConfig": {
+      "type": "object",
+      "description": "RAUC integration.",
+      "properties": {
+        "system-updates": {
+          "$ref": "#/$defs/nexigon_agent.config.RaucSystemUpdatesConfig"
+        }
+      },
+      "required": [],
+      "unevaluatedProperties": false
+    },
+    "nexigon_agent.config.RaucSystemUpdatesConfig": {
+      "type": "object",
+      "description": "System updates with RAUC.\n\nImplements the OTA update contract of Nexigon Hub: the agent converges toward\nthe desired state in `dev.nexigon.ota.config` and reports its progress in\n`dev.nexigon.ota.status`.",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "path": {
+          "type": "string"
+        },
+        "check-interval-secs": {
+          "type": [
+            "integer",
+            "string"
+          ],
+          "format": "uint64",
+          "minimum": 0,
+          "pattern": "^[0-9]+$"
+        },
+        "check-jitter-secs": {
+          "type": [
+            "integer",
+            "string"
+          ],
+          "format": "uint64",
+          "minimum": 0,
+          "pattern": "^[0-9]+$"
+        }
+      },
+      "required": [],
+      "unevaluatedProperties": false
+    },
+    "nexigon_agent.config.RugixIntegrationConfig": {
+      "type": "object",
+      "description": "Rugix integration.",
+      "properties": {
+        "system-updates": {
+          "$ref": "#/$defs/nexigon_agent.config.RugixSystemUpdatesConfig"
+        }
+      },
+      "required": [],
+      "unevaluatedProperties": false
+    },
+    "nexigon_agent.config.RugixSystemUpdatesConfig": {
+      "type": "object",
+      "description": "System updates with Rugix Ctrl.\n\nImplements the OTA update contract of Nexigon Hub: the agent converges toward\nthe desired state in `dev.nexigon.ota.config` and reports its progress in\n`dev.nexigon.ota.status`.",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "path": {
+          "type": "string"
+        },
+        "check-interval-secs": {
+          "type": [
+            "integer",
+            "string"
+          ],
+          "format": "uint64",
+          "minimum": 0,
+          "pattern": "^[0-9]+$"
+        },
+        "check-jitter-secs": {
+          "type": [
+            "integer",
+            "string"
+          ],
+          "format": "uint64",
+          "minimum": 0,
+          "pattern": "^[0-9]+$"
+        },
+        "use-bundle-hash": {
+          "type": "boolean"
         }
       },
       "required": [],

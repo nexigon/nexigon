@@ -11,6 +11,7 @@ homepage.workspace = true
 anyhow.workspace = true
 clap = { workspace = true, features = ["derive"] }
 futures.workspace = true
+jiff.workspace = true
 nexigon-api.workspace = true
 nexigon-client.workspace = true
 nexigon-ids.workspace = true

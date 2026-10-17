@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- `projects devices list` lists one page of devices, newest first. Use
+  `--limit` and `--cursor` to page through large projects. This requires Hub
+  2026.4.0 or later, and CLI 0.6.0 cannot list devices on that Hub.
+
 ## 0.6.0 (2026-09-18)
 
 - Add optional pairing-key provisioning on port 6947 and persist provisioned

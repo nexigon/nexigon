@@ -2,12 +2,12 @@
 
 import audit::AuditLogEvent
 import datetime::Timestamp
+import devices::DeviceFilter
 import devices::DeviceFingerprint
 import devices::DeviceGroup
 import devices::DeviceId
-import devices::DeviceSelectionError
 import devices::DeviceStatus
-import fleet::FleetOperationTargetSelector
+import json::JsonValue
 import organizations::OrganizationId
 import outputs::Empty
 import pagination::PageInfo
@@ -114,21 +114,106 @@ record DeleteProjectAction {
     project_id: ProjectId,
 }
 
-/// Query the devices of a project.
-#[request(name = "projects_QueryDevices", response = QueryProjectDevicesOutput)]
-record QueryProjectDevicesAction {
-    /// Shared filter, also accepted by fleet operations.
-    selector?: FleetOperationTargetSelector,
+/// A schema for an exact property name. Schemas never constrain property writes.
+record PropertySchema {
+    /// Exact property name.
+    name: string,
+    /// JSON Schema document.
+    #[json(name = "schema")]
+    json_schema: JsonValue,
+    /// Whether the definition is built in and cannot be changed or removed.
+    builtin: bool,
+}
+
+/// List project definitions and the read-only built-in definitions.
+#[request(
+    name = "projects_QueryPropertySchemas",
+    response = QueryPropertySchemasOutput
+)]
+record QueryPropertySchemasAction {
     /// ID of the project.
     project_id: ProjectId,
 }
 
+/// Available property schemas, ordered by name.
+record QueryPropertySchemasOutput {
+    /// Available definitions.
+    schemas: [PropertySchema],
+}
+
+/// Create or replace a project schema without validating existing property values.
+///
+/// Requires permission to manage project settings. Built-in definitions are read-only.
+/// The schema must be a JSON object or boolean. Editors report unsupported or invalid
+/// schemas and allow explicit overrides; APIs do not enforce schemas on property writes.
+#[request(name = "projects_SetPropertySchema", response = Empty)]
+record SetPropertySchemaAction {
+    /// ID of the project.
+    project_id: ProjectId,
+    /// Exact property name.
+    #[validate(
+        { 1 <= _.size <= 256 },
+        message = "Property name must be between 1 and 256 characters."
+    )]
+    #[validate(
+        { matches(_, "^[a-zA-Z0-9][a-zA-Z0-9._-]*$") },
+        message = "Property name must start with a letter or digit and contain only letters, digits, dots, underscores, or hyphens."
+    )]
+    name: string,
+    /// JSON Schema document.
+    #[json(name = "schema")]
+    json_schema: JsonValue,
+}
+
+/// Remove a project definition without changing property values.
+///
+/// Requires permission to manage project settings. Built-in definitions are read-only.
+#[request(name = "projects_RemovePropertySchema", response = Empty)]
+record RemovePropertySchemaAction {
+    /// ID of the project.
+    project_id: ProjectId,
+    /// Exact property name.
+    #[validate(
+        { 1 <= _.size <= 256 },
+        message = "Property name must be between 1 and 256 characters."
+    )]
+    name: string,
+}
+
+/// Query a page of the devices of a project, newest first.
+#[request(name = "projects_QueryDevices", response = QueryProjectDevicesOutput)]
+record QueryProjectDevicesAction {
+    /// ID of the project.
+    project_id: ProjectId,
+    /// Only return devices matching this filter.
+    filter?: DeviceFilter,
+    /// Page to return. Without this field, the first page is returned.
+    page?: PageRequest,
+}
+
 /// Output of querying the devices of a project.
 record QueryProjectDevicesOutput {
-    /// Devices whose property predicates failed evaluation.
-    selection_errors: [DeviceSelectionError],
-    /// List of devices.
+    /// Devices on this page.
     devices: [QueryProjectDevicesItem],
+    /// Continuation of the traversal.
+    page: PageInfo,
+}
+
+/// Count the devices of a project.
+#[request(name = "projects_CountDevices", response = CountProjectDevicesOutput)]
+record CountProjectDevicesAction {
+    /// ID of the project.
+    project_id: ProjectId,
+    /// Only count devices matching this filter in `matching`.
+    filter?: DeviceFilter,
+}
+
+/// Output of counting the devices of a project.
+record CountProjectDevicesOutput {
+    /// Number of devices in the project.
+    total: u32,
+    /// Number of devices matching the filter.
+    matching: u32,
 }
 
 /// Device item.

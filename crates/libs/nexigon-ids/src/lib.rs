@@ -513,6 +513,9 @@ define_types! {
     /// The first 22 characters of the respective organization API token secret.
     OrganizationApiTokenId => (FlatRawId, "org_pk", 22, secret = false),
 
+    /// Product feedback submission id (globally unique).
+    FeedbackId => (FlatRawId, "feedback", 22, secret = false),
+
     /// Subscription ID (globally unique).
     SubscriptionId => (FlatRawId, "subscription", 22, secret = false),
     /// Billing period ID (globally unique).

@@ -445,7 +445,7 @@ mod tests {
                 TerminalConfig::new()
                     .with_enabled(Some(true))
                     .with_user(Some(user.name.into()))
-                    .with_shell(Some("/bin/sh".to_owned().into())),
+                    .with_shell(Some("/bin/sh".into())),
             )),
         );
 

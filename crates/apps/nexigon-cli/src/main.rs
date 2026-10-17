@@ -14,6 +14,7 @@ use tracing::error;
 use tracing::info;
 
 use nexigon_api::types::actor::GetActorAction;
+use nexigon_api::types::pagination::PageRequest;
 use nexigon_api::with_actions;
 use nexigon_client::ClientToken;
 use nexigon_client::connect_executor;
@@ -142,28 +143,7 @@ async fn main() -> anyhow::Result<()> {
                 println!("{}", serde_json::to_string(&output).unwrap())
             }
         },
-        Cmd::Actions(cmd) => match cmd {
-            ActionsCmd::Execute { name, input } => {
-                use nexigon_api::types::*;
-                macro_rules! invoke_action {
-                    ($(($name:literal, $variant:ident, $input:path, $output:path),)*) => {
-                        match name.as_str() {
-                            $(
-                                $name => {
-                                    let action = serde_json::from_str::<$input>(input).context("parsing action input")?;
-                                    let output = executor.execute(action).await?;
-                                    println!("{}", serde_json::to_string(&output).unwrap());
-                                },
-                            )*
-                            _ => {
-                                bail!("unknown action: {name}");
-                            }
-                        }
-                    };
-                }
-                with_actions!(invoke_action)
-            }
-        },
+        Cmd::Actions(cmd) => execute_actions_cmd(cmd, &mut executor).await?,
         Cmd::Repositories(cmd) => {
             execute_repositories_cmd(cmd, &mut executor).await?;
         }
@@ -210,9 +190,21 @@ async fn main() -> anyhow::Result<()> {
                 write_json(&output);
             }
             ProjectsCmd::Devices(cmd) => match cmd {
-                ProjectDevicesCmd::List { project } => {
+                ProjectDevicesCmd::List {
+                    project,
+                    limit,
+                    cursor,
+                } => {
                     let output = executor
-                        .execute(projects::QueryProjectDevicesAction::new(project.clone()))
+                        .execute(
+                            projects::QueryProjectDevicesAction::new(project.clone()).with_page(
+                                Some(
+                                    PageRequest::new()
+                                        .with_limit(*limit)
+                                        .with_cursor(cursor.clone().map(Into::into)),
+                                ),
+                            ),
+                        )
                         .await
                         .context("querying project devices")??;
                     write_json(&output);
@@ -495,6 +487,37 @@ async fn main() -> anyhow::Result<()> {
     Ok(())
 }
 
+// Keep the generated action dispatch out of the main future: its debug poll
+// frame otherwise consumes stack space for every CLI command.
+async fn execute_actions_cmd(
+    cmd: &ActionsCmd,
+    executor: &mut nexigon_client::ClientExecutor,
+) -> anyhow::Result<()> {
+    match cmd {
+        ActionsCmd::Execute { name, input } => {
+            use nexigon_api::types::*;
+            macro_rules! invoke_action {
+                ($(($name:literal, $variant:ident, $input:path, $output:path),)*) => {
+                    match name.as_str() {
+                        $(
+                            $name => {
+                                let action = serde_json::from_str::<$input>(input).context("parsing action input")?;
+                                let output = executor.execute(action).await?;
+                                println!("{}", serde_json::to_string(&output).unwrap());
+                            },
+                        )*
+                        _ => {
+                            bail!("unknown action: {name}");
+                        }
+                    }
+                };
+            }
+            with_actions!(invoke_action)
+        }
+    }
+    Ok(())
+}
+
 /// CLI arguments.
 #[derive(Debug, Parser)]
 #[clap(version = nexigon_version::NEXIGON_GIT_VERSION)]
@@ -620,10 +643,16 @@ pub enum ProjectsCmd {
 /// Project devices subcommand.
 #[derive(Debug, Parser)]
 pub enum ProjectDevicesCmd {
-    /// List devices of a project.
+    /// List a page of the devices of a project, newest first.
     List {
         /// Project ID.
         project: ProjectId,
+        /// Maximum number of devices to return.
+        #[clap(long)]
+        limit: Option<u32>,
+        /// Cursor from a previous page's `nextCursor`.
+        #[clap(long)]
+        cursor: Option<String>,
     },
 }
 

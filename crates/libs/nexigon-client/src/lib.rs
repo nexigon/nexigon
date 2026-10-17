@@ -413,9 +413,17 @@ impl ClientBuilder {
                     .unwrap(),
             );
         }
-        let (socket, _) =
-            tokio_tungstenite::connect_async_tls_with_config(request, None, true, Some(connector))
-                .await?;
+        // Most agent connections are idle. Larger frames can grow this buffer
+        // without reserving Tungstenite's 128 KiB default for every device.
+        let websocket_config = tokio_tungstenite::tungstenite::protocol::WebSocketConfig::default()
+            .read_buffer_size(8 * 1024);
+        let (socket, _) = tokio_tungstenite::connect_async_tls_with_config(
+            request,
+            Some(websocket_config),
+            true,
+            Some(connector),
+        )
+        .await?;
         let transport = WebSocketTransport::new(socket);
         let connection = Connection::with_limits_and_info(
             transport,

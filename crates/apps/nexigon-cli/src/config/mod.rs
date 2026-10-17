@@ -111,7 +111,7 @@ mod tests {
     fn user_token_config_round_trips() {
         let token = UserToken::generate();
         let config = Config {
-            hub_url: "https://hub.example.test".to_owned().into(),
+            hub_url: "https://hub.example.test".into(),
             token: AuthenticationToken::UserToken(token.clone()),
         };
 
@@ -126,7 +126,7 @@ mod tests {
     fn organization_api_token_config_round_trips() {
         let token = OrganizationApiToken::generate();
         let config = Config {
-            hub_url: "https://hub.example.test".to_owned().into(),
+            hub_url: "https://hub.example.test".into(),
             token: AuthenticationToken::OrganizationApiToken(token.clone()),
         };
 

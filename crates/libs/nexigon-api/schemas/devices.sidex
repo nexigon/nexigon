@@ -851,6 +851,16 @@ record UpdateDeviceGroupsAction {
 // ============================================================================
 
 
+/// Device list filter. All supplied conditions must hold.
+record DeviceFilter {
+    /// Case-insensitive substring of device name, hostname, or ID.
+    search?: string,
+    /// Current combined health and connection status.
+    status?: DeviceStatus,
+    /// Group membership conditions.
+    groups?: DeviceGroupSelector,
+}
+
 /// Group membership conditions, combined with AND.
 record DeviceGroupSelector {
     /// Every listed group must be present. Empty or absent imposes no condition.

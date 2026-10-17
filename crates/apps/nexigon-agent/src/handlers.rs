@@ -102,10 +102,33 @@ impl ExternalHandlerResult {
     }
 }
 
-/// Registry of loaded command definitions.
+/// Registry of loaded command definitions and commands built into the agent.
 #[derive(Default)]
 pub struct CommandRegistry {
     commands: HashMap<String, LoadedCommand>,
+    builtins: HashMap<String, BuiltinCommand>,
+}
+
+/// Command implemented by the agent itself.
+///
+/// Built-in commands take no input, start their work in the background, and
+/// complete immediately without output.
+struct BuiltinCommand {
+    descriptor: DeviceCommandDescriptor,
+    start: Arc<dyn Fn() + Send + Sync>,
+}
+
+impl BuiltinCommand {
+    fn invoke(&self) -> DeviceCommandDoneData {
+        (self.start)();
+        DeviceCommandDoneData {
+            status: DeviceCommandStatus::Ok,
+            output: None,
+            error: None,
+            log_tail: Vec::new().into(),
+            duration_ms: 0,
+        }
+    }
 }
 
 struct LoadedCommand {
@@ -135,10 +158,14 @@ impl CommandRegistry {
                 ?directory,
                 "commands directory does not exist, no commands loaded"
             );
-            return Ok(Self { commands });
+            return Ok(Self {
+                commands,
+                builtins: HashMap::new(),
+            });
         };
         let mut loaded_from = HashMap::new();
         let mut registry_bytes = 0usize;
+        let builtins = HashMap::new();
 
         for name in names {
             let path = directory.join(&name);
@@ -167,10 +194,26 @@ impl CommandRegistry {
             commands.insert(command_name.into(), command);
         }
 
-        let registry = Self { commands };
+        let registry = Self { commands, builtins };
         validate_manifest_size(&registry.manifest())?;
         info!(count = registry.commands.len(), "loaded external commands");
         Ok(registry)
+    }
+
+    /// Register a command implemented by the agent.
+    ///
+    /// A built-in command replaces an external command with the same name.
+    pub(crate) fn register_builtin(
+        &mut self,
+        descriptor: DeviceCommandDescriptor,
+        start: Arc<dyn Fn() + Send + Sync>,
+    ) {
+        let name = descriptor.name.to_string();
+        if self.commands.remove(&name).is_some() {
+            warn!(%name, "built-in command replaces an external command definition");
+        }
+        self.builtins
+            .insert(name, BuiltinCommand { descriptor, start });
     }
 
     /// Get a command by name.
@@ -202,6 +245,11 @@ impl CommandRegistry {
                     .map(|schema| schema.value.clone()))
                 .map(Into::into),
             })
+            .chain(
+                self.builtins
+                    .values()
+                    .map(|builtin| builtin.descriptor.clone()),
+            )
             .collect::<Vec<_>>();
         commands.sort_unstable_by(|left, right| left.name.cmp(&right.name));
         DeviceCommandManifest {
@@ -1044,7 +1092,7 @@ async fn handle_handler_channel_inner(
         let frame = DeviceCommandDeviceFrame::Done(DeviceCommandDoneData {
             status: DeviceCommandStatus::Error,
             output: None,
-            error: Some("invalid command name".to_owned().into()),
+            error: Some("invalid command name".into()),
             log_tail: Vec::new().into(),
             duration_ms: 0,
         });
@@ -1059,11 +1107,18 @@ async fn handle_handler_channel_inner(
         "command invocation"
     );
 
+    if let Some(builtin) = registry.builtins.get(&*request.command) {
+        let frame = DeviceCommandDeviceFrame::Done(builtin.invoke());
+        write_command_frame(&mut chan_writer, &frame).await.ok();
+        chan_writer.shutdown().await.ok();
+        return Ok(());
+    }
+
     let Some(command) = registry.get_loaded(&request.command) else {
         let frame = DeviceCommandDeviceFrame::Done(DeviceCommandDoneData {
             status: DeviceCommandStatus::Error,
             output: None,
-            error: Some("command not found".to_owned().into()),
+            error: Some("command not found".into()),
             log_tail: Vec::new().into(),
             duration_ms: 0,
         });
@@ -1125,16 +1180,19 @@ async fn invoke_registered_command_inner(
         return DeviceCommandDoneData {
             status: DeviceCommandStatus::Error,
             output: None,
-            error: Some("invalid command name".to_owned().into()),
+            error: Some("invalid command name".into()),
             log_tail: Vec::new().into(),
             duration_ms: 0,
         };
+    }
+    if let Some(builtin) = registry.builtins.get(&*request.command) {
+        return builtin.invoke();
     }
     let Some(command) = registry.get_loaded(&request.command) else {
         return DeviceCommandDoneData {
             status: DeviceCommandStatus::Error,
             output: None,
-            error: Some("command not found".to_owned().into()),
+            error: Some("command not found".into()),
             log_tail: Vec::new().into(),
             duration_ms: 0,
         };
@@ -1152,7 +1210,7 @@ async fn invoke_registered_command_inner(
             DeviceCommandDoneData {
                 status: DeviceCommandStatus::Error,
                 output: None,
-                error: Some("failed to execute command".to_owned().into()),
+                error: Some("failed to execute command".into()),
                 log_tail: Vec::new().into(),
                 duration_ms: 0,
             }
@@ -1724,9 +1782,7 @@ mod tests {
 
     #[tokio::test]
     async fn attacker_controlled_command_names_never_reach_errors() {
-        let registry = CommandRegistry {
-            commands: HashMap::new(),
-        };
+        let registry = CommandRegistry::default();
         let oversized = "secret".repeat(MAX_COMMAND_NAME_BYTES);
         let result = invoke_registered_command(
             &registry,
