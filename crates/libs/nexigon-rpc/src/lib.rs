@@ -1368,7 +1368,9 @@ mod tests {
         assert_eq!(admission.available_response_bytes(), before);
     }
 
-    #[tokio::test]
+    // The paused clock only advances while all tasks wait, so a slow machine
+    // cannot exceed the body timeout while writing the request.
+    #[tokio::test(start_paused = true)]
     async fn delayed_response_header_is_not_mistaken_for_a_stalled_body() {
         let admission = RpcAdmission::new(RpcLimits {
             body_timeout: Duration::from_millis(10),
