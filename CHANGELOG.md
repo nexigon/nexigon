@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.6.1 (2026-10-21)
+
+- Verify all HTTPS connections against the operating system's trust store.
+  Pairing-key provisioning, `repositories` commands, and OTLP export previously
+  also trusted roots compiled into the binary, including
+  `emSign ECC Root CA - G3`, to which the compromised eMudhra intermediates
+  chain.
+- Reject certificate chains containing the compromised eMudhra intermediate keys
+  by updating `rustls-webpki` to 0.103.16.
+- Update Rustls to 0.23.46.
+
+See the [release notes](releases/v0.6.1.md).
+
 ## 0.6.0 (2026-09-18)
 
 - Add optional pairing-key provisioning on port 6947 and persist provisioned
