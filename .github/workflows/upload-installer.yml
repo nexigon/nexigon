@@ -10,9 +10,9 @@ jobs:
     name: Upload Installer
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Deploy
-        uses: silitics/actions/deploy-site@main
+        uses: silitics/actions/deploy-site@87cc4a5ff8e6df4e7ee89b927f6d7726ca0db1fd # main (2026-10-11)
         with:
           domain: install.nexigon.dev
           source-dir: installer
