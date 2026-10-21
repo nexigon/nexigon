@@ -9,7 +9,7 @@
 ## 0.6.1 (2026-10-21)
 
 - Verify all HTTPS connections against the operating system's trust store.
-  Pairing-key provisioning, `repositories` commands, and OTLP export previously
+  Pairing-key provisioning, repository asset uploads, and OTLP export previously
   also trusted roots compiled into the binary, including
   `emSign ECC Root CA - G3`, to which the compromised eMudhra intermediates
   chain.
