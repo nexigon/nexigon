@@ -62,6 +62,9 @@ pub struct SystemUpdates {
     updater: Arc<dyn SystemUpdater>,
     /// Version path built into the image.
     default_path: Option<String>,
+    /// Asset filename built into the image, or the bundle of the running system
+    /// if absent.
+    default_asset: Option<String>,
     check_interval: Duration,
     /// Maximum random delay of scheduled checks.
     check_jitter: Duration,
@@ -75,6 +78,7 @@ impl SystemUpdates {
         Self {
             updater,
             default_path: None,
+            default_asset: None,
             check_interval: DEFAULT_CHECK_INTERVAL,
             check_jitter: DEFAULT_CHECK_JITTER,
             time_zone: None,
@@ -84,6 +88,13 @@ impl SystemUpdates {
     /// Set the version path that applies without a configured path.
     pub fn with_default_path(mut self, path: Option<String>) -> Self {
         self.default_path = path;
+        self
+    }
+
+    /// Set the asset filename that applies without a configured asset, instead
+    /// of the bundle of the running system.
+    pub fn with_default_asset(mut self, asset: Option<String>) -> Self {
+        self.default_asset = asset;
         self
     }
 
@@ -128,12 +139,14 @@ pub(crate) fn settings(config: &Config) -> anyhow::Result<Option<SystemUpdates>>
                 use_bundle_hash: rugix.use_bundle_hash.unwrap_or(false),
             }))
             .with_default_path(rugix.path.as_deref().map(str::to_owned))
+            .with_default_asset(rugix.asset.as_deref().map(str::to_owned))
             .with_check_interval(interval(rugix.check_interval_secs))
             .with_check_jitter(jitter(rugix.check_jitter_secs)),
         )),
         (None, Some(rauc)) => Ok(Some(
             SystemUpdates::new(Arc::new(Updater::Rauc))
                 .with_default_path(rauc.path.as_deref().map(str::to_owned))
+                .with_default_asset(rauc.asset.as_deref().map(str::to_owned))
                 .with_check_interval(interval(rauc.check_interval_secs))
                 .with_check_jitter(jitter(rauc.check_jitter_secs)),
         )),

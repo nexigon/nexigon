@@ -1,0 +1,257 @@
+//! Actions and types related to device profiles.
+//!
+//! A device profile is a project-owned set of property values. A device applies
+//! its assigned profiles in order, followed by its own property values. Each
+//! value applies to the values before it as a JSON merge patch (RFC 7396).
+
+import datetime::Timestamp
+import devices::DeviceGroupSelector
+import json::JsonValue
+import outputs::Empty
+import pagination::PageInfo
+import pagination::PageRequest
+import projects::ProjectId
+
+/// Stable identity of a device profile.
+#[rust(type = "nexigon_ids::ids::DeviceProfileId")]
+#[json(type = "string")]
+opaque DeviceProfileId
+
+/// Property value set by a device profile.
+record DeviceProfileProperty {
+    /// Value of the property.
+    value: JsonValue,
+    /// Indicates whether devices are prevented from changing the property.
+    protected: bool,
+}
+
+/// Device profile without its property values.
+record DeviceProfileSummary {
+    profile_id: DeviceProfileId,
+    project_id: ProjectId,
+    /// Display name, which does not have to be unique.
+    display_name: string,
+    description?: string,
+    /// Latest revision. Devices always use the latest revision.
+    revision: u32,
+    /// Number of devices the profile is assigned to.
+    device_count: u32,
+}
+
+/// Device profile with the property values of its latest revision.
+record DeviceProfile {
+    profile_id: DeviceProfileId,
+    project_id: ProjectId,
+    /// Display name, which does not have to be unique.
+    display_name: string,
+    description?: string,
+    /// Latest revision. Devices always use the latest revision.
+    revision: u32,
+    /// Property values of the latest revision.
+    properties: [string: DeviceProfileProperty],
+    /// Number of devices the profile is assigned to.
+    device_count: u32,
+}
+
+/// Immutable revision of a device profile.
+record DeviceProfileRevision {
+    revision: u32,
+    /// Time when the revision was saved.
+    created_at: Timestamp,
+    /// Property values of the revision.
+    properties: [string: DeviceProfileProperty],
+}
+
+/// List the device profiles of a project.
+#[unstable(feature = "device_profiles")]
+#[request(name = "profiles_Query", response = QueryDeviceProfilesOutput)]
+record QueryDeviceProfilesAction {
+    project_id: ProjectId,
+}
+
+/// Output of listing the device profiles of a project.
+record QueryDeviceProfilesOutput {
+    profiles: [DeviceProfileSummary],
+}
+
+/// Get a device profile with the property values of its latest revision.
+#[unstable(feature = "device_profiles")]
+#[request(name = "profiles_Get", response = GetDeviceProfileOutput)]
+record GetDeviceProfileAction {
+    project_id: ProjectId,
+    profile_id: DeviceProfileId,
+}
+
+/// Output of getting a device profile.
+#[json(tag = "result")]
+variant GetDeviceProfileOutput {
+    /// The profile does not exist in the project.
+    NotFound,
+    /// The profile was found.
+    Found: DeviceProfile,
+}
+
+/// Create a device profile with its first revision.
+#[unstable(feature = "device_profiles")]
+#[request(name = "profiles_Create", response = DeviceProfile)]
+record CreateDeviceProfileAction {
+    project_id: ProjectId,
+    #[validate(
+        { 1 <= _.size <= 128 },
+        message = "Profile name must be between 1 and 128 characters."
+    )]
+    display_name: string,
+    #[validate(
+        { _.size <= 4096 },
+        message = "Profile description must be at most 4096 characters."
+    )]
+    description?: string,
+    /// Property values of the first revision.
+    properties: [string: DeviceProfileProperty],
+}
+
+/// Replace the display name and description of a device profile.
+///
+/// Does not create a revision and does not change any device property.
+#[unstable(feature = "device_profiles")]
+#[request(name = "profiles_Update", response = Empty)]
+record UpdateDeviceProfileAction {
+    project_id: ProjectId,
+    profile_id: DeviceProfileId,
+    #[validate(
+        { 1 <= _.size <= 128 },
+        message = "Profile name must be between 1 and 128 characters."
+    )]
+    display_name: string,
+    #[validate(
+        { _.size <= 4096 },
+        message = "Profile description must be at most 4096 characters."
+    )]
+    description?: string,
+}
+
+/// Delete a device profile and remove it from every device.
+#[unstable(feature = "device_profiles")]
+#[request(name = "profiles_Delete", response = Empty)]
+record DeleteDeviceProfileAction {
+    project_id: ProjectId,
+    profile_id: DeviceProfileId,
+}
+
+/// Save new property values of a device profile as its next revision.
+///
+/// Every device with the profile applies the new values right away.
+#[unstable(feature = "device_profiles")]
+#[request(
+    name = "profiles_SaveRevision",
+    response = SaveDeviceProfileRevisionOutput
+)]
+record SaveDeviceProfileRevisionAction {
+    project_id: ProjectId,
+    profile_id: DeviceProfileId,
+    /// Revision the new values are based on. The save fails with
+    /// `RevisionConflict` if this is not the latest revision.
+    expected_revision: u32,
+    /// Property values of the new revision.
+    properties: [string: DeviceProfileProperty],
+}
+
+/// Output of saving a device profile revision.
+#[json(tag = "result")]
+variant SaveDeviceProfileRevisionOutput {
+    /// The revision was saved.
+    Saved: SavedDeviceProfileRevision,
+    /// The revision was not saved because another revision was saved in the
+    /// meantime.
+    RevisionConflict: DeviceProfileRevisionConflict,
+}
+
+/// Details of a saved device profile revision.
+record SavedDeviceProfileRevision {
+    revision: u32,
+}
+
+/// Details of a revision conflict when saving a device profile.
+record DeviceProfileRevisionConflict {
+    /// The latest revision of the profile.
+    current_revision: u32,
+}
+
+/// Assign a device profile to the devices of its project that match group
+/// conditions.
+///
+/// Applies once to the devices that match now; devices that match later do not
+/// receive the profile. The profile applies after a device's other profiles, and
+/// devices that already have it keep its position. Devices that already have the
+/// maximum number of profiles are skipped. Requires permission to change the
+/// profiles of every matching device.
+#[unstable(feature = "device_profiles")]
+#[request(
+    name = "profiles_AssignDevices",
+    response = AssignDeviceProfileDevicesOutput
+)]
+record AssignDeviceProfileDevicesAction {
+    project_id: ProjectId,
+    profile_id: DeviceProfileId,
+    /// Group conditions that devices must satisfy. Without conditions, every
+    /// device of the project matches.
+    groups?: DeviceGroupSelector,
+}
+
+/// Output of assigning a device profile to matching devices.
+///
+/// Devices deleted while the profile is assigned are not counted.
+record AssignDeviceProfileDevicesOutput {
+    /// Number of devices the profile was assigned to.
+    assigned: u32,
+    /// Number of matching devices that already had the profile.
+    unchanged: u32,
+    /// Number of matching devices skipped because they already have the maximum
+    /// number of profiles.
+    skipped: u32,
+}
+
+/// Remove a device profile from the devices of its project that match group
+/// conditions.
+///
+/// Requires permission to change the profiles of every matching device that has
+/// the profile.
+#[unstable(feature = "device_profiles")]
+#[request(
+    name = "profiles_UnassignDevices",
+    response = UnassignDeviceProfileDevicesOutput
+)]
+record UnassignDeviceProfileDevicesAction {
+    project_id: ProjectId,
+    profile_id: DeviceProfileId,
+    /// Group conditions that devices must satisfy. Without conditions, every
+    /// device of the project matches.
+    groups?: DeviceGroupSelector,
+}
+
+/// Output of removing a device profile from matching devices.
+record UnassignDeviceProfileDevicesOutput {
+    /// Number of devices the profile was removed from.
+    removed: u32,
+}
+
+/// List the revisions of a device profile, newest first.
+#[unstable(feature = "device_profiles")]
+#[request(
+    name = "profiles_QueryRevisions",
+    response = QueryDeviceProfileRevisionsOutput
+)]
+record QueryDeviceProfileRevisionsAction {
+    project_id: ProjectId,
+    profile_id: DeviceProfileId,
+    /// Page to return. Without this field, the first page is returned.
+    page?: PageRequest,
+}
+
+/// Output of listing the revisions of a device profile.
+record QueryDeviceProfileRevisionsOutput {
+    /// Revisions on this page, newest first.
+    revisions: [DeviceProfileRevision],
+    /// Continuation of the traversal.
+    page: PageInfo,
+}

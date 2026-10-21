@@ -2,12 +2,20 @@
 //!
 //! A check reads the desired state from `dev.nexigon.ota.config`, finishes an
 //! update in progress, plans the next version, applies the hold, spread, retry,
-//! and maintenance window policies, and installs the next version if all of
-//! them allow it. It publishes the actual state in `dev.nexigon.ota.status`.
+//! and maintenance window policies, and installs the configured asset of the
+//! next version if all of them allow it. It publishes the actual state in
+//! `dev.nexigon.ota.status`.
 //!
 //! The status published by the previous check is the only state that persists
 //! across checks and reboots. Nexigon Hub stores it, so it survives switching
 //! between system partitions.
+//!
+//! Status writes carry the version read last (compare-and-swap), so that a
+//! concurrent change, such as a cleared failure count, is not overwritten. A
+//! check that loses such a race starts over from the changed status. Once an
+//! installation has started or a booted system awaits its commit, the check
+//! writes its status regardless, because the next check needs it to detect the
+//! outcome of the update.
 
 use std::collections::HashMap;
 use std::time::Duration;
@@ -25,6 +33,7 @@ use nexigon_api::types::devices::GetDevicePropertyAction;
 use nexigon_api::types::devices::GetDevicePropertyOutput;
 use nexigon_api::types::devices::PublishDeviceEventsAction;
 use nexigon_api::types::devices::SetDevicePropertyAction;
+use nexigon_api::types::devices::SetDevicePropertyOutput;
 use nexigon_api::types::properties::OtaUpdateBlocked;
 use nexigon_api::types::properties::OtaUpdateCapability;
 use nexigon_api::types::properties::OtaUpdateConfig;
@@ -36,7 +45,9 @@ use nexigon_api::types::properties::OtaUpdater;
 use nexigon_api::types::repositories::GetPackageVersionDetailsAction;
 use nexigon_api::types::repositories::GetPackageVersionDetailsOutput;
 use nexigon_api::types::repositories::IssueAssetDownloadUrlAction;
+use nexigon_api::types::repositories::PackageVersionAsset;
 use nexigon_api::types::repositories::PackageVersionId;
+use nexigon_api::types::repositories::RepositoryAssetStatus;
 use nexigon_api::types::repositories::ResolvePackageVersionByPathAction;
 use nexigon_api::types::repositories::ResolvePackageVersionByPathOutput;
 use nexigon_client::ClientExecutor;
@@ -74,10 +85,13 @@ pub(crate) const STATUS_PROPERTY: &str = "dev.nexigon.ota.status";
 const EVENT_CATEGORY: &str = "ota";
 /// Time until checking whether the clock has been synchronized.
 const CLOCK_RECHECK_DELAY: Duration = Duration::from_secs(60);
+/// Number of times a check starts over after the status changed concurrently.
+const MAX_STATUS_CONFLICTS: usize = 3;
 
 /// Optional features of the OTA update contract that the agent implements.
-const CAPABILITIES: [OtaUpdateCapability; 5] = [
+const CAPABILITIES: [OtaUpdateCapability; 6] = [
     OtaUpdateCapability::Hold,
+    OtaUpdateCapability::Asset,
     OtaUpdateCapability::Window,
     OtaUpdateCapability::Retry,
     OtaUpdateCapability::Spread,
@@ -105,6 +119,13 @@ pub(crate) struct Checker {
     /// Signals a shutdown, which also prevents rebooting into an installed version.
     shutdown: CancellationToken,
     details: HashMap<PackageVersionId, GetPackageVersionDetailsOutput>,
+    /// Version of the status read or written last, or `None` without a status.
+    status_version: Option<u64>,
+    /// Whether this check started an installation.
+    installing: bool,
+    /// Whether this check reported the outcome of the previous attempt, which it
+    /// does only once, even if it starts over.
+    outcome_reported: bool,
 }
 
 impl Checker {
@@ -122,14 +143,33 @@ impl Checker {
             cancellation,
             shutdown,
             details: HashMap::new(),
+            status_version: None,
+            installing: false,
+            outcome_reported: false,
         }
     }
 
     /// Run one check and publish the resulting status.
+    ///
+    /// Starts over if the status changes concurrently.
     #[tracing::instrument(skip_all)]
     pub(crate) async fn check(&mut self) -> anyhow::Result<CheckOutcome> {
+        self.outcome_reported = false;
+        for _ in 0..MAX_STATUS_CONFLICTS {
+            match self.check_once().await {
+                Err(error) if error.is::<StatusConflict>() => {
+                    info!("the update status changed during the check, starting over");
+                }
+                outcome => return outcome,
+            }
+        }
+        self.check_once().await
+    }
+
+    async fn check_once(&mut self) -> anyhow::Result<CheckOutcome> {
         // Versions may be deleted or rebased between checks.
         self.details.clear();
+        self.installing = false;
         let now = Timestamp::now();
         let previous = self.previous_status().await?;
         let property = self.property(CONFIG_PROPERTY).await?;
@@ -141,7 +181,11 @@ impl Checker {
             .with_current_version(Some(identity.version.clone().into()))
             .with_updater(self.updater_info().await);
 
-        let config = effective_config(self.settings.default_path.as_deref(), property.as_ref());
+        let config = effective_config(
+            self.defaults(),
+            &self.settings.updater.bundle_filename(&identity.name),
+            property.as_ref(),
+        );
         let retry = retry_policy_with_defaults(
             config
                 .as_ref()
@@ -210,14 +254,17 @@ impl Checker {
                 .runs_installed_version(&previous, running_id.as_ref(), &identity)
                 .await?
             {
-                info!(version = %identity.version, "update completed");
-                self.event(
-                    DeviceEventSeverity::Info,
-                    "update completed",
-                    &identity,
-                    None,
-                )
-                .await;
+                if !self.outcome_reported {
+                    info!(version = %identity.version, "update completed");
+                    self.event(
+                        DeviceEventSeverity::Info,
+                        "update completed",
+                        &identity,
+                        None,
+                    )
+                    .await;
+                    self.outcome_reported = true;
+                }
                 completed = true;
             } else if matches!(state, OtaUpdateState::Installing) {
                 failure = Some("the installation was interrupted".to_owned());
@@ -229,14 +276,17 @@ impl Checker {
             }
         }
         if let Some(error) = &failure {
-            warn!(%error, "update failed");
-            self.event(
-                DeviceEventSeverity::Error,
-                "update failed",
-                &identity,
-                Some(error),
-            )
-            .await;
+            if !self.outcome_reported {
+                warn!(%error, "update failed");
+                self.event(
+                    DeviceEventSeverity::Error,
+                    "update failed",
+                    &identity,
+                    Some(error),
+                )
+                .await;
+                self.outcome_reported = true;
+            }
             status.last_error = Some(error.clone().into());
         }
 
@@ -349,11 +399,30 @@ impl Checker {
             Some(_) => {}
         }
 
+        // A missing asset blocks only an attempt that is due, so that the
+        // failure count and the retry schedule persist while it is missing.
+        let filename = config
+            .asset
+            .as_deref()
+            .expect("the effective configuration names an asset");
+        let Some(asset) = self.available_asset(&next, filename).await? else {
+            let blocked = OtaUpdateBlocked::new("no-asset").with_message(Some(
+                format!("The next version has no available asset {filename}.").into(),
+            ));
+            return self
+                .finish(
+                    status
+                        .with_state(Some(OtaUpdateState::Blocked))
+                        .with_blocked(Some(blocked)),
+                )
+                .await;
+        };
+
         if let Some(deferral) = window_closed(&status, config.window.as_ref(), self.time_zone()) {
             return self.finish_deferred(deferral).await;
         }
 
-        self.attempt(status, &config, &identity, &next, &retry, failures)
+        self.attempt(status, &identity, &next, &asset, &retry, failures)
             .await
     }
 
@@ -366,29 +435,20 @@ impl Checker {
     async fn attempt(
         &mut self,
         status: OtaUpdateStatus,
-        config: &OtaUpdateConfig,
         identity: &SystemIdentity,
         next: &PackageVersionId,
+        asset: &PackageVersionAsset,
         retry: &OtaUpdateRetryPolicy,
         failures: u32,
     ) -> anyhow::Result<CheckOutcome> {
         if self.cancellation.is_cancelled() {
             bail!("the agent is stopping");
         }
-        let bundle = self.settings.updater.bundle_filename(&identity.name);
         let details = self.version_details(next).await?.clone();
-        let Some(asset) = details
-            .assets
-            .iter()
-            .find(|asset| *asset.filename == bundle)
-        else {
-            let error = anyhow!("the version has no asset {bundle}");
-            return self.finish(failed(status, &error)).await;
-        };
         let url = call(
             &mut self.executor,
             IssueAssetDownloadUrlAction::new(asset.asset_id.clone())
-                .with_filename(Some(bundle.clone().into())),
+                .with_filename(Some(asset.filename.clone())),
         )
         .await?
         .url;
@@ -399,6 +459,7 @@ impl Checker {
         info!(version = %next, "installing update");
         self.publish(&status.clone().with_state(Some(OtaUpdateState::Installing)))
             .await?;
+        self.installing = true;
         self.event(
             DeviceEventSeverity::Info,
             "installing update",
@@ -424,17 +485,20 @@ impl Checker {
 
         // The window applies to the activation, which may start long after the
         // attempt. A hold does not stop an update in progress.
-        let config = match self.config().await {
-            Ok(config) => config,
+        let window = match self.config(identity).await {
+            Ok(config) => config.window,
             Err(error) => {
                 warn!(
                     error = format!("{error:#}"),
                     "using the update configuration read before the installation"
                 );
-                config.clone()
+                status
+                    .config
+                    .as_ref()
+                    .and_then(|config| config.window.clone())
             }
         };
-        if let Some(deferral) = window_closed(&status, config.window.as_ref(), self.time_zone()) {
+        if let Some(deferral) = window_closed(&status, window.as_ref(), self.time_zone()) {
             self.settings.updater.deactivate().await?;
             return self.finish_deferred(deferral).await;
         }
@@ -555,7 +619,9 @@ impl Checker {
     }
 
     async fn previous_status(&mut self) -> anyhow::Result<OtaUpdateStatus> {
-        let Some(property) = self.property(STATUS_PROPERTY).await? else {
+        let property = self.property(STATUS_PROPERTY).await?;
+        self.status_version = property.as_ref().map(|property| property.version);
+        let Some(property) = property else {
             return Ok(OtaUpdateStatus::new());
         };
         let value = serde_json::to_value(&property.value)?;
@@ -610,10 +676,39 @@ impl Checker {
         Ok(&self.details[version_id])
     }
 
+    /// Asset of a version with the given filename, if it has been uploaded.
+    async fn available_asset(
+        &mut self,
+        version_id: &PackageVersionId,
+        filename: &str,
+    ) -> anyhow::Result<Option<PackageVersionAsset>> {
+        Ok(self
+            .version_details(version_id)
+            .await?
+            .assets
+            .iter()
+            .find(|asset| {
+                *asset.filename == *filename
+                    && matches!(asset.status, RepositoryAssetStatus::Available)
+            })
+            .cloned())
+    }
+
     /// Read the desired state applied to the defaults of the agent configuration.
-    async fn config(&mut self) -> anyhow::Result<OtaUpdateConfig> {
+    async fn config(&mut self, identity: &SystemIdentity) -> anyhow::Result<OtaUpdateConfig> {
         let property = self.property(CONFIG_PROPERTY).await?;
-        effective_config(self.settings.default_path.as_deref(), property.as_ref())
+        effective_config(
+            self.defaults(),
+            &self.settings.updater.bundle_filename(&identity.name),
+            property.as_ref(),
+        )
+    }
+
+    /// Defaults of the agent configuration.
+    fn defaults(&self) -> OtaUpdateConfig {
+        OtaUpdateConfig::new()
+            .with_path(self.settings.default_path.clone().map(Into::into))
+            .with_asset(self.settings.default_asset.clone().map(Into::into))
     }
 
     /// Time zone in which maintenance windows apply.
@@ -655,19 +750,42 @@ impl Checker {
         Ok(outcome)
     }
 
+    /// Publish a status unless the status changed since it was read.
+    ///
+    /// Fails with [`StatusConflict`] if it changed, unless this check started an
+    /// installation or the status awaits a commit. Then the status replaces the
+    /// changed one.
     async fn publish(&mut self, status: &OtaUpdateStatus) -> anyhow::Result<()> {
         let value =
             serde_json::to_value(status).context("failed to serialize the update status")?;
-        call(
+        let action = SetDevicePropertyAction::new(
+            self.device_id.clone(),
+            STATUS_PROPERTY.to_owned(),
+            value.into(),
+        );
+        let output = call(
             &mut self.executor,
-            SetDevicePropertyAction::new(
-                self.device_id.clone(),
-                STATUS_PROPERTY.to_owned(),
-                value.into(),
-            ),
+            action.clone().with_expected_version(self.status_version),
         )
-        .await
-        .map(drop)
+        .await?;
+        let output = match output {
+            SetDevicePropertyOutput::Set(_) => output,
+            SetDevicePropertyOutput::VersionConflict(_) | SetDevicePropertyOutput::Deleted
+                if self.installing || matches!(status.state, Some(OtaUpdateState::Committing)) =>
+            {
+                call(&mut self.executor, action).await?
+            }
+            SetDevicePropertyOutput::VersionConflict(_) | SetDevicePropertyOutput::Deleted => {
+                return Err(StatusConflict.into());
+            }
+        };
+        let SetDevicePropertyOutput::Set(success) = output else {
+            bail!("Nexigon Hub did not store the update status");
+        };
+        // Nexigon Hub 2026.3 and earlier do not report the version, so the next
+        // write of this check is unconditional.
+        self.status_version = success.version;
+        Ok(())
     }
 
     /// Emit an update event, logging failures instead of interrupting the update.
@@ -697,6 +815,11 @@ impl Checker {
         }
     }
 }
+
+/// The status changed since the check read it.
+#[derive(Debug, thiserror::Error)]
+#[error("the update status changed concurrently")]
+struct StatusConflict;
 
 /// Repository, package, and tag or ID of a version.
 #[derive(Debug, Clone)]
@@ -740,17 +863,24 @@ impl std::fmt::Display for VersionPath {
 }
 
 /// Apply the configuration property to the defaults of the agent configuration.
+///
+/// Without a configured asset, the bundle of the running system applies.
 fn effective_config(
-    default_path: Option<&str>,
+    defaults: OtaUpdateConfig,
+    running_bundle: &str,
     property: Option<&DeviceProperty>,
 ) -> anyhow::Result<OtaUpdateConfig> {
-    let defaults = OtaUpdateConfig::new().with_path(default_path.map(Into::into));
     let mut config = serde_json::to_value(defaults)?;
     if let Some(property) = property {
         let patch = serde_json::to_value(&property.value)?;
         merge_patch(&mut config, &patch);
     }
-    serde_json::from_value(config).context("invalid update configuration")
+    let mut config: OtaUpdateConfig =
+        serde_json::from_value(config).context("invalid update configuration")?;
+    config
+        .asset
+        .get_or_insert_with(|| running_bundle.to_owned().into());
+    Ok(config)
 }
 
 /// Metadata of a package version.
@@ -879,4 +1009,39 @@ fn clock_synchronized() -> bool {
 #[cfg(not(target_os = "linux"))]
 fn clock_synchronized() -> bool {
     true
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// The property overrides the asset of the agent configuration, and
+    /// removing the asset with `null` selects the bundle of the running system.
+    #[test]
+    fn effective_asset() {
+        let asset = |defaults: OtaUpdateConfig, patch: Option<&str>| {
+            let property = patch.map(config_property);
+            effective_config(defaults, "running.rugixb", property.as_ref())
+                .unwrap()
+                .asset
+                .unwrap()
+                .to_string()
+        };
+        let image = OtaUpdateConfig::new().with_asset(Some("image.rugixb".into()));
+        assert_eq!(asset(OtaUpdateConfig::new(), None), "running.rugixb");
+        assert_eq!(asset(image.clone(), None), "image.rugixb");
+        assert_eq!(
+            asset(image.clone(), Some(r#"{"asset":"other.rugixb"}"#)),
+            "other.rugixb"
+        );
+        assert_eq!(asset(image, Some(r#"{"asset":null}"#)), "running.rugixb");
+    }
+
+    fn config_property(value: &str) -> DeviceProperty {
+        serde_json::from_str(&format!(
+            r#"{{"name":"{CONFIG_PROPERTY}","value":{value},"protected":true,
+            "version":1,"lastUpdated":"2026-10-17T00:00:00Z"}}"#
+        ))
+        .unwrap()
+    }
 }

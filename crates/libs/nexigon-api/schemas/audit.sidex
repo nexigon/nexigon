@@ -2,10 +2,13 @@
 
 import actor::Actor
 import datetime::Timestamp
+import devices::DeviceId
 import jobs::JobId
 import json::JsonValue
+import organizations::OrganizationApiTokenId
 import pagination::PageInfo
 import pagination::PageRequest
+import users::UserId
 
 /// Unique ID of an audit log action.
 #[rust(type = "nexigon_ids::ids::AuditLogActionId")]
@@ -47,6 +50,45 @@ record AuditLogEventAction {
 record AuditLogEventJob {
     /// ID of the job.
     job_id: JobId,
+}
+
+/// Names of the actors of the returned audit log entries.
+///
+/// Closed user accounts, deleted API tokens, and devices without a name are
+/// omitted.
+record AuditLogReferences {
+    /// Users acting directly or through a user token.
+    users: [AuditLogUserReference],
+    /// Devices.
+    devices: [AuditLogDeviceReference],
+    /// Organization API tokens.
+    organization_api_tokens: [AuditLogOrganizationApiTokenReference],
+}
+
+/// User referenced by audit log entries.
+record AuditLogUserReference {
+    /// ID of the user.
+    user_id: UserId,
+    /// Name of the user.
+    display_name?: string,
+    /// Email of the user.
+    email: string,
+}
+
+/// Device referenced by audit log entries.
+record AuditLogDeviceReference {
+    /// ID of the device.
+    device_id: DeviceId,
+    /// Name of the device.
+    name: string,
+}
+
+/// Organization API token referenced by audit log entries.
+record AuditLogOrganizationApiTokenReference {
+    /// ID of the API token.
+    token_id: OrganizationApiTokenId,
+    /// Name of the API token.
+    name: string,
 }
 
 /// Action recorded in the audit log.
@@ -100,6 +142,10 @@ record QueryAuditLogEventsOutput {
     page?: PageInfo,
     /// List of audit events.
     events: [AuditLogEvent],
+    /// Names of the actors of the returned events.
+    ///
+    /// Absent in responses of Nexigon Hub 2026.3 and earlier.
+    references?: AuditLogReferences,
 }
 
 /// Query the actions recorded in the audit log.
@@ -120,4 +166,8 @@ record QueryAuditLogActionsOutput {
     page?: PageInfo,
     /// List of actions.
     actions: [AuditLogAction],
+    /// Names of the actors of the returned actions.
+    ///
+    /// Absent in responses of Nexigon Hub 2026.3 and earlier.
+    references?: AuditLogReferences,
 }

@@ -75,6 +75,12 @@ record OtaUpdateConfig {
     /// `<version>` is a tag or a version ID. A tag tracks the version the tag
     /// points to. A version ID pins a single version.
     path?: string,
+    /// Filename of the asset that the device installs from a version.
+    ///
+    /// Defaults to `<system>.<extension>`, where `<system>` is the name of the
+    /// running system and the update system determines the extension, such as
+    /// `rugixb` for Rugix Ctrl and `raucb` for RAUC.
+    asset?: string,
     /// Hold the device at its current version.
     ///
     /// While set, the device starts no new update. An update in progress
@@ -90,6 +96,11 @@ record OtaUpdateConfig {
     ///
     /// Devices update without waiting when absent.
     spread?: OtaUpdateSpread,
+    /// Rollout number.
+    ///
+    /// Integrations ignore its value. Changing it changes the configuration,
+    /// which starts a new round of attempts on devices whose attempts failed.
+    rollout?: u32,
 }
 
 /// Maintenance window in the device's local time.
@@ -198,13 +209,18 @@ record OtaUpdateRetryPolicy {
     /// resets and a new round of attempts begins.
     ///
     /// Without a cooldown, the device stops attempting the version until the
-    /// configuration is written again.
+    /// version of the configuration changes or the failure count is cleared.
     cooldown_secs?: u32,
 }
 
 /// OTA update status (`dev.nexigon.ota.status`).
 ///
 /// Actual state of a device, published by its update integration.
+///
+/// The integration writes the status with the version it read last
+/// (compare-and-swap), so that it does not overwrite concurrent changes. Other
+/// writers may only clear `failure_count` and `next_attempt_at`, which requests
+/// a new attempt.
 #[unstable(feature = "ota_updates")]
 record OtaUpdateStatus {
     /// Optional features of the OTA update contract that the integration supports.
@@ -214,8 +230,9 @@ record OtaUpdateStatus {
     /// Version of the `dev.nexigon.ota.config` property that the integration
     /// last read.
     ///
-    /// Absent when the property does not exist. Every write to the property,
-    /// even with an unchanged value, increments its version.
+    /// Absent when the property does not exist. The version changes with every
+    /// write to the device's own value, even with an unchanged value, and
+    /// whenever a profile changes the property's value.
     config_version?: u64,
     /// Version string of the running system, as built into the image.
     ///
@@ -242,7 +259,8 @@ record OtaUpdateStatus {
     /// Number of consecutive failed attempts for the next version.
     ///
     /// Resets to zero when the next version or `config_version` changes, when
-    /// the retry cooldown ends, or when an update succeeds.
+    /// the retry cooldown ends, when an update succeeds, or when another writer
+    /// clears it.
     failure_count?: u32,
     /// Error message of the last failure, if any.
     last_error?: string,
@@ -306,6 +324,8 @@ variant OtaUpdateCapability {
     Spread,
     /// The integration honors `config.hold`.
     Hold,
+    /// The integration honors `config.asset`.
+    Asset,
 }
 
 /// OTA update state.
@@ -350,6 +370,8 @@ record OtaUpdateBlocked {
     ///   a checkpoint.
     /// - `unknown-current-version`: The target has a base version, but
     ///   `current_version` does not resolve to a package version.
+    /// - `no-asset`: The next version has no available asset with the filename
+    ///   in `config.asset`.
     ///
     /// Integrations may define their own codes for conditions specific to the
     /// device, such as `awaiting-approval`.

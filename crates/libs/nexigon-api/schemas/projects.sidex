@@ -1,6 +1,7 @@
 //! Actions and types related to projects.
 
 import audit::AuditLogEvent
+import audit::AuditLogReferences
 import datetime::Timestamp
 import devices::DeviceFilter
 import devices::DeviceFingerprint
@@ -487,6 +488,10 @@ record QueryAuditLogEventsOutput {
     page?: PageInfo,
     /// List of audit log events.
     events: [AuditLogEvent],
+    /// Names of the actors of the returned events.
+    ///
+    /// Absent in responses of Nexigon Hub 2026.3 and earlier.
+    references?: AuditLogReferences,
 }
 
 /// Add a repository to the project.

@@ -256,6 +256,9 @@
         "path": {
           "type": "string"
         },
+        "asset": {
+          "type": "string"
+        },
         "check-interval-secs": {
           "type": [
             "integer",
@@ -297,6 +300,9 @@
           "type": "boolean"
         },
         "path": {
+          "type": "string"
+        },
+        "asset": {
           "type": "string"
         },
         "check-interval-secs": {

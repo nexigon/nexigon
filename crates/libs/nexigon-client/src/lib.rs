@@ -28,6 +28,7 @@ use nexigon_ids::Id;
 use nexigon_ids::ids::DeploymentToken;
 use nexigon_ids::ids::DeviceFingerprint;
 use nexigon_ids::ids::OrganizationApiToken;
+use nexigon_ids::ids::OrganizationId;
 use nexigon_ids::ids::UserToken;
 use nexigon_multiplex::Channel;
 use nexigon_multiplex::Connection;
@@ -219,6 +220,8 @@ pub struct ClientBuilder {
     connection_limits: ConnectionLimits,
     /// Metadata sent in the multiplex Hello frame.
     connection_info: Bytes,
+    /// Optional organization boundary for requests on this connection.
+    organization: Option<OrganizationId>,
 }
 
 impl ClientBuilder {
@@ -234,7 +237,14 @@ impl ClientBuilder {
             register_connection: true,
             connection_limits: ConnectionLimits::default(),
             connection_info: Bytes::new(),
+            organization: None,
         }
+    }
+
+    /// Restrict resource lookups to an organization for every channel on this connection.
+    pub fn with_organization(mut self, organization: Option<OrganizationId>) -> Self {
+        self.organization = organization;
+        self
     }
 
     /// Configure multiplex connection resource limits.
@@ -382,6 +392,15 @@ impl ClientBuilder {
             "X-Register-Connection",
             self.register_connection.to_string().try_into().unwrap(),
         );
+        if let Some(organization) = &self.organization {
+            request.headers_mut().append(
+                "X-Nexigon-Organization",
+                organization
+                    .stringify()
+                    .try_into()
+                    .expect("organization IDs are valid header values"),
+            );
+        }
         match &self.token {
             ClientToken::DeploymentToken(token) => {
                 request
