@@ -34,7 +34,6 @@ allow = [
   "Apache-2.0",
   "BSD-3-Clause",
   "CC0-1.0",
-  "CDLA-Permissive-2.0",
   "ISC",
   "MIT",
   "Unicode-3.0",
@@ -49,3 +48,9 @@ allow-git = [
 
 [bans]
 multiple-versions = "allow"
+deny = [
+  # Bundled root certificates can only be updated with a new release. All TLS
+  # connections must use the operating system's trust store instead.
+  { crate = "webpki-roots", reason = "use the operating system's trust store" },
+  { crate = "webpki-root-certs", reason = "use the operating system's trust store" },
+]
