@@ -4,7 +4,20 @@
 
 - `projects devices list` lists one page of devices, newest first. Use
   `--limit` and `--cursor` to page through large projects. This requires Hub
-  2026.4.0 or later, and CLI 0.6.0 cannot list devices on that Hub.
+  2026.4.0 or later, and CLI 0.6.1 and earlier cannot list devices on that Hub.
+
+## 0.6.1 (2026-10-21)
+
+- Verify all HTTPS connections against the operating system's trust store.
+  Pairing-key provisioning, `repositories` commands, and OTLP export previously
+  also trusted roots compiled into the binary, including
+  `emSign ECC Root CA - G3`, to which the compromised eMudhra intermediates
+  chain.
+- Reject certificate chains containing the compromised eMudhra intermediate keys
+  by updating `rustls-webpki` to 0.103.16.
+- Update Rustls to 0.23.46.
+
+See the [release notes](releases/v0.6.1.md).
 
 ## 0.6.0 (2026-09-18)
 
