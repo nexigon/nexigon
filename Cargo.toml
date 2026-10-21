@@ -46,7 +46,10 @@ x509-cert = "0.2"
 reportify = { git = "https://github.com/silitics/si-rust-libs.git" }
 si-crypto-hashes = "0.1"
 # Pinned until si-observability 0.1.4, which trusts the system's trust store, is on crates.io.
-si-observability = { git = "https://github.com/silitics/si-rust-libs.git", rev = "0d73ec1128940d678cb5fab578e4f30db891fd11", features = ["otlp", "clap4"] }
+si-observability = { git = "https://github.com/silitics/si-rust-libs.git", rev = "0d73ec1128940d678cb5fab578e4f30db891fd11", features = [
+    "otlp",
+    "clap4",
+] }
 sidex = { git = "https://github.com/silitics/sidex.git", tag = "v0.4.1", features = [
     "serde-1",
     "jiff-02",
