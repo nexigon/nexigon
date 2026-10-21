@@ -2,6 +2,7 @@
 
 import actor::Actor
 import audit::AuditLogEvent
+import audit::AuditLogReferences
 import cluster::ClusterNodeId
 import datetime::Timestamp
 import fleet::FleetOperationId
@@ -12,6 +13,8 @@ import jwt::Jwt
 import outputs::Empty
 import pagination::PageInfo
 import pagination::PageRequest
+import profiles::DeviceProfileId
+import profiles::DeviceProfileSummary
 import projects::DeploymentToken
 import projects::DeploymentTokenId
 import projects::ProjectId
@@ -87,6 +90,8 @@ record GetDeviceDetailsAction {
 record GetDeviceDetailsOutput {
     /// Groups currently assigned to this device.
     groups: [DeviceGroup],
+    /// Profiles assigned to this device, in the order they apply.
+    profiles: [DeviceProfileSummary],
     /// ID of the device.
     device_id: DeviceId,
     /// Project ID of the device.
@@ -549,13 +554,21 @@ record SetDevicePropertyAction {
 #[json(tag = "result")]
 variant SetDevicePropertyOutput {
     /// The property was set successfully.
-    Set,
+    Set: SetDevicePropertySuccess,
     /// The property was not updated because its version did not match the
     /// expected version (compare-and-swap conflict).
     VersionConflict: SetDevicePropertyVersionConflict,
     /// The property was not updated because it has been deleted while an
     /// expected version was specified.
     Deleted,
+}
+
+/// Details of a successful property update.
+record SetDevicePropertySuccess {
+    /// The new version of the property.
+    ///
+    /// Absent in responses of Nexigon Hub 2026.3 and earlier.
+    version?: u64,
 }
 
 /// Details of a version conflict when setting a device property.
@@ -591,7 +604,9 @@ variant GetDevicePropertyOutput {
     Found: DeviceProperty,
 }
 
-/// Remove a property from a device.
+/// Remove a property value set on a device.
+///
+/// Values that the device's profiles set for the property remain.
 #[request(name = "devices_RemoveProperty", response = RemoveDevicePropertyOutput)]
 record RemoveDevicePropertyAction {
     /// ID of the device.
@@ -612,7 +627,7 @@ record RemoveDevicePropertyAction {
 /// Output of removing a property from a device.
 #[json(tag = "result")]
 variant RemoveDevicePropertyOutput {
-    /// The property was not found.
+    /// The device has no value of its own for the property.
     NotFound,
     /// The property was removed.
     Removed,
@@ -634,7 +649,57 @@ record QueryDevicePropertiesOutput {
     properties: [string: DeviceProperty],
 }
 
+/// Query where the property values of a device come from.
+#[unstable(feature = "device_profiles")]
+#[request(
+    name = "devices_QueryPropertySources",
+    response = QueryDevicePropertySourcesOutput
+)]
+record QueryDevicePropertySourcesAction {
+    /// ID of the device.
+    device_id: DeviceId,
+}
+
+/// Output of querying where the property values of a device come from.
+record QueryDevicePropertySourcesOutput {
+    /// Sources of every property that a profile or the device itself sets.
+    properties: [string: DevicePropertySources],
+}
+
+/// Values that make up a device property.
+///
+/// The property's value results from applying the profile values in order,
+/// followed by the device value, each as a JSON merge patch (RFC 7396).
+record DevicePropertySources {
+    /// Version of the property, for compare-and-swap writes of the device value.
+    version: u64,
+    /// Values set by the device's profiles, in the order they apply.
+    profiles: [DevicePropertyProfileValue],
+    /// Value set on the device itself.
+    device?: DevicePropertyDeviceValue,
+}
+
+/// Property value set by a profile of a device.
+record DevicePropertyProfileValue {
+    profile_id: DeviceProfileId,
+    /// Revision of the profile that sets the value.
+    revision: u32,
+    value: JsonValue,
+    protected: bool,
+}
+
+/// Property value set on a device itself.
+record DevicePropertyDeviceValue {
+    value: JsonValue,
+    protected: bool,
+}
+
 /// Device property.
+///
+/// The value results from applying the values of the device's profiles in
+/// order, followed by the device's own value, each as a JSON merge patch
+/// (RFC 7396). Without profiles setting the property, it is the device's own
+/// value.
 record DeviceProperty {
     /// Name of the property.
     name: string,
@@ -642,7 +707,11 @@ record DeviceProperty {
     value: JsonValue,
     /// Indicates whether the property is protected.
     protected: bool,
-    /// Incremental version number, incremented on each update.
+    /// Version number.
+    ///
+    /// Increases with every write to the device's own value, even with an
+    /// unchanged value, and with every change of the device's profiles that
+    /// affects the property.
     version: u64,
     /// Last time the property was updated.
     last_updated: Timestamp,
@@ -663,6 +732,10 @@ record QueryDeviceAuditLogOutput {
     page?: PageInfo,
     /// List of audit log events.
     events: [AuditLogEvent],
+    /// Names of the actors of the returned events.
+    ///
+    /// Absent in responses of Nexigon Hub 2026.3 and earlier.
+    references?: AuditLogReferences,
 }
 
 /// Query the on-demand commands supported by a device.
@@ -847,6 +920,43 @@ record UpdateDeviceGroupsAction {
 }
 
 // ============================================================================
+// Device Profiles
+// ============================================================================
+
+
+/// Replace the profiles of a device.
+///
+/// The device applies the profiles in the given order, so later profiles take
+/// precedence. Device credentials cannot change profiles.
+#[unstable(feature = "device_profiles")]
+#[request(name = "devices_SetProfiles", response = Empty)]
+record SetDeviceProfilesAction {
+    device_id: DeviceId,
+    /// Profiles of the device, in the order they apply. A profile may appear
+    /// only once.
+    profile_ids: [DeviceProfileId],
+}
+
+/// Atomically add and remove profiles on explicit devices in one project.
+///
+/// Added profiles apply after the device's other profiles, in the given order.
+/// Adding an assigned profile keeps its position, and removing an absent one is
+/// a no-op. A profile cannot appear in both lists. All devices and profiles must
+/// belong to the project; otherwise no assignments change. Device credentials
+/// cannot change profiles.
+#[unstable(feature = "device_profiles")]
+#[request(name = "devices_UpdateProfiles", response = Empty)]
+record UpdateDeviceProfilesAction {
+    project_id: ProjectId,
+    #[validate({ _.size >= 1 }, message = "Select at least one device.")]
+    device_ids: [DeviceId],
+    /// Profiles to add, in the order they apply after a device's other profiles.
+    add: [DeviceProfileId],
+    /// Profiles to remove.
+    remove: [DeviceProfileId],
+}
+
+// ============================================================================
 // Device Selection
 // ============================================================================
 
@@ -859,6 +969,9 @@ record DeviceFilter {
     status?: DeviceStatus,
     /// Group membership conditions.
     groups?: DeviceGroupSelector,
+    /// Only devices that apply this profile.
+    #[unstable(feature = "device_profiles")]
+    profile?: DeviceProfileId,
 }
 
 /// Group membership conditions, combined with AND.

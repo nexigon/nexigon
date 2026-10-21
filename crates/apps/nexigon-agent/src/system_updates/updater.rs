@@ -32,6 +32,9 @@ const OS_RELEASE_PATH: &str = "/etc/os-release";
 /// run the agent in-process, such as simulators.
 pub trait SystemUpdater: Send + Sync {
     /// Filename of the bundle for a system in a package version.
+    ///
+    /// The device installs the bundle of the running system unless the
+    /// configuration names another asset.
     fn bundle_filename(&self, system: &str) -> String;
 
     /// Determine the name and version of the running system.

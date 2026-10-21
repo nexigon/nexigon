@@ -1,6 +1,7 @@
 //! Actions and types related to organizations.
 
 import audit::AuditLogEvent
+import audit::AuditLogReferences
 import outputs::Empty
 import pagination::PageInfo
 import pagination::PageRequest
@@ -265,6 +266,10 @@ record QueryOrganizationAuditLogOutput {
     page?: PageInfo,
     /// List of audit log events.
     events: [AuditLogEvent],
+    /// Names of the actors of the returned events.
+    ///
+    /// Absent in responses of Nexigon Hub 2026.3 and earlier.
+    references?: AuditLogReferences,
 }
 
 /// Organization S3 defaults for repositories without their own configuration.

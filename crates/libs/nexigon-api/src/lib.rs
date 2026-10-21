@@ -98,6 +98,19 @@ macro_rules! with_actions {
             ("groups_Delete", DeleteDeviceGroup, devices::DeleteDeviceGroupAction, outputs::Empty),
             ("devices_UpdateGroups", UpdateDeviceGroups, devices::UpdateDeviceGroupsAction, outputs::Empty),
 
+            // # Device Profiles
+            ("profiles_Query", QueryDeviceProfiles, profiles::QueryDeviceProfilesAction, profiles::QueryDeviceProfilesOutput),
+            ("profiles_Get", GetDeviceProfile, profiles::GetDeviceProfileAction, profiles::GetDeviceProfileOutput),
+            ("profiles_Create", CreateDeviceProfile, profiles::CreateDeviceProfileAction, profiles::DeviceProfile),
+            ("profiles_Update", UpdateDeviceProfile, profiles::UpdateDeviceProfileAction, outputs::Empty),
+            ("profiles_Delete", DeleteDeviceProfile, profiles::DeleteDeviceProfileAction, outputs::Empty),
+            ("profiles_SaveRevision", SaveDeviceProfileRevision, profiles::SaveDeviceProfileRevisionAction, profiles::SaveDeviceProfileRevisionOutput),
+            ("profiles_QueryRevisions", QueryDeviceProfileRevisions, profiles::QueryDeviceProfileRevisionsAction, profiles::QueryDeviceProfileRevisionsOutput),
+            ("profiles_AssignDevices", AssignDeviceProfileDevices, profiles::AssignDeviceProfileDevicesAction, profiles::AssignDeviceProfileDevicesOutput),
+            ("profiles_UnassignDevices", UnassignDeviceProfileDevices, profiles::UnassignDeviceProfileDevicesAction, profiles::UnassignDeviceProfileDevicesOutput),
+            ("devices_SetProfiles", SetDeviceProfiles, devices::SetDeviceProfilesAction, outputs::Empty),
+            ("devices_UpdateProfiles", UpdateDeviceProfiles, devices::UpdateDeviceProfilesAction, outputs::Empty),
+
             // # Projects
             ("projects_Query", QueryProjects, projects::QueryProjectsAction, projects::QueryProjectsOutput),
             ("projects_GetDetails", GetProjectDetails, projects::GetProjectDetailsAction, projects::GetProjectDetailsOutput),
@@ -159,6 +172,7 @@ macro_rules! with_actions {
             ("devices_GetProperty", GetDeviceProperty, devices::GetDevicePropertyAction, devices::GetDevicePropertyOutput),
             ("devices_RemoveProperty", RemoveDeviceProperty, devices::RemoveDevicePropertyAction, devices::RemoveDevicePropertyOutput),
             ("devices_QueryProperties", QueryDeviceProperties, devices::QueryDevicePropertiesAction, devices::QueryDevicePropertiesOutput),
+            ("devices_QueryPropertySources", QueryDevicePropertySources, devices::QueryDevicePropertySourcesAction, devices::QueryDevicePropertySourcesOutput),
             // ## Audit Log
             ("devices_QueryAuditLog", QueryDeviceAuditLog, devices::QueryDeviceAuditLogAction, devices::QueryDeviceAuditLogOutput),
             // ## On-Demand Commands
@@ -219,6 +233,7 @@ macro_rules! with_actions {
             ("repositories_RemovePackageAsset", RemovePackageAsset, repositories::RemovePackageAssetAction, outputs::Empty),
             ("repositories_SetPackageAssetMetadata", SetPackageAssetMetadata, repositories::SetPackageAssetMetadataAction, outputs::Empty),
             ("repositories_QueryPackageVersions", QueryPackageVersions, repositories::QueryPackageVersionsAction, repositories::QueryPackageVersionsOutput),
+            ("repositories_QueryPackageTags", QueryPackageTags, repositories::QueryPackageTagsAction, repositories::QueryPackageTagsOutput),
             // ## Package Versions
             ("repositories_ResolveVersionByPath", ResolvePackageVersionByPath, repositories::ResolvePackageVersionByPathAction, repositories::ResolvePackageVersionByPathOutput),
             ("repositories_GetVersionDetails", GetPackageVersionDetails, repositories::GetPackageVersionDetailsAction, repositories::GetPackageVersionDetailsOutput),

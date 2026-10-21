@@ -94,6 +94,12 @@ record RugixSystemUpdatesConfig {
     /// The `path` in `dev.nexigon.ota.config` overrides it. Without either, the
     /// device does not update.
     path?: string,
+    /// Default filename of the bundle that the device installs from a version.
+    ///
+    /// The `asset` in `dev.nexigon.ota.config` overrides it. Defaults to
+    /// `<system>.rugixb`, where `<system>` is the `name` in the Rugix build
+    /// information or `IMAGE_ID` in `/etc/os-release`.
+    asset?: string,
     /// Seconds between update checks (defaults to 14400).
     check_interval_secs?: u64,
     /// Maximum random delay of scheduled update checks in seconds (defaults
@@ -130,6 +136,11 @@ record RaucSystemUpdatesConfig {
     /// The `path` in `dev.nexigon.ota.config` overrides it. Without either, the
     /// device does not update.
     path?: string,
+    /// Default filename of the bundle that the device installs from a version.
+    ///
+    /// The `asset` in `dev.nexigon.ota.config` overrides it. Defaults to
+    /// `<system>.raucb`, where `<system>` is `IMAGE_ID` in `/etc/os-release`.
+    asset?: string,
     /// Seconds between update checks (defaults to 14400).
     check_interval_secs?: u64,
     /// Maximum random delay of scheduled update checks in seconds (defaults

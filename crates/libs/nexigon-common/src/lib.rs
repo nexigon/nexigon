@@ -11,6 +11,7 @@ use anyhow::anyhow;
 use anyhow::bail;
 use clap::Subcommand;
 
+use nexigon_api::types::pagination::PageRequest;
 use nexigon_api::types::repositories::AddPackageAssetAction;
 use nexigon_api::types::repositories::AddPackageVersionAssetAction;
 use nexigon_api::types::repositories::AddTagItem;
@@ -29,7 +30,10 @@ use nexigon_api::types::repositories::GetRepositoryDetailsAction;
 use nexigon_api::types::repositories::GetRepositoryS3ConfigAction;
 use nexigon_api::types::repositories::IssueAssetDownloadUrlAction;
 use nexigon_api::types::repositories::IssueAssetUploadUrlAction;
+use nexigon_api::types::repositories::PackageTagFilter;
+use nexigon_api::types::repositories::PackageVersionFilter;
 use nexigon_api::types::repositories::PackageVersionRetention;
+use nexigon_api::types::repositories::QueryPackageTagsAction;
 use nexigon_api::types::repositories::QueryPackageVersionsAction;
 use nexigon_api::types::repositories::QueryRepositoryAssetsAction;
 use nexigon_api::types::repositories::QueryRepositoryPackagesAction;
@@ -360,8 +364,9 @@ pub enum RepositoriesCmd {
     },
     /// Create a new repository.
     Create {
-        /// Organization ID.
-        organization: OrganizationId,
+        /// Organization ID. Inferred by the Nexigon CLI with an organization token.
+        #[clap(long)]
+        organization: Option<OrganizationId>,
         /// Display name.
         display_name: String,
         /// Repository visibility.
@@ -521,6 +526,9 @@ pub enum PackagesCmd {
     /// Manage package versions.
     #[clap(subcommand)]
     Versions(PackageVersionsCmd),
+    /// Query package tags.
+    #[clap(subcommand)]
+    Tags(PackageTagsCmd),
 }
 
 /// Package assets subcommand.
@@ -560,10 +568,39 @@ pub enum PackageAssetsCmd {
 /// Package versions nested under packages.
 #[derive(Debug, Subcommand)]
 pub enum PackageVersionsCmd {
-    /// List package versions.
+    /// List a page of package versions, newest first.
     List {
         /// Package path or ID.
         package: String,
+        /// Only list versions whose name, ID, or one of whose tags contains this
+        /// text, ignoring case.
+        #[clap(long)]
+        search: Option<String>,
+        /// Maximum number of versions to return.
+        #[clap(long)]
+        limit: Option<u32>,
+        /// Cursor from a previous page's `nextCursor`.
+        #[clap(long)]
+        cursor: Option<String>,
+    },
+}
+
+/// Package tags nested under packages.
+#[derive(Debug, Subcommand)]
+pub enum PackageTagsCmd {
+    /// List a page of package tags and their versions, most recently assigned first.
+    List {
+        /// Package path or ID.
+        package: String,
+        /// Only list tags containing this text, ignoring case.
+        #[clap(long)]
+        search: Option<String>,
+        /// Maximum number of tags to return.
+        #[clap(long)]
+        limit: Option<u32>,
+        /// Cursor from a previous page's `nextCursor`.
+        #[clap(long)]
+        cursor: Option<String>,
     },
 }
 
@@ -774,8 +811,13 @@ pub async fn execute_repositories_cmd(
         } => {
             let output = executor
                 .execute(
-                    CreateRepositoryAction::new(organization.clone(), display_name.clone())
-                        .with_visibility(visibility.clone()),
+                    CreateRepositoryAction::new(
+                        organization.clone().ok_or_else(|| {
+                            anyhow!("--organization <org-id> is required to create a repository")
+                        })?,
+                        display_name.clone(),
+                    )
+                    .with_visibility(visibility.clone()),
                 )
                 .await
                 .context("creating repository")??;
@@ -1022,12 +1064,44 @@ pub async fn execute_repositories_cmd(
                 }
             },
             PackagesCmd::Versions(cmd) => match cmd {
-                PackageVersionsCmd::List { package } => {
+                PackageVersionsCmd::List {
+                    package,
+                    search,
+                    limit,
+                    cursor,
+                } => {
                     let package_id = resolve_package(executor, package).await?;
                     let output = executor
-                        .execute(QueryPackageVersionsAction::new(package_id))
+                        .execute(
+                            QueryPackageVersionsAction::new(package_id)
+                                .with_filter(search.clone().map(|search| {
+                                    PackageVersionFilter::new().with_search(Some(search.into()))
+                                }))
+                                .with_page(Some(page_request(*limit, cursor))),
+                        )
                         .await
                         .context("querying package versions")??;
+                    write_json(&output);
+                }
+            },
+            PackagesCmd::Tags(cmd) => match cmd {
+                PackageTagsCmd::List {
+                    package,
+                    search,
+                    limit,
+                    cursor,
+                } => {
+                    let package_id = resolve_package(executor, package).await?;
+                    let output = executor
+                        .execute(
+                            QueryPackageTagsAction::new(package_id)
+                                .with_filter(search.clone().map(|search| {
+                                    PackageTagFilter::new().with_search(Some(search.into()))
+                                }))
+                                .with_page(Some(page_request(*limit, cursor))),
+                        )
+                        .await
+                        .context("querying package tags")??;
                     write_json(&output);
                 }
             },
@@ -1329,6 +1403,13 @@ fn parse_repository_visibility(visibility: &str) -> Result<RepositoryVisibility,
 
 fn write_json<T: serde::Serialize>(output: &T) {
     serde_json::to_writer_pretty(std::io::stdout(), output).unwrap();
+}
+
+/// Request a page with an optional size, continuing from a previous page's cursor.
+fn page_request(limit: Option<u32>, cursor: &Option<String>) -> PageRequest {
+    PageRequest::new()
+        .with_limit(limit)
+        .with_cursor(cursor.clone().map(Into::into))
 }
 
 #[cfg(test)]

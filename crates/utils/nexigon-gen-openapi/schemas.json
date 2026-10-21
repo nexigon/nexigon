@@ -274,6 +274,23 @@
     ],
     "description": "Status associated with an audit log action."
   },
+  "nexigon_api.audit.AuditLogDeviceReference": {
+    "type": "object",
+    "description": "Device referenced by audit log entries.",
+    "properties": {
+      "deviceId": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceId"
+      },
+      "name": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "deviceId",
+      "name"
+    ],
+    "unevaluatedProperties": false
+  },
   "nexigon_api.audit.AuditLogEvent": {
     "type": "object",
     "description": "Event recorded in the audit log.\n\nAudit data is guaranteed to not contain any secret information.",
@@ -339,6 +356,73 @@
     ],
     "unevaluatedProperties": false
   },
+  "nexigon_api.audit.AuditLogOrganizationApiTokenReference": {
+    "type": "object",
+    "description": "Organization API token referenced by audit log entries.",
+    "properties": {
+      "tokenId": {
+        "$ref": "#/components/schemas/nexigon_api.organizations.OrganizationApiTokenId"
+      },
+      "name": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "tokenId",
+      "name"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.audit.AuditLogReferences": {
+    "type": "object",
+    "description": "Names of the actors of the returned audit log entries.\n\nClosed user accounts, deleted API tokens, and devices without a name are\nomitted.",
+    "properties": {
+      "users": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.audit.AuditLogUserReference"
+        }
+      },
+      "devices": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.audit.AuditLogDeviceReference"
+        }
+      },
+      "organizationApiTokens": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.audit.AuditLogOrganizationApiTokenReference"
+        }
+      }
+    },
+    "required": [
+      "users",
+      "devices",
+      "organizationApiTokens"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.audit.AuditLogUserReference": {
+    "type": "object",
+    "description": "User referenced by audit log entries.",
+    "properties": {
+      "userId": {
+        "$ref": "#/components/schemas/nexigon_api.users.UserId"
+      },
+      "displayName": {
+        "type": "string"
+      },
+      "email": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "userId",
+      "email"
+    ],
+    "unevaluatedProperties": false
+  },
   "nexigon_api.audit.QueryAuditLogActionsAction": {
     "type": "object",
     "description": "Query the actions recorded in the audit log.\n\nRequires administrator permissions.",
@@ -362,6 +446,9 @@
         "items": {
           "$ref": "#/components/schemas/nexigon_api.audit.AuditLogAction"
         }
+      },
+      "references": {
+        "$ref": "#/components/schemas/nexigon_api.audit.AuditLogReferences"
       }
     },
     "required": [
@@ -392,6 +479,9 @@
         "items": {
           "$ref": "#/components/schemas/nexigon_api.audit.AuditLogEvent"
         }
+      },
+      "references": {
+        "$ref": "#/components/schemas/nexigon_api.audit.AuditLogReferences"
       }
     },
     "required": [
@@ -1065,6 +1155,9 @@
       },
       "groups": {
         "$ref": "#/components/schemas/nexigon_api.devices.DeviceGroupSelector"
+      },
+      "profile": {
+        "$ref": "#/components/schemas/nexigon_api.profiles.DeviceProfileId"
       }
     },
     "required": [],
@@ -1728,7 +1821,7 @@
   },
   "nexigon_api.devices.DeviceProperty": {
     "type": "object",
-    "description": "Device property.",
+    "description": "Device property.\n\nThe value results from applying the values of the device's profiles in\norder, followed by the device's own value, each as a JSON merge patch\n(RFC 7396). Without profiles setting the property, it is the device's own\nvalue.",
     "properties": {
       "name": {
         "type": "string"
@@ -1758,6 +1851,80 @@
       "protected",
       "version",
       "lastUpdated"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.devices.DevicePropertyDeviceValue": {
+    "type": "object",
+    "description": "Property value set on a device itself.",
+    "properties": {
+      "value": {
+        "$ref": "#/components/schemas/nexigon_api.json.JsonValue"
+      },
+      "protected": {
+        "type": "boolean"
+      }
+    },
+    "required": [
+      "value",
+      "protected"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.devices.DevicePropertyProfileValue": {
+    "type": "object",
+    "description": "Property value set by a profile of a device.",
+    "properties": {
+      "profileId": {
+        "$ref": "#/components/schemas/nexigon_api.profiles.DeviceProfileId"
+      },
+      "revision": {
+        "type": "integer",
+        "format": "uint32",
+        "maximum": 4294967295,
+        "minimum": 0
+      },
+      "value": {
+        "$ref": "#/components/schemas/nexigon_api.json.JsonValue"
+      },
+      "protected": {
+        "type": "boolean"
+      }
+    },
+    "required": [
+      "profileId",
+      "revision",
+      "value",
+      "protected"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.devices.DevicePropertySources": {
+    "type": "object",
+    "description": "Values that make up a device property.\n\nThe property's value results from applying the profile values in order,\nfollowed by the device value, each as a JSON merge patch (RFC 7396).",
+    "properties": {
+      "version": {
+        "type": [
+          "integer",
+          "string"
+        ],
+        "format": "uint64",
+        "minimum": 0,
+        "pattern": "^[0-9]+$"
+      },
+      "profiles": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.devices.DevicePropertyProfileValue"
+        }
+      },
+      "device": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DevicePropertyDeviceValue"
+      }
+    },
+    "required": [
+      "version",
+      "profiles"
     ],
     "unevaluatedProperties": false
   },
@@ -1810,6 +1977,12 @@
           "$ref": "#/components/schemas/nexigon_api.devices.DeviceGroup"
         }
       },
+      "profiles": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.profiles.DeviceProfileSummary"
+        }
+      },
       "deviceId": {
         "$ref": "#/components/schemas/nexigon_api.devices.DeviceId"
       },
@@ -1840,6 +2013,7 @@
     },
     "required": [
       "groups",
+      "profiles",
       "deviceId",
       "projectId",
       "fingerprintId",
@@ -2107,6 +2281,9 @@
         "items": {
           "$ref": "#/components/schemas/nexigon_api.audit.AuditLogEvent"
         }
+      },
+      "references": {
+        "$ref": "#/components/schemas/nexigon_api.audit.AuditLogReferences"
       }
     },
     "required": [
@@ -2305,6 +2482,35 @@
     ],
     "unevaluatedProperties": false
   },
+  "nexigon_api.devices.QueryDevicePropertySourcesAction": {
+    "type": "object",
+    "description": "**Unstable (feature `device_profiles`).**\n\nQuery where the property values of a device come from.",
+    "properties": {
+      "deviceId": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceId"
+      }
+    },
+    "required": [
+      "deviceId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.devices.QueryDevicePropertySourcesOutput": {
+    "type": "object",
+    "description": "Output of querying where the property values of a device come from.",
+    "properties": {
+      "properties": {
+        "type": "object",
+        "additionalProperties": {
+          "$ref": "#/components/schemas/nexigon_api.devices.DevicePropertySources"
+        }
+      }
+    },
+    "required": [
+      "properties"
+    ],
+    "unevaluatedProperties": false
+  },
   "nexigon_api.devices.QueryDevicesAction": {
     "type": "object",
     "description": "Query the devices of the instance.",
@@ -2394,7 +2600,7 @@
   },
   "nexigon_api.devices.RemoveDevicePropertyAction": {
     "type": "object",
-    "description": "Remove a property from a device.",
+    "description": "Remove a property value set on a device.\n\nValues that the device's profiles set for the property remain.",
     "properties": {
       "deviceId": {
         "$ref": "#/components/schemas/nexigon_api.devices.DeviceId"
@@ -2485,6 +2691,26 @@
     ],
     "unevaluatedProperties": false
   },
+  "nexigon_api.devices.SetDeviceProfilesAction": {
+    "type": "object",
+    "description": "**Unstable (feature `device_profiles`).**\n\nReplace the profiles of a device.\n\nThe device applies the profiles in the given order, so later profiles take\nprecedence. Device credentials cannot change profiles.",
+    "properties": {
+      "deviceId": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceId"
+      },
+      "profileIds": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.profiles.DeviceProfileId"
+        }
+      }
+    },
+    "required": [
+      "deviceId",
+      "profileIds"
+    ],
+    "unevaluatedProperties": false
+  },
   "nexigon_api.devices.SetDevicePropertyAction": {
     "type": "object",
     "description": "Set a property of a device.",
@@ -2526,6 +2752,15 @@
         "properties": {
           "result": {
             "const": "Set"
+          },
+          "version": {
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "uint64",
+            "minimum": 0,
+            "pattern": "^[0-9]+$"
           }
         },
         "required": [
@@ -2565,6 +2800,23 @@
         ]
       }
     ]
+  },
+  "nexigon_api.devices.SetDevicePropertySuccess": {
+    "type": "object",
+    "description": "Details of a successful property update.",
+    "properties": {
+      "version": {
+        "type": [
+          "integer",
+          "string"
+        ],
+        "format": "uint64",
+        "minimum": 0,
+        "pattern": "^[0-9]+$"
+      }
+    },
+    "required": [],
+    "unevaluatedProperties": false
   },
   "nexigon_api.devices.SetDevicePropertyVersionConflict": {
     "type": "object",
@@ -2665,6 +2917,40 @@
         "type": "array",
         "items": {
           "$ref": "#/components/schemas/nexigon_api.devices.DeviceGroupId"
+        }
+      }
+    },
+    "required": [
+      "projectId",
+      "deviceIds",
+      "add",
+      "remove"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.devices.UpdateDeviceProfilesAction": {
+    "type": "object",
+    "description": "**Unstable (feature `device_profiles`).**\n\nAtomically add and remove profiles on explicit devices in one project.\n\nAdded profiles apply after the device's other profiles, in the given order.\nAdding an assigned profile keeps its position, and removing an absent one is\na no-op. A profile cannot appear in both lists. All devices and profiles must\nbelong to the project; otherwise no assignments change. Device credentials\ncannot change profiles.",
+    "properties": {
+      "projectId": {
+        "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+      },
+      "deviceIds": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.devices.DeviceId"
+        }
+      },
+      "add": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.profiles.DeviceProfileId"
+        }
+      },
+      "remove": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.profiles.DeviceProfileId"
         }
       }
     },
@@ -2867,6 +3153,7 @@
   "nexigon_api.errors.ActionErrorKind": {
     "enum": [
       "Invalid",
+      "NotFound",
       "Forbidden",
       "OperationAuthorizationRequired",
       "MfaEnrollmentRequired",
@@ -4991,6 +5278,9 @@
         "items": {
           "$ref": "#/components/schemas/nexigon_api.audit.AuditLogEvent"
         }
+      },
+      "references": {
+        "$ref": "#/components/schemas/nexigon_api.audit.AuditLogReferences"
       }
     },
     "required": [
@@ -5331,6 +5621,544 @@
       }
     },
     "required": [],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.profiles.AssignDeviceProfileDevicesAction": {
+    "type": "object",
+    "description": "**Unstable (feature `device_profiles`).**\n\nAssign a device profile to the devices of its project that match group\nconditions.\n\nApplies once to the devices that match now; devices that match later do not\nreceive the profile. The profile applies after a device's other profiles, and\ndevices that already have it keep its position. Devices that already have the\nmaximum number of profiles are skipped. Requires permission to change the\nprofiles of every matching device.",
+    "properties": {
+      "projectId": {
+        "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+      },
+      "profileId": {
+        "$ref": "#/components/schemas/nexigon_api.profiles.DeviceProfileId"
+      },
+      "groups": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceGroupSelector"
+      }
+    },
+    "required": [
+      "projectId",
+      "profileId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.profiles.AssignDeviceProfileDevicesOutput": {
+    "type": "object",
+    "description": "Output of assigning a device profile to matching devices.\n\nDevices deleted while the profile is assigned are not counted.",
+    "properties": {
+      "assigned": {
+        "type": "integer",
+        "format": "uint32",
+        "maximum": 4294967295,
+        "minimum": 0
+      },
+      "unchanged": {
+        "type": "integer",
+        "format": "uint32",
+        "maximum": 4294967295,
+        "minimum": 0
+      },
+      "skipped": {
+        "type": "integer",
+        "format": "uint32",
+        "maximum": 4294967295,
+        "minimum": 0
+      }
+    },
+    "required": [
+      "assigned",
+      "unchanged",
+      "skipped"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.profiles.CreateDeviceProfileAction": {
+    "type": "object",
+    "description": "**Unstable (feature `device_profiles`).**\n\nCreate a device profile with its first revision.",
+    "properties": {
+      "projectId": {
+        "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+      },
+      "displayName": {
+        "type": "string"
+      },
+      "description": {
+        "type": "string"
+      },
+      "properties": {
+        "type": "object",
+        "additionalProperties": {
+          "$ref": "#/components/schemas/nexigon_api.profiles.DeviceProfileProperty"
+        }
+      }
+    },
+    "required": [
+      "projectId",
+      "displayName",
+      "properties"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.profiles.DeleteDeviceProfileAction": {
+    "type": "object",
+    "description": "**Unstable (feature `device_profiles`).**\n\nDelete a device profile and remove it from every device.",
+    "properties": {
+      "projectId": {
+        "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+      },
+      "profileId": {
+        "$ref": "#/components/schemas/nexigon_api.profiles.DeviceProfileId"
+      }
+    },
+    "required": [
+      "projectId",
+      "profileId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.profiles.DeviceProfile": {
+    "type": "object",
+    "description": "Device profile with the property values of its latest revision.",
+    "properties": {
+      "profileId": {
+        "$ref": "#/components/schemas/nexigon_api.profiles.DeviceProfileId"
+      },
+      "projectId": {
+        "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+      },
+      "displayName": {
+        "type": "string"
+      },
+      "description": {
+        "type": "string"
+      },
+      "revision": {
+        "type": "integer",
+        "format": "uint32",
+        "maximum": 4294967295,
+        "minimum": 0
+      },
+      "properties": {
+        "type": "object",
+        "additionalProperties": {
+          "$ref": "#/components/schemas/nexigon_api.profiles.DeviceProfileProperty"
+        }
+      },
+      "deviceCount": {
+        "type": "integer",
+        "format": "uint32",
+        "maximum": 4294967295,
+        "minimum": 0
+      }
+    },
+    "required": [
+      "profileId",
+      "projectId",
+      "displayName",
+      "revision",
+      "properties",
+      "deviceCount"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.profiles.DeviceProfileId": {
+    "type": "string",
+    "description": "Stable identity of a device profile."
+  },
+  "nexigon_api.profiles.DeviceProfileProperty": {
+    "type": "object",
+    "description": "Property value set by a device profile.",
+    "properties": {
+      "value": {
+        "$ref": "#/components/schemas/nexigon_api.json.JsonValue"
+      },
+      "protected": {
+        "type": "boolean"
+      }
+    },
+    "required": [
+      "value",
+      "protected"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.profiles.DeviceProfileRevision": {
+    "type": "object",
+    "description": "Immutable revision of a device profile.",
+    "properties": {
+      "revision": {
+        "type": "integer",
+        "format": "uint32",
+        "maximum": 4294967295,
+        "minimum": 0
+      },
+      "createdAt": {
+        "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
+      },
+      "properties": {
+        "type": "object",
+        "additionalProperties": {
+          "$ref": "#/components/schemas/nexigon_api.profiles.DeviceProfileProperty"
+        }
+      }
+    },
+    "required": [
+      "revision",
+      "createdAt",
+      "properties"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.profiles.DeviceProfileRevisionConflict": {
+    "type": "object",
+    "description": "Details of a revision conflict when saving a device profile.",
+    "properties": {
+      "currentRevision": {
+        "type": "integer",
+        "format": "uint32",
+        "maximum": 4294967295,
+        "minimum": 0
+      }
+    },
+    "required": [
+      "currentRevision"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.profiles.DeviceProfileSummary": {
+    "type": "object",
+    "description": "Device profile without its property values.",
+    "properties": {
+      "profileId": {
+        "$ref": "#/components/schemas/nexigon_api.profiles.DeviceProfileId"
+      },
+      "projectId": {
+        "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+      },
+      "displayName": {
+        "type": "string"
+      },
+      "description": {
+        "type": "string"
+      },
+      "revision": {
+        "type": "integer",
+        "format": "uint32",
+        "maximum": 4294967295,
+        "minimum": 0
+      },
+      "deviceCount": {
+        "type": "integer",
+        "format": "uint32",
+        "maximum": 4294967295,
+        "minimum": 0
+      }
+    },
+    "required": [
+      "profileId",
+      "projectId",
+      "displayName",
+      "revision",
+      "deviceCount"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.profiles.GetDeviceProfileAction": {
+    "type": "object",
+    "description": "**Unstable (feature `device_profiles`).**\n\nGet a device profile with the property values of its latest revision.",
+    "properties": {
+      "projectId": {
+        "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+      },
+      "profileId": {
+        "$ref": "#/components/schemas/nexigon_api.profiles.DeviceProfileId"
+      }
+    },
+    "required": [
+      "projectId",
+      "profileId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.profiles.GetDeviceProfileOutput": {
+    "description": "Output of getting a device profile.",
+    "oneOf": [
+      {
+        "type": "object",
+        "properties": {
+          "result": {
+            "const": "NotFound"
+          }
+        },
+        "required": [
+          "result"
+        ]
+      },
+      {
+        "type": "object",
+        "properties": {
+          "result": {
+            "const": "Found"
+          },
+          "profileId": {
+            "$ref": "#/components/schemas/nexigon_api.profiles.DeviceProfileId"
+          },
+          "projectId": {
+            "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+          },
+          "displayName": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "revision": {
+            "type": "integer",
+            "format": "uint32",
+            "maximum": 4294967295,
+            "minimum": 0
+          },
+          "properties": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/nexigon_api.profiles.DeviceProfileProperty"
+            }
+          },
+          "deviceCount": {
+            "type": "integer",
+            "format": "uint32",
+            "maximum": 4294967295,
+            "minimum": 0
+          }
+        },
+        "required": [
+          "result",
+          "profileId",
+          "projectId",
+          "displayName",
+          "revision",
+          "properties",
+          "deviceCount"
+        ]
+      }
+    ]
+  },
+  "nexigon_api.profiles.QueryDeviceProfileRevisionsAction": {
+    "type": "object",
+    "description": "**Unstable (feature `device_profiles`).**\n\nList the revisions of a device profile, newest first.",
+    "properties": {
+      "projectId": {
+        "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+      },
+      "profileId": {
+        "$ref": "#/components/schemas/nexigon_api.profiles.DeviceProfileId"
+      },
+      "page": {
+        "$ref": "#/components/schemas/nexigon_api.pagination.PageRequest"
+      }
+    },
+    "required": [
+      "projectId",
+      "profileId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.profiles.QueryDeviceProfileRevisionsOutput": {
+    "type": "object",
+    "description": "Output of listing the revisions of a device profile.",
+    "properties": {
+      "revisions": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.profiles.DeviceProfileRevision"
+        }
+      },
+      "page": {
+        "$ref": "#/components/schemas/nexigon_api.pagination.PageInfo"
+      }
+    },
+    "required": [
+      "revisions",
+      "page"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.profiles.QueryDeviceProfilesAction": {
+    "type": "object",
+    "description": "**Unstable (feature `device_profiles`).**\n\nList the device profiles of a project.",
+    "properties": {
+      "projectId": {
+        "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+      }
+    },
+    "required": [
+      "projectId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.profiles.QueryDeviceProfilesOutput": {
+    "type": "object",
+    "description": "Output of listing the device profiles of a project.",
+    "properties": {
+      "profiles": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.profiles.DeviceProfileSummary"
+        }
+      }
+    },
+    "required": [
+      "profiles"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.profiles.SaveDeviceProfileRevisionAction": {
+    "type": "object",
+    "description": "**Unstable (feature `device_profiles`).**\n\nSave new property values of a device profile as its next revision.\n\nEvery device with the profile applies the new values right away.",
+    "properties": {
+      "projectId": {
+        "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+      },
+      "profileId": {
+        "$ref": "#/components/schemas/nexigon_api.profiles.DeviceProfileId"
+      },
+      "expectedRevision": {
+        "type": "integer",
+        "format": "uint32",
+        "maximum": 4294967295,
+        "minimum": 0
+      },
+      "properties": {
+        "type": "object",
+        "additionalProperties": {
+          "$ref": "#/components/schemas/nexigon_api.profiles.DeviceProfileProperty"
+        }
+      }
+    },
+    "required": [
+      "projectId",
+      "profileId",
+      "expectedRevision",
+      "properties"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.profiles.SaveDeviceProfileRevisionOutput": {
+    "description": "Output of saving a device profile revision.",
+    "oneOf": [
+      {
+        "type": "object",
+        "properties": {
+          "result": {
+            "const": "Saved"
+          },
+          "revision": {
+            "type": "integer",
+            "format": "uint32",
+            "maximum": 4294967295,
+            "minimum": 0
+          }
+        },
+        "required": [
+          "result",
+          "revision"
+        ]
+      },
+      {
+        "type": "object",
+        "properties": {
+          "result": {
+            "const": "RevisionConflict"
+          },
+          "currentRevision": {
+            "type": "integer",
+            "format": "uint32",
+            "maximum": 4294967295,
+            "minimum": 0
+          }
+        },
+        "required": [
+          "result",
+          "currentRevision"
+        ]
+      }
+    ]
+  },
+  "nexigon_api.profiles.SavedDeviceProfileRevision": {
+    "type": "object",
+    "description": "Details of a saved device profile revision.",
+    "properties": {
+      "revision": {
+        "type": "integer",
+        "format": "uint32",
+        "maximum": 4294967295,
+        "minimum": 0
+      }
+    },
+    "required": [
+      "revision"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.profiles.UnassignDeviceProfileDevicesAction": {
+    "type": "object",
+    "description": "**Unstable (feature `device_profiles`).**\n\nRemove a device profile from the devices of its project that match group\nconditions.\n\nRequires permission to change the profiles of every matching device that has\nthe profile.",
+    "properties": {
+      "projectId": {
+        "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+      },
+      "profileId": {
+        "$ref": "#/components/schemas/nexigon_api.profiles.DeviceProfileId"
+      },
+      "groups": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceGroupSelector"
+      }
+    },
+    "required": [
+      "projectId",
+      "profileId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.profiles.UnassignDeviceProfileDevicesOutput": {
+    "type": "object",
+    "description": "Output of removing a device profile from matching devices.",
+    "properties": {
+      "removed": {
+        "type": "integer",
+        "format": "uint32",
+        "maximum": 4294967295,
+        "minimum": 0
+      }
+    },
+    "required": [
+      "removed"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.profiles.UpdateDeviceProfileAction": {
+    "type": "object",
+    "description": "**Unstable (feature `device_profiles`).**\n\nReplace the display name and description of a device profile.\n\nDoes not create a revision and does not change any device property.",
+    "properties": {
+      "projectId": {
+        "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+      },
+      "profileId": {
+        "$ref": "#/components/schemas/nexigon_api.profiles.DeviceProfileId"
+      },
+      "displayName": {
+        "type": "string"
+      },
+      "description": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "projectId",
+      "profileId",
+      "displayName"
+    ],
     "unevaluatedProperties": false
   },
   "nexigon_api.projects.AddProjectRepositoryAction": {
@@ -5715,6 +6543,9 @@
         "items": {
           "$ref": "#/components/schemas/nexigon_api.audit.AuditLogEvent"
         }
+      },
+      "references": {
+        "$ref": "#/components/schemas/nexigon_api.audit.AuditLogReferences"
       }
     },
     "required": [
@@ -6504,7 +7335,8 @@
       "retry",
       "checkpoints",
       "spread",
-      "hold"
+      "hold",
+      "asset"
     ],
     "description": "**Unstable (feature `ota_updates`).**\n\nOptional feature of the OTA update contract."
   },
@@ -6513,6 +7345,9 @@
     "description": "**Unstable (feature `ota_updates`).**\n\nOTA update configuration (`dev.nexigon.ota.config`).\n\nDesired state of a device. Integrations apply the property to defaults\nbuilt into the image as a JSON merge patch (RFC 7396): objects merge\nrecursively, `null` removes a default, and any other value, including an\narray, replaces the default.",
     "properties": {
       "path": {
+        "type": "string"
+      },
+      "asset": {
         "type": "string"
       },
       "hold": {
@@ -6526,6 +7361,12 @@
       },
       "spread": {
         "$ref": "#/components/schemas/nexigon_api.properties.OtaUpdateSpread"
+      },
+      "rollout": {
+        "type": "integer",
+        "format": "uint32",
+        "maximum": 4294967295,
+        "minimum": 0
       }
     },
     "required": [],
@@ -6602,7 +7443,7 @@
   },
   "nexigon_api.properties.OtaUpdateStatus": {
     "type": "object",
-    "description": "**Unstable (feature `ota_updates`).**\n\nOTA update status (`dev.nexigon.ota.status`).\n\nActual state of a device, published by its update integration.",
+    "description": "**Unstable (feature `ota_updates`).**\n\nOTA update status (`dev.nexigon.ota.status`).\n\nActual state of a device, published by its update integration.\n\nThe integration writes the status with the version it read last\n(compare-and-swap), so that it does not overwrite concurrent changes. Other\nwriters may only clear `failure_count` and `next_attempt_at`, which requests\na new attempt.",
     "properties": {
       "capabilities": {
         "type": "array",
@@ -7972,6 +8813,17 @@
     "required": [],
     "unevaluatedProperties": false
   },
+  "nexigon_api.repositories.PackageTagFilter": {
+    "type": "object",
+    "description": "Conditions on package tags.",
+    "properties": {
+      "search": {
+        "type": "string"
+      }
+    },
+    "required": [],
+    "unevaluatedProperties": false
+  },
   "nexigon_api.repositories.PackageVersionAsset": {
     "type": "object",
     "description": "Package version asset.",
@@ -8015,6 +8867,17 @@
       "status",
       "metadata"
     ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.repositories.PackageVersionFilter": {
+    "type": "object",
+    "description": "Conditions on package versions.",
+    "properties": {
+      "search": {
+        "type": "string"
+      }
+    },
+    "required": [],
     "unevaluatedProperties": false
   },
   "nexigon_api.repositories.PackageVersionId": {
@@ -8094,6 +8957,9 @@
         "items": {
           "$ref": "#/components/schemas/nexigon_api.audit.AuditLogEvent"
         }
+      },
+      "references": {
+        "$ref": "#/components/schemas/nexigon_api.audit.AuditLogReferences"
       }
     },
     "required": [
@@ -8101,12 +8967,85 @@
     ],
     "unevaluatedProperties": false
   },
-  "nexigon_api.repositories.QueryPackageVersionsAction": {
+  "nexigon_api.repositories.QueryPackageTagsAction": {
     "type": "object",
-    "description": "Query the versions of a package.",
+    "description": "Query a page of the tags of a package, most recently assigned first.",
     "properties": {
       "packageId": {
         "$ref": "#/components/schemas/nexigon_api.repositories.PackageId"
+      },
+      "filter": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.PackageTagFilter"
+      },
+      "page": {
+        "$ref": "#/components/schemas/nexigon_api.pagination.PageRequest"
+      }
+    },
+    "required": [
+      "packageId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.repositories.QueryPackageTagsItem": {
+    "type": "object",
+    "description": "Tag of a package and the version it points to.",
+    "properties": {
+      "tag": {
+        "type": "string"
+      },
+      "locked": {
+        "type": "boolean"
+      },
+      "assignedAt": {
+        "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
+      },
+      "versionId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.PackageVersionId"
+      },
+      "versionName": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "tag",
+      "locked",
+      "assignedAt",
+      "versionId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.repositories.QueryPackageTagsOutput": {
+    "type": "object",
+    "description": "Output of querying the tags of a package.",
+    "properties": {
+      "tags": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.repositories.QueryPackageTagsItem"
+        }
+      },
+      "page": {
+        "$ref": "#/components/schemas/nexigon_api.pagination.PageInfo"
+      }
+    },
+    "required": [
+      "tags",
+      "page"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.repositories.QueryPackageVersionsAction": {
+    "type": "object",
+    "description": "Query a page of the versions of a package, newest first.",
+    "properties": {
+      "packageId": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.PackageId"
+      },
+      "filter": {
+        "$ref": "#/components/schemas/nexigon_api.repositories.PackageVersionFilter"
+      },
+      "page": {
+        "$ref": "#/components/schemas/nexigon_api.pagination.PageRequest"
       }
     },
     "required": [
@@ -8141,6 +9080,9 @@
       },
       "baseVersionId": {
         "$ref": "#/components/schemas/nexigon_api.repositories.PackageVersionId"
+      },
+      "baseVersionName": {
+        "type": "string"
       }
     },
     "required": [
@@ -8159,10 +9101,14 @@
         "items": {
           "$ref": "#/components/schemas/nexigon_api.repositories.QueryPackageVersionsItem"
         }
+      },
+      "page": {
+        "$ref": "#/components/schemas/nexigon_api.pagination.PageInfo"
       }
     },
     "required": [
-      "versions"
+      "versions",
+      "page"
     ],
     "unevaluatedProperties": false
   },

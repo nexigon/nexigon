@@ -1,6 +1,9 @@
+//! Nexigon CLI for authenticated, organization-scoped resource operations.
+
 use std::net::Ipv4Addr;
 use std::net::SocketAddr;
 use std::path::PathBuf;
+use std::pin::Pin;
 
 use anyhow::Context;
 use anyhow::anyhow;
@@ -14,6 +17,7 @@ use tracing::error;
 use tracing::info;
 
 use nexigon_api::types::actor::GetActorAction;
+use nexigon_api::types::organizations::QueryOrganizationProjectsAction;
 use nexigon_api::types::pagination::PageRequest;
 use nexigon_api::with_actions;
 use nexigon_client::ClientToken;
@@ -27,13 +31,15 @@ use nexigon_ids::ids::RepositoryId;
 use nexigon_multiplex::ConnectionRef;
 use nexigon_multiplex::OpenError;
 
+use crate::config::AuthenticationToken;
 use crate::config::Config;
 
 pub mod config;
+mod organization;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
-    let args = Args::parse();
+    let mut args = Args::parse();
     let _logging_guard = si_observability::Initializer::new("NEXIGON")
         .apply(&args.logging)
         .init();
@@ -83,35 +89,40 @@ async fn main() -> anyhow::Result<()> {
         String::from_utf8(config_contents).context("config is not valid UTF-8")?;
     let config = toml::from_str::<Config>(&config_contents).context("cannot parse config")?;
     nexigon_client::install_crypto_provider();
+    let organization_header = match (&args.cmd, &config.token) {
+        (Cmd::Auth(_) | Cmd::Actions(_), _) => None,
+        (_, AuthenticationToken::UserToken(_)) => args.organization.clone(),
+        (_, AuthenticationToken::OrganizationApiToken(_)) => None,
+    };
     let connection = nexigon_client::ClientBuilder::new(
-        config.hub_url.parse().unwrap(),
+        config.hub_url.parse().context("invalid Nexigon Hub URL")?,
         ClientToken::from(config.token.clone()),
     )
+    .with_organization(organization_header)
     .connect()
     .await
-    .unwrap();
+    .context("connecting to Nexigon Hub")?;
     let mut connection_ref = connection.make_ref();
     let join_handle = connection.spawn();
-    let mut executor = connect_executor(&mut connection_ref).await.unwrap();
-    match executor
+    let mut executor = connect_executor(&mut connection_ref)
+        .await
+        .context("opening action executor")?;
+    let actor = executor
         .execute(GetActorAction::new())
         .await
-        .unwrap()
-        .unwrap()
-        .actor
-    {
-        nexigon_api::types::actor::Actor::UserToken(actor) => {
-            info!(user_id = %actor.user_id);
-        }
-        nexigon_api::types::actor::Actor::OrganizationApiToken(actor) => {
-            info!(organization_id = %actor.organization_id, token_id = %actor.token_id);
-        }
-        _ => {
-            bail!("received unexpected actor type");
-        }
+        .context("querying authenticated identity")??;
+    organization::validate_actor(&actor.actor)?;
+    if let Cmd::Auth(AuthCmd::Status) = &args.cmd {
+        write_json(&actor);
+        return Ok(());
     }
-    match &args.cmd {
-        Cmd::Configure { .. } => {
+    if let Cmd::Actions(cmd) = &args.cmd {
+        execute_actions_cmd(cmd, &mut executor).await?;
+        return Ok(());
+    }
+    let organization = organization::select(&actor.actor, args.organization.as_ref())?;
+    match &mut args.cmd {
+        Cmd::Configure { .. } | Cmd::Auth(_) | Cmd::Actions(_) => {
             unreachable!()
         }
         Cmd::Forward { device, forward } => {
@@ -143,14 +154,20 @@ async fn main() -> anyhow::Result<()> {
                 println!("{}", serde_json::to_string(&output).unwrap())
             }
         },
-        Cmd::Actions(cmd) => execute_actions_cmd(cmd, &mut executor).await?,
         Cmd::Repositories(cmd) => {
+            if let nexigon_common::RepositoriesCmd::Create {
+                organization: target,
+                ..
+            } = cmd
+            {
+                *target = Some(organization.clone());
+            }
             execute_repositories_cmd(cmd, &mut executor).await?;
         }
         Cmd::Projects(cmd) => match cmd {
             ProjectsCmd::List => {
                 let output = executor
-                    .execute(projects::QueryProjectsAction::new())
+                    .execute(QueryOrganizationProjectsAction::new(organization.clone()))
                     .await
                     .context("querying projects")??;
                 write_json(&output);
@@ -162,7 +179,7 @@ async fn main() -> anyhow::Result<()> {
                     .context("getting project details")??;
                 write_json(&output);
             }
-            ProjectsCmd::Create { organization, name } => {
+            ProjectsCmd::Create { name } => {
                 let output = executor
                     .execute(projects::CreateProjectAction::new(
                         organization.clone(),
@@ -488,7 +505,8 @@ async fn main() -> anyhow::Result<()> {
 }
 
 // Keep the generated action dispatch out of the main future: its debug poll
-// frame otherwise consumes stack space for every CLI command.
+// frame otherwise consumes stack space for every CLI command. The dispatch only
+// selects a function, so that its frame does not grow with every action.
 async fn execute_actions_cmd(
     cmd: &ActionsCmd,
     executor: &mut nexigon_client::ClientExecutor,
@@ -496,15 +514,11 @@ async fn execute_actions_cmd(
     match cmd {
         ActionsCmd::Execute { name, input } => {
             use nexigon_api::types::*;
-            macro_rules! invoke_action {
+            macro_rules! select_action {
                 ($(($name:literal, $variant:ident, $input:path, $output:path),)*) => {
                     match name.as_str() {
                         $(
-                            $name => {
-                                let action = serde_json::from_str::<$input>(input).context("parsing action input")?;
-                                let output = executor.execute(action).await?;
-                                println!("{}", serde_json::to_string(&output).unwrap());
-                            },
+                            $name => execute_action::<$input> as ExecuteActionFn,
                         )*
                         _ => {
                             bail!("unknown action: {name}");
@@ -512,10 +526,29 @@ async fn execute_actions_cmd(
                     }
                 };
             }
-            with_actions!(invoke_action)
+            let execute = with_actions!(select_action);
+            execute(executor, input).await
         }
     }
-    Ok(())
+}
+
+/// Function that executes an action given as JSON.
+type ExecuteActionFn = for<'a> fn(
+    &'a mut nexigon_client::ClientExecutor,
+    &'a str,
+) -> Pin<Box<dyn Future<Output = anyhow::Result<()>> + 'a>>;
+
+/// Execute an action given as JSON and print its output as JSON.
+fn execute_action<'a, A: nexigon_api::Action>(
+    executor: &'a mut nexigon_client::ClientExecutor,
+    input: &'a str,
+) -> Pin<Box<dyn Future<Output = anyhow::Result<()>> + 'a>> {
+    Box::pin(async move {
+        let action = serde_json::from_str::<A>(input).context("parsing action input")?;
+        let output = executor.execute(action).await?;
+        println!("{}", serde_json::to_string(&output).unwrap());
+        Ok(())
+    })
 }
 
 /// CLI arguments.
@@ -528,6 +561,9 @@ pub struct Args {
     /// Configuration file.
     #[clap(long)]
     config: Option<PathBuf>,
+    /// Organization to operate in. Required with a user token for resource commands.
+    #[clap(long, global = true)]
+    organization: Option<OrganizationId>,
     //// Command.
     #[clap(subcommand)]
     cmd: Cmd,
@@ -542,6 +578,9 @@ enum Cmd {
         #[clap(long)]
         local: bool,
     },
+    /// Inspect authentication.
+    #[clap(subcommand)]
+    Auth(AuthCmd),
     /// Forward command.
     Forward {
         /// Device id.
@@ -564,6 +603,13 @@ enum Cmd {
     /// Manage devices.
     #[clap(subcommand)]
     Devices(DevicesCmd),
+}
+
+/// Authentication inspection.
+#[derive(Debug, Parser)]
+enum AuthCmd {
+    /// Verify the configured token and print its authenticated actor as JSON.
+    Status,
 }
 
 /// HTTP reverse proxy command.
@@ -609,8 +655,6 @@ pub enum ProjectsCmd {
     },
     /// Create a project.
     Create {
-        /// Organization ID.
-        organization: OrganizationId,
         /// Project name.
         name: String,
     },

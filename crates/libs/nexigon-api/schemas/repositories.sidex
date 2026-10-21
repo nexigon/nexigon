@@ -1,6 +1,7 @@
 //! Actions and types related to repositories.
 
 import audit::AuditLogEvent
+import audit::AuditLogReferences
 import datetime::Timestamp
 import digest::Digest
 import json::JsonValue
@@ -771,7 +772,7 @@ variant SetPackageNameOutput {
     Success,
 }
 
-/// Query the versions of a package.
+/// Query a page of the versions of a package, newest first.
 #[request(
     name = "repositories_QueryPackageVersions",
     response = QueryPackageVersionsOutput
@@ -779,12 +780,24 @@ variant SetPackageNameOutput {
 record QueryPackageVersionsAction {
     /// ID of the package.
     package_id: PackageId,
+    /// Only return versions matching this filter.
+    filter?: PackageVersionFilter,
+    /// Page to return. Without this field, the first page is returned.
+    page?: PageRequest,
+}
+
+/// Conditions on package versions.
+record PackageVersionFilter {
+    /// Case-insensitive substring of the version's name, ID, or one of its tags.
+    search?: string,
 }
 
 /// Output of querying the versions of a package.
 record QueryPackageVersionsOutput {
-    /// List of package versions.
+    /// Versions on this page.
     versions: [QueryPackageVersionsItem],
+    /// Continuation of the traversal.
+    page: PageInfo,
 }
 
 /// Package version query item.
@@ -803,6 +816,50 @@ record QueryPackageVersionsItem {
     tags: [PackageVersionTag],
     /// Version that a device must run before installing this version.
     base_version_id?: PackageVersionId,
+    /// Optional name of the base version.
+    base_version_name?: string,
+}
+
+/// Query a page of the tags of a package, most recently assigned first.
+#[request(
+    name = "repositories_QueryPackageTags",
+    response = QueryPackageTagsOutput
+)]
+record QueryPackageTagsAction {
+    /// ID of the package.
+    package_id: PackageId,
+    /// Only return tags matching this filter.
+    filter?: PackageTagFilter,
+    /// Page to return. Without this field, the first page is returned.
+    page?: PageRequest,
+}
+
+/// Conditions on package tags.
+record PackageTagFilter {
+    /// Case-insensitive substring of the tag.
+    search?: string,
+}
+
+/// Output of querying the tags of a package.
+record QueryPackageTagsOutput {
+    /// Tags on this page.
+    tags: [QueryPackageTagsItem],
+    /// Continuation of the traversal.
+    page: PageInfo,
+}
+
+/// Tag of a package and the version it points to.
+record QueryPackageTagsItem {
+    /// Tag.
+    tag: string,
+    /// Indicates whether the tag is locked.
+    locked: bool,
+    /// Time at which the tag was assigned to its version.
+    assigned_at: Timestamp,
+    /// ID of the version the tag points to.
+    version_id: PackageVersionId,
+    /// Optional name of the version the tag points to.
+    version_name?: string,
 }
 
 /// Package version tag.
@@ -830,11 +887,12 @@ record AddTagItem {
     tag: string,
     /// Indicates whether the tag should be locked.
     ///
-    /// Default to false.
+    /// Defaults to false.
     locked?: bool,
     /// Indicates whether the tag should be reassigned, if it already exists.
     ///
-    /// Defaults to true.
+    /// Defaults to false. Adding a tag that is assigned to another version fails
+    /// unless the tag is reassigned. Locked tags are never reassigned.
     reassign?: bool,
 }
 
@@ -1361,6 +1419,10 @@ record QueryAuditLogEventsOutput {
     page?: PageInfo,
     /// List of audit log events.
     events: [AuditLogEvent],
+    /// Names of the actors of the returned events.
+    ///
+    /// Absent in responses of Nexigon Hub 2026.3 and earlier.
+    references?: AuditLogReferences,
 }
 
 /// The scope supplying repository storage.

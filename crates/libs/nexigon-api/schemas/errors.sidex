@@ -6,6 +6,8 @@
 variant ActionErrorKind {
     /// Invalid action.
     Invalid,
+    /// Resource not found in the selected organization.
+    NotFound,
     /// Forbidden action.
     Forbidden,
     /// The action requires inline credential re-verification.
