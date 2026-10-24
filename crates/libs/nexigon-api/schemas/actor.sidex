@@ -69,9 +69,11 @@ record OrganizationApiTokenActor {
     token_id: OrganizationApiTokenId,
 }
 
-/// Get the actor.
-/// 
-/// This action is used to get the actor that is used to invoke the action.
+/// Get the actor invoking the action.
+///
+/// The actor identifies the authenticated caller, such as a user, an API token, or a
+/// device. Devices use this action to learn their own device ID.
+#[group(name = "device")]
 #[request(name = "actor_GetActor", response = GetActorOutput)]
 record GetActorAction {}
 

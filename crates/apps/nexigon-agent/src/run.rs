@@ -32,9 +32,7 @@ use nexigon_api::types::devices::DeviceOperationWorkStep;
 use nexigon_api::types::devices::ReportDeviceOperationStepAction;
 use nexigon_api::types::devices::SetDevicePropertyAction;
 use nexigon_api::types::properties::DeviceCommandDescriptor;
-use nexigon_client::ClientExecutor;
 use nexigon_client::WebsocketConnection;
-use nexigon_client::connect_executor;
 use nexigon_ids::ids::DeviceId;
 use nexigon_ids::ids::DeviceOperationWorkClaimId;
 use nexigon_multiplex::ConnectionEvent;
@@ -52,6 +50,8 @@ use tracing::warn;
 
 use crate::config::Config;
 use crate::config::OperationsConfig;
+use crate::device_api::DeviceExecutor;
+use crate::device_api::connect_device_executor;
 use crate::handlers;
 use crate::handlers::CommandRegistry;
 use crate::operation_ledger::OperationLedger;
@@ -315,7 +315,7 @@ pub async fn run_with_connection(
     // agent stops, so it runs outside the task group and its shutdown deadline.
     let mut system_updates_task = None;
     let agent_run = async {
-        let mut executor = connect_executor(&mut connection_ref)
+        let mut executor = connect_device_executor(&mut connection_ref)
             .await
             .context("cannot open executor channel")?;
         let device_id = match executor
@@ -344,7 +344,7 @@ pub async fn run_with_connection(
         if system_info_enabled {
             let sysinfo_config = config.clone();
             let sysinfo_device_id = device_id.clone();
-            let mut sysinfo_executor = connect_executor(&mut connection_ref)
+            let mut sysinfo_executor = connect_device_executor(&mut connection_ref)
                 .await
                 .context("cannot open sysinfo executor channel")?;
             let sysinfo_cancellation = cancellation.clone();
@@ -383,7 +383,7 @@ pub async fn run_with_connection(
         }
 
         if let Some(settings) = system_updates {
-            match connect_executor(&mut connection_ref).await {
+            match connect_device_executor(&mut connection_ref).await {
                 Ok(executor) => {
                     system_updates_task = Some(tokio::spawn(crate::system_updates::run(
                         settings,
@@ -433,7 +433,7 @@ pub async fn run_with_connection(
             let operations_command_registry = command_registry.clone();
             let operations_command_slots = command_slots;
             let operations_device_id = device_id.clone();
-            let mut operations_executor = connect_executor(&mut connection_ref)
+            let mut operations_executor = connect_device_executor(&mut connection_ref)
                 .await
                 .context("cannot open operations executor channel")?;
             let operation_cancellation = cancellation.clone();
@@ -513,7 +513,6 @@ pub async fn run_with_connection(
                                         let report = DeviceOperationStepReport {
                                             status: DeviceOperationStepReportStatus::Failed,
                                             output: None,
-                                            checkpoint: None,
                                             error: Some(
                                                 ("previous command execution was interrupted after dispatch; refusing unsafe automatic replay"
                                                     .to_owned()).into(),
@@ -592,7 +591,6 @@ pub async fn run_with_connection(
                                             let report = DeviceOperationStepReport {
                                                 status,
                                                 output: done.output,
-                                                checkpoint: None,
                                                 error: done.error,
                                             };
                                             if let Err(error) = operation_ledger
@@ -611,14 +609,6 @@ pub async fn run_with_connection(
                                                 continue;
                                             }
                                             report
-                                        }
-                                        DeviceOperationWorkStep::DeviceTask(_) => {
-                                            debug!(
-                                                device_operation_id = %device_operation_id,
-                                                step_index,
-                                                "device task work is not handled by the agent"
-                                            );
-                                            continue;
                                         }
                                     },
                                 };
@@ -1032,7 +1022,7 @@ trait OperationReporter {
     ) -> impl Future<Output = ReportAttempt>;
 }
 
-impl OperationReporter for ClientExecutor {
+impl OperationReporter for DeviceExecutor {
     async fn report(
         &mut self,
         device_id: DeviceId,

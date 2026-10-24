@@ -1,6 +1,6 @@
 {
   "nexigon_api.actor.Actor": {
-    "description": "Actor that may invoke actions in the system.",
+    "description": "**Group `admin`:** Part of the Admin API, which requires instance administrator permissions. Backward-incompatible changes are more frequent than for other actions.\n\n**Group `device`:** Part of the Device API, which Nexigon Agent and other software on devices use. Changes remain backward compatible for at least five years.\n\nActor that may invoke actions in the system.",
     "oneOf": [
       {
         "type": "object",
@@ -115,14 +115,14 @@
   },
   "nexigon_api.actor.AnonymousActor": {
     "type": "object",
-    "description": "Anonymous actor, typically used for unauthenticated actions.",
+    "description": "**Group `admin`:** Part of the Admin API, which requires instance administrator permissions. Backward-incompatible changes are more frequent than for other actions.\n\n**Group `device`:** Part of the Device API, which Nexigon Agent and other software on devices use. Changes remain backward compatible for at least five years.\n\nAnonymous actor, typically used for unauthenticated actions.",
     "properties": {},
     "required": [],
     "unevaluatedProperties": false
   },
   "nexigon_api.actor.ClusterNodeActor": {
     "type": "object",
-    "description": "Cluster node.",
+    "description": "**Group `admin`:** Part of the Admin API, which requires instance administrator permissions. Backward-incompatible changes are more frequent than for other actions.\n\n**Group `device`:** Part of the Device API, which Nexigon Agent and other software on devices use. Changes remain backward compatible for at least five years.\n\nCluster node.",
     "properties": {
       "nodeId": {
         "$ref": "#/components/schemas/nexigon_api.cluster.ClusterNodeId"
@@ -135,7 +135,7 @@
   },
   "nexigon_api.actor.DeviceActor": {
     "type": "object",
-    "description": "Device authenticated via a specific deployment token.",
+    "description": "**Group `admin`:** Part of the Admin API, which requires instance administrator permissions. Backward-incompatible changes are more frequent than for other actions.\n\n**Group `device`:** Part of the Device API, which Nexigon Agent and other software on devices use. Changes remain backward compatible for at least five years.\n\nDevice authenticated via a specific deployment token.",
     "properties": {
       "deviceId": {
         "$ref": "#/components/schemas/nexigon_api.devices.DeviceId"
@@ -152,14 +152,14 @@
   },
   "nexigon_api.actor.GetActorAction": {
     "type": "object",
-    "description": "Get the actor.\n\nThis action is used to get the actor that is used to invoke the action.",
+    "description": "**Group `device`:** Part of the Device API, which Nexigon Agent and other software on devices use. Changes remain backward compatible for at least five years.\n\nGet the actor invoking the action.\n\nThe actor identifies the authenticated caller, such as a user, an API token, or a\ndevice. Devices use this action to learn their own device ID.",
     "properties": {},
     "required": [],
     "unevaluatedProperties": false
   },
   "nexigon_api.actor.GetActorOutput": {
     "type": "object",
-    "description": "Output of getting the actor.",
+    "description": "**Group `device`:** Part of the Device API, which Nexigon Agent and other software on devices use. Changes remain backward compatible for at least five years.\n\nOutput of getting the actor.",
     "properties": {
       "actor": {
         "$ref": "#/components/schemas/nexigon_api.actor.Actor"
@@ -172,7 +172,7 @@
   },
   "nexigon_api.actor.OrganizationApiTokenActor": {
     "type": "object",
-    "description": "Organization API token actor.",
+    "description": "**Group `admin`:** Part of the Admin API, which requires instance administrator permissions. Backward-incompatible changes are more frequent than for other actions.\n\n**Group `device`:** Part of the Device API, which Nexigon Agent and other software on devices use. Changes remain backward compatible for at least five years.\n\nOrganization API token actor.",
     "properties": {
       "organizationId": {
         "$ref": "#/components/schemas/nexigon_api.organizations.OrganizationId"
@@ -189,14 +189,14 @@
   },
   "nexigon_api.actor.SystemActor": {
     "type": "object",
-    "description": "System actor, typically used for internal actions.",
+    "description": "**Group `admin`:** Part of the Admin API, which requires instance administrator permissions. Backward-incompatible changes are more frequent than for other actions.\n\n**Group `device`:** Part of the Device API, which Nexigon Agent and other software on devices use. Changes remain backward compatible for at least five years.\n\nSystem actor, typically used for internal actions.",
     "properties": {},
     "required": [],
     "unevaluatedProperties": false
   },
   "nexigon_api.actor.UserActor": {
     "type": "object",
-    "description": "User authenticated via a user session.",
+    "description": "**Group `admin`:** Part of the Admin API, which requires instance administrator permissions. Backward-incompatible changes are more frequent than for other actions.\n\n**Group `device`:** Part of the Device API, which Nexigon Agent and other software on devices use. Changes remain backward compatible for at least five years.\n\nUser authenticated via a user session.",
     "properties": {
       "userId": {
         "$ref": "#/components/schemas/nexigon_api.users.UserId"
@@ -209,7 +209,7 @@
   },
   "nexigon_api.actor.UserTokenActor": {
     "type": "object",
-    "description": "User authenticated via a specific token.",
+    "description": "**Group `admin`:** Part of the Admin API, which requires instance administrator permissions. Backward-incompatible changes are more frequent than for other actions.\n\n**Group `device`:** Part of the Device API, which Nexigon Agent and other software on devices use. Changes remain backward compatible for at least five years.\n\nUser authenticated via a specific token.",
     "properties": {
       "userId": {
         "$ref": "#/components/schemas/nexigon_api.users.UserId"
@@ -226,7 +226,7 @@
   },
   "nexigon_api.audit.AuditLogAction": {
     "type": "object",
-    "description": "Action recorded in the audit log.\n\nAudit data is guaranteed to not contain any secret information.",
+    "description": "**Group `admin`:** Part of the Admin API, which requires instance administrator permissions. Backward-incompatible changes are more frequent than for other actions.\n\nAction recorded in the audit log.\n\nAudit data is guaranteed to not contain any secret information.",
     "properties": {
       "actionId": {
         "$ref": "#/components/schemas/nexigon_api.audit.AuditLogActionId"
@@ -262,7 +262,7 @@
   },
   "nexigon_api.audit.AuditLogActionId": {
     "type": "string",
-    "description": "Unique ID of an audit log action."
+    "description": "**Group `admin`:** Part of the Admin API, which requires instance administrator permissions. Backward-incompatible changes are more frequent than for other actions.\n\nUnique ID of an audit log action."
   },
   "nexigon_api.audit.AuditLogActionStatus": {
     "enum": [
@@ -272,11 +272,11 @@
       "Failed",
       "Pending"
     ],
-    "description": "Status associated with an audit log action."
+    "description": "**Group `admin`:** Part of the Admin API, which requires instance administrator permissions. Backward-incompatible changes are more frequent than for other actions.\n\nStatus associated with an audit log action."
   },
   "nexigon_api.audit.AuditLogDeviceReference": {
     "type": "object",
-    "description": "Device referenced by audit log entries.",
+    "description": "**Group `admin`:** Part of the Admin API, which requires instance administrator permissions. Backward-incompatible changes are more frequent than for other actions.\n\nDevice referenced by audit log entries.",
     "properties": {
       "deviceId": {
         "$ref": "#/components/schemas/nexigon_api.devices.DeviceId"
@@ -293,7 +293,7 @@
   },
   "nexigon_api.audit.AuditLogEvent": {
     "type": "object",
-    "description": "Event recorded in the audit log.\n\nAudit data is guaranteed to not contain any secret information.",
+    "description": "**Group `admin`:** Part of the Admin API, which requires instance administrator permissions. Backward-incompatible changes are more frequent than for other actions.\n\nEvent recorded in the audit log.\n\nAudit data is guaranteed to not contain any secret information.",
     "properties": {
       "eventId": {
         "$ref": "#/components/schemas/nexigon_api.audit.AuditLogEventId"
@@ -328,7 +328,7 @@
   },
   "nexigon_api.audit.AuditLogEventAction": {
     "type": "object",
-    "description": "Action that caused an event.",
+    "description": "**Group `admin`:** Part of the Admin API, which requires instance administrator permissions. Backward-incompatible changes are more frequent than for other actions.\n\nAction that caused an event.",
     "properties": {
       "actionId": {
         "$ref": "#/components/schemas/nexigon_api.audit.AuditLogActionId"
@@ -341,11 +341,11 @@
   },
   "nexigon_api.audit.AuditLogEventId": {
     "type": "string",
-    "description": "Unique ID of an audit log event."
+    "description": "**Group `admin`:** Part of the Admin API, which requires instance administrator permissions. Backward-incompatible changes are more frequent than for other actions.\n\nUnique ID of an audit log event."
   },
   "nexigon_api.audit.AuditLogEventJob": {
     "type": "object",
-    "description": "Job that caused an event.",
+    "description": "**Group `admin`:** Part of the Admin API, which requires instance administrator permissions. Backward-incompatible changes are more frequent than for other actions.\n\nJob that caused an event.",
     "properties": {
       "jobId": {
         "$ref": "#/components/schemas/nexigon_api.jobs.JobId"
@@ -358,7 +358,7 @@
   },
   "nexigon_api.audit.AuditLogOrganizationApiTokenReference": {
     "type": "object",
-    "description": "Organization API token referenced by audit log entries.",
+    "description": "**Group `admin`:** Part of the Admin API, which requires instance administrator permissions. Backward-incompatible changes are more frequent than for other actions.\n\nOrganization API token referenced by audit log entries.",
     "properties": {
       "tokenId": {
         "$ref": "#/components/schemas/nexigon_api.organizations.OrganizationApiTokenId"
@@ -375,7 +375,7 @@
   },
   "nexigon_api.audit.AuditLogReferences": {
     "type": "object",
-    "description": "Names of the actors of the returned audit log entries.\n\nClosed user accounts, deleted API tokens, and devices without a name are\nomitted.",
+    "description": "**Group `admin`:** Part of the Admin API, which requires instance administrator permissions. Backward-incompatible changes are more frequent than for other actions.\n\nNames of the actors of the returned audit log entries.\n\nClosed user accounts, deleted API tokens, and devices without a name are\nomitted.",
     "properties": {
       "users": {
         "type": "array",
@@ -405,7 +405,7 @@
   },
   "nexigon_api.audit.AuditLogUserReference": {
     "type": "object",
-    "description": "User referenced by audit log entries.",
+    "description": "**Group `admin`:** Part of the Admin API, which requires instance administrator permissions. Backward-incompatible changes are more frequent than for other actions.\n\nUser referenced by audit log entries.",
     "properties": {
       "userId": {
         "$ref": "#/components/schemas/nexigon_api.users.UserId"
@@ -425,7 +425,7 @@
   },
   "nexigon_api.audit.QueryAuditLogActionsAction": {
     "type": "object",
-    "description": "Query the actions recorded in the audit log.\n\nRequires administrator permissions.",
+    "description": "**Group `admin`:** Part of the Admin API, which requires instance administrator permissions. Backward-incompatible changes are more frequent than for other actions.\n\nQuery the actions recorded in the audit log.\n\nRequires administrator permissions.",
     "properties": {
       "page": {
         "$ref": "#/components/schemas/nexigon_api.pagination.PageRequest"
@@ -436,7 +436,7 @@
   },
   "nexigon_api.audit.QueryAuditLogActionsOutput": {
     "type": "object",
-    "description": "Output of querying the actions recorded in the audit log.",
+    "description": "**Group `admin`:** Part of the Admin API, which requires instance administrator permissions. Backward-incompatible changes are more frequent than for other actions.\n\nOutput of querying the actions recorded in the audit log.",
     "properties": {
       "page": {
         "$ref": "#/components/schemas/nexigon_api.pagination.PageInfo"
@@ -458,7 +458,7 @@
   },
   "nexigon_api.audit.QueryAuditLogEventsAction": {
     "type": "object",
-    "description": "Query the events recorded in the audit log.\n\nRequires administrator permissions.",
+    "description": "**Group `admin`:** Part of the Admin API, which requires instance administrator permissions. Backward-incompatible changes are more frequent than for other actions.\n\nQuery the events recorded in the audit log.\n\nRequires administrator permissions.",
     "properties": {
       "page": {
         "$ref": "#/components/schemas/nexigon_api.pagination.PageRequest"
@@ -469,7 +469,7 @@
   },
   "nexigon_api.audit.QueryAuditLogEventsOutput": {
     "type": "object",
-    "description": "Output of querying the events recorded in the audit log.",
+    "description": "**Group `admin`:** Part of the Admin API, which requires instance administrator permissions. Backward-incompatible changes are more frequent than for other actions.\n\nOutput of querying the events recorded in the audit log.",
     "properties": {
       "page": {
         "$ref": "#/components/schemas/nexigon_api.pagination.PageInfo"
@@ -490,7 +490,7 @@
     "unevaluatedProperties": false
   },
   "nexigon_api.authorization.ActionAuthorization": {
-    "description": "Authorization material available to an action.\n\n`Context` is not an authorization decision. It asks the action to evaluate\nwhether its already-authenticated actor, permissions, and other contextual\nevidence are sufficient. Each action defines which variants it accepts.",
+    "description": "**Group `admin`:** Part of the Admin API, which requires instance administrator permissions. Backward-incompatible changes are more frequent than for other actions.\n\nAuthorization material available to an action.\n\n`Context` is not an authorization decision. It asks the action to evaluate\nwhether its already-authenticated actor, permissions, and other contextual\nevidence are sufficient. Each action defines which variants it accepts.",
     "oneOf": [
       {
         "type": "object",
@@ -525,7 +525,7 @@
   },
   "nexigon_api.authorization.ActionCredentials": {
     "type": "object",
-    "description": "Credentials that re-verify the user session for one action execution.",
+    "description": "**Group `admin`:** Part of the Admin API, which requires instance administrator permissions. Backward-incompatible changes are more frequent than for other actions.\n\nCredentials that re-verify the user session for one action execution.",
     "properties": {
       "password": {
         "type": "string"
@@ -541,7 +541,7 @@
   },
   "nexigon_api.cluster.ClusterNodeId": {
     "type": "string",
-    "description": "Unique ID of a cluster node."
+    "description": "**Group `admin`:** Part of the Admin API, which requires instance administrator permissions. Backward-incompatible changes are more frequent than for other actions.\n\n**Group `device`:** Part of the Device API, which Nexigon Agent and other software on devices use. Changes remain backward compatible for at least five years.\n\nUnique ID of a cluster node."
   },
   "nexigon_api.datetime.Date": {
     "type": "string",
@@ -568,7 +568,7 @@
   "nexigon_api.datetime.Timestamp": {
     "type": "string",
     "format": "date-time",
-    "description": "ISO 8601 formatted date and time string."
+    "description": "**Group `admin`:** Part of the Admin API, which requires instance administrator permissions. Backward-incompatible changes are more frequent than for other actions.\n\n**Group `device`:** Part of the Device API, which Nexigon Agent and other software on devices use. Changes remain backward compatible for at least five years.\n\nISO 8601 formatted date and time string."
   },
   "nexigon_api.devices.AddDeviceCertificateAction": {
     "type": "object",
@@ -622,7 +622,7 @@
   },
   "nexigon_api.devices.ClaimDeviceOperationWorkAction": {
     "type": "object",
-    "description": "Atomically claim device operation work for a device.",
+    "description": "**Group `device`:** Part of the Device API, which Nexigon Agent and other software on devices use. Changes remain backward compatible for at least five years.\n\nClaim device operation work for a device.\n\nLeases pending work items to the device atomically, so no other worker receives\nthem at the same time. Report the outcome of each item with\n`devices_ReportOperationStep`, passing the item's claim ID. Only the device itself\ncan claim its work.",
     "properties": {
       "deviceId": {
         "$ref": "#/components/schemas/nexigon_api.devices.DeviceId"
@@ -647,7 +647,7 @@
   },
   "nexigon_api.devices.ClaimDeviceOperationWorkOutput": {
     "type": "object",
-    "description": "Output of claiming operation work for a device.",
+    "description": "**Group `device`:** Part of the Device API, which Nexigon Agent and other software on devices use. Changes remain backward compatible for at least five years.\n\nOutput of claiming operation work for a device.",
     "properties": {
       "work": {
         "type": "array",
@@ -1092,7 +1092,7 @@
   },
   "nexigon_api.devices.DeviceEvent": {
     "type": "object",
-    "description": "Event emitted by a device.",
+    "description": "**Group `device`:** Part of the Device API, which Nexigon Agent and other software on devices use. Changes remain backward compatible for at least five years.\n\nEvent emitted by a device.",
     "properties": {
       "eventId": {
         "$ref": "#/components/schemas/nexigon_api.devices.DeviceEventId"
@@ -1130,7 +1130,7 @@
   },
   "nexigon_api.devices.DeviceEventId": {
     "type": "string",
-    "description": "ID of a device event (unique per device)."
+    "description": "**Group `device`:** Part of the Device API, which Nexigon Agent and other software on devices use. Changes remain backward compatible for at least five years.\n\nID of a device event (unique per device)."
   },
   "nexigon_api.devices.DeviceEventSeverity": {
     "enum": [
@@ -1141,7 +1141,7 @@
       "Error",
       "Critical"
     ],
-    "description": "Severity of a device event."
+    "description": "**Group `device`:** Part of the Device API, which Nexigon Agent and other software on devices use. Changes remain backward compatible for at least five years.\n\nSeverity of a device event."
   },
   "nexigon_api.devices.DeviceFilter": {
     "type": "object",
@@ -1165,7 +1165,7 @@
   },
   "nexigon_api.devices.DeviceFingerprint": {
     "type": "string",
-    "description": "Device fingerprint."
+    "description": "**Group `device`:** Part of the Device API, which Nexigon Agent and other software on devices use. Changes remain backward compatible for at least five years.\n\nDevice fingerprint."
   },
   "nexigon_api.devices.DeviceFingerprintId": {
     "type": "string",
@@ -1234,7 +1234,30 @@
   },
   "nexigon_api.devices.DeviceId": {
     "type": "string",
-    "description": "Unique ID of a device."
+    "description": "**Group `admin`:** Part of the Admin API, which requires instance administrator permissions. Backward-incompatible changes are more frequent than for other actions.\n\n**Group `device`:** Part of the Device API, which Nexigon Agent and other software on devices use. Changes remain backward compatible for at least five years.\n\nUnique ID of a device."
+  },
+  "nexigon_api.devices.DeviceOperationCommandWork": {
+    "type": "object",
+    "description": "**Group `device`:** Part of the Device API, which Nexigon Agent and other software on devices use. Changes remain backward compatible for at least five years.\n\nCommand that a device runs for a device operation.",
+    "properties": {
+      "command": {
+        "type": "string"
+      },
+      "input": {
+        "$ref": "#/components/schemas/nexigon_api.json.JsonValue"
+      },
+      "timeoutSecs": {
+        "type": "integer",
+        "format": "uint32",
+        "maximum": 4294967295,
+        "minimum": 0
+      }
+    },
+    "required": [
+      "command",
+      "input"
+    ],
+    "unevaluatedProperties": false
   },
   "nexigon_api.devices.DeviceOperationDetails": {
     "type": "object",
@@ -1265,10 +1288,10 @@
   },
   "nexigon_api.devices.DeviceOperationDeviceCommandStep": {
     "type": "object",
-    "description": "Device-polled command step.",
+    "description": "Step that asks the device to run a command.\n\nThe device must run Nexigon Agent with commands and operation polling\nenabled.",
     "properties": {
       "when": {
-        "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
+        "type": "string"
       },
       "command": {
         "type": "string"
@@ -1289,42 +1312,39 @@
     ],
     "unevaluatedProperties": false
   },
-  "nexigon_api.devices.DeviceOperationDeviceTaskStep": {
+  "nexigon_api.devices.DeviceOperationId": {
+    "type": "string",
+    "description": "**Group `device`:** Part of the Device API, which Nexigon Agent and other software on devices use. Changes remain backward compatible for at least five years.\n\nUnique ID of a device operation."
+  },
+  "nexigon_api.devices.DeviceOperationPatchDevicePropertyStep": {
     "type": "object",
-    "description": "Durable device task step.\n\nThe Hub exposes task polling, progress, checkpoint, and report semantics for custom\non-device clients. The bundled Nexigon agent requests command work only and has no\ntask executor, so without such a client this step remains running until its timeout.",
+    "description": "Step that applies a JSON merge patch (RFC 7396) to the device's own value of\na property.",
     "properties": {
       "when": {
-        "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
-      },
-      "task": {
         "type": "string"
       },
-      "input": {
+      "name": {
+        "type": "string"
+      },
+      "patch": {
         "$ref": "#/components/schemas/nexigon_api.json.JsonValue"
       },
-      "timeoutSecs": {
-        "type": "integer",
-        "format": "uint32",
-        "maximum": 4294967295,
-        "minimum": 0
+      "protected": {
+        "type": "boolean"
       }
     },
     "required": [
-      "task",
-      "input"
+      "name",
+      "patch"
     ],
     "unevaluatedProperties": false
   },
-  "nexigon_api.devices.DeviceOperationId": {
-    "type": "string",
-    "description": "Unique ID of a device operation."
-  },
   "nexigon_api.devices.DeviceOperationRemoveDevicePropertyStep": {
     "type": "object",
-    "description": "Server-side device property removal.",
+    "description": "Step that removes the device's own value of a property.\n\nThe values of the device's profiles still apply afterwards.",
     "properties": {
       "when": {
-        "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
+        "type": "string"
       },
       "name": {
         "type": "string"
@@ -1337,10 +1357,10 @@
   },
   "nexigon_api.devices.DeviceOperationSetDevicePropertyStep": {
     "type": "object",
-    "description": "Server-side device property set.",
+    "description": "Step that sets the device's own value of a property.\n\nThe device's own value applies to the values of its profiles as a JSON merge\npatch, so it overrides the members of their values that it sets.",
     "properties": {
       "when": {
-        "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
+        "type": "string"
       },
       "name": {
         "type": "string"
@@ -1370,7 +1390,7 @@
     "description": "Device operation lifecycle status."
   },
   "nexigon_api.devices.DeviceOperationStep": {
-    "description": "One step in a device operation.",
+    "description": "One step in a device operation.\n\nExpressions of steps can read the variables `properties` and `now` and the\nvariable `operation`, whose `writes` hold, by property name, the property\nversions that the operation's earlier steps created.",
     "oneOf": [
       {
         "type": "object",
@@ -1379,7 +1399,7 @@
             "const": "SetDeviceProperty"
           },
           "when": {
-            "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
+            "type": "string"
           },
           "name": {
             "type": "string"
@@ -1401,16 +1421,16 @@
         "type": "object",
         "properties": {
           "kind": {
-            "const": "UpdateDeviceProperty"
+            "const": "PatchDeviceProperty"
           },
           "when": {
-            "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
+            "type": "string"
           },
           "name": {
             "type": "string"
           },
-          "mutation": {
-            "$ref": "#/components/schemas/nexigon_api.json.JsonMutation"
+          "patch": {
+            "$ref": "#/components/schemas/nexigon_api.json.JsonValue"
           },
           "protected": {
             "type": "boolean"
@@ -1419,7 +1439,7 @@
         "required": [
           "kind",
           "name",
-          "mutation"
+          "patch"
         ]
       },
       {
@@ -1429,7 +1449,7 @@
             "const": "RemoveDeviceProperty"
           },
           "when": {
-            "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
+            "type": "string"
           },
           "name": {
             "type": "string"
@@ -1447,7 +1467,7 @@
             "const": "DeviceCommand"
           },
           "when": {
-            "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
+            "type": "string"
           },
           "command": {
             "type": "string"
@@ -1472,41 +1492,16 @@
         "type": "object",
         "properties": {
           "kind": {
-            "const": "DeviceTask"
-          },
-          "when": {
-            "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
-          },
-          "task": {
-            "type": "string"
-          },
-          "input": {
-            "$ref": "#/components/schemas/nexigon_api.json.JsonValue"
-          },
-          "timeoutSecs": {
-            "type": "integer",
-            "format": "uint32",
-            "maximum": 4294967295,
-            "minimum": 0
-          }
-        },
-        "required": [
-          "kind",
-          "task",
-          "input"
-        ]
-      },
-      {
-        "type": "object",
-        "properties": {
-          "kind": {
             "const": "WaitForDeviceProperty"
           },
           "when": {
-            "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
+            "type": "string"
           },
-          "predicate": {
-            "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
+          "expression": {
+            "type": "string"
+          },
+          "failureExpression": {
+            "type": "string"
           },
           "timeoutSecs": {
             "type": "integer",
@@ -1517,22 +1512,19 @@
         },
         "required": [
           "kind",
-          "predicate"
+          "expression"
         ]
       }
     ]
   },
   "nexigon_api.devices.DeviceOperationStepReport": {
     "type": "object",
-    "description": "Report from a device after executing a polled step.",
+    "description": "**Group `device`:** Part of the Device API, which Nexigon Agent and other software on devices use. Changes remain backward compatible for at least five years.\n\nReport from a device after executing a polled step.",
     "properties": {
       "status": {
         "$ref": "#/components/schemas/nexigon_api.devices.DeviceOperationStepReportStatus"
       },
       "output": {
-        "$ref": "#/components/schemas/nexigon_api.json.JsonValue"
-      },
-      "checkpoint": {
         "$ref": "#/components/schemas/nexigon_api.json.JsonValue"
       },
       "error": {
@@ -1546,11 +1538,10 @@
   },
   "nexigon_api.devices.DeviceOperationStepReportStatus": {
     "enum": [
-      "Running",
       "Succeeded",
       "Failed"
     ],
-    "description": "Device-reported step result status."
+    "description": "**Group `device`:** Part of the Device API, which Nexigon Agent and other software on devices use. Changes remain backward compatible for at least five years.\n\nDevice-reported step result status."
   },
   "nexigon_api.devices.DeviceOperationStepState": {
     "type": "object",
@@ -1576,9 +1567,6 @@
       },
       "completedAt": {
         "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
-      },
-      "checkpoint": {
-        "$ref": "#/components/schemas/nexigon_api.json.JsonValue"
       }
     },
     "required": [
@@ -1667,38 +1655,18 @@
     ],
     "unevaluatedProperties": false
   },
-  "nexigon_api.devices.DeviceOperationUpdateDevicePropertyStep": {
-    "type": "object",
-    "description": "Server-side device property update.",
-    "properties": {
-      "when": {
-        "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
-      },
-      "name": {
-        "type": "string"
-      },
-      "mutation": {
-        "$ref": "#/components/schemas/nexigon_api.json.JsonMutation"
-      },
-      "protected": {
-        "type": "boolean"
-      }
-    },
-    "required": [
-      "name",
-      "mutation"
-    ],
-    "unevaluatedProperties": false
-  },
   "nexigon_api.devices.DeviceOperationWaitForDevicePropertyStep": {
     "type": "object",
-    "description": "Server-observed property wait step.",
+    "description": "Step that waits until the device's properties satisfy an expression.\n\nAn expression that produces an error, for example because the device has\nnot reported a property yet, keeps the step waiting. The step shows the\nlatest error.",
     "properties": {
       "when": {
-        "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
+        "type": "string"
       },
-      "predicate": {
-        "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
+      "expression": {
+        "type": "string"
+      },
+      "failureExpression": {
+        "type": "string"
       },
       "timeoutSecs": {
         "type": "integer",
@@ -1708,17 +1676,17 @@
       }
     },
     "required": [
-      "predicate"
+      "expression"
     ],
     "unevaluatedProperties": false
   },
   "nexigon_api.devices.DeviceOperationWorkClaimId": {
     "type": "string",
-    "description": "Unique claim for one lease of a device operation work item."
+    "description": "**Group `device`:** Part of the Device API, which Nexigon Agent and other software on devices use. Changes remain backward compatible for at least five years.\n\nUnique claim for one lease of a device operation work item."
   },
   "nexigon_api.devices.DeviceOperationWorkItem": {
     "type": "object",
-    "description": "Work item returned to a device when it polls.",
+    "description": "**Group `device`:** Part of the Device API, which Nexigon Agent and other software on devices use. Changes remain backward compatible for at least five years.\n\nWork item returned to a device when it polls.",
     "properties": {
       "deviceOperationId": {
         "$ref": "#/components/schemas/nexigon_api.devices.DeviceOperationId"
@@ -1735,9 +1703,6 @@
         "maximum": 4294967295,
         "minimum": 0
       },
-      "checkpoint": {
-        "$ref": "#/components/schemas/nexigon_api.json.JsonValue"
-      },
       "step": {
         "$ref": "#/components/schemas/nexigon_api.devices.DeviceOperationWorkStep"
       }
@@ -1753,22 +1718,18 @@
   },
   "nexigon_api.devices.DeviceOperationWorkKind": {
     "enum": [
-      "DeviceCommand",
-      "DeviceTask"
+      "DeviceCommand"
     ],
-    "description": "Kind of device operation work to return from a poll."
+    "description": "**Group `device`:** Part of the Device API, which Nexigon Agent and other software on devices use. Changes remain backward compatible for at least five years.\n\nKind of device operation work to return from a poll."
   },
   "nexigon_api.devices.DeviceOperationWorkStep": {
-    "description": "Device-executable operation step.",
+    "description": "**Group `device`:** Part of the Device API, which Nexigon Agent and other software on devices use. Changes remain backward compatible for at least five years.\n\nDevice-executable operation step.",
     "oneOf": [
       {
         "type": "object",
         "properties": {
           "kind": {
             "const": "DeviceCommand"
-          },
-          "when": {
-            "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
           },
           "command": {
             "type": "string"
@@ -1788,40 +1749,12 @@
           "command",
           "input"
         ]
-      },
-      {
-        "type": "object",
-        "properties": {
-          "kind": {
-            "const": "DeviceTask"
-          },
-          "when": {
-            "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
-          },
-          "task": {
-            "type": "string"
-          },
-          "input": {
-            "$ref": "#/components/schemas/nexigon_api.json.JsonValue"
-          },
-          "timeoutSecs": {
-            "type": "integer",
-            "format": "uint32",
-            "maximum": 4294967295,
-            "minimum": 0
-          }
-        },
-        "required": [
-          "kind",
-          "task",
-          "input"
-        ]
       }
     ]
   },
   "nexigon_api.devices.DeviceProperty": {
     "type": "object",
-    "description": "Device property.\n\nThe value results from applying the values of the device's profiles in\norder, followed by the device's own value, each as a JSON merge patch\n(RFC 7396). Without profiles setting the property, it is the device's own\nvalue.",
+    "description": "**Group `device`:** Part of the Device API, which Nexigon Agent and other software on devices use. Changes remain backward compatible for at least five years.\n\nDevice property.\n\nThe value results from applying the values of the device's profiles in\norder, followed by the device's own value, each as a JSON merge patch\n(RFC 7396). Without profiles setting the property, it is the device's own\nvalue.",
     "properties": {
       "name": {
         "type": "string"
@@ -1930,7 +1863,7 @@
   },
   "nexigon_api.devices.DeviceSelectionError": {
     "type": "object",
-    "description": "A device whose property predicates could not be evaluated.",
+    "description": "A device for which a selector's expression produced an error.",
     "properties": {
       "deviceId": {
         "$ref": "#/components/schemas/nexigon_api.devices.DeviceId"
@@ -1980,7 +1913,7 @@
       "profiles": {
         "type": "array",
         "items": {
-          "$ref": "#/components/schemas/nexigon_api.profiles.DeviceProfileSummary"
+          "$ref": "#/components/schemas/nexigon_api.profiles.AssignedDeviceProfile"
         }
       },
       "deviceId": {
@@ -2083,7 +2016,7 @@
   },
   "nexigon_api.devices.GetDevicePropertyAction": {
     "type": "object",
-    "description": "Get a property of a device.",
+    "description": "**Group `device`:** Part of the Device API, which Nexigon Agent and other software on devices use. Changes remain backward compatible for at least five years.\n\nGet a property of a device.\n\nThe value combines the values of the device's profiles with the device's own\nvalue.",
     "properties": {
       "deviceId": {
         "$ref": "#/components/schemas/nexigon_api.devices.DeviceId"
@@ -2099,7 +2032,7 @@
     "unevaluatedProperties": false
   },
   "nexigon_api.devices.GetDevicePropertyOutput": {
-    "description": "Output of getting a property of a device.",
+    "description": "**Group `device`:** Part of the Device API, which Nexigon Agent and other software on devices use. Changes remain backward compatible for at least five years.\n\nOutput of getting a property of a device.",
     "oneOf": [
       {
         "type": "object",
@@ -2200,7 +2133,7 @@
   },
   "nexigon_api.devices.IssueDeviceTokenAction": {
     "type": "object",
-    "description": "Issue a JWT for a device with user-defined claims.\n\n**Note: Only use this action for integration with external systems.**",
+    "description": "**Group `device`:** Part of the Device API, which Nexigon Agent and other software on devices use. Changes remain backward compatible for at least five years.\n\nIssue a token that proves a device's identity to an external system.\n\nThe token is a JWT signed by Nexigon Hub that carries the device ID and the given\nclaims. An external backend validates it with `devices_ValidateDeviceToken`.\n\n**Note: Only use this action for integration with external systems.** The token\ndoes not replace the credentials a device uses to connect to Nexigon Hub.",
     "properties": {
       "deviceId": {
         "$ref": "#/components/schemas/nexigon_api.devices.DeviceId"
@@ -2222,7 +2155,7 @@
   },
   "nexigon_api.devices.IssueDeviceTokenOutput": {
     "type": "object",
-    "description": "Output of issuing a JWT for a device.",
+    "description": "**Group `device`:** Part of the Device API, which Nexigon Agent and other software on devices use. Changes remain backward compatible for at least five years.\n\nOutput of issuing a JWT for a device.",
     "properties": {
       "jwt": {
         "$ref": "#/components/schemas/nexigon_api.jwt.Jwt"
@@ -2235,7 +2168,7 @@
   },
   "nexigon_api.devices.PublishDeviceEventsAction": {
     "type": "object",
-    "description": "Publish device events.",
+    "description": "**Group `device`:** Part of the Device API, which Nexigon Agent and other software on devices use. Changes remain backward compatible for at least five years.\n\nPublish events of a device.\n\nNexigon Hub stores events as a history of device behavior. Each event has an ID\nthat is unique per device. An event published again with the same ID is not\nstored again, so publishing can safely be retried.",
     "properties": {
       "deviceId": {
         "$ref": "#/components/schemas/nexigon_api.devices.DeviceId"
@@ -2513,14 +2446,14 @@
   },
   "nexigon_api.devices.QueryDevicesAction": {
     "type": "object",
-    "description": "Query the devices of the instance.",
+    "description": "**Group `admin`:** Part of the Admin API, which requires instance administrator permissions. Backward-incompatible changes are more frequent than for other actions.\n\nQuery the devices of the instance.",
     "properties": {},
     "required": [],
     "unevaluatedProperties": false
   },
   "nexigon_api.devices.QueryDevicesItem": {
     "type": "object",
-    "description": "Device item.",
+    "description": "**Group `admin`:** Part of the Admin API, which requires instance administrator permissions. Backward-incompatible changes are more frequent than for other actions.\n\nDevice item.",
     "properties": {
       "deviceId": {
         "$ref": "#/components/schemas/nexigon_api.devices.DeviceId"
@@ -2550,7 +2483,7 @@
   },
   "nexigon_api.devices.QueryDevicesOutput": {
     "type": "object",
-    "description": "Output of querying the devices of the instance.",
+    "description": "**Group `admin`:** Part of the Admin API, which requires instance administrator permissions. Backward-incompatible changes are more frequent than for other actions.\n\nOutput of querying the devices of the instance.",
     "properties": {
       "devices": {
         "type": "array",
@@ -2566,7 +2499,7 @@
   },
   "nexigon_api.devices.RegisterDeviceConnectionAction": {
     "type": "object",
-    "description": "Register a connection of a device to a cluster node.",
+    "description": "Register a connection of a device to a cluster node.\n\nNexigon Hub invokes this action internally. Clients do not need it.",
     "properties": {
       "deviceId": {
         "$ref": "#/components/schemas/nexigon_api.devices.DeviceId"
@@ -2628,7 +2561,7 @@
   },
   "nexigon_api.devices.ReportDeviceOperationStepAction": {
     "type": "object",
-    "description": "Report the result of a device operation step.\n\nRepeating a report after it was already applied is a successful no-op. A report whose\nclaim has been superseded is also ignored, so an expired worker cannot overwrite the\ncurrent attempt.",
+    "description": "**Group `device`:** Part of the Device API, which Nexigon Agent and other software on devices use. Changes remain backward compatible for at least five years.\n\nReport the result of a device operation step.\n\nRepeating a report after it was already applied is a successful no-op. A report whose\nclaim has been superseded is also ignored, so an expired worker cannot overwrite the\ncurrent attempt.",
     "properties": {
       "deviceId": {
         "$ref": "#/components/schemas/nexigon_api.devices.DeviceId"
@@ -2698,22 +2631,22 @@
       "deviceId": {
         "$ref": "#/components/schemas/nexigon_api.devices.DeviceId"
       },
-      "profileIds": {
+      "profiles": {
         "type": "array",
         "items": {
-          "$ref": "#/components/schemas/nexigon_api.profiles.DeviceProfileId"
+          "$ref": "#/components/schemas/nexigon_api.profiles.DeviceProfileAssignment"
         }
       }
     },
     "required": [
       "deviceId",
-      "profileIds"
+      "profiles"
     ],
     "unevaluatedProperties": false
   },
   "nexigon_api.devices.SetDevicePropertyAction": {
     "type": "object",
-    "description": "Set a property of a device.",
+    "description": "**Group `device`:** Part of the Device API, which Nexigon Agent and other software on devices use. Changes remain backward compatible for at least five years.\n\nSet a property of a device.\n\nA property is a named JSON value of a device. Setting a property replaces the\ndevice's own value and increments the property's version. With an expected version,\nthe property is only updated if its version still matches (compare-and-swap).\nDevices cannot change protected properties.",
     "properties": {
       "deviceId": {
         "$ref": "#/components/schemas/nexigon_api.devices.DeviceId"
@@ -2745,7 +2678,7 @@
     "unevaluatedProperties": false
   },
   "nexigon_api.devices.SetDevicePropertyOutput": {
-    "description": "Output of setting a device property.",
+    "description": "**Group `device`:** Part of the Device API, which Nexigon Agent and other software on devices use. Changes remain backward compatible for at least five years.\n\nOutput of setting a device property.",
     "oneOf": [
       {
         "type": "object",
@@ -2803,7 +2736,7 @@
   },
   "nexigon_api.devices.SetDevicePropertySuccess": {
     "type": "object",
-    "description": "Details of a successful property update.",
+    "description": "**Group `device`:** Part of the Device API, which Nexigon Agent and other software on devices use. Changes remain backward compatible for at least five years.\n\nDetails of a successful property update.",
     "properties": {
       "version": {
         "type": [
@@ -2820,7 +2753,7 @@
   },
   "nexigon_api.devices.SetDevicePropertyVersionConflict": {
     "type": "object",
-    "description": "Details of a version conflict when setting a device property.",
+    "description": "**Group `device`:** Part of the Device API, which Nexigon Agent and other software on devices use. Changes remain backward compatible for at least five years.\n\nDetails of a version conflict when setting a device property.",
     "properties": {
       "currentVersion": {
         "type": [
@@ -2852,7 +2785,7 @@
   },
   "nexigon_api.devices.UnregisterDeviceConnectionAction": {
     "type": "object",
-    "description": "Unregister a connection of a device to a cluster node.",
+    "description": "Unregister a connection of a device to a cluster node.\n\nNexigon Hub invokes this action internally. Clients do not need it.",
     "properties": {
       "connectionId": {
         "$ref": "#/components/schemas/nexigon_api.devices.DeviceConnectionId"
@@ -2930,7 +2863,7 @@
   },
   "nexigon_api.devices.UpdateDeviceProfilesAction": {
     "type": "object",
-    "description": "**Unstable (feature `device_profiles`).**\n\nAtomically add and remove profiles on explicit devices in one project.\n\nAdded profiles apply after the device's other profiles, in the given order.\nAdding an assigned profile keeps its position, and removing an absent one is\na no-op. A profile cannot appear in both lists. All devices and profiles must\nbelong to the project; otherwise no assignments change. Device credentials\ncannot change profiles.",
+    "description": "**Unstable (feature `device_profiles`).**\n\nAtomically add and remove profiles on explicit devices in one project.\n\nAdded profiles apply after the device's other profiles, in the given order.\nAdding an assigned profile keeps its position but sets its mode, and removing\nan absent one is a no-op. A profile cannot appear in both lists. All devices\nand profiles must belong to the project; otherwise no assignments change.\nDevice credentials cannot change profiles.",
     "properties": {
       "projectId": {
         "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
@@ -2944,7 +2877,7 @@
       "add": {
         "type": "array",
         "items": {
-          "$ref": "#/components/schemas/nexigon_api.profiles.DeviceProfileId"
+          "$ref": "#/components/schemas/nexigon_api.profiles.DeviceProfileAssignment"
         }
       },
       "remove": {
@@ -2964,7 +2897,7 @@
   },
   "nexigon_api.devices.ValidateDeviceHttpProxyTokenAction": {
     "type": "object",
-    "description": "Validate a HTTP proxy JWT.",
+    "description": "Validate an HTTP proxy JWT.\n\nNexigon Hub invokes this action internally. Clients do not need it.",
     "properties": {
       "jwt": {
         "$ref": "#/components/schemas/nexigon_api.jwt.Jwt"
@@ -3057,7 +2990,7 @@
   },
   "nexigon_api.devices.ValidateDeviceTokenAction": {
     "type": "object",
-    "description": "Validate a device JWT.\n\n**Note: Only use this action for integration with external systems.**",
+    "description": "Validate a token issued with `devices_IssueDeviceToken`.\n\nReturns the device ID and claims of a valid token. Tokens of deleted devices, of\ndevices in deleted projects, and of devices in deactivated organizations are\ninvalid.\n\n**Note: Only use this action for integration with external systems.**",
     "properties": {
       "jwt": {
         "$ref": "#/components/schemas/nexigon_api.jwt.Jwt"
@@ -3122,7 +3055,7 @@
   },
   "nexigon_api.digest.Digest": {
     "type": "string",
-    "description": "A hash digest."
+    "description": "**Group `device`:** Part of the Device API, which Nexigon Agent and other software on devices use. Changes remain backward compatible for at least five years.\n\nA hash digest."
   },
   "nexigon_api.errors.ActionError": {
     "type": "object",
@@ -3196,9 +3129,9 @@
       }
     ]
   },
-  "nexigon_api.fleet.AdvanceFleetOperationStageAction": {
+  "nexigon_api.fleet.CancelFleetOperationAction": {
     "type": "object",
-    "description": "Advance the fleet operation to the next stage.",
+    "description": "Cancel a fleet operation and its unfinished targets.",
     "properties": {
       "fleetOperationId": {
         "$ref": "#/components/schemas/nexigon_api.fleet.FleetOperationId"
@@ -3209,80 +3142,9 @@
     ],
     "unevaluatedProperties": false
   },
-  "nexigon_api.fleet.AdvanceFleetOperationStageOutput": {
-    "description": "Output of advancing a fleet operation stage.",
-    "oneOf": [
-      {
-        "type": "object",
-        "properties": {
-          "result": {
-            "const": "Advanced"
-          }
-        },
-        "required": [
-          "result"
-        ]
-      },
-      {
-        "type": "object",
-        "properties": {
-          "result": {
-            "const": "AlreadyFinalStage"
-          }
-        },
-        "required": [
-          "result"
-        ]
-      },
-      {
-        "type": "object",
-        "properties": {
-          "result": {
-            "const": "GuardBlocked"
-          },
-          "minSuccessPercent": {
-            "type": "integer",
-            "format": "uint32",
-            "maximum": 4294967295,
-            "minimum": 0
-          },
-          "successPercent": {
-            "type": "integer",
-            "format": "uint32",
-            "maximum": 4294967295,
-            "minimum": 0
-          },
-          "maxFailurePercent": {
-            "type": "integer",
-            "format": "uint32",
-            "maximum": 4294967295,
-            "minimum": 0
-          },
-          "failurePercent": {
-            "type": "integer",
-            "format": "uint32",
-            "maximum": 4294967295,
-            "minimum": 0
-          },
-          "gates": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/nexigon_api.fleet.FleetOperationStageGateStatus"
-            }
-          }
-        },
-        "required": [
-          "result",
-          "successPercent",
-          "failurePercent",
-          "gates"
-        ]
-      }
-    ]
-  },
-  "nexigon_api.fleet.CancelFleetOperationAction": {
+  "nexigon_api.fleet.CloseFleetOperationAction": {
     "type": "object",
-    "description": "Cancel a fleet operation.",
+    "description": "Stop a dynamic fleet operation from selecting further targets.\n\nThe operation finishes once all of its stages are released and all of its\ntargets have finished.",
     "properties": {
       "fleetOperationId": {
         "$ref": "#/components/schemas/nexigon_api.fleet.FleetOperationId"
@@ -3327,7 +3189,7 @@
   },
   "nexigon_api.fleet.CreateFleetOperationAction": {
     "type": "object",
-    "description": "Create a fleet operation.",
+    "description": "Create a fleet operation as a draft.",
     "properties": {
       "projectId": {
         "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
@@ -3338,14 +3200,14 @@
       "description": {
         "type": "string"
       },
-      "enrollmentIntervalSecs": {
+      "enrollment": {
+        "$ref": "#/components/schemas/nexigon_api.fleet.FleetOperationEnrollment"
+      },
+      "deadlineSecs": {
         "type": "integer",
         "format": "uint32",
         "maximum": 4294967295,
         "minimum": 0
-      },
-      "closeWhenConverged": {
-        "type": "boolean"
       },
       "selector": {
         "$ref": "#/components/schemas/nexigon_api.fleet.FleetOperationTargetSelector"
@@ -3353,7 +3215,7 @@
       "stages": {
         "type": "array",
         "items": {
-          "$ref": "#/components/schemas/nexigon_api.fleet.FleetOperationStage"
+          "$ref": "#/components/schemas/nexigon_api.rollouts.RolloutStage"
         }
       },
       "steps": {
@@ -3418,7 +3280,7 @@
   },
   "nexigon_api.fleet.FleetOperationDetails": {
     "type": "object",
-    "description": "Fleet operation details.",
+    "description": "Fleet operation with its definition and the progress of its stages.",
     "properties": {
       "summary": {
         "$ref": "#/components/schemas/nexigon_api.fleet.FleetOperationSummary"
@@ -3429,7 +3291,7 @@
       "stages": {
         "type": "array",
         "items": {
-          "$ref": "#/components/schemas/nexigon_api.fleet.FleetOperationStage"
+          "$ref": "#/components/schemas/nexigon_api.fleet.FleetOperationStageState"
         }
       },
       "steps": {
@@ -3447,46 +3309,20 @@
     ],
     "unevaluatedProperties": false
   },
-  "nexigon_api.fleet.FleetOperationDevicePropertyGate": {
-    "type": "object",
-    "description": "Gate over target device properties.",
-    "properties": {
-      "predicate": {
-        "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
-      },
-      "minMatchPercent": {
-        "type": "integer",
-        "format": "uint32",
-        "maximum": 4294967295,
-        "minimum": 0
-      }
-    },
-    "required": [
-      "predicate",
-      "minMatchPercent"
+  "nexigon_api.fleet.FleetOperationEnrollment": {
+    "enum": [
+      "Snapshot",
+      "Dynamic"
     ],
-    "unevaluatedProperties": false
+    "description": "How a fleet operation selects its targets."
   },
   "nexigon_api.fleet.FleetOperationId": {
     "type": "string",
     "description": "Unique ID of a fleet operation."
   },
-  "nexigon_api.fleet.FleetOperationNotBeforeGate": {
-    "type": "object",
-    "description": "Gate that passes once hub server time has reached a timestamp.",
-    "properties": {
-      "notBefore": {
-        "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
-      }
-    },
-    "required": [
-      "notBefore"
-    ],
-    "unevaluatedProperties": false
-  },
   "nexigon_api.fleet.FleetOperationProgress": {
     "type": "object",
-    "description": "Progress counts for selected targets.",
+    "description": "Numbers of targets by status. Targets of deleted devices are not counted.",
     "properties": {
       "total": {
         "type": "integer",
@@ -3544,7 +3380,7 @@
   },
   "nexigon_api.fleet.FleetOperationSelectionError": {
     "type": "object",
-    "description": "A device the target selector could not be evaluated against.\n\nThe device is not a target: the operation could not establish that it even applies to\nit. The error is recorded so that a broken selector is visible instead of silently\nnarrowing the fleet, and the operation retries the device on its next enrollment pass.",
+    "description": "A device for which the target selector's expression produced an error.\n\nThe device is not a target. A dynamic operation evaluates the selector for\nthe device again on its next selection of targets.",
     "properties": {
       "deviceId": {
         "$ref": "#/components/schemas/nexigon_api.devices.DeviceId"
@@ -3563,188 +3399,26 @@
     ],
     "unevaluatedProperties": false
   },
-  "nexigon_api.fleet.FleetOperationStage": {
+  "nexigon_api.fleet.FleetOperationStageState": {
     "type": "object",
-    "description": "One stage in a fleet operation.",
+    "description": "Definition and progress of a fleet operation stage.",
     "properties": {
-      "name": {
-        "type": "string"
+      "definition": {
+        "$ref": "#/components/schemas/nexigon_api.rollouts.RolloutStage"
       },
-      "percentage": {
-        "type": "integer",
-        "format": "uint32",
-        "maximum": 4294967295,
-        "minimum": 0
+      "releasedAt": {
+        "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
       },
-      "autoAdvance": {
-        "type": "boolean"
+      "targets": {
+        "$ref": "#/components/schemas/nexigon_api.fleet.FleetOperationProgress"
       },
       "guard": {
-        "$ref": "#/components/schemas/nexigon_api.fleet.FleetOperationStageGuard"
+        "$ref": "#/components/schemas/nexigon_api.rollouts.RolloutGuardStatus"
       }
     },
     "required": [
-      "name"
-    ],
-    "unevaluatedProperties": false
-  },
-  "nexigon_api.fleet.FleetOperationStageGate": {
-    "description": "Observed gate checked before a stage can advance.",
-    "oneOf": [
-      {
-        "type": "object",
-        "properties": {
-          "kind": {
-            "const": "DeviceProperty"
-          },
-          "predicate": {
-            "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
-          },
-          "minMatchPercent": {
-            "type": "integer",
-            "format": "uint32",
-            "maximum": 4294967295,
-            "minimum": 0
-          }
-        },
-        "required": [
-          "kind",
-          "predicate",
-          "minMatchPercent"
-        ]
-      },
-      {
-        "type": "object",
-        "properties": {
-          "kind": {
-            "const": "NotBefore"
-          },
-          "notBefore": {
-            "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
-          }
-        },
-        "required": [
-          "kind",
-          "notBefore"
-        ]
-      }
-    ]
-  },
-  "nexigon_api.fleet.FleetOperationStageGateStatus": {
-    "type": "object",
-    "description": "Observed gate result.",
-    "properties": {
-      "gateIndex": {
-        "type": "integer",
-        "format": "uint32",
-        "maximum": 4294967295,
-        "minimum": 0
-      },
-      "passed": {
-        "type": "boolean"
-      },
-      "summary": {
-        "type": "string"
-      },
-      "actualPercent": {
-        "type": "integer",
-        "format": "uint32",
-        "maximum": 4294967295,
-        "minimum": 0
-      },
-      "thresholdPercent": {
-        "type": "integer",
-        "format": "uint32",
-        "maximum": 4294967295,
-        "minimum": 0
-      },
-      "evaluationErrorCount": {
-        "type": "integer",
-        "format": "uint32",
-        "maximum": 4294967295,
-        "minimum": 0
-      },
-      "evaluationError": {
-        "type": "string"
-      }
-    },
-    "required": [
-      "gateIndex",
-      "passed",
-      "summary",
-      "actualPercent",
-      "thresholdPercent",
-      "evaluationErrorCount"
-    ],
-    "unevaluatedProperties": false
-  },
-  "nexigon_api.fleet.FleetOperationStageGuard": {
-    "type": "object",
-    "description": "Guard checked before a stage can be advanced.",
-    "properties": {
-      "minSuccessPercent": {
-        "type": "integer",
-        "format": "uint32",
-        "maximum": 4294967295,
-        "minimum": 0
-      },
-      "maxFailurePercent": {
-        "type": "integer",
-        "format": "uint32",
-        "maximum": 4294967295,
-        "minimum": 0
-      },
-      "gates": {
-        "type": "array",
-        "items": {
-          "$ref": "#/components/schemas/nexigon_api.fleet.FleetOperationStageGate"
-        }
-      }
-    },
-    "required": [
-      "gates"
-    ],
-    "unevaluatedProperties": false
-  },
-  "nexigon_api.fleet.FleetOperationStageGuardStatus": {
-    "type": "object",
-    "description": "Guard status when advancement is blocked.",
-    "properties": {
-      "minSuccessPercent": {
-        "type": "integer",
-        "format": "uint32",
-        "maximum": 4294967295,
-        "minimum": 0
-      },
-      "successPercent": {
-        "type": "integer",
-        "format": "uint32",
-        "maximum": 4294967295,
-        "minimum": 0
-      },
-      "maxFailurePercent": {
-        "type": "integer",
-        "format": "uint32",
-        "maximum": 4294967295,
-        "minimum": 0
-      },
-      "failurePercent": {
-        "type": "integer",
-        "format": "uint32",
-        "maximum": 4294967295,
-        "minimum": 0
-      },
-      "gates": {
-        "type": "array",
-        "items": {
-          "$ref": "#/components/schemas/nexigon_api.fleet.FleetOperationStageGateStatus"
-        }
-      }
-    },
-    "required": [
-      "successPercent",
-      "failurePercent",
-      "gates"
+      "definition",
+      "targets"
     ],
     "unevaluatedProperties": false
   },
@@ -3752,12 +3426,12 @@
     "enum": [
       "Draft",
       "Running",
-      "Paused",
+      "Halted",
       "Completed",
       "Failed",
       "Cancelled"
     ],
-    "description": "Fleet operation lifecycle status."
+    "description": "Lifecycle status of a fleet operation."
   },
   "nexigon_api.fleet.FleetOperationSummary": {
     "type": "object",
@@ -3778,25 +3452,10 @@
       "status": {
         "$ref": "#/components/schemas/nexigon_api.fleet.FleetOperationStatus"
       },
-      "enrollmentIntervalSecs": {
-        "type": "integer",
-        "format": "uint32",
-        "maximum": 4294967295,
-        "minimum": 0
+      "enrollment": {
+        "$ref": "#/components/schemas/nexigon_api.fleet.FleetOperationEnrollment"
       },
-      "lastEnrollmentAt": {
-        "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
-      },
-      "closeWhenConverged": {
-        "type": "boolean"
-      },
-      "activeStageIndex": {
-        "type": "integer",
-        "format": "uint32",
-        "maximum": 4294967295,
-        "minimum": 0
-      },
-      "stageCount": {
+      "deadlineSecs": {
         "type": "integer",
         "format": "uint32",
         "maximum": 4294967295,
@@ -3811,6 +3470,15 @@
       "startedAt": {
         "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
       },
+      "haltedAt": {
+        "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
+      },
+      "closedAt": {
+        "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
+      },
+      "lastEnrollmentAt": {
+        "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
+      },
       "completedAt": {
         "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
       }
@@ -3820,9 +3488,7 @@
       "projectId",
       "name",
       "status",
-      "closeWhenConverged",
-      "activeStageIndex",
-      "stageCount",
+      "enrollment",
       "progress",
       "createdAt"
     ],
@@ -3830,7 +3496,7 @@
   },
   "nexigon_api.fleet.FleetOperationTarget": {
     "type": "object",
-    "description": "A device a fleet operation applies to, and how its work is faring.\n\nA device becomes a target when the operation's selector matches it and it is given a\ndevice operation. That device operation is what actually executes; the fields below\nreport its progress.",
+    "description": "A device that a fleet operation applies to, and the progress of its device\noperation.",
     "properties": {
       "deviceId": {
         "$ref": "#/components/schemas/nexigon_api.devices.DeviceId"
@@ -3856,6 +3522,12 @@
       "lastError": {
         "type": "string"
       },
+      "releasedAt": {
+        "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
+      },
+      "deadlineAt": {
+        "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
+      },
       "updatedAt": {
         "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
       },
@@ -3879,7 +3551,7 @@
   },
   "nexigon_api.fleet.FleetOperationTargetSelector": {
     "type": "object",
-    "description": "Device selection within a single project. All supplied conditions must hold.",
+    "description": "Devices that a fleet operation applies to. All supplied conditions must hold.",
     "properties": {
       "deviceIds": {
         "type": "array",
@@ -3887,25 +3559,14 @@
           "$ref": "#/components/schemas/nexigon_api.devices.DeviceId"
         }
       },
-      "predicates": {
-        "type": "array",
-        "items": {
-          "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
-        }
-      },
       "groups": {
         "$ref": "#/components/schemas/nexigon_api.devices.DeviceGroupSelector"
       },
-      "search": {
+      "expression": {
         "type": "string"
-      },
-      "status": {
-        "$ref": "#/components/schemas/nexigon_api.devices.DeviceStatus"
       }
     },
-    "required": [
-      "predicates"
-    ],
+    "required": [],
     "unevaluatedProperties": false
   },
   "nexigon_api.fleet.FleetProperty": {
@@ -3962,7 +3623,7 @@
   },
   "nexigon_api.fleet.GetFleetOperationAction": {
     "type": "object",
-    "description": "Get fleet operation details.",
+    "description": "Get a fleet operation.",
     "properties": {
       "fleetOperationId": {
         "$ref": "#/components/schemas/nexigon_api.fleet.FleetOperationId"
@@ -3974,7 +3635,7 @@
     "unevaluatedProperties": false
   },
   "nexigon_api.fleet.GetFleetOperationOutput": {
-    "description": "Output of getting fleet operation details.",
+    "description": "Output of getting a fleet operation.",
     "oneOf": [
       {
         "type": "object",
@@ -4002,7 +3663,7 @@
           "stages": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/nexigon_api.fleet.FleetOperationStage"
+              "$ref": "#/components/schemas/nexigon_api.fleet.FleetOperationStageState"
             }
           },
           "steps": {
@@ -4095,9 +3756,9 @@
       }
     ]
   },
-  "nexigon_api.fleet.PauseFleetOperationAction": {
+  "nexigon_api.fleet.HaltFleetOperationAction": {
     "type": "object",
-    "description": "Pause a running fleet operation.\n\nPausing halts the rollout without undoing any of it. No new devices are enrolled, no\ndevice operation makes progress, and devices are handed no new work. Nothing is\ncancelled and no state is lost.\n\nA device that already took a work item and has carried it out can still report the\nresult, and the result is recorded: pausing stops new work being generated, it does not\ndiscard work that was genuinely done.\n\nResume with `fleet_StartOperation`, which picks the rollout up exactly where it left\noff. Time spent paused does not count towards step timeouts: the clock on any step that\nwas in flight restarts on resume, so a long pause cannot time work out.",
+    "description": "Halt a running fleet operation.\n\nThe operation selects no targets, releases no stages, and hands out no work\nuntil it is resumed. Devices can still report the results of work that they\nalready claimed. The clocks of spreads, soak times, timeouts, and deadlines\ndo not advance while the operation is halted. Halting a halted operation has\nno effect.",
     "properties": {
       "fleetOperationId": {
         "$ref": "#/components/schemas/nexigon_api.fleet.FleetOperationId"
@@ -4110,7 +3771,7 @@
   },
   "nexigon_api.fleet.PreviewFleetOperationTargetsAction": {
     "type": "object",
-    "description": "Preview the devices a target selector currently matches.\n\nEvaluates the selector against the current state of every device in the\nproject. A preview does not freeze membership; operations resolve their\ntargets when they enroll devices.",
+    "description": "Preview the devices that a target selector currently matches.\n\nA preview does not decide the targets of an operation. An operation selects\nits targets when it starts and, if it is dynamic, periodically afterwards.",
     "properties": {
       "projectId": {
         "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
@@ -4199,7 +3860,7 @@
   },
   "nexigon_api.fleet.QueryFleetOperationSelectionErrorsAction": {
     "type": "object",
-    "description": "Query the devices whose selector evaluation failed for a fleet operation.\n\nNormally empty. A non-empty result means the selector could not be evaluated against\nthose devices, so the operation cannot tell whether it applies to them.",
+    "description": "List the devices for which a fleet operation's target selector produced an\nerror.",
     "properties": {
       "fleetOperationId": {
         "$ref": "#/components/schemas/nexigon_api.fleet.FleetOperationId"
@@ -4212,7 +3873,7 @@
   },
   "nexigon_api.fleet.QueryFleetOperationSelectionErrorsOutput": {
     "type": "object",
-    "description": "Output of querying a fleet operation's selection errors.",
+    "description": "Output of listing a fleet operation's selection errors.",
     "properties": {
       "errors": {
         "type": "array",
@@ -4228,10 +3889,16 @@
   },
   "nexigon_api.fleet.QueryFleetOperationTargetsAction": {
     "type": "object",
-    "description": "Query the devices a fleet operation applies to, its *targets*.\n\nA target is a device the selector matched, reported together with the device operation\ncarrying out the work on it and the stage that gates it. Devices in stages the rollout\nhas not reached yet are included, and are `Pending`.\n\nThis is a separate query rather than part of the operation's details because the list\ngrows with the fleet, and most reads of an operation do not want it.",
+    "description": "List the targets of a fleet operation, by stage.",
     "properties": {
       "fleetOperationId": {
         "$ref": "#/components/schemas/nexigon_api.fleet.FleetOperationId"
+      },
+      "status": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceOperationStatus"
+      },
+      "page": {
+        "$ref": "#/components/schemas/nexigon_api.pagination.PageRequest"
       }
     },
     "required": [
@@ -4241,23 +3908,27 @@
   },
   "nexigon_api.fleet.QueryFleetOperationTargetsOutput": {
     "type": "object",
-    "description": "Output of querying the devices a fleet operation applies to.",
+    "description": "Output of listing the targets of a fleet operation.",
     "properties": {
       "targets": {
         "type": "array",
         "items": {
           "$ref": "#/components/schemas/nexigon_api.fleet.FleetOperationTarget"
         }
+      },
+      "page": {
+        "$ref": "#/components/schemas/nexigon_api.pagination.PageInfo"
       }
     },
     "required": [
-      "targets"
+      "targets",
+      "page"
     ],
     "unevaluatedProperties": false
   },
   "nexigon_api.fleet.QueryFleetOperationsAction": {
     "type": "object",
-    "description": "Query fleet operations for a project.",
+    "description": "List the fleet operations of a project, newest first.",
     "properties": {
       "projectId": {
         "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
@@ -4270,7 +3941,7 @@
   },
   "nexigon_api.fleet.QueryFleetOperationsOutput": {
     "type": "object",
-    "description": "Output of querying fleet operations.",
+    "description": "Output of listing fleet operations.",
     "properties": {
       "operations": {
         "type": "array",
@@ -4313,6 +3984,26 @@
     ],
     "unevaluatedProperties": false
   },
+  "nexigon_api.fleet.ReleaseFleetOperationStageAction": {
+    "type": "object",
+    "description": "Release the next stage of a running fleet operation, skipping its guard and\nthe wait for the previous stage's spread.",
+    "properties": {
+      "fleetOperationId": {
+        "$ref": "#/components/schemas/nexigon_api.fleet.FleetOperationId"
+      },
+      "stageIndex": {
+        "type": "integer",
+        "format": "uint32",
+        "maximum": 4294967295,
+        "minimum": 0
+      }
+    },
+    "required": [
+      "fleetOperationId",
+      "stageIndex"
+    ],
+    "unevaluatedProperties": false
+  },
   "nexigon_api.fleet.RemoveFleetPropertyAction": {
     "type": "object",
     "description": "Remove a fleet property.\n\nHandles both manual and computed properties. For computed properties, the\nassociated definition is removed as well.",
@@ -4341,6 +4032,19 @@
     ],
     "description": "Output of removing a fleet property."
   },
+  "nexigon_api.fleet.ResumeFleetOperationAction": {
+    "type": "object",
+    "description": "Resume a halted fleet operation where it stopped.\n\nResuming a running operation has no effect.",
+    "properties": {
+      "fleetOperationId": {
+        "$ref": "#/components/schemas/nexigon_api.fleet.FleetOperationId"
+      }
+    },
+    "required": [
+      "fleetOperationId"
+    ],
+    "unevaluatedProperties": false
+  },
   "nexigon_api.fleet.SetFleetPropertyAction": {
     "type": "object",
     "description": "Set a fleet property manually.",
@@ -4364,7 +4068,7 @@
   },
   "nexigon_api.fleet.StartFleetOperationAction": {
     "type": "object",
-    "description": "Start a draft fleet operation.",
+    "description": "Start a draft fleet operation.\n\nSelects the targets and releases the first stage.",
     "properties": {
       "fleetOperationId": {
         "$ref": "#/components/schemas/nexigon_api.fleet.FleetOperationId"
@@ -4377,14 +4081,14 @@
   },
   "nexigon_api.instance.GetInstanceSettingsRawAction": {
     "type": "object",
-    "description": "Get the settings of the instance.",
+    "description": "**Group `admin`:** Part of the Admin API, which requires instance administrator permissions. Backward-incompatible changes are more frequent than for other actions.\n\nGet the settings of the instance.",
     "properties": {},
     "required": [],
     "unevaluatedProperties": false
   },
   "nexigon_api.instance.GetInstanceSettingsRawOutput": {
     "type": "object",
-    "description": "Settings of the instance.",
+    "description": "**Group `admin`:** Part of the Admin API, which requires instance administrator permissions. Backward-incompatible changes are more frequent than for other actions.\n\nSettings of the instance.",
     "properties": {
       "settings": {
         "type": "object",
@@ -4400,14 +4104,14 @@
   },
   "nexigon_api.instance.GetInstanceStatisticsAction": {
     "type": "object",
-    "description": "Get instance statistics.",
+    "description": "**Group `admin`:** Part of the Admin API, which requires instance administrator permissions. Backward-incompatible changes are more frequent than for other actions.\n\nGet instance statistics.",
     "properties": {},
     "required": [],
     "unevaluatedProperties": false
   },
   "nexigon_api.instance.GetInstanceStatisticsOutput": {
     "type": "object",
-    "description": "Instance statistics.",
+    "description": "**Group `admin`:** Part of the Admin API, which requires instance administrator permissions. Backward-incompatible changes are more frequent than for other actions.\n\nInstance statistics.",
     "properties": {
       "users": {
         "type": "integer",
@@ -4437,7 +4141,7 @@
   },
   "nexigon_api.instance.SetInstanceSettingRawAction": {
     "type": "object",
-    "description": "Set a setting of the instance.",
+    "description": "**Group `admin`:** Part of the Admin API, which requires instance administrator permissions. Backward-incompatible changes are more frequent than for other actions.\n\nSet a setting of the instance.",
     "properties": {
       "key": {
         "type": "string"
@@ -4454,7 +4158,7 @@
   },
   "nexigon_api.jobs.Job": {
     "type": "object",
-    "description": "Job.",
+    "description": "**Group `admin`:** Part of the Admin API, which requires instance administrator permissions. Backward-incompatible changes are more frequent than for other actions.\n\nJob.",
     "properties": {
       "jobId": {
         "$ref": "#/components/schemas/nexigon_api.jobs.JobId"
@@ -4513,7 +4217,7 @@
   },
   "nexigon_api.jobs.JobId": {
     "type": "string",
-    "description": "Unique ID of a job."
+    "description": "**Group `admin`:** Part of the Admin API, which requires instance administrator permissions. Backward-incompatible changes are more frequent than for other actions.\n\nUnique ID of a job."
   },
   "nexigon_api.jobs.JobStatus": {
     "enum": [
@@ -4523,18 +4227,18 @@
       "Expired",
       "Cancelled"
     ],
-    "description": "Execution status of a job."
+    "description": "**Group `admin`:** Part of the Admin API, which requires instance administrator permissions. Backward-incompatible changes are more frequent than for other actions.\n\nExecution status of a job."
   },
   "nexigon_api.jobs.QueryJobsAction": {
     "type": "object",
-    "description": "Query the jobs of the instance.",
+    "description": "**Group `admin`:** Part of the Admin API, which requires instance administrator permissions. Backward-incompatible changes are more frequent than for other actions.\n\nQuery the jobs of the instance.",
     "properties": {},
     "required": [],
     "unevaluatedProperties": false
   },
   "nexigon_api.jobs.QueryJobsOutput": {
     "type": "object",
-    "description": "Output of querying the jobs of the instance.",
+    "description": "**Group `admin`:** Part of the Admin API, which requires instance administrator permissions. Backward-incompatible changes are more frequent than for other actions.\n\nOutput of querying the jobs of the instance.",
     "properties": {
       "jobs": {
         "type": "array",
@@ -4548,551 +4252,16 @@
     ],
     "unevaluatedProperties": false
   },
-  "nexigon_api.json.JsonBinaryExpr": {
-    "type": "object",
-    "description": "Binary expression payload.",
-    "properties": {
-      "left": {
-        "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
-      },
-      "right": {
-        "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
-      }
-    },
-    "required": [
-      "left",
-      "right"
-    ],
-    "unevaluatedProperties": false
-  },
-  "nexigon_api.json.JsonExistsExpr": {
-    "type": "object",
-    "description": "Path existence expression payload.",
-    "properties": {
-      "expr": {
-        "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
-      },
-      "path": {
-        "$ref": "#/components/schemas/nexigon_api.json.JsonPath"
-      }
-    },
-    "required": [
-      "expr",
-      "path"
-    ],
-    "unevaluatedProperties": false
-  },
-  "nexigon_api.json.JsonExpr": {
-    "description": "JSON expression evaluated against a context of named JSON values.\n\nEvery expression returns a `JsonValue`; boolean expressions are not a\nseparate language. A consumer that uses an expression as a condition\nrequires its result to be a JSON boolean.\n\n`NamedValue` reads are supplied by the consumer. In device and fleet\noperations, each name is an exact device-property name and its value is the\nproperty's JSON value. A missing name is distinct from a name whose value is\nJSON `null`.",
-    "oneOf": [
-      {
-        "type": "object",
-        "properties": {
-          "kind": {
-            "const": "Literal"
-          },
-          "value": {
-            "$ref": "#/components/schemas/nexigon_api.json.JsonValue"
-          }
-        },
-        "required": [
-          "kind",
-          "value"
-        ]
-      },
-      {
-        "type": "object",
-        "properties": {
-          "kind": {
-            "const": "Current"
-          }
-        },
-        "required": [
-          "kind"
-        ]
-      },
-      {
-        "type": "object",
-        "properties": {
-          "kind": {
-            "const": "NamedValue"
-          },
-          "name": {
-            "type": "string"
-          },
-          "default": {
-            "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
-          }
-        },
-        "required": [
-          "kind",
-          "name"
-        ]
-      },
-      {
-        "type": "object",
-        "properties": {
-          "kind": {
-            "const": "Get"
-          },
-          "expr": {
-            "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
-          },
-          "path": {
-            "$ref": "#/components/schemas/nexigon_api.json.JsonPath"
-          },
-          "default": {
-            "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
-          }
-        },
-        "required": [
-          "kind",
-          "expr",
-          "path"
-        ]
-      },
-      {
-        "type": "object",
-        "properties": {
-          "kind": {
-            "const": "Equals"
-          },
-          "left": {
-            "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
-          },
-          "right": {
-            "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
-          }
-        },
-        "required": [
-          "kind",
-          "left",
-          "right"
-        ]
-      },
-      {
-        "type": "object",
-        "properties": {
-          "kind": {
-            "const": "NotEquals"
-          },
-          "left": {
-            "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
-          },
-          "right": {
-            "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
-          }
-        },
-        "required": [
-          "kind",
-          "left",
-          "right"
-        ]
-      },
-      {
-        "type": "object",
-        "properties": {
-          "kind": {
-            "const": "LessThan"
-          },
-          "left": {
-            "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
-          },
-          "right": {
-            "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
-          }
-        },
-        "required": [
-          "kind",
-          "left",
-          "right"
-        ]
-      },
-      {
-        "type": "object",
-        "properties": {
-          "kind": {
-            "const": "LessThanOrEquals"
-          },
-          "left": {
-            "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
-          },
-          "right": {
-            "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
-          }
-        },
-        "required": [
-          "kind",
-          "left",
-          "right"
-        ]
-      },
-      {
-        "type": "object",
-        "properties": {
-          "kind": {
-            "const": "GreaterThan"
-          },
-          "left": {
-            "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
-          },
-          "right": {
-            "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
-          }
-        },
-        "required": [
-          "kind",
-          "left",
-          "right"
-        ]
-      },
-      {
-        "type": "object",
-        "properties": {
-          "kind": {
-            "const": "GreaterThanOrEquals"
-          },
-          "left": {
-            "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
-          },
-          "right": {
-            "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
-          }
-        },
-        "required": [
-          "kind",
-          "left",
-          "right"
-        ]
-      },
-      {
-        "type": "object",
-        "properties": {
-          "kind": {
-            "const": "In"
-          },
-          "left": {
-            "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
-          },
-          "right": {
-            "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
-          }
-        },
-        "required": [
-          "kind",
-          "left",
-          "right"
-        ]
-      },
-      {
-        "type": "object",
-        "properties": {
-          "kind": {
-            "const": "And"
-          },
-          "exprs": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
-            }
-          }
-        },
-        "required": [
-          "kind",
-          "exprs"
-        ]
-      },
-      {
-        "type": "object",
-        "properties": {
-          "kind": {
-            "const": "Or"
-          },
-          "exprs": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
-            }
-          }
-        },
-        "required": [
-          "kind",
-          "exprs"
-        ]
-      },
-      {
-        "type": "object",
-        "properties": {
-          "kind": {
-            "const": "Not"
-          },
-          "expr": {
-            "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
-          }
-        },
-        "required": [
-          "kind",
-          "expr"
-        ]
-      },
-      {
-        "type": "object",
-        "properties": {
-          "kind": {
-            "const": "Exists"
-          },
-          "expr": {
-            "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
-          },
-          "path": {
-            "$ref": "#/components/schemas/nexigon_api.json.JsonPath"
-          }
-        },
-        "required": [
-          "kind",
-          "expr",
-          "path"
-        ]
-      },
-      {
-        "type": "object",
-        "properties": {
-          "kind": {
-            "const": "VersionRequirement"
-          },
-          "expr": {
-            "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
-          },
-          "requirement": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "kind",
-          "expr",
-          "requirement"
-        ]
-      }
-    ]
-  },
-  "nexigon_api.json.JsonGetExpr": {
-    "type": "object",
-    "description": "Get a nested value inside another expression result.",
-    "properties": {
-      "expr": {
-        "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
-      },
-      "path": {
-        "$ref": "#/components/schemas/nexigon_api.json.JsonPath"
-      },
-      "default": {
-        "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
-      }
-    },
-    "required": [
-      "expr",
-      "path"
-    ],
-    "unevaluatedProperties": false
-  },
-  "nexigon_api.json.JsonMergePatchMutation": {
-    "type": "object",
-    "description": "RFC 7396 JSON Merge Patch mutation.",
-    "properties": {
-      "path": {
-        "$ref": "#/components/schemas/nexigon_api.json.JsonPath"
-      },
-      "expr": {
-        "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
-      }
-    },
-    "required": [
-      "path",
-      "expr"
-    ],
-    "unevaluatedProperties": false
-  },
-  "nexigon_api.json.JsonMutation": {
-    "description": "Declarative mutation to apply to a JSON value.\n\nExpressions inside a mutation may use `Current` to read the exact value to\nwhich the mutation is applied. Object parents missing from a `Set` or\n`MergePatch` path are created. Array indexes must already exist. Removing a\nmissing member or index is a successful no-op; removing an array element\nshifts later elements left.",
-    "oneOf": [
-      {
-        "type": "object",
-        "properties": {
-          "mutation": {
-            "const": "Set"
-          },
-          "path": {
-            "$ref": "#/components/schemas/nexigon_api.json.JsonPath"
-          },
-          "expr": {
-            "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
-          }
-        },
-        "required": [
-          "mutation",
-          "path",
-          "expr"
-        ]
-      },
-      {
-        "type": "object",
-        "properties": {
-          "mutation": {
-            "const": "MergePatch"
-          },
-          "path": {
-            "$ref": "#/components/schemas/nexigon_api.json.JsonPath"
-          },
-          "expr": {
-            "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
-          }
-        },
-        "required": [
-          "mutation",
-          "path",
-          "expr"
-        ]
-      },
-      {
-        "type": "object",
-        "properties": {
-          "mutation": {
-            "const": "Remove"
-          },
-          "path": {
-            "$ref": "#/components/schemas/nexigon_api.json.JsonPath"
-          }
-        },
-        "required": [
-          "mutation",
-          "path"
-        ]
-      }
-    ]
-  },
-  "nexigon_api.json.JsonNamedValueExpr": {
-    "type": "object",
-    "description": "Read a named JSON value from the evaluation context.",
-    "properties": {
-      "name": {
-        "type": "string"
-      },
-      "default": {
-        "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
-      }
-    },
-    "required": [
-      "name"
-    ],
-    "unevaluatedProperties": false
-  },
-  "nexigon_api.json.JsonPath": {
-    "type": "array",
-    "description": "Structured path into a JSON value.\n\nA JSON array of path segments. String segments address object members;\nunsigned integer segments address array elements. The empty path addresses\nthe expression or mutation root. Operation definitions accept at most 32\nsegments per path.",
-    "items": {
-      "$ref": "#/components/schemas/nexigon_api.json.JsonPathSegment"
-    }
-  },
-  "nexigon_api.json.JsonPathSegment": {
-    "description": "One segment in a structured JSON path.",
-    "anyOf": [
-      {
-        "type": "string"
-      },
-      {
-        "type": "integer",
-        "format": "uint32",
-        "maximum": 4294967295,
-        "minimum": 0
-      }
-    ]
-  },
-  "nexigon_api.json.JsonRemoveMutation": {
-    "type": "object",
-    "description": "Remove mutation.",
-    "properties": {
-      "path": {
-        "$ref": "#/components/schemas/nexigon_api.json.JsonPath"
-      }
-    },
-    "required": [
-      "path"
-    ],
-    "unevaluatedProperties": false
-  },
-  "nexigon_api.json.JsonSetMutation": {
-    "type": "object",
-    "description": "Set mutation.",
-    "properties": {
-      "path": {
-        "$ref": "#/components/schemas/nexigon_api.json.JsonPath"
-      },
-      "expr": {
-        "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
-      }
-    },
-    "required": [
-      "path",
-      "expr"
-    ],
-    "unevaluatedProperties": false
-  },
-  "nexigon_api.json.JsonUnaryExpr": {
-    "type": "object",
-    "description": "Unary expression payload.",
-    "properties": {
-      "expr": {
-        "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
-      }
-    },
-    "required": [
-      "expr"
-    ],
-    "unevaluatedProperties": false
-  },
   "nexigon_api.json.JsonValue": {
-    "description": "JSON value."
-  },
-  "nexigon_api.json.JsonVariadicExpr": {
-    "type": "object",
-    "description": "Variadic expression payload.",
-    "properties": {
-      "exprs": {
-        "type": "array",
-        "items": {
-          "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
-        }
-      }
-    },
-    "required": [
-      "exprs"
-    ],
-    "unevaluatedProperties": false
-  },
-  "nexigon_api.json.JsonVersionRequirementExpr": {
-    "type": "object",
-    "description": "Version requirement expression payload.",
-    "properties": {
-      "expr": {
-        "$ref": "#/components/schemas/nexigon_api.json.JsonExpr"
-      },
-      "requirement": {
-        "type": "string"
-      }
-    },
-    "required": [
-      "expr",
-      "requirement"
-    ],
-    "unevaluatedProperties": false
+    "description": "**Group `admin`:** Part of the Admin API, which requires instance administrator permissions. Backward-incompatible changes are more frequent than for other actions.\n\n**Group `device`:** Part of the Device API, which Nexigon Agent and other software on devices use. Changes remain backward compatible for at least five years.\n\nJSON value."
   },
   "nexigon_api.jwt.Jwt": {
     "type": "string",
-    "description": "JSON Web Token (JWT)."
+    "description": "**Group `device`:** Part of the Device API, which Nexigon Agent and other software on devices use. Changes remain backward compatible for at least five years.\n\nJSON Web Token (JWT)."
   },
   "nexigon_api.organizations.AddOrganizationMemberAction": {
     "type": "object",
-    "description": "Add a user to an organization.",
+    "description": "**Group `admin`:** Part of the Admin API, which requires instance administrator permissions. Backward-incompatible changes are more frequent than for other actions.\n\nAdd a user to an organization.",
     "properties": {
       "organizationId": {
         "$ref": "#/components/schemas/nexigon_api.organizations.OrganizationId"
@@ -5112,7 +4281,7 @@
   },
   "nexigon_api.organizations.CreateOrganizationAction": {
     "type": "object",
-    "description": "Create an organization.",
+    "description": "**Group `admin`:** Part of the Admin API, which requires instance administrator permissions. Backward-incompatible changes are more frequent than for other actions.\n\nCreate an organization.",
     "properties": {
       "name": {
         "type": "string"
@@ -5135,7 +4304,7 @@
   },
   "nexigon_api.organizations.CreateOrganizationOutput": {
     "type": "object",
-    "description": "Output of creating an organization.",
+    "description": "**Group `admin`:** Part of the Admin API, which requires instance administrator permissions. Backward-incompatible changes are more frequent than for other actions.\n\nOutput of creating an organization.",
     "properties": {
       "organizationId": {
         "$ref": "#/components/schemas/nexigon_api.organizations.OrganizationId"
@@ -5146,9 +4315,29 @@
     ],
     "unevaluatedProperties": false
   },
+  "nexigon_api.organizations.DeactivateOrganizationAction": {
+    "type": "object",
+    "description": "**Group `admin`:** Part of the Admin API, which requires instance administrator permissions. Backward-incompatible changes are more frequent than for other actions.\n\nDeactivate an organization.\n\nAdmin-only operation. Members and API tokens hold no permissions in a\ndeactivated organization, except that its administrators can manage its\nsubscription. Its devices cannot connect, and its repositories are neither\npublic nor available to devices of other organizations. Members,\ntokens, devices, data, and subscriptions are retained, and billing continues.\nReactivation restores access. Deactivating a deactivated organization\nreplaces its message, or selects the built-in message if `message` is absent.",
+    "properties": {
+      "authorization": {
+        "$ref": "#/components/schemas/nexigon_api.authorization.ActionAuthorization"
+      },
+      "organizationId": {
+        "$ref": "#/components/schemas/nexigon_api.organizations.OrganizationId"
+      },
+      "message": {
+        "$ref": "#/components/schemas/nexigon_api.users.DeactivationMessage"
+      }
+    },
+    "required": [
+      "authorization",
+      "organizationId"
+    ],
+    "unevaluatedProperties": false
+  },
   "nexigon_api.organizations.DeleteOrganizationAction": {
     "type": "object",
-    "description": "Delete an organization.",
+    "description": "**Group `admin`:** Part of the Admin API, which requires instance administrator permissions. Backward-incompatible changes are more frequent than for other actions.\n\nDelete an organization.",
     "properties": {
       "organizationId": {
         "$ref": "#/components/schemas/nexigon_api.organizations.OrganizationId"
@@ -5240,11 +4429,27 @@
   },
   "nexigon_api.organizations.OrganizationApiTokenId": {
     "type": "string",
-    "description": "Unique ID of an organization API token."
+    "description": "**Group `admin`:** Part of the Admin API, which requires instance administrator permissions. Backward-incompatible changes are more frequent than for other actions.\n\n**Group `device`:** Part of the Device API, which Nexigon Agent and other software on devices use. Changes remain backward compatible for at least five years.\n\nUnique ID of an organization API token."
+  },
+  "nexigon_api.organizations.OrganizationDeactivation": {
+    "type": "object",
+    "description": "**Group `admin`:** Part of the Admin API, which requires instance administrator permissions. Backward-incompatible changes are more frequent than for other actions.\n\nDeactivation of an organization.",
+    "properties": {
+      "deactivatedAt": {
+        "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
+      },
+      "message": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "deactivatedAt"
+    ],
+    "unevaluatedProperties": false
   },
   "nexigon_api.organizations.OrganizationId": {
     "type": "string",
-    "description": "Unique ID of an organization"
+    "description": "**Group `admin`:** Part of the Admin API, which requires instance administrator permissions. Backward-incompatible changes are more frequent than for other actions.\n\n**Group `device`:** Part of the Device API, which Nexigon Agent and other software on devices use. Changes remain backward compatible for at least five years.\n\nUnique ID of an organization"
   },
   "nexigon_api.organizations.OrganizationInvitationId": {
     "type": "string",
@@ -5491,20 +4696,23 @@
   },
   "nexigon_api.organizations.QueryOrganizationsAction": {
     "type": "object",
-    "description": "Query the organizations of the instance.",
+    "description": "**Group `admin`:** Part of the Admin API, which requires instance administrator permissions. Backward-incompatible changes are more frequent than for other actions.\n\nQuery the organizations of the instance.",
     "properties": {},
     "required": [],
     "unevaluatedProperties": false
   },
   "nexigon_api.organizations.QueryOrganizationsItem": {
     "type": "object",
-    "description": "Organization item.",
+    "description": "**Group `admin`:** Part of the Admin API, which requires instance administrator permissions. Backward-incompatible changes are more frequent than for other actions.\n\nOrganization item.",
     "properties": {
       "organizationId": {
         "$ref": "#/components/schemas/nexigon_api.organizations.OrganizationId"
       },
       "name": {
         "type": "string"
+      },
+      "deactivation": {
+        "$ref": "#/components/schemas/nexigon_api.organizations.OrganizationDeactivation"
       }
     },
     "required": [
@@ -5515,7 +4723,7 @@
   },
   "nexigon_api.organizations.QueryOrganizationsOutput": {
     "type": "object",
-    "description": "Output of querying the organizations of the instance.",
+    "description": "**Group `admin`:** Part of the Admin API, which requires instance administrator permissions. Backward-incompatible changes are more frequent than for other actions.\n\nOutput of querying the organizations of the instance.",
     "properties": {
       "organizations": {
         "type": "array",
@@ -5526,6 +4734,23 @@
     },
     "required": [
       "organizations"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.organizations.ReactivateOrganizationAction": {
+    "type": "object",
+    "description": "**Group `admin`:** Part of the Admin API, which requires instance administrator permissions. Backward-incompatible changes are more frequent than for other actions.\n\nReactivate a deactivated organization.\n\nAdmin-only operation that restores access for members, API tokens, and\ndevices.",
+    "properties": {
+      "authorization": {
+        "$ref": "#/components/schemas/nexigon_api.authorization.ActionAuthorization"
+      },
+      "organizationId": {
+        "$ref": "#/components/schemas/nexigon_api.organizations.OrganizationId"
+      }
+    },
+    "required": [
+      "authorization",
+      "organizationId"
     ],
     "unevaluatedProperties": false
   },
@@ -5586,18 +4811,18 @@
   },
   "nexigon_api.outputs.Empty": {
     "type": "object",
-    "description": "Empty output.",
+    "description": "**Group `admin`:** Part of the Admin API, which requires instance administrator permissions. Backward-incompatible changes are more frequent than for other actions.\n\n**Group `device`:** Part of the Device API, which Nexigon Agent and other software on devices use. Changes remain backward compatible for at least five years.\n\nEmpty output.",
     "properties": {},
     "required": [],
     "unevaluatedProperties": false
   },
   "nexigon_api.pagination.PageCursor": {
     "type": "string",
-    "description": "Opaque, authenticated continuation token. Clients must not interpret its contents."
+    "description": "**Group `admin`:** Part of the Admin API, which requires instance administrator permissions. Backward-incompatible changes are more frequent than for other actions.\n\nOpaque, authenticated continuation token. Clients must not interpret its contents."
   },
   "nexigon_api.pagination.PageInfo": {
     "type": "object",
-    "description": "Continuation information for a requested page.",
+    "description": "**Group `admin`:** Part of the Admin API, which requires instance administrator permissions. Backward-incompatible changes are more frequent than for other actions.\n\nContinuation information for a requested page.",
     "properties": {
       "nextCursor": {
         "$ref": "#/components/schemas/nexigon_api.pagination.PageCursor"
@@ -5608,7 +4833,7 @@
   },
   "nexigon_api.pagination.PageRequest": {
     "type": "object",
-    "description": "Request a bounded page. Omit the cursor to start a new traversal.",
+    "description": "**Group `admin`:** Part of the Admin API, which requires instance administrator permissions. Backward-incompatible changes are more frequent than for other actions.\n\nRequest a bounded page. Omit the cursor to start a new traversal.",
     "properties": {
       "limit": {
         "type": "integer",
@@ -5625,7 +4850,7 @@
   },
   "nexigon_api.profiles.AssignDeviceProfileDevicesAction": {
     "type": "object",
-    "description": "**Unstable (feature `device_profiles`).**\n\nAssign a device profile to the devices of its project that match group\nconditions.\n\nApplies once to the devices that match now; devices that match later do not\nreceive the profile. The profile applies after a device's other profiles, and\ndevices that already have it keep its position. Devices that already have the\nmaximum number of profiles are skipped. Requires permission to change the\nprofiles of every matching device.",
+    "description": "**Unstable (feature `device_profiles`).**\n\nAssign a device profile to the devices of its project that match group\nconditions.\n\nApplies once to the devices that match now; devices that match later do not\nreceive the profile. The profile applies after a device's other profiles, and\ndevices that already have it keep its position but take the given mode.\nDevices that already have the maximum number of profiles are skipped. Requires\npermission to change the profiles of every matching device.",
     "properties": {
       "projectId": {
         "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
@@ -5635,6 +4860,9 @@
       },
       "groups": {
         "$ref": "#/components/schemas/nexigon_api.devices.DeviceGroupSelector"
+      },
+      "mode": {
+        "$ref": "#/components/schemas/nexigon_api.profiles.DeviceProfileMode"
       }
     },
     "required": [
@@ -5670,6 +4898,29 @@
       "assigned",
       "unchanged",
       "skipped"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.profiles.AssignedDeviceProfile": {
+    "type": "object",
+    "description": "Profile that a device applies.",
+    "properties": {
+      "profile": {
+        "$ref": "#/components/schemas/nexigon_api.profiles.DeviceProfileSummary"
+      },
+      "mode": {
+        "$ref": "#/components/schemas/nexigon_api.profiles.DeviceProfileMode"
+      },
+      "revision": {
+        "type": "integer",
+        "format": "uint32",
+        "maximum": 4294967295,
+        "minimum": 0
+      }
+    },
+    "required": [
+      "profile",
+      "mode"
     ],
     "unevaluatedProperties": false
   },
@@ -5762,9 +5013,70 @@
     ],
     "unevaluatedProperties": false
   },
+  "nexigon_api.profiles.DeviceProfileAssignment": {
+    "type": "object",
+    "description": "Profile of a device and how the device follows the profile's revisions.",
+    "properties": {
+      "profileId": {
+        "$ref": "#/components/schemas/nexigon_api.profiles.DeviceProfileId"
+      },
+      "mode": {
+        "$ref": "#/components/schemas/nexigon_api.profiles.DeviceProfileMode"
+      }
+    },
+    "required": [
+      "profileId"
+    ],
+    "unevaluatedProperties": false
+  },
   "nexigon_api.profiles.DeviceProfileId": {
     "type": "string",
     "description": "Stable identity of a device profile."
+  },
+  "nexigon_api.profiles.DeviceProfileMode": {
+    "description": "How a device follows the revisions of an assigned profile.",
+    "oneOf": [
+      {
+        "type": "object",
+        "properties": {
+          "mode": {
+            "const": "Latest"
+          }
+        },
+        "required": [
+          "mode"
+        ]
+      },
+      {
+        "type": "object",
+        "properties": {
+          "mode": {
+            "const": "Pinned"
+          },
+          "revision": {
+            "type": "integer",
+            "format": "uint32",
+            "maximum": 4294967295,
+            "minimum": 0
+          }
+        },
+        "required": [
+          "mode",
+          "revision"
+        ]
+      },
+      {
+        "type": "object",
+        "properties": {
+          "mode": {
+            "const": "Rollout"
+          }
+        },
+        "required": [
+          "mode"
+        ]
+      }
+    ]
   },
   "nexigon_api.profiles.DeviceProfileProperty": {
     "type": "object",
@@ -5823,6 +5135,153 @@
     },
     "required": [
       "currentRevision"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.profiles.DeviceProfileRollout": {
+    "type": "object",
+    "description": "Rollout of a profile revision.",
+    "properties": {
+      "number": {
+        "type": "integer",
+        "format": "uint32",
+        "maximum": 4294967295,
+        "minimum": 0
+      },
+      "revision": {
+        "type": "integer",
+        "format": "uint32",
+        "maximum": 4294967295,
+        "minimum": 0
+      },
+      "stages": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.profiles.DeviceProfileRolloutStageState"
+        }
+      },
+      "completionExpression": {
+        "type": "string"
+      },
+      "failureExpression": {
+        "type": "string"
+      },
+      "startedAt": {
+        "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
+      },
+      "haltedAt": {
+        "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
+      },
+      "converged": {
+        "type": "boolean"
+      }
+    },
+    "required": [
+      "number",
+      "revision",
+      "stages",
+      "startedAt",
+      "converged"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.profiles.DeviceProfileRolloutDevice": {
+    "type": "object",
+    "description": "Device in a rollout.",
+    "properties": {
+      "deviceId": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceId"
+      },
+      "name": {
+        "type": "string"
+      },
+      "stageIndex": {
+        "type": "integer",
+        "format": "uint32",
+        "maximum": 4294967295,
+        "minimum": 0
+      },
+      "status": {
+        "$ref": "#/components/schemas/nexigon_api.profiles.DeviceProfileRolloutDeviceStatus"
+      },
+      "updatedAt": {
+        "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
+      }
+    },
+    "required": [
+      "deviceId",
+      "stageIndex",
+      "status",
+      "updatedAt"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.profiles.DeviceProfileRolloutDeviceCounts": {
+    "type": "object",
+    "description": "Numbers of devices by rollout status.",
+    "properties": {
+      "pending": {
+        "type": "integer",
+        "format": "uint32",
+        "maximum": 4294967295,
+        "minimum": 0
+      },
+      "active": {
+        "type": "integer",
+        "format": "uint32",
+        "maximum": 4294967295,
+        "minimum": 0
+      },
+      "completed": {
+        "type": "integer",
+        "format": "uint32",
+        "maximum": 4294967295,
+        "minimum": 0
+      },
+      "failed": {
+        "type": "integer",
+        "format": "uint32",
+        "maximum": 4294967295,
+        "minimum": 0
+      }
+    },
+    "required": [
+      "pending",
+      "active",
+      "completed",
+      "failed"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.profiles.DeviceProfileRolloutDeviceStatus": {
+    "enum": [
+      "Pending",
+      "Active",
+      "Completed",
+      "Failed"
+    ],
+    "description": "Status of a device in a rollout."
+  },
+  "nexigon_api.profiles.DeviceProfileRolloutStageState": {
+    "type": "object",
+    "description": "Definition and progress of a rollout stage.",
+    "properties": {
+      "definition": {
+        "$ref": "#/components/schemas/nexigon_api.rollouts.RolloutStage"
+      },
+      "releasedAt": {
+        "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
+      },
+      "devices": {
+        "$ref": "#/components/schemas/nexigon_api.profiles.DeviceProfileRolloutDeviceCounts"
+      },
+      "guard": {
+        "$ref": "#/components/schemas/nexigon_api.rollouts.RolloutGuardStatus"
+      }
+    },
+    "required": [
+      "definition",
+      "devices"
     ],
     "unevaluatedProperties": false
   },
@@ -5944,6 +5403,121 @@
       }
     ]
   },
+  "nexigon_api.profiles.GetDeviceProfileRolloutAction": {
+    "type": "object",
+    "description": "**Unstable (feature `device_profiles`).**\n\nGet the rollout of a profile.",
+    "properties": {
+      "projectId": {
+        "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+      },
+      "profileId": {
+        "$ref": "#/components/schemas/nexigon_api.profiles.DeviceProfileId"
+      }
+    },
+    "required": [
+      "projectId",
+      "profileId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.profiles.GetDeviceProfileRolloutOutput": {
+    "description": "Output of getting the rollout of a profile.",
+    "oneOf": [
+      {
+        "type": "object",
+        "properties": {
+          "result": {
+            "const": "NotFound"
+          }
+        },
+        "required": [
+          "result"
+        ]
+      },
+      {
+        "type": "object",
+        "properties": {
+          "result": {
+            "const": "Found"
+          },
+          "number": {
+            "type": "integer",
+            "format": "uint32",
+            "maximum": 4294967295,
+            "minimum": 0
+          },
+          "revision": {
+            "type": "integer",
+            "format": "uint32",
+            "maximum": 4294967295,
+            "minimum": 0
+          },
+          "stages": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/nexigon_api.profiles.DeviceProfileRolloutStageState"
+            }
+          },
+          "completionExpression": {
+            "type": "string"
+          },
+          "failureExpression": {
+            "type": "string"
+          },
+          "startedAt": {
+            "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
+          },
+          "haltedAt": {
+            "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
+          },
+          "converged": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "result",
+          "number",
+          "revision",
+          "stages",
+          "startedAt",
+          "converged"
+        ]
+      }
+    ]
+  },
+  "nexigon_api.profiles.HaltDeviceProfileRolloutAction": {
+    "type": "object",
+    "description": "**Unstable (feature `device_profiles`).**\n\nHalt the rollout of a profile.\n\nThe rollout applies its revision to no further devices and releases no\nstages until it is resumed. Halting a halted rollout has no effect.",
+    "properties": {
+      "projectId": {
+        "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+      },
+      "profileId": {
+        "$ref": "#/components/schemas/nexigon_api.profiles.DeviceProfileId"
+      }
+    },
+    "required": [
+      "projectId",
+      "profileId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.profiles.PinnedDeviceProfileMode": {
+    "type": "object",
+    "description": "Revision that a device is pinned to.",
+    "properties": {
+      "revision": {
+        "type": "integer",
+        "format": "uint32",
+        "maximum": 4294967295,
+        "minimum": 0
+      }
+    },
+    "required": [
+      "revision"
+    ],
+    "unevaluatedProperties": false
+  },
   "nexigon_api.profiles.QueryDeviceProfileRevisionsAction": {
     "type": "object",
     "description": "**Unstable (feature `device_profiles`).**\n\nList the revisions of a device profile, newest first.",
@@ -5984,6 +5558,46 @@
     ],
     "unevaluatedProperties": false
   },
+  "nexigon_api.profiles.QueryDeviceProfileRolloutDevicesAction": {
+    "type": "object",
+    "description": "**Unstable (feature `device_profiles`).**\n\nList the devices of a profile's rollout, by stage.",
+    "properties": {
+      "projectId": {
+        "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+      },
+      "profileId": {
+        "$ref": "#/components/schemas/nexigon_api.profiles.DeviceProfileId"
+      },
+      "page": {
+        "$ref": "#/components/schemas/nexigon_api.pagination.PageRequest"
+      }
+    },
+    "required": [
+      "projectId",
+      "profileId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.profiles.QueryDeviceProfileRolloutDevicesOutput": {
+    "type": "object",
+    "description": "Output of listing the devices of a profile's rollout.",
+    "properties": {
+      "devices": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.profiles.DeviceProfileRolloutDevice"
+        }
+      },
+      "page": {
+        "$ref": "#/components/schemas/nexigon_api.pagination.PageInfo"
+      }
+    },
+    "required": [
+      "devices",
+      "page"
+    ],
+    "unevaluatedProperties": false
+  },
   "nexigon_api.profiles.QueryDeviceProfilesAction": {
     "type": "object",
     "description": "**Unstable (feature `device_profiles`).**\n\nList the device profiles of a project.",
@@ -6013,9 +5627,50 @@
     ],
     "unevaluatedProperties": false
   },
+  "nexigon_api.profiles.ReleaseDeviceProfileRolloutStageAction": {
+    "type": "object",
+    "description": "**Unstable (feature `device_profiles`).**\n\nRelease the next stage of a running rollout, skipping its guard and the wait\nfor the previous stage's spread.",
+    "properties": {
+      "projectId": {
+        "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+      },
+      "profileId": {
+        "$ref": "#/components/schemas/nexigon_api.profiles.DeviceProfileId"
+      },
+      "stageIndex": {
+        "type": "integer",
+        "format": "uint32",
+        "maximum": 4294967295,
+        "minimum": 0
+      }
+    },
+    "required": [
+      "projectId",
+      "profileId",
+      "stageIndex"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.profiles.ResumeDeviceProfileRolloutAction": {
+    "type": "object",
+    "description": "**Unstable (feature `device_profiles`).**\n\nResume the halted rollout of a profile where it stopped.\n\nResuming a running rollout has no effect.",
+    "properties": {
+      "projectId": {
+        "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+      },
+      "profileId": {
+        "$ref": "#/components/schemas/nexigon_api.profiles.DeviceProfileId"
+      }
+    },
+    "required": [
+      "projectId",
+      "profileId"
+    ],
+    "unevaluatedProperties": false
+  },
   "nexigon_api.profiles.SaveDeviceProfileRevisionAction": {
     "type": "object",
-    "description": "**Unstable (feature `device_profiles`).**\n\nSave new property values of a device profile as its next revision.\n\nEvery device with the profile applies the new values right away.",
+    "description": "**Unstable (feature `device_profiles`).**\n\nSave new property values of a device profile as its next revision.\n\nEvery device that has the profile in `Latest` mode applies the new values\nright away.",
     "properties": {
       "projectId": {
         "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
@@ -6098,6 +5753,59 @@
     },
     "required": [
       "revision"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.profiles.StartDeviceProfileRolloutAction": {
+    "type": "object",
+    "description": "**Unstable (feature `device_profiles`).**\n\nStart a rollout of a profile revision to the profile's devices in rollout\nmode, replacing the profile's current rollout.\n\nReleases the first stage right away. The new rollout runs even if the rollout\nit replaces was halted.",
+    "properties": {
+      "projectId": {
+        "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+      },
+      "profileId": {
+        "$ref": "#/components/schemas/nexigon_api.profiles.DeviceProfileId"
+      },
+      "revision": {
+        "type": "integer",
+        "format": "uint32",
+        "maximum": 4294967295,
+        "minimum": 0
+      },
+      "stages": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.rollouts.RolloutStage"
+        }
+      },
+      "completionExpression": {
+        "type": "string"
+      },
+      "failureExpression": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "projectId",
+      "profileId",
+      "revision",
+      "stages"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.profiles.StartDeviceProfileRolloutOutput": {
+    "type": "object",
+    "description": "Output of starting a rollout.",
+    "properties": {
+      "number": {
+        "type": "integer",
+        "format": "uint32",
+        "maximum": 4294967295,
+        "minimum": 0
+      }
+    },
+    "required": [
+      "number"
     ],
     "unevaluatedProperties": false
   },
@@ -6383,7 +6091,7 @@
   },
   "nexigon_api.projects.DeploymentToken": {
     "type": "string",
-    "description": "Deployment token."
+    "description": "**Group `device`:** Part of the Device API, which Nexigon Agent and other software on devices use. Changes remain backward compatible for at least five years.\n\nDeployment token."
   },
   "nexigon_api.projects.DeploymentTokenFlags": {
     "type": "object",
@@ -6398,7 +6106,7 @@
   },
   "nexigon_api.projects.DeploymentTokenId": {
     "type": "string",
-    "description": "Unique ID of a deployment token."
+    "description": "**Group `admin`:** Part of the Admin API, which requires instance administrator permissions. Backward-incompatible changes are more frequent than for other actions.\n\n**Group `device`:** Part of the Device API, which Nexigon Agent and other software on devices use. Changes remain backward compatible for at least five years.\n\nUnique ID of a deployment token."
   },
   "nexigon_api.projects.DevicePairingKeyId": {
     "type": "string",
@@ -6469,7 +6177,7 @@
   },
   "nexigon_api.projects.ProjectId": {
     "type": "string",
-    "description": "Unique ID of a project."
+    "description": "**Group `admin`:** Part of the Admin API, which requires instance administrator permissions. Backward-incompatible changes are more frequent than for other actions.\n\n**Group `device`:** Part of the Device API, which Nexigon Agent and other software on devices use. Changes remain backward compatible for at least five years.\n\nUnique ID of a project."
   },
   "nexigon_api.projects.ProjectOtlpConfig": {
     "type": "object",
@@ -6826,14 +6534,14 @@
   },
   "nexigon_api.projects.QueryProjectsAction": {
     "type": "object",
-    "description": "Query the projects of the instance.",
+    "description": "**Group `admin`:** Part of the Admin API, which requires instance administrator permissions. Backward-incompatible changes are more frequent than for other actions.\n\nQuery the projects of the instance.",
     "properties": {},
     "required": [],
     "unevaluatedProperties": false
   },
   "nexigon_api.projects.QueryProjectsItem": {
     "type": "object",
-    "description": "Project item.",
+    "description": "**Group `admin`:** Part of the Admin API, which requires instance administrator permissions. Backward-incompatible changes are more frequent than for other actions.\n\nProject item.",
     "properties": {
       "projectId": {
         "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
@@ -6850,7 +6558,7 @@
   },
   "nexigon_api.projects.QueryProjectsOutput": {
     "type": "object",
-    "description": "Output of querying the projects of the instance.",
+    "description": "**Group `admin`:** Part of the Admin API, which requires instance administrator permissions. Backward-incompatible changes are more frequent than for other actions.\n\nOutput of querying the projects of the instance.",
     "properties": {
       "projects": {
         "type": "array",
@@ -6895,7 +6603,7 @@
   },
   "nexigon_api.projects.RedeemDevicePairingKeyAction": {
     "type": "object",
-    "description": "Redeem a device pairing key.",
+    "description": "**Group `device`:** Part of the Device API, which Nexigon Agent and other software on devices use. Changes remain backward compatible for at least five years.\n\nRedeem a device pairing key.\n\nCreates a device in the pairing key's project and issues a deployment token bound\nto it. The device uses the token to connect to Nexigon Hub. This action does not\nrequire authentication; the pairing key authorizes it.",
     "properties": {
       "pairingKey": {
         "type": "string"
@@ -6915,7 +6623,7 @@
   },
   "nexigon_api.projects.RedeemDevicePairingKeyOutput": {
     "type": "object",
-    "description": "Output of redeeming a device pairing key.",
+    "description": "**Group `device`:** Part of the Device API, which Nexigon Agent and other software on devices use. Changes remain backward compatible for at least five years.\n\nOutput of redeeming a device pairing key.",
     "properties": {
       "projectId": {
         "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
@@ -8456,7 +8164,7 @@
   },
   "nexigon_api.repositories.GetPackageVersionDetailsAction": {
     "type": "object",
-    "description": "Get information about a package version.",
+    "description": "**Group `device`:** Part of the Device API, which Nexigon Agent and other software on devices use. Changes remain backward compatible for at least five years.\n\nGet information about a package version.",
     "properties": {
       "versionId": {
         "$ref": "#/components/schemas/nexigon_api.repositories.PackageVersionId"
@@ -8469,7 +8177,7 @@
   },
   "nexigon_api.repositories.GetPackageVersionDetailsOutput": {
     "type": "object",
-    "description": "Output of getting information about a package version.",
+    "description": "**Group `device`:** Part of the Device API, which Nexigon Agent and other software on devices use. Changes remain backward compatible for at least five years.\n\nOutput of getting information about a package version.",
     "properties": {
       "versionId": {
         "$ref": "#/components/schemas/nexigon_api.repositories.PackageVersionId"
@@ -8614,7 +8322,7 @@
   },
   "nexigon_api.repositories.IssueAssetDownloadUrlAction": {
     "type": "object",
-    "description": "Issue a URL for downloading an asset.",
+    "description": "**Group `device`:** Part of the Device API, which Nexigon Agent and other software on devices use. Changes remain backward compatible for at least five years.\n\nIssue a URL for downloading an asset.\n\nThe URL is valid for two hours and requires no further authentication.",
     "properties": {
       "assetId": {
         "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryAssetId"
@@ -8630,7 +8338,7 @@
   },
   "nexigon_api.repositories.IssueAssetDownloadUrlOutput": {
     "type": "object",
-    "description": "Output of issuing a URL for downloading an asset.",
+    "description": "**Group `device`:** Part of the Device API, which Nexigon Agent and other software on devices use. Changes remain backward compatible for at least five years.\n\nOutput of issuing a URL for downloading an asset.",
     "properties": {
       "url": {
         "type": "string"
@@ -8723,7 +8431,7 @@
   },
   "nexigon_api.repositories.PackageId": {
     "type": "string",
-    "description": "Unique ID of a package."
+    "description": "**Group `device`:** Part of the Device API, which Nexigon Agent and other software on devices use. Changes remain backward compatible for at least five years.\n\nUnique ID of a package."
   },
   "nexigon_api.repositories.PackageImageLimits": {
     "type": "object",
@@ -8826,7 +8534,7 @@
   },
   "nexigon_api.repositories.PackageVersionAsset": {
     "type": "object",
-    "description": "Package version asset.",
+    "description": "**Group `device`:** Part of the Device API, which Nexigon Agent and other software on devices use. Changes remain backward compatible for at least five years.\n\nPackage version asset.",
     "properties": {
       "filename": {
         "type": "string"
@@ -8882,7 +8590,7 @@
   },
   "nexigon_api.repositories.PackageVersionId": {
     "type": "string",
-    "description": "Unique ID of a package version."
+    "description": "**Group `device`:** Part of the Device API, which Nexigon Agent and other software on devices use. Changes remain backward compatible for at least five years.\n\nUnique ID of a package version."
   },
   "nexigon_api.repositories.PackageVersionRetention": {
     "type": "object",
@@ -8911,7 +8619,7 @@
   },
   "nexigon_api.repositories.PackageVersionTag": {
     "type": "object",
-    "description": "Package version tag.",
+    "description": "**Group `device`:** Part of the Device API, which Nexigon Agent and other software on devices use. Changes remain backward compatible for at least five years.\n\nPackage version tag.",
     "properties": {
       "tag": {
         "type": "string"
@@ -9373,7 +9081,7 @@
   },
   "nexigon_api.repositories.RepositoryAssetId": {
     "type": "string",
-    "description": "Unique ID of a repository asset."
+    "description": "**Group `device`:** Part of the Device API, which Nexigon Agent and other software on devices use. Changes remain backward compatible for at least five years.\n\nUnique ID of a repository asset."
   },
   "nexigon_api.repositories.RepositoryAssetLifecycle": {
     "type": "object",
@@ -9446,11 +9154,11 @@
       "Available",
       "Deleting"
     ],
-    "description": "Asset status."
+    "description": "**Group `device`:** Part of the Device API, which Nexigon Agent and other software on devices use. Changes remain backward compatible for at least five years.\n\nAsset status."
   },
   "nexigon_api.repositories.RepositoryAssetStorage": {
     "type": "object",
-    "description": "Latest object-storage check for an asset.",
+    "description": "**Group `device`:** Part of the Device API, which Nexigon Agent and other software on devices use. Changes remain backward compatible for at least five years.\n\nLatest object-storage check for an asset.",
     "properties": {
       "status": {
         "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryAssetStorageStatus"
@@ -9476,7 +9184,7 @@
       "Mismatched",
       "Error"
     ],
-    "description": "Result of the latest non-destructive object-storage check."
+    "description": "**Group `device`:** Part of the Device API, which Nexigon Agent and other software on devices use. Changes remain backward compatible for at least five years.\n\nResult of the latest non-destructive object-storage check."
   },
   "nexigon_api.repositories.RepositoryAssetUsage": {
     "type": "object",
@@ -9562,7 +9270,7 @@
   },
   "nexigon_api.repositories.RepositoryId": {
     "type": "string",
-    "description": "Unique ID of a repository."
+    "description": "**Group `device`:** Part of the Device API, which Nexigon Agent and other software on devices use. Changes remain backward compatible for at least five years.\n\nUnique ID of a repository."
   },
   "nexigon_api.repositories.RepositoryS3Config": {
     "type": "object",
@@ -9683,7 +9391,7 @@
   },
   "nexigon_api.repositories.ResolvePackageVersionAssetByPathAction": {
     "type": "object",
-    "description": "Resolve a version asset by its path.",
+    "description": "**Group `device`:** Part of the Device API, which Nexigon Agent and other software on devices use. Changes remain backward compatible for at least five years.\n\nResolve a version asset by its path.\n\nA path consists of a repository, a package, a version tag, and the asset's\nfilename within the version.",
     "properties": {
       "repository": {
         "type": "string"
@@ -9707,7 +9415,7 @@
     "unevaluatedProperties": false
   },
   "nexigon_api.repositories.ResolvePackageVersionAssetByPathOutput": {
-    "description": "Output of resolving a version asset by its path.",
+    "description": "**Group `device`:** Part of the Device API, which Nexigon Agent and other software on devices use. Changes remain backward compatible for at least five years.\n\nOutput of resolving a version asset by its path.",
     "oneOf": [
       {
         "type": "object",
@@ -9751,7 +9459,7 @@
   },
   "nexigon_api.repositories.ResolvePackageVersionAssetByPathSuccess": {
     "type": "object",
-    "description": "Successfully resolved version asset by path.",
+    "description": "**Group `device`:** Part of the Device API, which Nexigon Agent and other software on devices use. Changes remain backward compatible for at least five years.\n\nSuccessfully resolved version asset by path.",
     "properties": {
       "repositoryId": {
         "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryId"
@@ -9776,7 +9484,7 @@
   },
   "nexigon_api.repositories.ResolvePackageVersionByPathAction": {
     "type": "object",
-    "description": "Resolve a package version by its path.",
+    "description": "**Group `device`:** Part of the Device API, which Nexigon Agent and other software on devices use. Changes remain backward compatible for at least five years.\n\nResolve a package version by its path.\n\nA path consists of a repository, a package, and a version tag. Devices can resolve\nversions in repositories linked to their project.",
     "properties": {
       "repository": {
         "type": "string"
@@ -9796,7 +9504,7 @@
     "unevaluatedProperties": false
   },
   "nexigon_api.repositories.ResolvePackageVersionByPathOutput": {
-    "description": "Output of resolving a package version by its path.",
+    "description": "**Group `device`:** Part of the Device API, which Nexigon Agent and other software on devices use. Changes remain backward compatible for at least five years.\n\nOutput of resolving a package version by its path.",
     "oneOf": [
       {
         "type": "object",
@@ -9836,7 +9544,7 @@
   },
   "nexigon_api.repositories.ResolvePackageVersionByPathSuccess": {
     "type": "object",
-    "description": "Successfully resolved package version by path.",
+    "description": "**Group `device`:** Part of the Device API, which Nexigon Agent and other software on devices use. Changes remain backward compatible for at least five years.\n\nSuccessfully resolved package version by path.",
     "properties": {
       "repositoryId": {
         "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryId"
@@ -10268,6 +9976,102 @@
     ],
     "unevaluatedProperties": false
   },
+  "nexigon_api.rollouts.RolloutGuard": {
+    "type": "object",
+    "description": "Conditions for releasing a rollout stage, all of which must hold.",
+    "properties": {
+      "minCompletedPercent": {
+        "type": [
+          "number",
+          "string"
+        ],
+        "pattern": "^(NaN|[+-]?Infinity)$"
+      },
+      "maxFailedPercent": {
+        "type": [
+          "number",
+          "string"
+        ],
+        "pattern": "^(NaN|[+-]?Infinity)$"
+      },
+      "soakSecs": {
+        "type": "integer",
+        "format": "uint32",
+        "maximum": 4294967295,
+        "minimum": 0
+      }
+    },
+    "required": [],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.rollouts.RolloutGuardStatus": {
+    "type": "object",
+    "description": "Progress of a guard toward releasing its stage.",
+    "properties": {
+      "completedPercent": {
+        "type": [
+          "number",
+          "string"
+        ],
+        "pattern": "^(NaN|[+-]?Infinity)$"
+      },
+      "failedPercent": {
+        "type": [
+          "number",
+          "string"
+        ],
+        "pattern": "^(NaN|[+-]?Infinity)$"
+      },
+      "remainingSecs": {
+        "type": "integer",
+        "format": "uint32",
+        "maximum": 4294967295,
+        "minimum": 0
+      },
+      "passed": {
+        "type": "boolean"
+      }
+    },
+    "required": [
+      "completedPercent",
+      "failedPercent",
+      "remainingSecs",
+      "passed"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.rollouts.RolloutStage": {
+    "type": "object",
+    "description": "Stage of a rollout.",
+    "properties": {
+      "name": {
+        "type": "string"
+      },
+      "groups": {
+        "$ref": "#/components/schemas/nexigon_api.devices.DeviceGroupSelector"
+      },
+      "percentage": {
+        "type": [
+          "number",
+          "string"
+        ],
+        "pattern": "^(NaN|[+-]?Infinity)$"
+      },
+      "spreadSecs": {
+        "type": "integer",
+        "format": "uint32",
+        "maximum": 4294967295,
+        "minimum": 0
+      },
+      "guard": {
+        "$ref": "#/components/schemas/nexigon_api.rollouts.RolloutGuard"
+      }
+    },
+    "required": [
+      "name"
+    ],
+    "unevaluatedProperties": false
+  },
   "nexigon_api.users.AcceptOrganizationInvitationAction": {
     "type": "object",
     "description": "Accept a organization invitation.",
@@ -10383,7 +10187,7 @@
   },
   "nexigon_api.users.CreateUserAction": {
     "type": "object",
-    "description": "Create a new user.",
+    "description": "**Group `admin`:** Part of the Admin API, which requires instance administrator permissions. Backward-incompatible changes are more frequent than for other actions.\n\nCreate a new user.",
     "properties": {
       "authorization": {
         "$ref": "#/components/schemas/nexigon_api.authorization.ActionAuthorization"
@@ -10408,7 +10212,7 @@
     "unevaluatedProperties": false
   },
   "nexigon_api.users.CreateUserOutput": {
-    "description": "Output of creating a user.",
+    "description": "**Group `admin`:** Part of the Admin API, which requires instance administrator permissions. Backward-incompatible changes are more frequent than for other actions.\n\nOutput of creating a user.",
     "oneOf": [
       {
         "type": "object",
@@ -10440,7 +10244,7 @@
   },
   "nexigon_api.users.CreateUserSuccess": {
     "type": "object",
-    "description": "User was created successfully.",
+    "description": "**Group `admin`:** Part of the Admin API, which requires instance administrator permissions. Backward-incompatible changes are more frequent than for other actions.\n\nUser was created successfully.",
     "properties": {
       "userId": {
         "$ref": "#/components/schemas/nexigon_api.users.UserId"
@@ -10488,9 +10292,33 @@
     ],
     "unevaluatedProperties": false
   },
+  "nexigon_api.users.DeactivateUserAction": {
+    "type": "object",
+    "description": "**Group `admin`:** Part of the Admin API, which requires instance administrator permissions. Backward-incompatible changes are more frequent than for other actions.\n\nDeactivate a user account.\n\nAdmin-only operation. Deactivated users cannot sign in and their API tokens\nare rejected. All existing sessions of the user are terminated. Memberships,\ntokens, and data are retained and usable again after reactivation. Deactivating\na deactivated user replaces their message, or selects the default message if\n`message` is absent. Users cannot deactivate themselves.",
+    "properties": {
+      "authorization": {
+        "$ref": "#/components/schemas/nexigon_api.authorization.ActionAuthorization"
+      },
+      "userId": {
+        "$ref": "#/components/schemas/nexigon_api.users.UserId"
+      },
+      "message": {
+        "$ref": "#/components/schemas/nexigon_api.users.DeactivationMessage"
+      }
+    },
+    "required": [
+      "authorization",
+      "userId"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.users.DeactivationMessage": {
+    "type": "string",
+    "description": "**Group `admin`:** Part of the Admin API, which requires instance administrator permissions. Backward-incompatible changes are more frequent than for other actions.\n\nMessage shown to a deactivated user or the members of a deactivated\norganization, formatted as Markdown."
+  },
   "nexigon_api.users.DeleteUserAction": {
     "type": "object",
-    "description": "Delete a user.",
+    "description": "**Group `admin`:** Part of the Admin API, which requires instance administrator permissions. Backward-incompatible changes are more frequent than for other actions.\n\nDelete a user.",
     "properties": {
       "userId": {
         "$ref": "#/components/schemas/nexigon_api.users.UserId"
@@ -10707,6 +10535,9 @@
       },
       "subscriptionPlanName": {
         "type": "string"
+      },
+      "deactivation": {
+        "$ref": "#/components/schemas/nexigon_api.organizations.OrganizationDeactivation"
       }
     },
     "required": [
@@ -10812,14 +10643,14 @@
   },
   "nexigon_api.users.QueryUsersAction": {
     "type": "object",
-    "description": "Query the users of the instance.",
+    "description": "**Group `admin`:** Part of the Admin API, which requires instance administrator permissions. Backward-incompatible changes are more frequent than for other actions.\n\nQuery the users of the instance.",
     "properties": {},
     "required": [],
     "unevaluatedProperties": false
   },
   "nexigon_api.users.QueryUsersItem": {
     "type": "object",
-    "description": "User item.",
+    "description": "**Group `admin`:** Part of the Admin API, which requires instance administrator permissions. Backward-incompatible changes are more frequent than for other actions.\n\nUser item.",
     "properties": {
       "userId": {
         "$ref": "#/components/schemas/nexigon_api.users.UserId"
@@ -10836,6 +10667,9 @@
       "isActive": {
         "type": "boolean"
       },
+      "deactivation": {
+        "$ref": "#/components/schemas/nexigon_api.users.UserDeactivation"
+      },
       "createdAt": {
         "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
       }
@@ -10851,7 +10685,7 @@
   },
   "nexigon_api.users.QueryUsersOutput": {
     "type": "object",
-    "description": "Output of querying the users of the instance.",
+    "description": "**Group `admin`:** Part of the Admin API, which requires instance administrator permissions. Backward-incompatible changes are more frequent than for other actions.\n\nOutput of querying the users of the instance.",
     "properties": {
       "users": {
         "type": "array",
@@ -10862,6 +10696,23 @@
     },
     "required": [
       "users"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.users.ReactivateUserAction": {
+    "type": "object",
+    "description": "**Group `admin`:** Part of the Admin API, which requires instance administrator permissions. Backward-incompatible changes are more frequent than for other actions.\n\nReactivate a deactivated user account.\n\nAdmin-only operation that restores the user's ability to sign in and use\ntheir API tokens.",
+    "properties": {
+      "authorization": {
+        "$ref": "#/components/schemas/nexigon_api.authorization.ActionAuthorization"
+      },
+      "userId": {
+        "$ref": "#/components/schemas/nexigon_api.users.UserId"
+      }
+    },
+    "required": [
+      "authorization",
+      "userId"
     ],
     "unevaluatedProperties": false
   },
@@ -10936,7 +10787,7 @@
   },
   "nexigon_api.users.SetUserEmailAction": {
     "type": "object",
-    "description": "Set the email address of a user.\n\nAdmin-only operation that updates the address without verification.",
+    "description": "**Group `admin`:** Part of the Admin API, which requires instance administrator permissions. Backward-incompatible changes are more frequent than for other actions.\n\nSet the email address of a user.\n\nAdmin-only operation that updates the address without verification.",
     "properties": {
       "authorization": {
         "$ref": "#/components/schemas/nexigon_api.authorization.ActionAuthorization"
@@ -10964,11 +10815,11 @@
         "result": "EmailAlreadyExists"
       }
     ],
-    "description": "Output of [`SetUserEmailAction`]."
+    "description": "**Group `admin`:** Part of the Admin API, which requires instance administrator permissions. Backward-incompatible changes are more frequent than for other actions.\n\nOutput of [`SetUserEmailAction`]."
   },
   "nexigon_api.users.SetUserIsAdminAction": {
     "type": "object",
-    "description": "Set whether the user is an instance administrator.",
+    "description": "**Group `admin`:** Part of the Admin API, which requires instance administrator permissions. Backward-incompatible changes are more frequent than for other actions.\n\nSet whether the user is an instance administrator.",
     "properties": {
       "authorization": {
         "$ref": "#/components/schemas/nexigon_api.authorization.ActionAuthorization"
@@ -10989,7 +10840,7 @@
   },
   "nexigon_api.users.SetUserPasswordAction": {
     "type": "object",
-    "description": "Set the password of a user.\n\nAdmin-only operation that sets the password without requiring the current\none. All existing sessions of the user are invalidated.",
+    "description": "**Group `admin`:** Part of the Admin API, which requires instance administrator permissions. Backward-incompatible changes are more frequent than for other actions.\n\nSet the password of a user.\n\nAdmin-only operation that sets the password without requiring the current\none. All existing sessions of the user are invalidated.",
     "properties": {
       "authorization": {
         "$ref": "#/components/schemas/nexigon_api.authorization.ActionAuthorization"
@@ -11021,9 +10872,25 @@
     ],
     "unevaluatedProperties": false
   },
+  "nexigon_api.users.UserDeactivation": {
+    "type": "object",
+    "description": "**Group `admin`:** Part of the Admin API, which requires instance administrator permissions. Backward-incompatible changes are more frequent than for other actions.\n\nDeactivation of a user account.",
+    "properties": {
+      "deactivatedAt": {
+        "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
+      },
+      "message": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "deactivatedAt"
+    ],
+    "unevaluatedProperties": false
+  },
   "nexigon_api.users.UserId": {
     "type": "string",
-    "description": "Unique ID of a user."
+    "description": "**Group `admin`:** Part of the Admin API, which requires instance administrator permissions. Backward-incompatible changes are more frequent than for other actions.\n\n**Group `device`:** Part of the Device API, which Nexigon Agent and other software on devices use. Changes remain backward compatible for at least five years.\n\nUnique ID of a user."
   },
   "nexigon_api.users.UserSession": {
     "type": "object",
@@ -11064,7 +10931,7 @@
   },
   "nexigon_api.users.UserTokenId": {
     "type": "string",
-    "description": "Unique ID of a user token."
+    "description": "**Group `admin`:** Part of the Admin API, which requires instance administrator permissions. Backward-incompatible changes are more frequent than for other actions.\n\n**Group `device`:** Part of the Device API, which Nexigon Agent and other software on devices use. Changes remain backward compatible for at least five years.\n\nUnique ID of a user token."
   },
   "nexigon_api.vulnerabilities.ArtifactDescriptor": {
     "type": "object",

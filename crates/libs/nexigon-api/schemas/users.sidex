@@ -5,6 +5,7 @@ import authorization::ActionAuthorization
 import datetime::Timestamp
 import devices::DeviceId
 import jwt::Jwt
+import organizations::OrganizationDeactivation
 import organizations::OrganizationId
 import organizations::OrganizationInvitationId
 import outputs::Empty
@@ -35,6 +36,7 @@ opaque UserSessionId
 opaque UserSessionToken
 
 /// Query the users of the instance.
+#[group(name = "admin")]
 #[request(name = "users_Query", response = QueryUsersOutput)]
 record QueryUsersAction {}
 
@@ -59,9 +61,30 @@ record QueryUsersItem {
     /// New registrations start out inactive and are activated when the
     /// user confirms their email address.
     is_active: bool,
+    /// Deactivation of the user account, if it is deactivated.
+    deactivation?: UserDeactivation,
     /// Timestamp when the user was created.
     created_at: Timestamp,
 }
+
+/// Deactivation of a user account.
+record UserDeactivation {
+    /// Timestamp when the user was deactivated.
+    deactivated_at: Timestamp,
+    /// Message shown to the user when they sign in, formatted as Markdown.
+    ///
+    /// The instance's default message is shown when absent.
+    message?: string,
+}
+
+/// Message shown to a deactivated user or the members of a deactivated
+/// organization, formatted as Markdown.
+#[validate(
+    { 1 <= _.size <= 2000 },
+    message = "Message must be between 1 and 2000 characters."
+)]
+#[validate({ matches(_, "\\S") }, message = "Message must not be blank.")]
+wrapper DeactivationMessage: string
 
 /// Get information about a user.
 #[request(name = "users_GetDetails", response = GetUserDetailsOutput)]
@@ -83,6 +106,7 @@ record GetUserDetailsOutput {
 }
 
 /// Create a new user.
+#[group(name = "admin")]
 #[request(name = "users_Create", response = CreateUserOutput)]
 record CreateUserAction {
     /// Authorization for this administrative action.
@@ -130,9 +154,43 @@ record CreateUserSuccess {
 }
 
 /// Delete a user.
+#[group(name = "admin")]
 #[request(name = "users_Delete", response = Empty)]
 record DeleteUserAction {
     /// ID of the user to delete.
+    user_id: UserId,
+}
+
+/// Deactivate a user account.
+///
+/// Admin-only operation. Deactivated users cannot sign in and their API tokens
+/// are rejected. All existing sessions of the user are terminated. Memberships,
+/// tokens, and data are retained and usable again after reactivation. Deactivating
+/// a deactivated user replaces their message, or selects the default message if
+/// `message` is absent. Users cannot deactivate themselves.
+#[group(name = "admin")]
+#[request(name = "users_Deactivate", response = Empty)]
+record DeactivateUserAction {
+    /// Authorization for this administrative action.
+    authorization: ActionAuthorization,
+    /// ID of the user.
+    user_id: UserId,
+    /// Message shown to the user when they sign in.
+    ///
+    /// The instance's default message is shown when absent.
+    message?: DeactivationMessage,
+}
+
+/// Reactivate a deactivated user account.
+///
+/// Admin-only operation that restores the user's ability to sign in and use
+/// their API tokens.
+#[group(name = "admin")]
+#[request(name = "users_Reactivate", response = Empty)]
+record ReactivateUserAction {
+    /// Authorization for this administrative action.
+    authorization: ActionAuthorization,
+    /// ID of the user.
     user_id: UserId,
 }
 
@@ -150,6 +208,7 @@ record SetUserDisplayNameAction {
 }
 
 /// Set whether the user is an instance administrator.
+#[group(name = "admin")]
 #[request(name = "users_SetIsAdmin", response = Empty)]
 record SetUserIsAdminAction {
     /// Authorization for this administrative action.
@@ -164,6 +223,7 @@ record SetUserIsAdminAction {
 ///
 /// Admin-only operation that sets the password without requiring the current
 /// one. All existing sessions of the user are invalidated.
+#[group(name = "admin")]
 #[request(name = "users_SetPassword", response = Empty)]
 record SetUserPasswordAction {
     /// Authorization for this administrative action.
@@ -181,6 +241,7 @@ record SetUserPasswordAction {
 /// Set the email address of a user.
 ///
 /// Admin-only operation that updates the address without verification.
+#[group(name = "admin")]
 #[request(name = "users_SetEmail", response = SetUserEmailOutput)]
 record SetUserEmailAction {
     /// Authorization for this administrative action.
@@ -372,6 +433,8 @@ record QueryUserOrganizationsItem {
     requires_subscription: bool,
     /// Name of the active subscription plan, if any.
     subscription_plan_name?: string,
+    /// Deactivation of the organization, if it is deactivated.
+    deactivation?: OrganizationDeactivation,
 }
 
 /// Query the organization invitations of a user.

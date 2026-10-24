@@ -26,6 +26,7 @@ use anyhow::bail;
 use jiff::Timestamp;
 use jiff::tz::TimeZone;
 use nexigon_api::Action;
+use nexigon_api::types::DeviceGroupMarker;
 use nexigon_api::types::devices::DeviceEvent;
 use nexigon_api::types::devices::DeviceEventSeverity;
 use nexigon_api::types::devices::DeviceProperty;
@@ -50,7 +51,6 @@ use nexigon_api::types::repositories::PackageVersionId;
 use nexigon_api::types::repositories::RepositoryAssetStatus;
 use nexigon_api::types::repositories::ResolvePackageVersionByPathAction;
 use nexigon_api::types::repositories::ResolvePackageVersionByPathOutput;
-use nexigon_client::ClientExecutor;
 use nexigon_ids::Generate;
 use nexigon_ids::ids::DeviceEventId;
 use nexigon_ids::ids::DeviceId;
@@ -76,6 +76,7 @@ use super::policy::spread_state;
 use super::policy::window_state;
 use super::updater::Bundle;
 use super::updater::SystemIdentity;
+use crate::device_api::DeviceExecutor;
 
 /// Device property holding the desired state.
 pub(crate) const CONFIG_PROPERTY: &str = "dev.nexigon.ota.config";
@@ -112,7 +113,7 @@ pub(crate) struct CheckOutcome {
 /// Executes checks against Nexigon Hub for one device.
 pub(crate) struct Checker {
     settings: SystemUpdates,
-    executor: ClientExecutor,
+    executor: DeviceExecutor,
     device_id: DeviceId,
     /// Signals a lost connection or a shutdown, which prevents new installations.
     cancellation: CancellationToken,
@@ -131,7 +132,7 @@ pub(crate) struct Checker {
 impl Checker {
     pub(crate) fn new(
         settings: SystemUpdates,
-        executor: ClientExecutor,
+        executor: DeviceExecutor,
         device_id: DeviceId,
         cancellation: CancellationToken,
         shutdown: CancellationToken,
@@ -989,7 +990,10 @@ fn failed(status: OtaUpdateStatus, error: &anyhow::Error) -> OtaUpdateStatus {
 ///
 /// Action futures are large. Boxing them keeps the futures of checks small,
 /// which would otherwise overflow the stack of unoptimized builds.
-async fn call<A: Action>(executor: &mut ClientExecutor, action: A) -> anyhow::Result<A::Output> {
+async fn call<A: Action + DeviceGroupMarker>(
+    executor: &mut DeviceExecutor,
+    action: A,
+) -> anyhow::Result<A::Output> {
     Box::pin(executor.execute(action))
         .await
         .context("failed to reach Nexigon Hub")?

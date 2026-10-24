@@ -930,6 +930,10 @@ record PackageVersionAsset {
 }
 
 /// Resolve a package version by its path.
+///
+/// A path consists of a repository, a package, and a version tag. Devices can resolve
+/// versions in repositories linked to their project.
+#[group(name = "device")]
 #[request(
     name = "repositories_ResolveVersionByPath",
     response = ResolvePackageVersionByPathOutput
@@ -990,6 +994,7 @@ record ResolvePackageVersionByPathSuccess {
 }
 
 /// Get information about a package version.
+#[group(name = "device")]
 #[request(
     name = "repositories_GetVersionDetails",
     response = GetPackageVersionDetailsOutput
@@ -1195,6 +1200,10 @@ record UntagPackageVersionAction {
 }
 
 /// Resolve a version asset by its path.
+///
+/// A path consists of a repository, a package, a version tag, and the asset's
+/// filename within the version.
+#[group(name = "device")]
 #[request(
     name = "repositories_ResolveVersionAssetByPath",
     response = ResolvePackageVersionAssetByPathOutput
@@ -1348,6 +1357,9 @@ record DeleteAssetAction {
 }
 
 /// Issue a URL for downloading an asset.
+///
+/// The URL is valid for two hours and requires no further authentication.
+#[group(name = "device")]
 #[request(
     name = "repositories_IssueAssetDownloadUrl",
     response = IssueAssetDownloadUrlOutput
@@ -1355,7 +1367,8 @@ record DeleteAssetAction {
 record IssueAssetDownloadUrlAction {
     /// ID of the asset to issue the URL for.
     asset_id: RepositoryAssetId,
-    /// Optional filename for the asset.
+    /// Filename under which browsers save the download, set through the
+    /// `Content-Disposition` header of the download response.
     #[validate(
         { 1 <= _.size <= 256 },
         message = "Filename must be between 1 and 256 characters."
@@ -1386,7 +1399,7 @@ record IssueAssetUploadUrlOutput {
     /// Objects uploaded through this URL remain dangling. New clients should use
     /// `verified_url`, apply every entry in `headers`, and finalize the upload.
     url: string,
-    /// URL for an upload whose digest and ownership can be verified by the hub.
+    /// URL for an upload whose digest and ownership Nexigon Hub can verify.
     verified_url?: string,
     /// Headers that must accompany a request to `verified_url`.
     headers?: [string: string],
@@ -1403,7 +1416,7 @@ record FinalizeAssetUploadAction {
 
 /// Query the audit log of the repository.
 #[request(
-    name = "audit_QueryAuditLogEvents",
+    name = "repositories_QueryAuditLog",
     response = QueryAuditLogEventsOutput
 )]
 record QueryAuditLogEventsAction {

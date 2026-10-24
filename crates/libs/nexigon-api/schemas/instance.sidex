@@ -4,6 +4,7 @@ import json::JsonValue
 import outputs::Empty
 
 /// Get instance statistics.
+#[group(name = "admin")]
 #[request(
     name = "instance_GetStatistics",
     response = GetInstanceStatisticsOutput
@@ -21,6 +22,7 @@ record GetInstanceStatisticsOutput {
 }
 
 /// Get the settings of the instance.
+#[group(name = "admin")]
 #[request(
     name = "instance_GetSettingsRaw",
     response = GetInstanceSettingsRawOutput
@@ -34,6 +36,7 @@ record GetInstanceSettingsRawOutput {
 }
 
 /// Set a setting of the instance.
+#[group(name = "admin")]
 #[request(name = "instance_SetSettingRaw", response = Empty)]
 record SetInstanceSettingRawAction {
     /// Name of the setting.

@@ -3,14 +3,22 @@
 //! A device profile is a project-owned set of property values. A device applies
 //! its assigned profiles in order, followed by its own property values. Each
 //! value applies to the values before it as a JSON merge patch (RFC 7396).
+//!
+//! For each of its profiles, a device follows the profile's revisions in a mode:
+//! it uses the latest revision, a pinned revision, or the revision of the
+//! profile's rollout. A rollout applies a revision to the devices in rollout
+//! mode in stages.
 
 import datetime::Timestamp
 import devices::DeviceGroupSelector
+import devices::DeviceId
 import json::JsonValue
 import outputs::Empty
 import pagination::PageInfo
 import pagination::PageRequest
 import projects::ProjectId
+import rollouts::RolloutGuardStatus
+import rollouts::RolloutStage
 
 /// Stable identity of a device profile.
 #[rust(type = "nexigon_ids::ids::DeviceProfileId")]
@@ -23,6 +31,43 @@ record DeviceProfileProperty {
     value: JsonValue,
     /// Indicates whether devices are prevented from changing the property.
     protected: bool,
+}
+
+/// How a device follows the revisions of an assigned profile.
+#[json(tag = "mode")]
+variant DeviceProfileMode {
+    /// Use every revision as soon as it is saved.
+    Latest,
+    /// Use one specific revision.
+    Pinned: PinnedDeviceProfileMode,
+    /// Use the revision of the profile's rollout once the rollout reaches the
+    /// device.
+    ///
+    /// A device that switches to this mode keeps its current revision until
+    /// then. A device that gets the profile in this mode has no revision until
+    /// then, so that the profile sets no values on it.
+    Rollout,
+}
+
+/// Revision that a device is pinned to.
+record PinnedDeviceProfileMode {
+    revision: u32,
+}
+
+/// Profile of a device and how the device follows the profile's revisions.
+record DeviceProfileAssignment {
+    profile_id: DeviceProfileId,
+    /// Defaults to `Latest`.
+    mode?: DeviceProfileMode,
+}
+
+/// Profile that a device applies.
+record AssignedDeviceProfile {
+    profile: DeviceProfileSummary,
+    mode: DeviceProfileMode,
+    /// Revision that the device uses. Absent if the profile is in rollout mode
+    /// and its rollout has not reached the device.
+    revision?: u32,
 }
 
 /// Device profile without its property values.
@@ -140,7 +185,8 @@ record DeleteDeviceProfileAction {
 
 /// Save new property values of a device profile as its next revision.
 ///
-/// Every device with the profile applies the new values right away.
+/// Every device that has the profile in `Latest` mode applies the new values
+/// right away.
 #[unstable(feature = "device_profiles")]
 #[request(
     name = "profiles_SaveRevision",
@@ -182,9 +228,9 @@ record DeviceProfileRevisionConflict {
 ///
 /// Applies once to the devices that match now; devices that match later do not
 /// receive the profile. The profile applies after a device's other profiles, and
-/// devices that already have it keep its position. Devices that already have the
-/// maximum number of profiles are skipped. Requires permission to change the
-/// profiles of every matching device.
+/// devices that already have it keep its position but take the given mode.
+/// Devices that already have the maximum number of profiles are skipped. Requires
+/// permission to change the profiles of every matching device.
 #[unstable(feature = "device_profiles")]
 #[request(
     name = "profiles_AssignDevices",
@@ -196,15 +242,17 @@ record AssignDeviceProfileDevicesAction {
     /// Group conditions that devices must satisfy. Without conditions, every
     /// device of the project matches.
     groups?: DeviceGroupSelector,
+    /// Mode of the profile on the devices. Defaults to `Latest`.
+    mode?: DeviceProfileMode,
 }
 
 /// Output of assigning a device profile to matching devices.
 ///
 /// Devices deleted while the profile is assigned are not counted.
 record AssignDeviceProfileDevicesOutput {
-    /// Number of devices the profile was assigned to.
+    /// Number of devices that got the profile or, if they already had it, the mode.
     assigned: u32,
-    /// Number of matching devices that already had the profile.
+    /// Number of matching devices that already had the profile in the mode.
     unchanged: u32,
     /// Number of matching devices skipped because they already have the maximum
     /// number of profiles.
@@ -254,4 +302,185 @@ record QueryDeviceProfileRevisionsOutput {
     revisions: [DeviceProfileRevision],
     /// Continuation of the traversal.
     page: PageInfo,
+}
+
+// ============================================================================
+// Rollouts
+// ============================================================================
+
+
+/// Start a rollout of a profile revision to the profile's devices in rollout
+/// mode, replacing the profile's current rollout.
+///
+/// Releases the first stage right away. The new rollout runs even if the rollout
+/// it replaces was halted.
+#[unstable(feature = "device_profiles")]
+#[request(
+    name = "profiles_StartRollout",
+    response = StartDeviceProfileRolloutOutput
+)]
+record StartDeviceProfileRolloutAction {
+    project_id: ProjectId,
+    profile_id: DeviceProfileId,
+    /// Revision to roll out.
+    revision: u32,
+    /// Stages in the order of their release.
+    #[validate(
+        { 1 <= _.size <= 20 },
+        message = "A rollout must have between 1 and 20 stages."
+    )]
+    stages: [RolloutStage],
+    /// Expression that decides whether an active device completed. Without
+    /// it, devices complete as soon as they become active.
+    #[validate(
+        { _.size <= 4096 },
+        message = "Expressions must be at most 4096 characters."
+    )]
+    completion_expression?: string,
+    /// Expression that decides whether an active device failed. Without it,
+    /// devices never fail. Requires a completion expression.
+    #[validate(
+        { _.size <= 4096 },
+        message = "Expressions must be at most 4096 characters."
+    )]
+    failure_expression?: string,
+}
+
+/// Output of starting a rollout.
+record StartDeviceProfileRolloutOutput {
+    /// Number of the started rollout.
+    number: u32,
+}
+
+/// Get the rollout of a profile.
+#[unstable(feature = "device_profiles")]
+#[request(name = "profiles_GetRollout", response = GetDeviceProfileRolloutOutput)]
+record GetDeviceProfileRolloutAction {
+    project_id: ProjectId,
+    profile_id: DeviceProfileId,
+}
+
+/// Output of getting the rollout of a profile.
+#[json(tag = "result")]
+variant GetDeviceProfileRolloutOutput {
+    /// The profile does not exist in the project or has no rollout.
+    NotFound,
+    /// The profile's rollout.
+    Found: DeviceProfileRollout,
+}
+
+/// Rollout of a profile revision.
+record DeviceProfileRollout {
+    /// Number of the rollout. Each rollout of a profile has a higher number than
+    /// the one it replaced.
+    number: u32,
+    /// Revision that the rollout applies.
+    revision: u32,
+    /// Stages in the order of their release.
+    stages: [DeviceProfileRolloutStageState],
+    completion_expression?: string,
+    failure_expression?: string,
+    started_at: Timestamp,
+    /// Time when the rollout was halted. Absent while it runs.
+    halted_at?: Timestamp,
+    /// Whether the last stage is released, its spread has finished, and every
+    /// device of the rollout has completed or failed.
+    converged: bool,
+}
+
+/// Definition and progress of a rollout stage.
+record DeviceProfileRolloutStageState {
+    definition: RolloutStage,
+    /// Time when the stage was released. Absent until then.
+    released_at?: Timestamp,
+    /// Numbers of the stage's devices by status.
+    devices: DeviceProfileRolloutDeviceCounts,
+    /// Progress of the stage's guard. Present for the next stage to release.
+    guard?: RolloutGuardStatus,
+}
+
+/// Numbers of devices by rollout status.
+record DeviceProfileRolloutDeviceCounts {
+    pending: u32,
+    active: u32,
+    completed: u32,
+    failed: u32,
+}
+
+/// Status of a device in a rollout.
+#[json(tagged = externally)]
+variant DeviceProfileRolloutDeviceStatus {
+    /// The rollout has not reached the device yet.
+    Pending,
+    /// The rollout applied its revision, and the device's outcome is open.
+    Active,
+    /// The device has taken the revision successfully.
+    Completed,
+    /// The device has failed to take the revision.
+    Failed,
+}
+
+/// Device in a rollout.
+record DeviceProfileRolloutDevice {
+    device_id: DeviceId,
+    /// Name of the device.
+    name?: string,
+    /// Index of the device's stage.
+    stage_index: u32,
+    status: DeviceProfileRolloutDeviceStatus,
+    /// Time when the status last changed.
+    updated_at: Timestamp,
+}
+
+/// List the devices of a profile's rollout, by stage.
+#[unstable(feature = "device_profiles")]
+#[request(
+    name = "profiles_QueryRolloutDevices",
+    response = QueryDeviceProfileRolloutDevicesOutput
+)]
+record QueryDeviceProfileRolloutDevicesAction {
+    project_id: ProjectId,
+    profile_id: DeviceProfileId,
+    /// Page to return. Without this field, the first page is returned.
+    page?: PageRequest,
+}
+
+/// Output of listing the devices of a profile's rollout.
+record QueryDeviceProfileRolloutDevicesOutput {
+    /// Devices on this page, by stage.
+    devices: [DeviceProfileRolloutDevice],
+    /// Continuation of the traversal.
+    page: PageInfo,
+}
+
+/// Halt the rollout of a profile.
+///
+/// The rollout applies its revision to no further devices and releases no
+/// stages until it is resumed. Halting a halted rollout has no effect.
+#[unstable(feature = "device_profiles")]
+#[request(name = "profiles_HaltRollout", response = Empty)]
+record HaltDeviceProfileRolloutAction {
+    project_id: ProjectId,
+    profile_id: DeviceProfileId,
+}
+
+/// Resume the halted rollout of a profile where it stopped.
+///
+/// Resuming a running rollout has no effect.
+#[unstable(feature = "device_profiles")]
+#[request(name = "profiles_ResumeRollout", response = Empty)]
+record ResumeDeviceProfileRolloutAction {
+    project_id: ProjectId,
+    profile_id: DeviceProfileId,
+}
+
+/// Release the next stage of a running rollout, skipping its guard and the wait
+/// for the previous stage's spread.
+#[unstable(feature = "device_profiles")]
+#[request(name = "profiles_ReleaseRolloutStage", response = Empty)]
+record ReleaseDeviceProfileRolloutStageAction {
+    project_id: ProjectId,
+    profile_id: DeviceProfileId,
+    /// Index of the stage to release, which must be the next unreleased one.
+    stage_index: u32,
 }

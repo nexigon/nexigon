@@ -1,0 +1,74 @@
+//! Stages and guards of staged rollouts.
+//!
+//! Profile rollouts and fleet operations reach their devices in stages. Each
+//! stage selects devices by group conditions and a percentage, and is released
+//! once the guard over the devices of earlier stages passes.
+
+import devices::DeviceGroupSelector
+
+/// Stage of a rollout.
+record RolloutStage {
+    #[validate(
+        { 1 <= _.size <= 128 },
+        message = "Stage name must be between 1 and 128 characters."
+    )]
+    name: string,
+    /// Group conditions that the stage's devices satisfy. Without conditions,
+    /// every device satisfies them.
+    groups?: DeviceGroupSelector,
+    /// Share of the devices that satisfy the conditions, by their position in
+    /// the rollout, in percent. May have a fraction, such as 0.5. Defaults to
+    /// 100.
+    ///
+    /// A device belongs to the first stage whose conditions it satisfies and
+    /// whose percentage is above its position.
+    #[validate(
+        { 0 < _ <= 100 },
+        message = "Stage percentage must be greater than 0 and at most 100."
+    )]
+    percentage?: f64,
+    /// Time over which the stage's devices become active, in seconds. Defaults
+    /// to 0.
+    #[validate({ _ <= 2592000 }, message = "Spread must be at most 30 days.")]
+    spread_secs?: u32,
+    /// Conditions for releasing the stage. The first stage is released when the
+    /// rollout starts and ignores its guard.
+    guard?: RolloutGuard,
+}
+
+/// Conditions for releasing a rollout stage, all of which must hold.
+record RolloutGuard {
+    /// Minimal share of the devices in earlier stages that completed, in
+    /// percent. Defaults to 100.
+    #[validate(
+        { 0 <= _ <= 100 },
+        message = "Completed share must be between 0 and 100."
+    )]
+    min_completed_percent?: f64,
+    /// Maximal share of the devices in earlier stages that failed, in percent.
+    /// Defaults to 0.
+    #[validate(
+        { 0 <= _ <= 100 },
+        message = "Failed share must be between 0 and 100."
+    )]
+    max_failed_percent?: f64,
+    /// Minimal time since the previous stage's spread finished, in seconds.
+    /// Defaults to 0.
+    #[validate({ _ <= 2592000 }, message = "Soak time must be at most 30 days.")]
+    soak_secs?: u32,
+}
+
+/// Progress of a guard toward releasing its stage.
+record RolloutGuardStatus {
+    /// Share of the devices in earlier stages that completed, in percent,
+    /// rounded down to two decimal places.
+    completed_percent: f64,
+    /// Share of the devices in earlier stages that failed, in percent, rounded
+    /// up to two decimal places.
+    failed_percent: f64,
+    /// Seconds until the previous stage's spread and the soak time have passed,
+    /// on the rollout's clock. Zero once they have.
+    remaining_secs: u32,
+    /// Whether all conditions of the guard pass.
+    passed: bool,
+}

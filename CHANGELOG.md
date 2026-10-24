@@ -44,6 +44,28 @@
   find versions by name, ID, or tag. The new `repositories packages tags list`
   lists the tags of a package and their versions with the same options. Both
   require Hub 2026.4.0 or later.
+- Mark the actions of the Device API, which remain backward compatible for at
+  least five years, and of the Admin API, which require instance administrator
+  permissions and change more often. The Rust, TypeScript, and Python API types
+  document the API they belong to. The Agent invokes only Device API actions,
+  except in its `repositories` commands.
+- Add the Admin API actions `users_Deactivate`, `users_Reactivate`,
+  `organizations_Deactivate`, and `organizations_Reactivate`. User and
+  organization queries return a `deactivation` field for deactivated accounts
+  and organizations.
+- Assign device profiles in the modes `latest`, `pinned`, or `rollout`, and roll
+  out profile revisions in stages with `profiles_StartRollout` and related
+  actions. `devices_SetProfiles`, `devices_UpdateProfiles`, and
+  `devices_GetDetails` take or return profile assignments instead of profile
+  IDs.
+- Redesign fleet operations. Selectors, step conditions, and waits take
+  expressions, and targets are released in stages with guards, spreads, and
+  soak times. `fleet_HaltOperation`, `fleet_ResumeOperation`,
+  `fleet_ReleaseOperationStage`, and `fleet_CloseOperation` replace
+  `fleet_PauseOperation` and `fleet_AdvanceOperationStage`. The `DeviceTask`
+  step is removed. Agent 0.6 keeps running the commands of fleet operations.
+- Update Tokio to 1.54.1 for RUSTSEC-2026-0386, which reports that
+  `AsyncFd::new` violates I/O safety.
 
 ## 0.6.1 (2026-10-21)
 

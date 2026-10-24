@@ -129,9 +129,13 @@ pub(crate) async fn handle_terminal_session_with_cancellation(
                 let master_fd = master.as_raw_fd();
                 // AsyncFd requires non-blocking mode.
                 set_nonblocking(master_fd).context("failed to set PTY master to non-blocking")?;
-                let async_master_read = tokio::io::unix::AsyncFd::new(master.try_clone()?)
+                let master_read = master.try_clone()?;
+                // SAFETY: Each `File` owns its file descriptor, which stays open and refers
+                // to the PTY master until the `AsyncFd` owning the `File` is dropped.
+                let async_master_read = unsafe { tokio::io::unix::AsyncFd::register(master_read) }
                     .context("failed to register PTY reader")?;
-                let async_master_write = tokio::io::unix::AsyncFd::new(master)
+                // SAFETY: As above.
+                let async_master_write = unsafe { tokio::io::unix::AsyncFd::register(master) }
                     .context("failed to register PTY writer")?;
                 Ok::<_, anyhow::Error>((master_fd, async_master_read, async_master_write))
             })();

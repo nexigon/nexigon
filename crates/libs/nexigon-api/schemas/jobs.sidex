@@ -47,6 +47,7 @@ variant JobStatus {
 }
 
 /// Query the jobs of the instance.
+#[group(name = "admin")]
 #[request(name = "jobs_Query", response = QueryJobsOutput)]
 record QueryJobsAction {}
 
