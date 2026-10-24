@@ -19,7 +19,6 @@ use anyhow::bail;
 use futures::FutureExt;
 use jiff::Timestamp;
 use jiff::tz::TimeZone;
-use nexigon_client::ClientExecutor;
 use nexigon_ids::ids::DeviceId;
 use tokio::sync::Notify;
 use tokio_util::sync::CancellationToken;
@@ -28,6 +27,7 @@ use tracing::info;
 use tracing::warn;
 
 use crate::config::Config;
+use crate::device_api::DeviceExecutor;
 
 mod check;
 mod planning;
@@ -165,7 +165,7 @@ pub(crate) fn settings(config: &Config) -> anyhow::Result<Option<SystemUpdates>>
 /// that the agent stops.
 pub(crate) async fn run(
     settings: SystemUpdates,
-    executor: ClientExecutor,
+    executor: DeviceExecutor,
     device_id: DeviceId,
     check_requested: Arc<Notify>,
     cancellation: CancellationToken,

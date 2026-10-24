@@ -2,12 +2,15 @@
 
 import audit::AuditLogEvent
 import audit::AuditLogReferences
+import authorization::ActionAuthorization
+import datetime::Timestamp
 import outputs::Empty
 import pagination::PageInfo
 import pagination::PageRequest
 import projects::ProjectId
 import repositories::RepositoryId
 import repositories::RepositoryS3Config
+import users::DeactivationMessage
 import users::UserId
 
 /// Unique ID of an organization
@@ -26,6 +29,7 @@ opaque OrganizationInvitationId
 opaque OrganizationApiTokenId
 
 /// Query the organizations of the instance.
+#[group(name = "admin")]
 #[request(name = "organizations_Query", response = QueryOrganizationsOutput)]
 record QueryOrganizationsAction {}
 
@@ -41,6 +45,18 @@ record QueryOrganizationsItem {
     organization_id: OrganizationId,
     /// Name of the organization.
     name: string,
+    /// Deactivation of the organization, if it is deactivated.
+    deactivation?: OrganizationDeactivation,
+}
+
+/// Deactivation of an organization.
+record OrganizationDeactivation {
+    /// Timestamp when the organization was deactivated.
+    deactivated_at: Timestamp,
+    /// Message shown to members, formatted as Markdown.
+    ///
+    /// A built-in message is shown when absent.
+    message?: string,
 }
 
 /// Query the members of an organization.
@@ -156,6 +172,7 @@ record QueryOrganizationInvitationsItem {
 }
 
 /// Create an organization.
+#[group(name = "admin")]
 #[request(name = "organizations_Create", response = CreateOrganizationOutput)]
 record CreateOrganizationAction {
     /// Name of the organization.
@@ -177,13 +194,50 @@ record CreateOrganizationOutput {
 }
 
 /// Delete an organization.
+#[group(name = "admin")]
 #[request(name = "organizations_Delete", response = Empty)]
 record DeleteOrganizationAction {
     /// ID of the organization.
     organization_id: OrganizationId,
 }
 
+/// Deactivate an organization.
+///
+/// Admin-only operation. Members and API tokens hold no permissions in a
+/// deactivated organization, except that its administrators can manage its
+/// subscription. Its devices cannot connect, and its repositories are neither
+/// public nor available to devices of other organizations. Members,
+/// tokens, devices, data, and subscriptions are retained, and billing continues.
+/// Reactivation restores access. Deactivating a deactivated organization
+/// replaces its message, or selects the built-in message if `message` is absent.
+#[group(name = "admin")]
+#[request(name = "organizations_Deactivate", response = Empty)]
+record DeactivateOrganizationAction {
+    /// Authorization for this administrative action.
+    authorization: ActionAuthorization,
+    /// ID of the organization.
+    organization_id: OrganizationId,
+    /// Message shown to members.
+    ///
+    /// A built-in message is shown when absent.
+    message?: DeactivationMessage,
+}
+
+/// Reactivate a deactivated organization.
+///
+/// Admin-only operation that restores access for members, API tokens, and
+/// devices.
+#[group(name = "admin")]
+#[request(name = "organizations_Reactivate", response = Empty)]
+record ReactivateOrganizationAction {
+    /// Authorization for this administrative action.
+    authorization: ActionAuthorization,
+    /// ID of the organization.
+    organization_id: OrganizationId,
+}
+
 /// Add a user to an organization.
+#[group(name = "admin")]
 #[request(name = "organizations_AddMember", response = Empty)]
 record AddOrganizationMemberAction {
     /// ID of the organization.

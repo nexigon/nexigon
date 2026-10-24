@@ -6,15 +6,15 @@ import audit::AuditLogReferences
 import cluster::ClusterNodeId
 import datetime::Timestamp
 import fleet::FleetOperationId
-import json::JsonExpr
-import json::JsonMutation
 import json::JsonValue
 import jwt::Jwt
 import outputs::Empty
 import pagination::PageInfo
 import pagination::PageRequest
+import profiles::AssignedDeviceProfile
+import profiles::DeviceProfileAssignment
 import profiles::DeviceProfileId
-import profiles::DeviceProfileSummary
+import profiles::DeviceProfileMode
 import projects::DeploymentToken
 import projects::DeploymentTokenId
 import projects::ProjectId
@@ -56,6 +56,7 @@ opaque CertificateFingerprint
 opaque DeviceEventId
 
 /// Query the devices of the instance.
+#[group(name = "admin")]
 #[request(name = "devices_Query", response = QueryDevicesOutput)]
 record QueryDevicesAction {}
 
@@ -91,7 +92,7 @@ record GetDeviceDetailsOutput {
     /// Groups currently assigned to this device.
     groups: [DeviceGroup],
     /// Profiles assigned to this device, in the order they apply.
-    profiles: [DeviceProfileSummary],
+    profiles: [AssignedDeviceProfile],
     /// ID of the device.
     device_id: DeviceId,
     /// Project ID of the device.
@@ -225,14 +226,19 @@ record SetDeviceNameAction {
     name?: string,
 }
 
-/// Issue a JWT for a device with user-defined claims.
+/// Issue a token that proves a device's identity to an external system.
 ///
-/// **Note: Only use this action for integration with external systems.**
+/// The token is a JWT signed by Nexigon Hub that carries the device ID and the given
+/// claims. An external backend validates it with `devices_ValidateDeviceToken`.
+///
+/// **Note: Only use this action for integration with external systems.** The token
+/// does not replace the credentials a device uses to connect to Nexigon Hub.
+#[group(name = "device")]
 #[request(name = "devices_IssueDeviceToken", response = IssueDeviceTokenOutput)]
 record IssueDeviceTokenAction {
     /// ID of the device.
     device_id: DeviceId,
-    /// Token validity duration in seconds.
+    /// Token validity duration in seconds. Defaults to 600 seconds (10 minutes).
     #[validate(
         { 1 <= _ <= 31536000 },
         message = "Token validity must be between 1 second and 1 year."
@@ -248,7 +254,11 @@ record IssueDeviceTokenOutput {
     jwt: Jwt,
 }
 
-/// Validate a device JWT.
+/// Validate a token issued with `devices_IssueDeviceToken`.
+///
+/// Returns the device ID and claims of a valid token. Tokens of deleted devices, of
+/// devices in deleted projects, and of devices in deactivated organizations are
+/// invalid.
 ///
 /// **Note: Only use this action for integration with external systems.**
 #[request(
@@ -313,6 +323,8 @@ record SetDeviceCertificateStatusAction {
 }
 
 /// Register a connection of a device to a cluster node.
+///
+/// Nexigon Hub invokes this action internally. Clients do not need it.
 #[request(
     name = "devices_RegisterConnection",
     response = RegisterDeviceConnectionOutput
@@ -333,6 +345,8 @@ record RegisterDeviceConnectionOutput {
 }
 
 /// Unregister a connection of a device to a cluster node.
+///
+/// Nexigon Hub invokes this action internally. Clients do not need it.
 #[request(name = "devices_UnregisterConnection", response = Empty)]
 record UnregisterDeviceConnectionAction {
     /// ID of the connection.
@@ -415,7 +429,9 @@ record IssueDeviceHttpProxyTokenOutput {
     url: string,
 }
 
-/// Validate a HTTP proxy JWT.
+/// Validate an HTTP proxy JWT.
+///
+/// Nexigon Hub invokes this action internally. Clients do not need it.
 #[request(
     name = "devices_ValidateHttpProxyToken",
     response = ValidateDeviceHttpProxyTokenOutput
@@ -454,12 +470,17 @@ record ValidateDeviceHttpProxyTokenSuccess {
     port?: u16,
 }
 
-/// Publish device events.
+/// Publish events of a device.
+///
+/// Nexigon Hub stores events as a history of device behavior. Each event has an ID
+/// that is unique per device. An event published again with the same ID is not
+/// stored again, so publishing can safely be retried.
+#[group(name = "device")]
 #[request(name = "devices_PublishEvents", response = Empty)]
 record PublishDeviceEventsAction {
     /// ID of the device.
     device_id: DeviceId,
-    /// Events to push.
+    /// Events to publish.
     events: [DeviceEvent],
 }
 
@@ -489,7 +510,7 @@ record QueryDeviceEventsOutput {
 record DeviceEvent {
     /// ID of the event.
     event_id: DeviceEventId,
-    /// Event category (optional, low-cardinality category of the event).
+    /// Category identifying the type of the event. Keep the set of categories small.
     #[validate(
         { 1 <= _.size <= 128 },
         message = "Event category must be between 1 and 128 characters."
@@ -503,7 +524,8 @@ record DeviceEvent {
     attributes: [string: JsonValue],
     /// Timestamp when the event was emitted.
     emitted_at: Timestamp,
-    /// Timestamp when the event was received.
+    /// Timestamp when Nexigon Hub received the event. Nexigon Hub sets it and
+    /// ignores the value in published events.
     received_at?: Timestamp,
 }
 
@@ -514,7 +536,7 @@ variant DeviceEventSeverity {
     Trace,
     /// Debugging event.
     Debug,
-    /// Informational even.
+    /// Informational event.
     Info,
     /// Warning event.
     Warning,
@@ -525,6 +547,12 @@ variant DeviceEventSeverity {
 }
 
 /// Set a property of a device.
+///
+/// A property is a named JSON value of a device. Setting a property replaces the
+/// device's own value and increments the property's version. With an expected version,
+/// the property is only updated if its version still matches (compare-and-swap).
+/// Devices cannot change protected properties.
+#[group(name = "device")]
 #[request(name = "devices_SetProperty", response = SetDevicePropertyOutput)]
 record SetDevicePropertyAction {
     /// ID of the device.
@@ -578,6 +606,10 @@ record SetDevicePropertyVersionConflict {
 }
 
 /// Get a property of a device.
+///
+/// The value combines the values of the device's profiles with the device's own
+/// value.
+#[group(name = "device")]
 #[request(name = "devices_GetProperty", response = GetDevicePropertyOutput)]
 record GetDevicePropertyAction {
     /// ID of the device.
@@ -778,7 +810,7 @@ record DeviceCommandInvokeData {
     command: string,
     /// Command input.
     input: JsonValue,
-    /// Stream log output back to the hub during execution (defaults to false).
+    /// Stream log output to Nexigon Hub during execution (defaults to false).
     stream_log?: bool,
     /// Timeout in seconds.
     timeout_secs?: u32,
@@ -932,26 +964,27 @@ record UpdateDeviceGroupsAction {
 #[request(name = "devices_SetProfiles", response = Empty)]
 record SetDeviceProfilesAction {
     device_id: DeviceId,
-    /// Profiles of the device, in the order they apply. A profile may appear
-    /// only once.
-    profile_ids: [DeviceProfileId],
+    /// Profiles of the device and their modes, in the order they apply. A
+    /// profile may appear only once.
+    profiles: [DeviceProfileAssignment],
 }
 
 /// Atomically add and remove profiles on explicit devices in one project.
 ///
 /// Added profiles apply after the device's other profiles, in the given order.
-/// Adding an assigned profile keeps its position, and removing an absent one is
-/// a no-op. A profile cannot appear in both lists. All devices and profiles must
-/// belong to the project; otherwise no assignments change. Device credentials
-/// cannot change profiles.
+/// Adding an assigned profile keeps its position but sets its mode, and removing
+/// an absent one is a no-op. A profile cannot appear in both lists. All devices
+/// and profiles must belong to the project; otherwise no assignments change.
+/// Device credentials cannot change profiles.
 #[unstable(feature = "device_profiles")]
 #[request(name = "devices_UpdateProfiles", response = Empty)]
 record UpdateDeviceProfilesAction {
     project_id: ProjectId,
     #[validate({ _.size >= 1 }, message = "Select at least one device.")]
     device_ids: [DeviceId],
-    /// Profiles to add, in the order they apply after a device's other profiles.
-    add: [DeviceProfileId],
+    /// Profiles to add with their modes, in the order they apply after a device's
+    /// other profiles.
+    add: [DeviceProfileAssignment],
     /// Profiles to remove.
     remove: [DeviceProfileId],
 }
@@ -985,7 +1018,7 @@ record DeviceGroupSelector {
     none?: [DeviceGroupId],
 }
 
-/// A device whose property predicates could not be evaluated.
+/// A device for which a selector's expression produced an error.
 record DeviceSelectionError {
     device_id: DeviceId,
     error: string,
@@ -1007,36 +1040,37 @@ opaque DeviceOperationId
 opaque DeviceOperationWorkClaimId
 
 /// One step in a device operation.
+///
+/// Expressions of steps can read the variables `properties` and `now` and the
+/// variable `operation`, whose `writes` hold, by property name, the property
+/// versions that the operation's earlier steps created.
 #[json(tag = "kind")]
 variant DeviceOperationStep {
-    /// Set a device property from the hub.
+    /// Set the device's own value of a property.
     SetDeviceProperty: DeviceOperationSetDevicePropertyStep,
-    /// Update a device property from the hub.
-    UpdateDeviceProperty: DeviceOperationUpdateDevicePropertyStep,
-    /// Remove a device property from the hub.
+    /// Apply a JSON merge patch to the device's own value of a property.
+    PatchDeviceProperty: DeviceOperationPatchDevicePropertyStep,
+    /// Remove the device's own value of a property.
     RemoveDeviceProperty: DeviceOperationRemoveDevicePropertyStep,
-    /// Ask the device to run an on-device command when it polls.
+    /// Ask the device to run a command.
     DeviceCommand: DeviceOperationDeviceCommandStep,
-    /// Durable work for a worker running locally on the device.
-    ///
-    /// **Not executed by the bundled agent.** The hub protocol is complete: a device
-    /// client may explicitly poll for task work, report progress and checkpoints, and
-    /// resume the current step from its latest checkpoint. Nexigon Agent deliberately
-    /// requests command work only.
-    ///
-    /// There is not yet an agent CLI or local-API task executor. Without a custom
-    /// on-device client, an operation that reaches this step remains running until its
-    /// timeout.
-    DeviceTask: DeviceOperationDeviceTaskStep,
-    /// Wait until a device-reported property predicate matches.
+    /// Wait until the device's properties satisfy an expression.
     WaitForDeviceProperty: DeviceOperationWaitForDevicePropertyStep,
 }
 
-/// Server-side device property set.
+/// Step that sets the device's own value of a property.
+///
+/// The device's own value applies to the values of its profiles as a JSON merge
+/// patch, so it overrides the members of their values that it sets.
 record DeviceOperationSetDevicePropertyStep {
-    /// Run the step only when this expression evaluates to JSON `true`.
-    /// A false result skips the step; an evaluation error fails it.
-    when?: JsonExpr,
+    /// Expression that decides whether the step runs. A step whose expression
+    /// is false is skipped, and a step whose expression produces an error
+    /// fails. Without an expression, the step runs.
+    #[validate(
+        { _.size <= 4096 },
+        message = "Expressions must be at most 4096 characters."
+    )]
+    when?: string,
     /// Property name.
     #[validate(
         { 1 <= _.size <= 256 },
@@ -1048,17 +1082,23 @@ record DeviceOperationSetDevicePropertyStep {
         code = "format:property_name"
     )]
     name: string,
-    /// Desired property value.
+    /// Value to set.
     value: JsonValue,
-    /// Whether the property should be protected.
+    /// Whether the property is protected. Defaults to `false`.
     protected?: bool,
 }
 
-/// Server-side device property update.
-record DeviceOperationUpdateDevicePropertyStep {
-    /// Run the step only when this expression evaluates to JSON `true`.
-    /// A false result skips the step; an evaluation error fails it.
-    when?: JsonExpr,
+/// Step that applies a JSON merge patch (RFC 7396) to the device's own value of
+/// a property.
+record DeviceOperationPatchDevicePropertyStep {
+    /// Expression that decides whether the step runs. A step whose expression
+    /// is false is skipped, and a step whose expression produces an error
+    /// fails. Without an expression, the step runs.
+    #[validate(
+        { _.size <= 4096 },
+        message = "Expressions must be at most 4096 characters."
+    )]
+    when?: string,
     /// Property name.
     #[validate(
         { 1 <= _.size <= 256 },
@@ -1070,20 +1110,25 @@ record DeviceOperationUpdateDevicePropertyStep {
         code = "format:property_name"
     )]
     name: string,
-    /// Mutation to apply to the current property value.
-    mutation: JsonMutation,
-    /// Whether the property should be protected.
-    ///
-    /// When omitted, the existing protection flag is preserved. If the property
-    /// does not exist yet, it defaults to unprotected.
+    /// Patch to apply. Without an own value, the patch applies to `null`.
+    patch: JsonValue,
+    /// Whether the property is protected. Without this field, a property keeps
+    /// its protection, and a new property is unprotected.
     protected?: bool,
 }
 
-/// Server-side device property removal.
+/// Step that removes the device's own value of a property.
+///
+/// The values of the device's profiles still apply afterwards.
 record DeviceOperationRemoveDevicePropertyStep {
-    /// Run the step only when this expression evaluates to JSON `true`.
-    /// A false result skips the step; an evaluation error fails it.
-    when?: JsonExpr,
+    /// Expression that decides whether the step runs. A step whose expression
+    /// is false is skipped, and a step whose expression produces an error
+    /// fails. Without an expression, the step runs.
+    #[validate(
+        { _.size <= 4096 },
+        message = "Expressions must be at most 4096 characters."
+    )]
+    when?: string,
     /// Property name.
     #[validate(
         { 1 <= _.size <= 256 },
@@ -1097,11 +1142,19 @@ record DeviceOperationRemoveDevicePropertyStep {
     name: string,
 }
 
-/// Device-polled command step.
+/// Step that asks the device to run a command.
+///
+/// The device must run Nexigon Agent with commands and operation polling
+/// enabled.
 record DeviceOperationDeviceCommandStep {
-    /// Run the step only when this expression evaluates to JSON `true`.
-    /// A false result skips the step; an evaluation error fails it.
-    when?: JsonExpr,
+    /// Expression that decides whether the step runs. A step whose expression
+    /// is false is skipped, and a step whose expression produces an error
+    /// fails. Without an expression, the step runs.
+    #[validate(
+        { _.size <= 4096 },
+        message = "Expressions must be at most 4096 characters."
+    )]
+    when?: string,
     /// Command name from the device command manifest.
     #[validate(
         { 1 <= _.size <= 256 },
@@ -1110,17 +1163,12 @@ record DeviceOperationDeviceCommandStep {
     command: string,
     /// Command input.
     input: JsonValue,
-    /// Step deadline in seconds. Defaults to one hour.
+    /// Time that the device has to run the command, in seconds. Defaults to
+    /// one hour.
     ///
-    /// The hub starts this clock when the command step becomes current work
-    /// for the device. The same value is also passed to the device command
-    /// handler as its execution timeout. If the device does not report before
-    /// the deadline, the operation driver marks the step and operation as timed out.
-    ///
-    /// The deadline is *noticed* by a background driver tick rather than at the
-    /// instant it passes, so a step times out within one tick of its deadline, not
-    /// exactly on it. Timeouts far shorter than the tick interval will therefore
-    /// overshoot considerably.
+    /// The time starts when the device claims the command, and the device
+    /// passes it to the command handler as its execution timeout. Use a fleet
+    /// operation's deadline to limit the wait for an offline device.
     #[validate(
         { 1 <= _ <= 86400 },
         message = "Command timeout must be between 1 second and 1 day."
@@ -1128,61 +1176,39 @@ record DeviceOperationDeviceCommandStep {
     timeout_secs?: u32,
 }
 
-/// Durable device task step.
+/// Step that waits until the device's properties satisfy an expression.
 ///
-/// The Hub exposes task polling, progress, checkpoint, and report semantics for custom
-/// on-device clients. The bundled Nexigon agent requests command work only and has no
-/// task executor, so without such a client this step remains running until its timeout.
-record DeviceOperationDeviceTaskStep {
-    /// Run the step only when this expression evaluates to JSON `true`.
-    /// A false result skips the step; an evaluation error fails it.
-    when?: JsonExpr,
-    /// Task name.
-    ///
-    /// A task is durable work scoped to this device operation step and intended for an
-    /// on-device worker. The bundled agent has no task executor; see
-    /// [`DeviceOperationStep::DeviceTask`].
-    #[validate(
-        { 1 <= _.size <= 256 },
-        message = "Device task name must be between 1 and 256 characters."
-    )]
-    task: string,
-    /// Task input.
-    input: JsonValue,
-    /// Step deadline in seconds. Defaults to one day.
-    ///
-    /// The hub starts this clock when the task step becomes current work for
-    /// the device. If no terminal outcome is reported before the deadline,
-    /// the operation driver marks the step and operation as timed out. The deadline
-    /// is noticed by a background driver tick rather than at the instant it passes,
-    /// so a step times out within one tick of its deadline, not exactly on it. A restarted
-    /// worker may resume from the latest checkpoint while the same step is
-    /// still current.
-    #[validate(
-        { 1 <= _ <= 604800 },
-        message = "Device task timeout must be between 1 second and 7 days."
-    )]
-    timeout_secs?: u32,
-}
-
-/// Server-observed property wait step.
+/// An expression that produces an error, for example because the device has
+/// not reported a property yet, keeps the step waiting. The step shows the
+/// latest error.
 record DeviceOperationWaitForDevicePropertyStep {
-    /// Run the step only when this expression evaluates to JSON `true`.
-    /// A false result skips the step; an evaluation error fails it.
-    when?: JsonExpr,
-    /// Expression that must evaluate to JSON `true` to complete the wait.
-    ///
-    /// A missing named value or path keeps the step waiting because the device
-    /// may report it later. Any other evaluation error fails the step.
-    predicate: JsonExpr,
-    /// Optional deadline in seconds.
-    ///
-    /// The hub starts this clock when the wait step becomes current for the
-    /// device. If the predicate does not match before the deadline,
-    /// the operation driver marks the step and operation as timed out.
+    /// Expression that decides whether the step runs. A step whose expression
+    /// is false is skipped, and a step whose expression produces an error
+    /// fails. Without an expression, the step runs.
     #[validate(
-        { 1 <= _ <= 604800 },
-        message = "Wait timeout must be between 1 second and 7 days."
+        { _.size <= 4096 },
+        message = "Expressions must be at most 4096 characters."
+    )]
+    when?: string,
+    /// Expression that finishes the wait once it is true.
+    #[validate(
+        { 1 <= _.size <= 4096 },
+        message = "Expressions must be between 1 and 4096 characters."
+    )]
+    expression: string,
+    /// Expression that fails the step once it is true. It takes precedence
+    /// over `expression`.
+    #[validate(
+        { _.size <= 4096 },
+        message = "Expressions must be at most 4096 characters."
+    )]
+    failure_expression?: string,
+    /// Time to wait, in seconds, after which the step times out. Without it,
+    /// the step waits until a fleet operation's deadline, if any, or until the
+    /// operation is cancelled.
+    #[validate(
+        { 1 <= _ <= 2592000 },
+        message = "Wait timeout must be between 1 second and 30 days."
     )]
     timeout_secs?: u32,
 }
@@ -1198,7 +1224,7 @@ variant DeviceOperationStatus {
     Succeeded,
     /// Operation failed a step.
     Failed,
-    /// Operation exceeded a step deadline.
+    /// Operation exceeded a step's timeout or its deadline.
     TimedOut,
     /// Operation was cancelled.
     Cancelled,
@@ -1209,13 +1235,13 @@ variant DeviceOperationStatus {
 variant DeviceOperationStepStatus {
     /// Step has not been started.
     Pending,
-    /// Step is waiting for device execution or a property predicate.
+    /// Step is waiting for the device or for its expression.
     Running,
     /// Step succeeded.
     Succeeded,
     /// Step failed.
     Failed,
-    /// Step exceeded its deadline.
+    /// Step exceeded its timeout or the operation's deadline.
     TimedOut,
     /// Step was skipped by conditions.
     Skipped,
@@ -1290,24 +1316,20 @@ record DeviceOperationStepState {
     step_index: u32,
     /// Step execution status.
     status: DeviceOperationStepStatus,
-    /// Step or device-reported command output.
+    /// Output that the device reported for a command.
     output?: JsonValue,
-    /// Error message when the step failed or timed out.
+    /// Error message when the step failed or timed out, or the latest error of
+    /// a waiting step's expressions.
     error?: string,
     /// When the step started running.
     started_at?: Timestamp,
     /// When the step reached a terminal status.
     completed_at?: Timestamp,
-    /// Durable checkpoint reported by the device while running a task step.
-    ///
-    /// Only ever set for `DeviceTask` steps; always absent for every other
-    /// step kind, since only device tasks can report checkpoints (see
-    /// `ReportDeviceOperationStepAction`).
-    checkpoint?: JsonValue,
 }
 
 /// Work item returned to a device when it polls.
 record DeviceOperationWorkItem {
+    /// ID of the device operation the work belongs to.
     device_operation_id: DeviceOperationId,
     /// Claim that must accompany reports for this delivery of the work.
     ///
@@ -1316,9 +1338,10 @@ record DeviceOperationWorkItem {
     claim_id: DeviceOperationWorkClaimId,
     /// Name of the standalone or fleet operation that defined this work.
     operation_name: string,
+    /// Zero-based index of the step within the device operation. Pass it to
+    /// `devices_ReportOperationStep` with the claim.
     step_index: u32,
-    /// Durable checkpoint from a previous report for this step.
-    checkpoint?: JsonValue,
+    /// Step to run.
     step: DeviceOperationWorkStep,
 }
 
@@ -1326,29 +1349,33 @@ record DeviceOperationWorkItem {
 #[json(tag = "kind")]
 variant DeviceOperationWorkStep {
     /// Run an on-device command and report its result.
-    DeviceCommand: DeviceOperationDeviceCommandStep,
-    /// Durable task work, for the device to run and checkpoint.
-    DeviceTask: DeviceOperationDeviceTaskStep,
+    DeviceCommand: DeviceOperationCommandWork,
+}
+
+/// Command that a device runs for a device operation.
+record DeviceOperationCommandWork {
+    /// Command name from the device command manifest.
+    command: string,
+    /// Command input.
+    input: JsonValue,
+    /// Execution timeout of the command handler, in seconds. Defaults to one
+    /// hour.
+    timeout_secs?: u32,
 }
 
 /// Kind of device operation work to return from a poll.
 #[json(tagged = externally)]
 variant DeviceOperationWorkKind {
-    /// Command work intended for the Nexigon agent command runner.
+    /// Command work, which Nexigon Agent runs with its device commands.
     DeviceCommand,
-    /// Durable task work. Not requested by the bundled Nexigon agent; see
-    /// `DeviceOperationStep::DeviceTask`.
-    DeviceTask,
 }
 
 /// Report from a device after executing a polled step.
 record DeviceOperationStepReport {
     /// Result status.
     status: DeviceOperationStepReportStatus,
-    /// Command or step output.
+    /// Command output.
     output?: JsonValue,
-    /// Durable checkpoint to return with future work polls for this step.
-    checkpoint?: JsonValue,
     /// Error message when the step failed.
     #[validate(
         { _.size <= 4096 },
@@ -1360,8 +1387,6 @@ record DeviceOperationStepReport {
 /// Device-reported step result status.
 #[json(tagged = externally)]
 variant DeviceOperationStepReportStatus {
-    /// Step is still running and the report carries intermediate progress.
-    Running,
     /// Step succeeded.
     Succeeded,
     /// Step failed.
@@ -1444,7 +1469,13 @@ record CancelDeviceOperationAction {
     device_operation_id: DeviceOperationId,
 }
 
-/// Atomically claim device operation work for a device.
+/// Claim device operation work for a device.
+///
+/// Leases pending work items to the device atomically, so no other worker receives
+/// them at the same time. Report the outcome of each item with
+/// `devices_ReportOperationStep`, passing the item's claim ID. Only the device itself
+/// can claim its work.
+#[group(name = "device")]
 #[request(
     name = "devices_ClaimOperationWork",
     response = ClaimDeviceOperationWorkOutput
@@ -1473,6 +1504,7 @@ record ClaimDeviceOperationWorkOutput {
 /// Repeating a report after it was already applied is a successful no-op. A report whose
 /// claim has been superseded is also ignored, so an expired worker cannot overwrite the
 /// current attempt.
+#[group(name = "device")]
 #[request(name = "devices_ReportOperationStep", response = Empty)]
 record ReportDeviceOperationStepAction {
     /// ID of the reporting device.

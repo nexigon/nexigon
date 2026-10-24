@@ -4,11 +4,18 @@ version = "1"
 description = "API definitions for Nexigon Hub."
 authors = ["Silitics GmbH <info@silitics.com>"]
 
+[groups.device]
+description = "Part of the Device API, which Nexigon Agent and other software on devices use. Changes remain backward compatible for at least five years."
+
+[groups.admin]
+description = "Part of the Admin API, which requires instance administrator permissions. Backward-incompatible changes are more frequent than for other actions."
+
 [backend.json-schema]
 
 [backend.rust]
 derive = ["Clone", "Debug"]
 plugins = ["builder", "serde"]
+group_traits = ["device"]
 
 [backend.ts]
 plugins = ["validate"]

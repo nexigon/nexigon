@@ -10,6 +10,7 @@ use std::path::PathBuf;
 use anyhow::Context;
 use anyhow::bail;
 use clap::Parser;
+use nexigon_agent::device_api::DeviceExecutor;
 use nexigon_agent::install_crypto_provider;
 #[cfg(unix)]
 use nexigon_agent_api::DEFAULT_SOCKET_PATH;
@@ -74,8 +75,10 @@ async fn main() -> anyhow::Result<()> {
             run_events_cmd(&mut session.executor, &session.actor, cmd).await?;
         }
         Cmd::Repositories(cmd) => {
-            let mut session = OneShot::open(&config_path).await?;
-            execute_repositories_cmd(&cmd, &mut session.executor).await?;
+            let session = OneShot::open(&config_path).await?;
+            // The repository commands are shared with Nexigon CLI and may invoke
+            // actions outside the Device API.
+            execute_repositories_cmd(&cmd, &mut session.executor.into_inner()).await?;
         }
     }
     Ok(())
@@ -87,7 +90,7 @@ async fn main() -> anyhow::Result<()> {
 /// agent's local API socket (preferred — reuses the agent's existing
 /// hub connection) or a fresh hub link as a fallback.
 struct OneShot {
-    executor: OneShotExecutor,
+    executor: DeviceExecutor<OneShotExecutor>,
     actor: nexigon_api::types::actor::DeviceActor,
     _connection_task: Option<tokio::task::JoinHandle<()>>,
 }
@@ -99,7 +102,7 @@ impl OneShot {
         match connect_local_executor(socket_path).await {
             Ok(executor) => {
                 debug!(?socket_path, "connected to agent local API");
-                let mut executor = OneShotExecutor::Local(executor);
+                let mut executor = DeviceExecutor::new(OneShotExecutor::Local(executor));
                 let actor = resolve_device_actor(&mut executor).await?;
                 Ok(Self {
                     executor,
@@ -130,7 +133,7 @@ impl OneShot {
         let executor = connect_executor(&mut connection_ref)
             .await
             .context("cannot open executor channel")?;
-        let mut executor = OneShotExecutor::Remote(executor);
+        let mut executor = DeviceExecutor::new(OneShotExecutor::Remote(executor));
         let actor = resolve_device_actor(&mut executor).await?;
         Ok(Self {
             executor,
@@ -161,7 +164,7 @@ impl Execute for OneShotExecutor {
 }
 
 async fn resolve_device_actor(
-    executor: &mut OneShotExecutor,
+    executor: &mut DeviceExecutor<OneShotExecutor>,
 ) -> anyhow::Result<nexigon_api::types::actor::DeviceActor> {
     match executor
         .execute(GetActorAction::new())
@@ -176,7 +179,7 @@ async fn resolve_device_actor(
 }
 
 async fn run_device_cmd(
-    executor: &mut OneShotExecutor,
+    executor: &mut DeviceExecutor<OneShotExecutor>,
     actor: &nexigon_api::types::actor::DeviceActor,
     cmd: DeviceCmd,
 ) -> anyhow::Result<()> {
@@ -224,7 +227,7 @@ async fn run_device_cmd(
 }
 
 async fn run_events_cmd(
-    executor: &mut OneShotExecutor,
+    executor: &mut DeviceExecutor<OneShotExecutor>,
     actor: &nexigon_api::types::actor::DeviceActor,
     cmd: EventsCmd,
 ) -> anyhow::Result<()> {

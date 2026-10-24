@@ -127,6 +127,7 @@ variant AuditLogActionStatus {
 /// Query the events recorded in the audit log.
 /// 
 /// Requires administrator permissions.
+#[group(name = "admin")]
 #[request(
     name = "audit_QueryAuditLogEvents",
     response = QueryAuditLogEventsOutput
@@ -151,6 +152,7 @@ record QueryAuditLogEventsOutput {
 /// Query the actions recorded in the audit log.
 /// 
 /// Requires administrator permissions.
+#[group(name = "admin")]
 #[request(
     name = "audit_QueryAuditLogActions",
     response = QueryAuditLogActionsOutput

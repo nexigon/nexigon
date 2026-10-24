@@ -36,6 +36,7 @@ opaque DevicePairingKeyId
 opaque DeploymentToken
 
 /// Query the projects of the instance.
+#[group(name = "admin")]
 #[request(name = "projects_Query", response = QueryProjectsOutput)]
 record QueryProjectsAction {}
 
@@ -437,6 +438,11 @@ record RevokeDevicePairingKeyAction {
 }
 
 /// Redeem a device pairing key.
+///
+/// Creates a device in the pairing key's project and issues a deployment token bound
+/// to it. The device uses the token to connect to Nexigon Hub. This action does not
+/// require authentication; the pairing key authorizes it.
+#[group(name = "device")]
 #[request(
     name = "projects_RedeemDevicePairingKey",
     response = RedeemDevicePairingKeyOutput
@@ -471,10 +477,7 @@ record RedeemDevicePairingKeyOutput {
 }
 
 /// Query the audit log of the project.
-#[request(
-    name = "audit_QueryAuditLogEvents",
-    response = QueryAuditLogEventsOutput
-)]
+#[request(name = "projects_QueryAuditLog", response = QueryAuditLogEventsOutput)]
 record QueryAuditLogEventsAction {
     /// Opt into cursor pagination. Without this field, the existing limit applies.
     page?: PageRequest,

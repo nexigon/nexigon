@@ -231,8 +231,9 @@ record OtaUpdateStatus {
     /// last read.
     ///
     /// Absent when the property does not exist. The version changes with every
-    /// write to the device's own value, even with an unchanged value, and
-    /// whenever a profile changes the property's value.
+    /// write to the device's own value and whenever a profile revision that
+    /// sets the property is applied to the device, even with an unchanged
+    /// value.
     config_version?: u64,
     /// Version string of the running system, as built into the image.
     ///

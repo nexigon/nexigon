@@ -61,7 +61,7 @@ version = "1.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "40c48f72fd53cd289104fc64099abca73db4166ad86ea0b4341abe65af83dadc"
 dependencies = [
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -72,7 +72,7 @@ checksum = "291e6a250ff86cd4a820112fb8898808a366d8f9f58ce16d1f538353ad55747d"
 dependencies = [
  "anstyle",
  "once_cell_polyfill",
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -491,7 +491,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "39cab71617ae0d63f51a36d69f866391735b51691dbda63cf6f96d042b63efeb"
 dependencies = [
  "libc",
- "windows-sys 0.61.2",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -1027,7 +1027,7 @@ dependencies = [
  "portable-atomic",
  "portable-atomic-util",
  "serde_core",
- "windows-sys 0.61.2",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -1455,7 +1455,7 @@ version = "0.50.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7957b9740744892f114936ab4a57b3f487491bbeafaf8083688b16841a4240e5"
 dependencies = [
- "windows-sys 0.61.2",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -2130,7 +2130,7 @@ dependencies = [
  "errno",
  "libc",
  "linux-raw-sys",
- "windows-sys 0.61.2",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -2404,8 +2404,8 @@ dependencies = [
 
 [[package]]
 name = "sidex"
-version = "0.4.1"
-source = "git+https://github.com/silitics/sidex.git?tag=v0.4.1#76909d137a1d4baeea27d6c590c81442268d7577"
+version = "0.5.0"
+source = "git+https://github.com/silitics/sidex.git?tag=v0.5.0#5c2e6f0701f3fec7d5391718d2a12ac909b6fb26"
 dependencies = [
  "base64 0.23.1",
  "indexmap",
@@ -2417,8 +2417,8 @@ dependencies = [
 
 [[package]]
 name = "sidex-attrs-api"
-version = "0.4.1"
-source = "git+https://github.com/silitics/sidex.git?tag=v0.4.1#76909d137a1d4baeea27d6c590c81442268d7577"
+version = "0.5.0"
+source = "git+https://github.com/silitics/sidex.git?tag=v0.5.0#5c2e6f0701f3fec7d5391718d2a12ac909b6fb26"
 dependencies = [
  "semver",
  "serde",
@@ -2430,8 +2430,8 @@ dependencies = [
 
 [[package]]
 name = "sidex-attrs-json"
-version = "0.4.1"
-source = "git+https://github.com/silitics/sidex.git?tag=v0.4.1#76909d137a1d4baeea27d6c590c81442268d7577"
+version = "0.5.0"
+source = "git+https://github.com/silitics/sidex.git?tag=v0.5.0#5c2e6f0701f3fec7d5391718d2a12ac909b6fb26"
 dependencies = [
  "serde",
  "serde_json",
@@ -2443,8 +2443,8 @@ dependencies = [
 
 [[package]]
 name = "sidex-attrs-rust"
-version = "0.4.1"
-source = "git+https://github.com/silitics/sidex.git?tag=v0.4.1#76909d137a1d4baeea27d6c590c81442268d7577"
+version = "0.5.0"
+source = "git+https://github.com/silitics/sidex.git?tag=v0.5.0#5c2e6f0701f3fec7d5391718d2a12ac909b6fb26"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -2458,8 +2458,8 @@ dependencies = [
 
 [[package]]
 name = "sidex-attrs-validate"
-version = "0.4.1"
-source = "git+https://github.com/silitics/sidex.git?tag=v0.4.1#76909d137a1d4baeea27d6c590c81442268d7577"
+version = "0.5.0"
+source = "git+https://github.com/silitics/sidex.git?tag=v0.5.0#5c2e6f0701f3fec7d5391718d2a12ac909b6fb26"
 dependencies = [
  "serde",
  "serde_json",
@@ -2472,8 +2472,8 @@ dependencies = [
 
 [[package]]
 name = "sidex-build-rs"
-version = "0.4.1"
-source = "git+https://github.com/silitics/sidex.git?tag=v0.4.1#76909d137a1d4baeea27d6c590c81442268d7577"
+version = "0.5.0"
+source = "git+https://github.com/silitics/sidex.git?tag=v0.5.0#5c2e6f0701f3fec7d5391718d2a12ac909b6fb26"
 dependencies = [
  "serde_json",
  "sidex-core",
@@ -2483,8 +2483,8 @@ dependencies = [
 
 [[package]]
 name = "sidex-core"
-version = "0.4.1"
-source = "git+https://github.com/silitics/sidex.git?tag=v0.4.1#76909d137a1d4baeea27d6c590c81442268d7577"
+version = "0.5.0"
+source = "git+https://github.com/silitics/sidex.git?tag=v0.5.0#5c2e6f0701f3fec7d5391718d2a12ac909b6fb26"
 dependencies = [
  "eyre",
  "hashbrown 0.13.2",
@@ -2494,6 +2494,7 @@ dependencies = [
  "serde",
  "serde_json",
  "sidex",
+ "sidex-attrs-api",
  "sidex-attrs-json",
  "sidex-diagnostics",
  "sidex-ir",
@@ -2504,8 +2505,8 @@ dependencies = [
 
 [[package]]
 name = "sidex-diagnostics"
-version = "0.4.1"
-source = "git+https://github.com/silitics/sidex.git?tag=v0.4.1#76909d137a1d4baeea27d6c590c81442268d7577"
+version = "0.5.0"
+source = "git+https://github.com/silitics/sidex.git?tag=v0.5.0#5c2e6f0701f3fec7d5391718d2a12ac909b6fb26"
 dependencies = [
  "anyhow",
  "ariadne",
@@ -2516,8 +2517,8 @@ dependencies = [
 
 [[package]]
 name = "sidex-gen"
-version = "0.4.1"
-source = "git+https://github.com/silitics/sidex.git?tag=v0.4.1#76909d137a1d4baeea27d6c590c81442268d7577"
+version = "0.5.0"
+source = "git+https://github.com/silitics/sidex.git?tag=v0.5.0#5c2e6f0701f3fec7d5391718d2a12ac909b6fb26"
 dependencies = [
  "serde_json",
  "sidex-diagnostics",
@@ -2527,8 +2528,8 @@ dependencies = [
 
 [[package]]
 name = "sidex-gen-rs"
-version = "0.4.1"
-source = "git+https://github.com/silitics/sidex.git?tag=v0.4.1#76909d137a1d4baeea27d6c590c81442268d7577"
+version = "0.5.0"
+source = "git+https://github.com/silitics/sidex.git?tag=v0.5.0#5c2e6f0701f3fec7d5391718d2a12ac909b6fb26"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -2545,16 +2546,16 @@ dependencies = [
 
 [[package]]
 name = "sidex-ir"
-version = "0.4.1"
-source = "git+https://github.com/silitics/sidex.git?tag=v0.4.1#76909d137a1d4baeea27d6c590c81442268d7577"
+version = "0.5.0"
+source = "git+https://github.com/silitics/sidex.git?tag=v0.5.0#5c2e6f0701f3fec7d5391718d2a12ac909b6fb26"
 dependencies = [
  "sidex",
 ]
 
 [[package]]
 name = "sidex-syntax"
-version = "0.4.1"
-source = "git+https://github.com/silitics/sidex.git?tag=v0.4.1#76909d137a1d4baeea27d6c590c81442268d7577"
+version = "0.5.0"
+source = "git+https://github.com/silitics/sidex.git?tag=v0.5.0#5c2e6f0701f3fec7d5391718d2a12ac909b6fb26"
 dependencies = [
  "sidex-diagnostics",
  "sidex-ir",
@@ -2562,8 +2563,8 @@ dependencies = [
 
 [[package]]
 name = "sidex-types-json-schema"
-version = "0.4.1"
-source = "git+https://github.com/silitics/sidex.git?tag=v0.4.1#76909d137a1d4baeea27d6c590c81442268d7577"
+version = "0.5.0"
+source = "git+https://github.com/silitics/sidex.git?tag=v0.5.0#5c2e6f0701f3fec7d5391718d2a12ac909b6fb26"
 dependencies = [
  "indexmap",
  "serde",
@@ -2573,8 +2574,8 @@ dependencies = [
 
 [[package]]
 name = "sidex-types-openapi"
-version = "0.4.1"
-source = "git+https://github.com/silitics/sidex.git?tag=v0.4.1#76909d137a1d4baeea27d6c590c81442268d7577"
+version = "0.5.0"
+source = "git+https://github.com/silitics/sidex.git?tag=v0.5.0#5c2e6f0701f3fec7d5391718d2a12ac909b6fb26"
 dependencies = [
  "indexmap",
  "serde",
@@ -2585,8 +2586,8 @@ dependencies = [
 
 [[package]]
 name = "sidex-validate-expr"
-version = "0.4.1"
-source = "git+https://github.com/silitics/sidex.git?tag=v0.4.1#76909d137a1d4baeea27d6c590c81442268d7577"
+version = "0.5.0"
+source = "git+https://github.com/silitics/sidex.git?tag=v0.5.0#5c2e6f0701f3fec7d5391718d2a12ac909b6fb26"
 dependencies = [
  "regex",
  "sidex-diagnostics",
@@ -2621,7 +2622,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3a766e1110788c36f4fa1c2b71b387a7815aa65f88ce0229841826633d93723e"
 dependencies = [
  "libc",
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -2713,7 +2714,7 @@ dependencies = [
  "getrandom 0.4.2",
  "once_cell",
  "rustix",
- "windows-sys 0.61.2",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -2843,9 +2844,9 @@ dependencies = [
 
 [[package]]
 name = "tokio"
-version = "1.52.1"
+version = "1.54.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b67dee974fe86fd92cc45b7a95fdd2f99a36a6d7b0d431a231178d3d670bbcc6"
+checksum = "b52fd3255258d26fac7264ab5a76b53c13367136dc011d3d6ad4f8ed070396a3"
 dependencies = [
  "bytes",
  "libc",
