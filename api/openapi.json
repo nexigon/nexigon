@@ -6314,7 +6314,7 @@
           "repositories"
         ],
         "summary": "ResolveName",
-        "description": "Resolve a repository by its name.",
+        "description": "Resolve a repository by its name.\n\nWithin an organization, the repository is given by its path name. The\norganization defaults to that of the request, which is set by an organization\nAPI token, the `X-Nexigon-Organization` header, or the project of a device.\nWithout an organization, the repository is given by its slug. A repository ID\nresolves in both cases.",
         "operationId": "repositories_ResolveName",
         "requestBody": {
           "content": {
@@ -6584,13 +6584,59 @@
         }
       }
     },
+    "/api/v1/actions/invoke/repositories_SetPathName": {
+      "post": {
+        "tags": [
+          "repositories"
+        ],
+        "summary": "SetPathName",
+        "description": "Set the path name of a repository.\n\nPaths that use the previous path name no longer resolve.",
+        "operationId": "repositories_SetPathName",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/nexigon_api.repositories.SetRepositoryPathNameAction"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/nexigon_api.repositories.SetRepositoryPathNameOutput"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
+          }
+        }
+      }
+    },
     "/api/v1/actions/invoke/repositories_SetSlug": {
       "post": {
         "tags": [
           "repositories"
         ],
         "summary": "SetSlug",
-        "description": "Set the slug of a repository.\n\nNote: Setting the slug requires the `public_repositories` subscription feature.",
+        "description": "Set the slug of a repository.\n\nThe slug is unique on the instance. It addresses the repository in paths\nresolved without an organization, for example, by anonymous clients of a public\nrepository.\n\nNote: Setting the slug requires the `public_repositories` subscription feature.",
         "operationId": "repositories_SetSlug",
         "requestBody": {
           "content": {
@@ -6866,7 +6912,7 @@
           "repositories"
         ],
         "summary": "ResolvePackageByPath",
-        "description": "Resolve a package by its path.",
+        "description": "Resolve a package by its path.\n\nWithin an organization, the repository is given by its path name. The\norganization defaults to that of the request, which is set by an organization\nAPI token, the `X-Nexigon-Organization` header, or the project of a device.\nWithout an organization, the repository is given by its slug. A repository ID\nresolves in both cases.",
         "operationId": "repositories_ResolvePackageByPath",
         "requestBody": {
           "content": {
@@ -7464,7 +7510,7 @@
           "repositories"
         ],
         "summary": "ResolveVersionByPath",
-        "description": "**Group `device`:** Part of the Device API, which Nexigon Agent and other software on devices use. Changes remain backward compatible for at least five years.\n\nResolve a package version by its path.\n\nA path consists of a repository, a package, and a version tag. Devices can resolve\nversions in repositories linked to their project.",
+        "description": "**Group `device`:** Part of the Device API, which Nexigon Agent and other software on devices use. Changes remain backward compatible for at least five years.\n\nResolve a package version by its path.\n\nA path consists of a repository, a package, and a version tag. Devices can resolve\nversions in repositories linked to their project.\n\nWithin an organization, the repository is given by its path name. The\norganization defaults to that of the request, which is set by an organization\nAPI token, the `X-Nexigon-Organization` header, or the project of a device.\nWithout an organization, the repository is given by its slug. A repository ID\nresolves in both cases.",
         "operationId": "repositories_ResolveVersionByPath",
         "requestBody": {
           "content": {
@@ -8154,7 +8200,7 @@
           "repositories"
         ],
         "summary": "ResolveVersionAssetByPath",
-        "description": "**Group `device`:** Part of the Device API, which Nexigon Agent and other software on devices use. Changes remain backward compatible for at least five years.\n\nResolve a version asset by its path.\n\nA path consists of a repository, a package, a version tag, and the asset's\nfilename within the version.",
+        "description": "**Group `device`:** Part of the Device API, which Nexigon Agent and other software on devices use. Changes remain backward compatible for at least five years.\n\nResolve a version asset by its path.\n\nA path consists of a repository, a package, a version tag, and the asset's\nfilename within the version.\n\nWithin an organization, the repository is given by its path name. The\norganization defaults to that of the request, which is set by an organization\nAPI token, the `X-Nexigon-Organization` header, or the project of a device.\nWithout an organization, the repository is given by its slug. A repository ID\nresolves in both cases.",
         "operationId": "repositories_ResolveVersionAssetByPath",
         "requestBody": {
           "content": {
@@ -13708,6 +13754,95 @@
         "type": "string",
         "description": "**Group `admin`:** Part of the Admin API, which requires instance administrator permissions. Backward-incompatible changes are more frequent than for other actions.\n\n**Group `device`:** Part of the Device API, which Nexigon Agent and other software on devices use. Changes remain backward compatible for at least five years.\n\nUnique ID of an organization API token."
       },
+      "nexigon_api.organizations.OrganizationAuditLogFilter": {
+        "description": "Filter for the audit log of an organization.",
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "const": "Project"
+              },
+              "projectId": {
+                "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+              }
+            },
+            "required": [
+              "kind",
+              "projectId"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "const": "Repository"
+              },
+              "repositoryId": {
+                "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryId"
+              }
+            },
+            "required": [
+              "kind",
+              "repositoryId"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "const": "User"
+              },
+              "userId": {
+                "$ref": "#/components/schemas/nexigon_api.users.UserId"
+              }
+            },
+            "required": [
+              "kind",
+              "userId"
+            ]
+          }
+        ]
+      },
+      "nexigon_api.organizations.OrganizationAuditLogProjectFilter": {
+        "type": "object",
+        "description": "Audit log filter selecting the events of a project.",
+        "properties": {
+          "projectId": {
+            "$ref": "#/components/schemas/nexigon_api.projects.ProjectId"
+          }
+        },
+        "required": [
+          "projectId"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.organizations.OrganizationAuditLogRepositoryFilter": {
+        "type": "object",
+        "description": "Audit log filter selecting the events of a repository.",
+        "properties": {
+          "repositoryId": {
+            "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryId"
+          }
+        },
+        "required": [
+          "repositoryId"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.organizations.OrganizationAuditLogUserFilter": {
+        "type": "object",
+        "description": "Audit log filter selecting the events of a user.",
+        "properties": {
+          "userId": {
+            "$ref": "#/components/schemas/nexigon_api.users.UserId"
+          }
+        },
+        "required": [
+          "userId"
+        ],
+        "unevaluatedProperties": false
+      },
       "nexigon_api.organizations.OrganizationDeactivation": {
         "type": "object",
         "description": "**Group `admin`:** Part of the Admin API, which requires instance administrator permissions. Backward-incompatible changes are more frequent than for other actions.\n\nDeactivation of an organization.",
@@ -13740,6 +13875,15 @@
           },
           "organizationId": {
             "$ref": "#/components/schemas/nexigon_api.organizations.OrganizationId"
+          },
+          "filter": {
+            "$ref": "#/components/schemas/nexigon_api.organizations.OrganizationAuditLogFilter"
+          },
+          "since": {
+            "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
+          },
+          "until": {
+            "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
           }
         },
         "required": [
@@ -13934,6 +14078,9 @@
             "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryId"
           },
           "displayName": {
+            "type": "string"
+          },
+          "pathName": {
             "type": "string"
           },
           "slug": {
@@ -15740,6 +15887,9 @@
           "displayName": {
             "type": "string"
           },
+          "pathName": {
+            "type": "string"
+          },
           "slug": {
             "type": "string"
           },
@@ -16052,6 +16202,288 @@
         "required": [],
         "unevaluatedProperties": false
       },
+      "nexigon_api.properties.AppDesiredState": {
+        "enum": [
+          "running",
+          "stopped",
+          "removed"
+        ],
+        "description": "**Unstable (feature `app_updates`).**\n\nDesired state of a managed app."
+      },
+      "nexigon_api.properties.AppGcPolicy": {
+        "type": "object",
+        "description": "**Unstable (feature `app_updates`).**\n\nRemoval of old versions of an app.\n\nAfter switching an app to a new version, the integration removes old versions\nto free storage. It keeps the running version and the most recent previously\nrunning versions, to which the app can switch back without downloading them\nagain.",
+        "properties": {
+          "keep": {
+            "type": "integer",
+            "format": "uint32",
+            "maximum": 4294967295,
+            "minimum": 0
+          }
+        },
+        "required": [],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.properties.AppRuntime": {
+        "type": "object",
+        "description": "**Unstable (feature `app_updates`).**\n\nRuntime that installs and runs apps on a device, such as Rugix Apps.",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.properties.AppStatus": {
+        "type": "object",
+        "description": "**Unstable (feature `app_updates`).**\n\nStatus of an app on a device.",
+        "properties": {
+          "managed": {
+            "type": "boolean"
+          },
+          "config": {
+            "$ref": "#/components/schemas/nexigon_api.properties.ManagedAppConfig"
+          },
+          "state": {
+            "$ref": "#/components/schemas/nexigon_api.properties.AppUpdateState"
+          },
+          "blocked": {
+            "$ref": "#/components/schemas/nexigon_api.properties.AppUpdateBlocked"
+          },
+          "generation": {
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "uint64",
+            "minimum": 0,
+            "pattern": "^[0-9]+$"
+          },
+          "currentVersionId": {
+            "$ref": "#/components/schemas/nexigon_api.repositories.PackageVersionId"
+          },
+          "targetVersionId": {
+            "$ref": "#/components/schemas/nexigon_api.repositories.PackageVersionId"
+          },
+          "asset": {
+            "type": "string"
+          },
+          "failureCount": {
+            "type": "integer",
+            "format": "uint32",
+            "maximum": 4294967295,
+            "minimum": 0
+          },
+          "lastError": {
+            "type": "string"
+          },
+          "nextAttemptAt": {
+            "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
+          },
+          "workload": {
+            "$ref": "#/components/schemas/nexigon_api.properties.AppWorkloadStatus"
+          }
+        },
+        "required": [
+          "managed"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.properties.AppUpdateBlocked": {
+        "type": "object",
+        "description": "**Unstable (feature `app_updates`).**\n\nInformation about a blocked app update.",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "code"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.properties.AppUpdateCapability": {
+        "enum": [
+          "window",
+          "retry",
+          "spread",
+          "hold",
+          "asset",
+          "gc"
+        ],
+        "description": "**Unstable (feature `app_updates`).**\n\nOptional feature of the app update contract."
+      },
+      "nexigon_api.properties.AppUpdateConfig": {
+        "type": "object",
+        "description": "**Unstable (feature `app_updates`).**\n\nApp update configuration (`dev.nexigon.apps.config`).\n\nDesired state of the apps on a device. The integration manages the apps listed\nin `apps` and leaves other installed apps untouched. Removing an app from\n`apps` ends its management without uninstalling it. To uninstall an app, set\nits `state` to `removed`.\n\nThe policies `hold`, `window`, `retry`, `spread`, and `gc` apply to every app\nthat does not set its own. They govern version changes. Changes of an app's\n`state` apply at the next check.",
+        "properties": {
+          "apps": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/nexigon_api.properties.ManagedAppConfig"
+            }
+          },
+          "hold": {
+            "type": "boolean"
+          },
+          "window": {
+            "$ref": "#/components/schemas/nexigon_api.properties.OtaUpdateWindow"
+          },
+          "retry": {
+            "$ref": "#/components/schemas/nexigon_api.properties.OtaUpdateRetryPolicy"
+          },
+          "spread": {
+            "$ref": "#/components/schemas/nexigon_api.properties.OtaUpdateSpread"
+          },
+          "gc": {
+            "$ref": "#/components/schemas/nexigon_api.properties.AppGcPolicy"
+          }
+        },
+        "required": [],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.properties.AppUpdateState": {
+        "enum": [
+          "idle",
+          "installing",
+          "activating",
+          "removing",
+          "completed",
+          "failed",
+          "blocked"
+        ],
+        "description": "**Unstable (feature `app_updates`).**\n\nState of an app's update process.\n\nThe resting states are `idle`, `completed`, `failed`, and `blocked`."
+      },
+      "nexigon_api.properties.AppUpdateStatus": {
+        "type": "object",
+        "description": "**Unstable (feature `app_updates`).**\n\nApp update status (`dev.nexigon.apps.status`).\n\nActual state of the apps on a device, published by its app integration.\n\nThe integration writes the status with the version it read last\n(compare-and-swap), so that it does not overwrite concurrent changes. Other\nwriters may only clear the `failure_count` and `next_attempt_at` of an app,\nwhich requests a new attempt.",
+        "properties": {
+          "capabilities": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/nexigon_api.properties.AppUpdateCapability"
+            }
+          },
+          "configVersion": {
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "uint64",
+            "minimum": 0,
+            "pattern": "^[0-9]+$"
+          },
+          "lastError": {
+            "type": "string"
+          },
+          "arch": {
+            "type": "string"
+          },
+          "runtime": {
+            "$ref": "#/components/schemas/nexigon_api.properties.AppRuntime"
+          },
+          "apps": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/nexigon_api.properties.AppStatus"
+            }
+          }
+        },
+        "required": [
+          "apps"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.properties.AppWorkloadMessage": {
+        "type": "object",
+        "description": "**Unstable (feature `app_updates`).**\n\nExplanation of an app's workload status.",
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "message"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.properties.AppWorkloadStatus": {
+        "description": "**Unstable (feature `app_updates`).**\n\nLive status of an app's workload.",
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "running"
+              }
+            },
+            "required": [
+              "state"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "unhealthy"
+              },
+              "message": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "state",
+              "message"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "stopped"
+              }
+            },
+            "required": [
+              "state"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "failed"
+              },
+              "message": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "state",
+              "message"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "unknown"
+              }
+            },
+            "required": [
+              "state"
+            ]
+          }
+        ]
+      },
       "nexigon_api.properties.DeviceCommandDescriptor": {
         "type": "object",
         "description": "**Unstable (feature `device_commands`).**\n\nDescriptor for an on-demand command.",
@@ -16204,6 +16636,44 @@
           "name",
           "port"
         ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.properties.ManagedAppConfig": {
+        "type": "object",
+        "description": "**Unstable (feature `app_updates`).**\n\nDesired state of a managed app.\n\nA policy set here replaces the policy of the configuration for this app.",
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "asset": {
+            "type": "string"
+          },
+          "state": {
+            "$ref": "#/components/schemas/nexigon_api.properties.AppDesiredState"
+          },
+          "hold": {
+            "type": "boolean"
+          },
+          "window": {
+            "$ref": "#/components/schemas/nexigon_api.properties.OtaUpdateWindow"
+          },
+          "retry": {
+            "$ref": "#/components/schemas/nexigon_api.properties.OtaUpdateRetryPolicy"
+          },
+          "spread": {
+            "$ref": "#/components/schemas/nexigon_api.properties.OtaUpdateSpread"
+          },
+          "gc": {
+            "$ref": "#/components/schemas/nexigon_api.properties.AppGcPolicy"
+          },
+          "rollout": {
+            "type": "integer",
+            "format": "uint32",
+            "maximum": 4294967295,
+            "minimum": 0
+          }
+        },
+        "required": [],
         "unevaluatedProperties": false
       },
       "nexigon_api.properties.MemoryInfo": {
@@ -17095,6 +17565,9 @@
           "displayName": {
             "type": "string"
           },
+          "pathName": {
+            "type": "string"
+          },
           "visibility": {
             "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryVisibility"
           }
@@ -17429,6 +17902,12 @@
           },
           "baseVersionId": {
             "$ref": "#/components/schemas/nexigon_api.repositories.PackageVersionId"
+          },
+          "createdAt": {
+            "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
+          },
+          "baseVersionName": {
+            "type": "string"
           }
         },
         "required": [
@@ -17461,6 +17940,9 @@
             "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryId"
           },
           "displayName": {
+            "type": "string"
+          },
+          "pathName": {
             "type": "string"
           },
           "slug": {
@@ -17996,6 +18478,24 @@
           },
           "baseVersionName": {
             "type": "string"
+          },
+          "assetCount": {
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "uint64",
+            "minimum": 0,
+            "pattern": "^[0-9]+$"
+          },
+          "assetSize": {
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "uint64",
+            "minimum": 0,
+            "pattern": "^[0-9]+$"
           }
         },
         "required": [
@@ -18134,6 +18634,24 @@
           },
           "createdAt": {
             "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
+          },
+          "description": {
+            "type": "string"
+          },
+          "imageUrl": {
+            "type": "string"
+          },
+          "versionCount": {
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "uint64",
+            "minimum": 0,
+            "pattern": "^[0-9]+$"
+          },
+          "latestVersion": {
+            "$ref": "#/components/schemas/nexigon_api.repositories.QueryPackageVersionsItem"
           }
         },
         "required": [
@@ -18523,6 +19041,9 @@
       "nexigon_api.repositories.ResolvePackageByPathAction": {
         "type": "object",
         "properties": {
+          "organizationId": {
+            "$ref": "#/components/schemas/nexigon_api.organizations.OrganizationId"
+          },
           "repository": {
             "type": "string"
           },
@@ -18591,6 +19112,9 @@
       "nexigon_api.repositories.ResolvePackageVersionAssetByPathAction": {
         "type": "object",
         "properties": {
+          "organizationId": {
+            "$ref": "#/components/schemas/nexigon_api.organizations.OrganizationId"
+          },
           "repository": {
             "type": "string"
           },
@@ -18683,6 +19207,9 @@
       "nexigon_api.repositories.ResolvePackageVersionByPathAction": {
         "type": "object",
         "properties": {
+          "organizationId": {
+            "$ref": "#/components/schemas/nexigon_api.organizations.OrganizationId"
+          },
           "repository": {
             "type": "string"
           },
@@ -18763,6 +19290,9 @@
       "nexigon_api.repositories.ResolveRepositoryNameAction": {
         "type": "object",
         "properties": {
+          "organizationId": {
+            "$ref": "#/components/schemas/nexigon_api.organizations.OrganizationId"
+          },
           "repository": {
             "type": "string"
           }
@@ -19055,6 +19585,33 @@
           "displayName"
         ],
         "unevaluatedProperties": false
+      },
+      "nexigon_api.repositories.SetRepositoryPathNameAction": {
+        "type": "object",
+        "properties": {
+          "repositoryId": {
+            "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryId"
+          },
+          "pathName": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "repositoryId",
+          "pathName"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.repositories.SetRepositoryPathNameOutput": {
+        "enum": [
+          {
+            "result": "NameAlreadyExists"
+          },
+          {
+            "result": "Success"
+          }
+        ],
+        "description": "Output of setting the path name of a repository."
       },
       "nexigon_api.repositories.SetRepositoryS3ConfigAction": {
         "type": "object",

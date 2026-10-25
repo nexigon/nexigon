@@ -13,6 +13,9 @@
   `repositories create <org-id> <display-name>` with `--organization <org-id>`.
   With an organization API token, omit the option. For the Agent's local
   `repositories create` command, supply `--organization <org-id>` explicitly.
+- Set a repository's path name with `repositories create --path-name` and
+  `repositories set-path-name`. Within an organization, repository names in
+  paths are path names.
 - Add system updates with Rugix Ctrl and RAUC, enabled with
   `[integrations.rugix.system-updates]` or `[integrations.rauc.system-updates]`.
   The Agent follows the desired state in `dev.nexigon.ota.config`, reports
@@ -22,6 +25,19 @@
   publishes the status with compare-and-swap. If the status changed during a
   check, for example because the failure count was cleared in Nexigon Hub, the
   check starts over from the changed status.
+- Add app management with Rugix Apps, enabled with `[integrations.rugix.apps]`.
+  The Agent installs, updates, stops, and removes the apps listed in
+  `dev.nexigon.apps.config` and reports the status of all apps in
+  `dev.nexigon.apps.status`. It installs the bundle for the device's
+  architecture, `<app>-<arch>.rugixb` by default, and supports holds,
+  maintenance windows, spreads, and retries. Outside a maintenance window, it
+  installs new versions without activating them. After an update, it removes
+  old versions except for the number of previously running versions that the
+  `gc` policy or `gc.keep` in the integration configuration keeps, 1 by
+  default. With commands enabled, the `nexigon.apps.check` command starts an
+  immediate check. The integration requires a Rugix Ctrl version that supports
+  `rugix-ctrl apps install --origin`. System updates and app changes do not run
+  at the same time.
 - Choose the asset that a device installs from each version with `asset` in
   the integration configuration or in `dev.nexigon.ota.config`. It defaults to
   the bundle of the running system, such as `<system>.rugixb`. A version

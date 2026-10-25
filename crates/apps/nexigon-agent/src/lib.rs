@@ -11,6 +11,10 @@
 //! Rugix Ctrl or RAUC. It reconciles the desired state in `dev.nexigon.ota.config` and
 //! reports progress in `dev.nexigon.ota.status`. Hosts running the agent in-process
 //! with [`run_with_connection`] may provide their own [`system_updates::SystemUpdater`].
+//!
+//! With app management enabled, the agent installs, updates, and removes apps with
+//! Rugix Apps. It reconciles the desired state in `dev.nexigon.apps.config` and reports
+//! the apps' status in `dev.nexigon.apps.status`.
 
 use std::future::Future;
 use std::io::ErrorKind;
@@ -40,6 +44,7 @@ use tracing::info;
 
 pub use nexigon_client::install_crypto_provider;
 
+mod apps;
 pub mod config;
 pub mod device_api;
 pub mod handlers;
@@ -47,6 +52,7 @@ pub mod handlers;
 pub mod local_api;
 mod operation_ledger;
 pub mod provisioning;
+mod reconcile;
 pub mod system_info;
 pub mod system_updates;
 #[cfg(target_os = "linux")]

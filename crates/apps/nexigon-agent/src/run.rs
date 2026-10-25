@@ -231,7 +231,9 @@ pub async fn run_with_connection(
             None
         })
     });
+    let app_updates = crate::apps::settings(&config);
     let check_requested = Arc::new(Notify::new());
+    let app_check_requested = Arc::new(Notify::new());
     let commands_enabled = config
         .commands
         .as_ref()
@@ -251,6 +253,15 @@ pub async fn run_with_connection(
                     .with_description(Some("Request an immediate system update check.".into()))
                     .with_category(Some("OTA".into())),
                 Arc::new(move || check_requested.notify_one()),
+            );
+        }
+        if app_updates.is_some() {
+            let app_check_requested = app_check_requested.clone();
+            registry.register_builtin(
+                DeviceCommandDescriptor::new(crate::apps::CHECK_COMMAND)
+                    .with_description(Some("Request an immediate check of the apps.".into()))
+                    .with_category(Some("Apps".into())),
+                Arc::new(move || app_check_requested.notify_one()),
             );
         }
         Some(Arc::new(registry))
@@ -311,9 +322,11 @@ pub async fn run_with_connection(
         }),
     );
 
-    // The system update loop finishes an installation in progress when the
-    // agent stops, so it runs outside the task group and its shutdown deadline.
+    // The system update and app loops finish a change in progress when the
+    // agent stops, so they run outside the task group and its shutdown deadline.
     let mut system_updates_task = None;
+    let mut app_updates_task = None;
+    let device_lock = Arc::new(tokio::sync::Mutex::new(()));
     let agent_run = async {
         let mut executor = connect_device_executor(&mut connection_ref)
             .await
@@ -389,6 +402,7 @@ pub async fn run_with_connection(
                         settings,
                         executor,
                         device_id.clone(),
+                        device_lock.clone(),
                         check_requested,
                         cancellation.clone(),
                         shutdown_requested.clone(),
@@ -397,6 +411,25 @@ pub async fn run_with_connection(
                 Err(error) => error!(
                     error = format!("{error:#}"),
                     "cannot open the system update executor channel, system updates are disabled"
+                ),
+            }
+        }
+
+        if let Some(settings) = app_updates {
+            match connect_device_executor(&mut connection_ref).await {
+                Ok(executor) => {
+                    app_updates_task = Some(tokio::spawn(crate::apps::run(
+                        settings,
+                        executor,
+                        device_id.clone(),
+                        device_lock.clone(),
+                        app_check_requested,
+                        cancellation.clone(),
+                    )));
+                }
+                Err(error) => error!(
+                    error = format!("{error:#}"),
+                    "cannot open the app executor channel, app management is disabled"
                 ),
             }
         }
@@ -684,6 +717,13 @@ pub async fn run_with_connection(
             Ok(Ok(())) => {}
             Ok(Err(error)) => error!(?error, "system update integration failed"),
             Err(error) => error!(?error, "system update integration panicked"),
+        }
+    }
+    if let Some(task) = app_updates_task {
+        match task.await {
+            Ok(Ok(())) => {}
+            Ok(Err(error)) => error!(?error, "app integration failed"),
+            Err(error) => error!(?error, "app integration panicked"),
         }
     }
     shutdown_watcher.abort();

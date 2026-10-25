@@ -294,7 +294,11 @@ record QueryProjectRepositoriesItem {
     repository_id: RepositoryId,
     /// Display name of the repository.
     display_name: string,
-    /// URL-safe slug of the repository, if one has been set.
+    /// Path name of the repository, unique within its organization.
+    ///
+    /// Absent on older Hub versions.
+    path_name?: string,
+    /// Slug of the repository, unique on the instance, if one has been set.
     slug?: string,
     /// Public name of the repository.
     ///

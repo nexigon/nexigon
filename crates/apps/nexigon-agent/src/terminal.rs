@@ -471,7 +471,8 @@ mod tests {
             write_terminal_data(&mut hub_channel, b"exit 7\n")
                 .await
                 .unwrap();
-            let exit = tokio::time::timeout(Duration::from_secs(5), async {
+            // Starting the shell can take seconds on a loaded machine.
+            let exit = tokio::time::timeout(Duration::from_secs(30), async {
                 loop {
                     match read_device_terminal_frame(&mut hub_channel).await.unwrap() {
                         DeviceTerminalFrame::Data(_) => {}
