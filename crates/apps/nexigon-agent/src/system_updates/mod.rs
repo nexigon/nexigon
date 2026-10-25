@@ -10,6 +10,8 @@
 //! `nexigon.ota.check` command requests a check. Scheduled checks are delayed
 //! randomly, so that devices whose checks are due at the same time, for example
 //! when a shared maintenance window opens, do not all reach Nexigon Hub at once.
+//! From the installation until the reboot, the integration holds the device
+//! lock that it shares with the app integration.
 
 use std::panic::AssertUnwindSafe;
 use std::sync::Arc;
@@ -17,9 +19,9 @@ use std::time::Duration;
 
 use anyhow::bail;
 use futures::FutureExt;
-use jiff::Timestamp;
 use jiff::tz::TimeZone;
 use nexigon_ids::ids::DeviceId;
+use tokio::sync::Mutex;
 use tokio::sync::Notify;
 use tokio_util::sync::CancellationToken;
 use tracing::error;
@@ -28,10 +30,15 @@ use tracing::warn;
 
 use crate::config::Config;
 use crate::device_api::DeviceExecutor;
+use crate::reconcile::DEFAULT_CHECK_INTERVAL;
+use crate::reconcile::DEFAULT_CHECK_JITTER;
+use crate::reconcile::MIN_CHECK_DELAY;
+use crate::reconcile::error_delay;
+use crate::reconcile::next_check_delay;
+use crate::reconcile::random_delay;
 
 mod check;
 mod planning;
-mod policy;
 mod updater;
 
 use check::Checker;
@@ -44,15 +51,6 @@ pub use updater::SystemUpdater;
 /// Device command that requests an immediate check.
 pub(crate) const CHECK_COMMAND: &str = "nexigon.ota.check";
 
-/// Default time between update checks.
-const DEFAULT_CHECK_INTERVAL: Duration = Duration::from_secs(4 * 60 * 60);
-/// Default maximum random delay of scheduled checks.
-const DEFAULT_CHECK_JITTER: Duration = Duration::from_secs(5 * 60);
-/// Delay before checking again after a check failed, for example because
-/// Nexigon Hub was unreachable.
-const ERROR_RETRY_DELAY: Duration = Duration::from_secs(5 * 60);
-/// Shortest time between two scheduled checks.
-const MIN_CHECK_DELAY: Duration = Duration::from_secs(10);
 /// Time to wait for a requested reboot before checking again.
 const REBOOT_TIMEOUT: Duration = Duration::from_secs(10 * 60);
 
@@ -167,6 +165,7 @@ pub(crate) async fn run(
     settings: SystemUpdates,
     executor: DeviceExecutor,
     device_id: DeviceId,
+    device_lock: Arc<Mutex<()>>,
     check_requested: Arc<Notify>,
     cancellation: CancellationToken,
     shutdown: CancellationToken,
@@ -177,11 +176,12 @@ pub(crate) async fn run(
         settings,
         executor,
         device_id,
+        device_lock,
         cancellation.clone(),
         shutdown,
     );
     while !cancellation.is_cancelled() {
-        let error_delay = ERROR_RETRY_DELAY.min(check_interval).max(MIN_CHECK_DELAY);
+        let error_delay = error_delay(check_interval);
         // A panicking check must not end the integration or the agent.
         let delay = match AssertUnwindSafe(checker.check()).catch_unwind().await {
             Ok(Ok(outcome)) if outcome.rebooting => {
@@ -205,7 +205,7 @@ pub(crate) async fn run(
                 error_delay
             }
         };
-        let delay = delay + check_jitter.mul_f64(rand::random::<f64>());
+        let delay = delay + random_delay(check_jitter);
         tokio::select! {
             biased;
             () = cancellation.cancelled() => return Ok(()),
@@ -214,15 +214,4 @@ pub(crate) async fn run(
         }
     }
     Ok(())
-}
-
-/// Time until the next check: the next attempt, if due before the interval.
-fn next_check_delay(next_attempt_at: Option<Timestamp>, check_interval: Duration) -> Duration {
-    let until_attempt = next_attempt_at.and_then(|at| {
-        let seconds = at.duration_since(Timestamp::now()).as_secs_f64();
-        Duration::try_from_secs_f64(seconds.max(0.0)).ok()
-    });
-    until_attempt
-        .map_or(check_interval, |until| until.min(check_interval))
-        .max(MIN_CHECK_DELAY)
 }

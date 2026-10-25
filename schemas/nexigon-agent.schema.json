@@ -136,7 +136,7 @@
     },
     "nexigon_agent.config.IntegrationsConfig": {
       "type": "object",
-      "description": "Integrations with update systems on the device.\n\nAt most one system update integration may be enabled.",
+      "description": "Integrations with update systems on the device.\n\nAt most one system update integration may be enabled. App management can be\nenabled alongside it.",
       "properties": {
         "rugix": {
           "$ref": "#/$defs/nexigon_agent.config.RugixIntegrationConfig"
@@ -281,12 +281,67 @@
       "required": [],
       "unevaluatedProperties": false
     },
+    "nexigon_agent.config.RugixAppsConfig": {
+      "type": "object",
+      "description": "App management with Rugix Apps.\n\nImplements the app update contract of Nexigon Hub: the agent converges the\napps on the device toward the desired state in `dev.nexigon.apps.config` and\nreports their status in `dev.nexigon.apps.status`. Requires a Rugix Ctrl\nversion that supports `rugix-ctrl apps install --origin`.",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "arch": {
+          "type": "string"
+        },
+        "check-interval-secs": {
+          "type": [
+            "integer",
+            "string"
+          ],
+          "format": "uint64",
+          "minimum": 0,
+          "pattern": "^[0-9]+$"
+        },
+        "check-jitter-secs": {
+          "type": [
+            "integer",
+            "string"
+          ],
+          "format": "uint64",
+          "minimum": 0,
+          "pattern": "^[0-9]+$"
+        },
+        "use-bundle-hash": {
+          "type": "boolean"
+        },
+        "gc": {
+          "$ref": "#/$defs/nexigon_agent.config.RugixAppsGcConfig"
+        }
+      },
+      "required": [],
+      "unevaluatedProperties": false
+    },
+    "nexigon_agent.config.RugixAppsGcConfig": {
+      "type": "object",
+      "description": "Removal of old app versions with `rugix-ctrl apps gc`.",
+      "properties": {
+        "keep": {
+          "type": "integer",
+          "format": "uint32",
+          "maximum": 4294967295,
+          "minimum": 0
+        }
+      },
+      "required": [],
+      "unevaluatedProperties": false
+    },
     "nexigon_agent.config.RugixIntegrationConfig": {
       "type": "object",
       "description": "Rugix integration.",
       "properties": {
         "system-updates": {
           "$ref": "#/$defs/nexigon_agent.config.RugixSystemUpdatesConfig"
+        },
+        "apps": {
+          "$ref": "#/$defs/nexigon_agent.config.RugixAppsConfig"
         }
       },
       "required": [],

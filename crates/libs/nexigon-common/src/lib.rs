@@ -62,6 +62,7 @@ use nexigon_api::types::repositories::SetPackageVersionMetadataAction;
 use nexigon_api::types::repositories::SetPackageVersionNameAction;
 use nexigon_api::types::repositories::SetPackageVersionRetentionAction;
 use nexigon_api::types::repositories::SetRepositoryDisplayNameAction;
+use nexigon_api::types::repositories::SetRepositoryPathNameAction;
 use nexigon_api::types::repositories::SetRepositoryS3ConfigAction;
 use nexigon_api::types::repositories::SetRepositorySlugAction;
 use nexigon_api::types::repositories::SetRepositoryVisibilityAction;
@@ -369,6 +370,10 @@ pub enum RepositoriesCmd {
         organization: Option<OrganizationId>,
         /// Display name.
         display_name: String,
+        /// Path name, unique within the organization. Defaults to `default`,
+        /// with a numeric suffix if it is already taken.
+        #[clap(long)]
+        path_name: Option<String>,
         /// Repository visibility.
         #[clap(long, value_parser = parse_repository_visibility)]
         visibility: Option<RepositoryVisibility>,
@@ -392,6 +397,13 @@ pub enum RepositoriesCmd {
         /// New visibility.
         #[clap(value_parser = parse_repository_visibility)]
         visibility: RepositoryVisibility,
+    },
+    /// Set repository path name.
+    SetPathName {
+        /// Repository name or ID.
+        repository: String,
+        /// New path name.
+        path_name: String,
     },
     /// Set repository slug.
     SetSlug {
@@ -807,6 +819,7 @@ pub async fn execute_repositories_cmd(
         RepositoriesCmd::Create {
             organization,
             display_name,
+            path_name,
             visibility,
         } => {
             let output = executor
@@ -817,6 +830,7 @@ pub async fn execute_repositories_cmd(
                         })?,
                         display_name.clone(),
                     )
+                    .with_path_name(path_name.clone().map(Into::into))
                     .with_visibility(visibility.clone()),
                 )
                 .await
@@ -857,6 +871,20 @@ pub async fn execute_repositories_cmd(
                 ))
                 .await
                 .context("setting repository visibility")??;
+            write_json(&output);
+        }
+        RepositoriesCmd::SetPathName {
+            repository,
+            path_name,
+        } => {
+            let repository_id = resolve_repository(executor, repository).await?;
+            let output = executor
+                .execute(SetRepositoryPathNameAction::new(
+                    repository_id,
+                    path_name.clone(),
+                ))
+                .await
+                .context("setting repository path name")??;
             write_json(&output);
         }
         RepositoriesCmd::SetSlug { repository, slug } => {

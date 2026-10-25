@@ -17,24 +17,15 @@
 //! writes its status regardless, because the next check needs it to detect the
 //! outcome of the update.
 
-use std::collections::HashMap;
-use std::time::Duration;
+use std::sync::Arc;
 
 use anyhow::Context;
 use anyhow::anyhow;
 use anyhow::bail;
 use jiff::Timestamp;
 use jiff::tz::TimeZone;
-use nexigon_api::Action;
-use nexigon_api::types::DeviceGroupMarker;
-use nexigon_api::types::devices::DeviceEvent;
 use nexigon_api::types::devices::DeviceEventSeverity;
 use nexigon_api::types::devices::DeviceProperty;
-use nexigon_api::types::devices::GetDevicePropertyAction;
-use nexigon_api::types::devices::GetDevicePropertyOutput;
-use nexigon_api::types::devices::PublishDeviceEventsAction;
-use nexigon_api::types::devices::SetDevicePropertyAction;
-use nexigon_api::types::devices::SetDevicePropertyOutput;
 use nexigon_api::types::properties::OtaUpdateBlocked;
 use nexigon_api::types::properties::OtaUpdateCapability;
 use nexigon_api::types::properties::OtaUpdateConfig;
@@ -43,20 +34,13 @@ use nexigon_api::types::properties::OtaUpdateState;
 use nexigon_api::types::properties::OtaUpdateStatus;
 use nexigon_api::types::properties::OtaUpdateWindow;
 use nexigon_api::types::properties::OtaUpdater;
-use nexigon_api::types::repositories::GetPackageVersionDetailsAction;
 use nexigon_api::types::repositories::GetPackageVersionDetailsOutput;
-use nexigon_api::types::repositories::IssueAssetDownloadUrlAction;
 use nexigon_api::types::repositories::PackageVersionAsset;
 use nexigon_api::types::repositories::PackageVersionId;
-use nexigon_api::types::repositories::RepositoryAssetStatus;
-use nexigon_api::types::repositories::ResolvePackageVersionByPathAction;
-use nexigon_api::types::repositories::ResolvePackageVersionByPathOutput;
-use nexigon_ids::Generate;
-use nexigon_ids::ids::DeviceEventId;
 use nexigon_ids::ids::DeviceId;
 use serde::Deserialize;
-use serde::Serialize;
-use serde::de::DeserializeOwned;
+use tokio::sync::Mutex;
+use tokio::sync::OwnedMutexGuard;
 use tokio_util::sync::CancellationToken;
 use tracing::info;
 use tracing::warn;
@@ -66,17 +50,22 @@ use super::planning::ChainEntry;
 use super::planning::NextVersion;
 use super::planning::Running;
 use super::planning::next_version;
-use super::policy::SpreadState;
-use super::policy::WindowState;
-use super::policy::merge_patch;
-use super::policy::retry_delay;
-use super::policy::retry_policy_with_defaults;
-use super::policy::spread_position;
-use super::policy::spread_state;
-use super::policy::window_state;
 use super::updater::Bundle;
 use super::updater::SystemIdentity;
 use crate::device_api::DeviceExecutor;
+use crate::reconcile::WindowGate;
+use crate::reconcile::hub::Hub;
+use crate::reconcile::hub::PropertyWrite;
+use crate::reconcile::hub::VersionPath;
+use crate::reconcile::hub::metadata;
+use crate::reconcile::hub::rugix_bundle_hash;
+use crate::reconcile::next_retry;
+use crate::reconcile::policy::SpreadState;
+use crate::reconcile::policy::merge_patch;
+use crate::reconcile::policy::retry_policy_with_defaults;
+use crate::reconcile::policy::spread_position;
+use crate::reconcile::policy::spread_state;
+use crate::reconcile::window_gate;
 
 /// Device property holding the desired state.
 pub(crate) const CONFIG_PROPERTY: &str = "dev.nexigon.ota.config";
@@ -84,8 +73,6 @@ pub(crate) const CONFIG_PROPERTY: &str = "dev.nexigon.ota.config";
 pub(crate) const STATUS_PROPERTY: &str = "dev.nexigon.ota.status";
 /// Event category of update events.
 const EVENT_CATEGORY: &str = "ota";
-/// Time until checking whether the clock has been synchronized.
-const CLOCK_RECHECK_DELAY: Duration = Duration::from_secs(60);
 /// Number of times a check starts over after the status changed concurrently.
 const MAX_STATUS_CONFLICTS: usize = 3;
 
@@ -113,13 +100,16 @@ pub(crate) struct CheckOutcome {
 /// Executes checks against Nexigon Hub for one device.
 pub(crate) struct Checker {
     settings: SystemUpdates,
-    executor: DeviceExecutor,
-    device_id: DeviceId,
+    hub: Hub,
     /// Signals a lost connection or a shutdown, which prevents new installations.
     cancellation: CancellationToken,
     /// Signals a shutdown, which also prevents rebooting into an installed version.
     shutdown: CancellationToken,
-    details: HashMap<PackageVersionId, GetPackageVersionDetailsOutput>,
+    /// Serializes changes of the device with the app integration.
+    device_lock: Arc<Mutex<()>>,
+    /// Keeps the app integration from changing the device until the reboot
+    /// into an installed version.
+    reboot_guard: Option<OwnedMutexGuard<()>>,
     /// Version of the status read or written last, or `None` without a status.
     status_version: Option<u64>,
     /// Whether this check started an installation.
@@ -134,16 +124,17 @@ impl Checker {
         settings: SystemUpdates,
         executor: DeviceExecutor,
         device_id: DeviceId,
+        device_lock: Arc<Mutex<()>>,
         cancellation: CancellationToken,
         shutdown: CancellationToken,
     ) -> Self {
         Self {
             settings,
-            executor,
-            device_id,
+            hub: Hub::new(executor, device_id),
             cancellation,
             shutdown,
-            details: HashMap::new(),
+            device_lock,
+            reboot_guard: None,
             status_version: None,
             installing: false,
             outcome_reported: false,
@@ -156,6 +147,7 @@ impl Checker {
     #[tracing::instrument(skip_all)]
     pub(crate) async fn check(&mut self) -> anyhow::Result<CheckOutcome> {
         self.outcome_reported = false;
+        self.reboot_guard = None;
         for _ in 0..MAX_STATUS_CONFLICTS {
             match self.check_once().await {
                 Err(error) if error.is::<StatusConflict>() => {
@@ -169,11 +161,11 @@ impl Checker {
 
     async fn check_once(&mut self) -> anyhow::Result<CheckOutcome> {
         // Versions may be deleted or rebased between checks.
-        self.details.clear();
+        self.hub.clear_cache();
         self.installing = false;
         let now = Timestamp::now();
         let previous = self.previous_status().await?;
-        let property = self.property(CONFIG_PROPERTY).await?;
+        let property = self.hub.property(CONFIG_PROPERTY).await?;
         let config_version = property.as_ref().map(|property| property.version);
         let identity = self.settings.updater.identity().await?;
         let mut status = OtaUpdateStatus::new()
@@ -240,7 +232,10 @@ impl Checker {
             Ok(path) => path,
             Err(error) => return self.finish(failed(status, &error)).await,
         };
-        let running_id = self.resolve(&path.with_version(&identity.version)).await?;
+        let running_id = self
+            .hub
+            .resolve(&path.with_version(&identity.version))
+            .await?;
         status.current_version_id = running_id.clone();
 
         let mut completed = false;
@@ -291,11 +286,11 @@ impl Checker {
             status.last_error = Some(error.clone().into());
         }
 
-        let Some(target_id) = self.resolve(&path).await? else {
+        let Some(target_id) = self.hub.resolve(&path).await? else {
             let error = anyhow!("version {path} does not exist");
             return self.finish(failed(status, &error)).await;
         };
-        let target = self.version_details(&target_id).await?.clone();
+        let target = self.hub.version_details(&target_id).await?.clone();
         let target_version = image_version(&target);
         status.target_version = target_version.clone().map(Into::into);
         status.target_version_id = Some(target_id.clone());
@@ -370,7 +365,8 @@ impl Checker {
                     .and_then(|tag| tag.assigned_at)
                     .map(Into::into)
             });
-            let position = spread_position(&self.device_id.to_string(), &target_id.to_string());
+            let position =
+                spread_position(&self.hub.device_id().to_string(), &target_id.to_string());
             if let SpreadState::Waiting { released_at } = spread_state(spread, start, position, now)
             {
                 return self.finish(blocked(status, "spread", released_at)).await;
@@ -406,7 +402,7 @@ impl Checker {
             .asset
             .as_deref()
             .expect("the effective configuration names an asset");
-        let Some(asset) = self.available_asset(&next, filename).await? else {
+        let Some(asset) = self.hub.available_asset(&next, filename).await? else {
             let blocked = OtaUpdateBlocked::new("no-asset").with_message(Some(
                 format!("The next version has no available asset {filename}.").into(),
             ));
@@ -442,20 +438,15 @@ impl Checker {
         retry: &OtaUpdateRetryPolicy,
         failures: u32,
     ) -> anyhow::Result<CheckOutcome> {
+        // The app integration may hold the lock for a while, during which the
+        // agent may be stopped and a download URL would expire.
+        let device_guard = self.device_lock.clone().lock_owned().await;
         if self.cancellation.is_cancelled() {
             bail!("the agent is stopping");
         }
-        let details = self.version_details(next).await?.clone();
-        let url = call(
-            &mut self.executor,
-            IssueAssetDownloadUrlAction::new(asset.asset_id.clone())
-                .with_filename(Some(asset.filename.clone())),
-        )
-        .await?
-        .url;
-        let bundle_hash = metadata::<AssetMetadata>(&asset.metadata)
-            .and_then(|metadata| metadata.rugix)
-            .and_then(|rugix| rugix.bundle_hash);
+        let details = self.hub.version_details(next).await?.clone();
+        let url = self.hub.download_url(asset).await?;
+        let bundle_hash = rugix_bundle_hash(asset);
 
         info!(version = %next, "installing update");
         self.publish(&status.clone().with_state(Some(OtaUpdateState::Installing)))
@@ -527,6 +518,7 @@ impl Checker {
                 .fail_attempt(status, identity, retry, failures, error)
                 .await;
         }
+        self.reboot_guard = Some(device_guard);
         Ok(CheckOutcome {
             next_attempt_at: None,
             rebooting: true,
@@ -578,7 +570,7 @@ impl Checker {
             if chain.iter().any(|entry| entry.version_id == base) {
                 bail!("the base versions of {} form a cycle", target.version_id);
             }
-            let details = self.version_details(&base).await?;
+            let details = self.hub.version_details(&base).await?;
             chain.push(ChainEntry {
                 version_id: base,
                 base_version_id: details.base_version_id.clone(),
@@ -588,6 +580,7 @@ impl Checker {
             Some(running_id) => Some(Running {
                 version_id: running_id.clone(),
                 base_version_id: self
+                    .hub
                     .version_details(running_id)
                     .await?
                     .base_version_id
@@ -612,7 +605,7 @@ impl Checker {
         if running_id == Some(installed) {
             return Ok(true);
         }
-        let details = self.version_details(installed).await?;
+        let details = self.hub.version_details(installed).await?;
         Ok(
             image_version(details).as_deref() == Some(identity.version.as_str())
                 || details.tags.iter().any(|tag| *tag.tag == identity.version),
@@ -620,7 +613,7 @@ impl Checker {
     }
 
     async fn previous_status(&mut self) -> anyhow::Result<OtaUpdateStatus> {
-        let property = self.property(STATUS_PROPERTY).await?;
+        let property = self.hub.property(STATUS_PROPERTY).await?;
         self.status_version = property.as_ref().map(|property| property.version);
         let Some(property) = property else {
             return Ok(OtaUpdateStatus::new());
@@ -632,72 +625,9 @@ impl Checker {
         }))
     }
 
-    async fn property(&mut self, name: &str) -> anyhow::Result<Option<DeviceProperty>> {
-        let output = call(
-            &mut self.executor,
-            GetDevicePropertyAction::new(self.device_id.clone(), name.to_owned()),
-        )
-        .await?;
-        Ok(match output {
-            GetDevicePropertyOutput::Found(property) => Some(property),
-            GetDevicePropertyOutput::NotFound => None,
-        })
-    }
-
-    /// Resolve a version path, or return `None` if it does not exist.
-    async fn resolve(&mut self, path: &VersionPath) -> anyhow::Result<Option<PackageVersionId>> {
-        let action = ResolvePackageVersionByPathAction::new(
-            path.repository.clone(),
-            path.package.clone(),
-            path.version.clone(),
-        );
-        // Version strings that are not valid tags cannot resolve. The future is
-        // boxed for the reason given at `call`.
-        match Box::pin(self.executor.execute(action))
-            .await
-            .context("failed to reach Nexigon Hub")?
-        {
-            Ok(ResolvePackageVersionByPathOutput::Found(found)) => Ok(Some(found.version_id)),
-            Ok(ResolvePackageVersionByPathOutput::NotFound) | Err(_) => Ok(None),
-        }
-    }
-
-    async fn version_details(
-        &mut self,
-        version_id: &PackageVersionId,
-    ) -> anyhow::Result<&GetPackageVersionDetailsOutput> {
-        if !self.details.contains_key(version_id) {
-            let details = call(
-                &mut self.executor,
-                GetPackageVersionDetailsAction::new(version_id.clone()),
-            )
-            .await?;
-            self.details.insert(version_id.clone(), details);
-        }
-        Ok(&self.details[version_id])
-    }
-
-    /// Asset of a version with the given filename, if it has been uploaded.
-    async fn available_asset(
-        &mut self,
-        version_id: &PackageVersionId,
-        filename: &str,
-    ) -> anyhow::Result<Option<PackageVersionAsset>> {
-        Ok(self
-            .version_details(version_id)
-            .await?
-            .assets
-            .iter()
-            .find(|asset| {
-                *asset.filename == *filename
-                    && matches!(asset.status, RepositoryAssetStatus::Available)
-            })
-            .cloned())
-    }
-
     /// Read the desired state applied to the defaults of the agent configuration.
     async fn config(&mut self, identity: &SystemIdentity) -> anyhow::Result<OtaUpdateConfig> {
-        let property = self.property(CONFIG_PROPERTY).await?;
+        let property = self.hub.property(CONFIG_PROPERTY).await?;
         effective_config(
             self.defaults(),
             &self.settings.updater.bundle_filename(&identity.name),
@@ -757,35 +687,25 @@ impl Checker {
     /// installation or the status awaits a commit. Then the status replaces the
     /// changed one.
     async fn publish(&mut self, status: &OtaUpdateStatus) -> anyhow::Result<()> {
-        let value =
-            serde_json::to_value(status).context("failed to serialize the update status")?;
-        let action = SetDevicePropertyAction::new(
-            self.device_id.clone(),
-            STATUS_PROPERTY.to_owned(),
-            value.into(),
-        );
-        let output = call(
-            &mut self.executor,
-            action.clone().with_expected_version(self.status_version),
-        )
-        .await?;
-        let output = match output {
-            SetDevicePropertyOutput::Set(_) => output,
-            SetDevicePropertyOutput::VersionConflict(_) | SetDevicePropertyOutput::Deleted
+        let write = match self
+            .hub
+            .set_property(STATUS_PROPERTY, status, self.status_version)
+            .await?
+        {
+            PropertyWrite::Conflict
                 if self.installing || matches!(status.state, Some(OtaUpdateState::Committing)) =>
             {
-                call(&mut self.executor, action).await?
+                self.hub.set_property(STATUS_PROPERTY, status, None).await?
             }
-            SetDevicePropertyOutput::VersionConflict(_) | SetDevicePropertyOutput::Deleted => {
-                return Err(StatusConflict.into());
-            }
+            PropertyWrite::Conflict => return Err(StatusConflict.into()),
+            write => write,
         };
-        let SetDevicePropertyOutput::Set(success) = output else {
+        let PropertyWrite::Written { version } = write else {
             bail!("Nexigon Hub did not store the update status");
         };
-        // Nexigon Hub 2026.3 and earlier do not report the version, so the next
-        // write of this check is unconditional.
-        self.status_version = success.version;
+        // Without a reported version, the next write of this check is
+        // unconditional.
+        self.status_version = version;
         Ok(())
     }
 
@@ -802,18 +722,9 @@ impl Checker {
         if let Some(error) = error {
             attributes.insert("error".into(), error.into());
         }
-        let event = DeviceEvent::new(
-            DeviceEventId::generate(),
-            severity,
-            message.into(),
-            attributes,
-            Timestamp::now().into(),
-        )
-        .with_category(Some(EVENT_CATEGORY.into()));
-        let action = PublishDeviceEventsAction::new(self.device_id.clone(), vec![event].into());
-        if let Err(error) = call(&mut self.executor, action).await {
-            warn!(?error, "failed to publish an update event");
-        }
+        self.hub
+            .event(EVENT_CATEGORY, severity, message, attributes)
+            .await;
     }
 }
 
@@ -821,47 +732,6 @@ impl Checker {
 #[derive(Debug, thiserror::Error)]
 #[error("the update status changed concurrently")]
 struct StatusConflict;
-
-/// Repository, package, and tag or ID of a version.
-#[derive(Debug, Clone)]
-struct VersionPath {
-    repository: String,
-    package: String,
-    version: String,
-}
-
-impl VersionPath {
-    fn parse(path: &str) -> anyhow::Result<Self> {
-        let mut parts = path.split('/');
-        match (parts.next(), parts.next(), parts.next(), parts.next()) {
-            (Some(repository), Some(package), Some(version), None)
-                if !repository.is_empty() && !package.is_empty() && !version.is_empty() =>
-            {
-                Ok(Self {
-                    repository: repository.to_owned(),
-                    package: package.to_owned(),
-                    version: version.to_owned(),
-                })
-            }
-            _ => Err(anyhow!(
-                "invalid version path {path:?}, expected <repository>/<package>/<version>"
-            )),
-        }
-    }
-
-    fn with_version(&self, version: &str) -> Self {
-        Self {
-            version: version.to_owned(),
-            ..self.clone()
-        }
-    }
-}
-
-impl std::fmt::Display for VersionPath {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}/{}/{}", self.repository, self.package, self.version)
-    }
-}
 
 /// Apply the configuration property to the defaults of the agent configuration.
 ///
@@ -892,26 +762,6 @@ struct VersionMetadata {
     image_version: Option<String>,
 }
 
-/// Metadata of a bundle asset.
-#[derive(Deserialize)]
-struct AssetMetadata {
-    rugix: Option<RugixAssetMetadata>,
-}
-
-#[derive(Deserialize)]
-#[serde(rename_all = "camelCase")]
-struct RugixAssetMetadata {
-    /// Hash of the bundle for Rugix Ctrl to verify.
-    bundle_hash: Option<String>,
-}
-
-/// Read the metadata of a version or asset, or `None` if it does not match.
-fn metadata<T: DeserializeOwned>(metadata: &impl Serialize) -> Option<T> {
-    serde_json::to_value(metadata)
-        .and_then(serde_json::from_value)
-        .ok()
-}
-
 /// Version string built into the image of a version.
 fn image_version(details: &GetPackageVersionDetailsOutput) -> Option<String> {
     metadata::<VersionMetadata>(&details.metadata)?.image_version
@@ -930,24 +780,22 @@ fn window_closed(
     window: Option<&OtaUpdateWindow>,
     time_zone: TimeZone,
 ) -> Option<Deferral> {
-    let window = window?;
-    if !clock_synchronized() {
-        // The clock usually synchronizes shortly after boot.
-        return Some(Deferral {
-            status: status
-                .clone()
-                .with_state(Some(OtaUpdateState::Blocked))
-                .with_blocked(Some(
-                    OtaUpdateBlocked::new("window")
-                        .with_message(Some("The device clock is not synchronized.".into())),
-                )),
-            recheck_at: Timestamp::now().checked_add(CLOCK_RECHECK_DELAY).ok(),
-        });
-    }
-    let status = match window_state(window, &Timestamp::now().to_zoned(time_zone)) {
-        Ok(WindowState::Open) => return None,
-        Ok(WindowState::Closed { opens_at }) => blocked(status.clone(), "window", opens_at),
-        Err(error) => status
+    let status = match window_gate(window?, time_zone) {
+        WindowGate::Open => return None,
+        WindowGate::Unsynchronized { recheck_at } => {
+            return Some(Deferral {
+                status: status
+                    .clone()
+                    .with_state(Some(OtaUpdateState::Blocked))
+                    .with_blocked(Some(
+                        OtaUpdateBlocked::new("window")
+                            .with_message(Some("The device clock is not synchronized.".into())),
+                    )),
+                recheck_at,
+            });
+        }
+        WindowGate::Closed { opens_at } => blocked(status.clone(), "window", opens_at),
+        WindowGate::Invalid(error) => status
             .clone()
             .with_state(Some(OtaUpdateState::Failed))
             .with_last_error(Some(
@@ -958,11 +806,6 @@ fn window_closed(
         status,
         recheck_at: None,
     })
-}
-
-fn next_retry(retry: &OtaUpdateRetryPolicy, failures: u32, now: Timestamp) -> Option<Timestamp> {
-    let delay = retry_delay(retry, failures)?;
-    now.checked_add(delay).ok()
 }
 
 fn blocked(
@@ -984,35 +827,6 @@ fn failed(status: OtaUpdateStatus, error: &anyhow::Error) -> OtaUpdateStatus {
     status
         .with_state(Some(OtaUpdateState::Failed))
         .with_last_error(Some(error.into()))
-}
-
-/// Execute an action, failing if Nexigon Hub is unreachable or rejects it.
-///
-/// Action futures are large. Boxing them keeps the futures of checks small,
-/// which would otherwise overflow the stack of unoptimized builds.
-async fn call<A: Action + DeviceGroupMarker>(
-    executor: &mut DeviceExecutor,
-    action: A,
-) -> anyhow::Result<A::Output> {
-    Box::pin(executor.execute(action))
-        .await
-        .context("failed to reach Nexigon Hub")?
-        .map_err(|error| anyhow!("Nexigon Hub rejected the request: {}", error.message))
-}
-
-/// Whether the kernel considers the system clock synchronized.
-#[cfg(target_os = "linux")]
-fn clock_synchronized() -> bool {
-    // SAFETY: `adjtimex` with zero `modes` only reads the kernel clock state
-    // into the provided, fully initialized structure.
-    let mut timex: libc::timex = unsafe { std::mem::zeroed() };
-    let state = unsafe { libc::adjtimex(&mut timex) };
-    state != libc::TIME_ERROR && timex.status & libc::STA_UNSYNC == 0
-}
-
-#[cfg(not(target_os = "linux"))]
-fn clock_synchronized() -> bool {
-    true
 }
 
 #[cfg(test)]

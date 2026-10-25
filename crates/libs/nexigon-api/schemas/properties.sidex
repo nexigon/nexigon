@@ -385,6 +385,273 @@ record OtaUpdateBlocked {
     message?: string,
 }
 
+/// App update configuration (`dev.nexigon.apps.config`).
+///
+/// Desired state of the apps on a device. The integration manages the apps listed
+/// in `apps` and leaves other installed apps untouched. Removing an app from
+/// `apps` ends its management without uninstalling it. To uninstall an app, set
+/// its `state` to `removed`.
+///
+/// The policies `hold`, `window`, `retry`, `spread`, and `gc` apply to every app
+/// that does not set its own. They govern version changes. Changes of an app's
+/// `state` apply at the next check.
+#[unstable(feature = "app_updates")]
+record AppUpdateConfig {
+    /// Managed apps by name.
+    apps?: [string: ManagedAppConfig],
+    /// Hold all apps at their current versions.
+    ///
+    /// While set, the device neither installs nor activates new versions. An
+    /// update in progress completes. Defaults to false.
+    hold?: bool,
+    /// Maintenance window restricting when updates are activated.
+    ///
+    /// Outside the window, the device may download and install a new version of a
+    /// running app without activating it. Updates can be activated at any time
+    /// when absent.
+    window?: OtaUpdateWindow,
+    /// Retry policy for failed update attempts.
+    retry?: OtaUpdateRetryPolicy,
+    /// Spreading of updates across devices.
+    ///
+    /// Devices update without waiting when absent.
+    spread?: OtaUpdateSpread,
+    /// Removal of old versions after an update.
+    gc?: AppGcPolicy,
+}
+
+/// Desired state of a managed app.
+///
+/// A policy set here replaces the policy of the configuration for this app.
+#[unstable(feature = "app_updates")]
+record ManagedAppConfig {
+    /// Version path in the format `<repository>/<package>/<version>`.
+    ///
+    /// `<version>` is a tag or a version ID. A tag tracks the version the tag
+    /// points to. A version ID pins a single version. Without a path, the
+    /// integration does not install or update the app and only applies `state`
+    /// to an installed app.
+    path?: string,
+    /// Filename of the bundle that the device installs from a version.
+    ///
+    /// `{arch}` stands for the architecture of the device. Defaults to
+    /// `<app>-{arch}.rugixb`, or to `<app>.rugixb` if the version has no bundle
+    /// for the architecture.
+    asset?: string,
+    /// Desired state of the app. Defaults to `running`.
+    state?: AppDesiredState,
+    /// Hold the app at its current version.
+    hold?: bool,
+    /// Maintenance window restricting when updates of the app are activated.
+    window?: OtaUpdateWindow,
+    /// Retry policy for failed update attempts of the app.
+    retry?: OtaUpdateRetryPolicy,
+    /// Spreading of updates of the app across devices.
+    spread?: OtaUpdateSpread,
+    /// Removal of old versions of the app after an update.
+    gc?: AppGcPolicy,
+    /// Rollout number.
+    ///
+    /// Integrations ignore its value. Changing it changes the app's
+    /// configuration, which starts a new round of attempts on devices whose
+    /// attempts failed.
+    rollout?: u32,
+}
+
+/// Removal of old versions of an app.
+///
+/// After switching an app to a new version, the integration removes old versions
+/// to free storage. It keeps the running version and the most recent previously
+/// running versions, to which the app can switch back without downloading them
+/// again.
+#[unstable(feature = "app_updates")]
+record AppGcPolicy {
+    /// Number of previously running versions to keep.
+    ///
+    /// Defaults to the integration's default, usually 1.
+    keep?: u32,
+}
+
+/// Desired state of a managed app.
+#[json(tagged = externally, rename_all = "lowercase")]
+#[unstable(feature = "app_updates")]
+variant AppDesiredState {
+    /// The app is installed and its workload runs.
+    Running,
+    /// The app is installed but deactivated, so that its workload does not run,
+    /// also not after a reboot.
+    Stopped,
+    /// The app is uninstalled, including its persistent data.
+    Removed,
+}
+
+/// App update status (`dev.nexigon.apps.status`).
+///
+/// Actual state of the apps on a device, published by its app integration.
+///
+/// The integration writes the status with the version it read last
+/// (compare-and-swap), so that it does not overwrite concurrent changes. Other
+/// writers may only clear the `failure_count` and `next_attempt_at` of an app,
+/// which requests a new attempt.
+#[unstable(feature = "app_updates")]
+record AppUpdateStatus {
+    /// Optional features of the app update contract that the integration supports.
+    capabilities?: [AppUpdateCapability],
+    /// Version of the `dev.nexigon.apps.config` property that the integration
+    /// last read.
+    ///
+    /// Absent when the property does not exist. The version changes with every
+    /// write to the device's own value and whenever a profile revision that
+    /// sets the property is applied to the device, even with an unchanged value.
+    config_version?: u64,
+    /// Why the integration cannot apply the configuration, if it cannot.
+    last_error?: string,
+    /// Architecture of the device, which selects the bundles it installs.
+    arch?: string,
+    /// Runtime that installs and runs apps on the device.
+    runtime?: AppRuntime,
+    /// Managed and installed apps by name.
+    apps: [string: AppStatus],
+}
+
+/// Runtime that installs and runs apps on a device, such as Rugix Apps.
+#[unstable(feature = "app_updates")]
+record AppRuntime {
+    /// Name of the runtime, such as `rugix`.
+    name: string,
+    /// Version of the runtime.
+    version?: string,
+}
+
+/// Status of an app on a device.
+#[unstable(feature = "app_updates")]
+record AppStatus {
+    /// Whether `dev.nexigon.apps.config` lists the app.
+    managed: bool,
+    /// Effective configuration of the app, including the policies that apply
+    /// to it.
+    config?: ManagedAppConfig,
+    /// Current state of the app's update process.
+    state?: AppUpdateState,
+    /// Why the update is blocked. Present when `state` is `blocked`.
+    blocked?: AppUpdateBlocked,
+    /// Generation of the app that runs, or that runs when the app starts.
+    generation?: u64,
+    /// Package version of `generation`.
+    ///
+    /// Absent when the integration did not install the generation.
+    current_version_id?: PackageVersionId,
+    /// Package version that the configured path resolves to.
+    target_version_id?: PackageVersionId,
+    /// Filename of the bundle selected from the target version.
+    asset?: string,
+    /// Number of consecutive failed attempts for the target version.
+    ///
+    /// Resets to zero when the target version or the effective configuration of
+    /// the app changes, when the retry cooldown ends, when an update succeeds, or
+    /// when another writer clears it.
+    failure_count?: u32,
+    /// Error message of the last failure, if any.
+    last_error?: string,
+    /// Earliest time of the next attempt.
+    ///
+    /// Set while the app waits for a spread, a maintenance window, a retry
+    /// delay, or a retry cooldown.
+    next_attempt_at?: Timestamp,
+    /// Live status of the app's workload, as reported by the runtime.
+    workload?: AppWorkloadStatus,
+}
+
+/// Optional feature of the app update contract.
+#[json(tagged = externally, rename_all = "camelCase")]
+#[unstable(feature = "app_updates")]
+variant AppUpdateCapability {
+    /// The integration honors `window`.
+    Window,
+    /// The integration honors `retry` and resets the failure count of an app
+    /// when its configuration changes.
+    Retry,
+    /// The integration honors `spread`.
+    Spread,
+    /// The integration honors `hold`.
+    Hold,
+    /// The integration honors `asset`.
+    Asset,
+    /// The integration honors `gc`.
+    Gc,
+}
+
+/// State of an app's update process.
+///
+/// The resting states are `idle`, `completed`, `failed`, and `blocked`.
+#[json(tagged = externally, rename_all = "lowercase")]
+#[unstable(feature = "app_updates")]
+variant AppUpdateState {
+    /// No path is configured.
+    Idle,
+    /// A new version is being downloaded and installed without interrupting
+    /// the app.
+    Installing,
+    /// The app is switching to the installed version.
+    Activating,
+    /// The app is being uninstalled.
+    Removing,
+    /// The app has the target version and its desired state, or it has been
+    /// uninstalled as desired.
+    Completed,
+    /// The last attempt failed.
+    Failed,
+    /// An update is available but cannot proceed yet. See `blocked` for the
+    /// reason.
+    Blocked,
+}
+
+/// Information about a blocked app update.
+#[unstable(feature = "app_updates")]
+record AppUpdateBlocked {
+    /// Machine-readable reason in kebab case.
+    ///
+    /// Nexigon defines these codes:
+    ///
+    /// - `hold`: The configuration holds the app at its current version.
+    /// - `spread`: The device waits for its turn in a spread or is outside the
+    ///   released percentage.
+    /// - `window`: The device waits for its maintenance window. The new version
+    ///   may already be installed.
+    /// - `no-asset`: The target version has no bundle for the device's
+    ///   architecture or no available asset with the filename in `config.asset`.
+    #[validate(
+        { matches(_, "^[a-z0-9]+(-[a-z0-9]+)*$") },
+        message = "Code must be in kebab case."
+    )]
+    code: string,
+    /// Human-readable explanation.
+    message?: string,
+}
+
+/// Live status of an app's workload.
+#[json(tag = "state", rename_all = "lowercase")]
+#[unstable(feature = "app_updates")]
+variant AppWorkloadStatus {
+    /// The workload runs.
+    Running,
+    /// The workload runs but reports a problem.
+    Unhealthy: AppWorkloadMessage,
+    /// The workload does not run.
+    Stopped,
+    /// The workload failed.
+    Failed: AppWorkloadMessage,
+    /// The runtime cannot determine the workload's status.
+    Unknown,
+}
+
+/// Explanation of an app's workload status.
+#[unstable(feature = "app_updates")]
+record AppWorkloadMessage {
+    /// Human-readable explanation.
+    message: string,
+}
+
 /// Device health information (`dev.nexigon.system.health`).
 record DeviceHealth {
     /// Health status of the device.

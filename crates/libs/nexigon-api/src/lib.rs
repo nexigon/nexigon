@@ -226,6 +226,7 @@ macro_rules! with_actions {
             ("repositories_Delete", DeleteRepository, repositories::DeleteRepositoryAction, outputs::Empty),
             ("repositories_SetVisibility", SetRepositoryVisibility, repositories::SetRepositoryVisibilityAction, outputs::Empty),
             ("repositories_SetDisplayName", SetRepositoryDisplayName, repositories::SetRepositoryDisplayNameAction, outputs::Empty),
+            ("repositories_SetPathName", SetRepositoryPathName, repositories::SetRepositoryPathNameAction, repositories::SetRepositoryPathNameOutput),
             ("repositories_SetSlug", SetRepositorySlug, repositories::SetRepositorySlugAction, repositories::SetRepositorySlugOutput),
             ("repositories_QueryPackages", QueryRepositoryPackages, repositories::QueryRepositoryPackagesAction, repositories::QueryRepositoryPackagesOutput),
             ("repositories_QueryAssets", QueryRepositoryAssets, repositories::QueryRepositoryAssetsAction, repositories::QueryRepositoryAssetsOutput),
@@ -362,10 +363,14 @@ impl Jwt {
 mod tests {
     use sidex::validation::validate;
 
+    use nexigon_ids::Generate;
+    use nexigon_ids::ids::PackageId;
+
     use crate::types::repositories::AddTagItem;
     use crate::types::repositories::RemoveTagItem;
     use crate::types::repositories::ResolvePackageVersionAssetByPathAction;
     use crate::types::repositories::ResolvePackageVersionByPathAction;
+    use crate::types::repositories::SetPackageKindAction;
 
     /// Verifies that repository version operations accept build metadata in tags.
     #[test]
@@ -392,5 +397,24 @@ mod tests {
             .is_ok()
         );
         assert!(validate(&AddTagItem::new("build/invalid".to_owned())).is_err());
+    }
+
+    /// Verifies that package kinds are lowercase identifiers.
+    #[test]
+    fn package_kinds_are_lowercase_identifiers() {
+        let kind = |kind: &str| {
+            validate(
+                &SetPackageKindAction::new(PackageId::generate())
+                    .with_kind(Some(kind.to_owned().into())),
+            )
+        };
+
+        assert!(kind("rugix-app").is_ok());
+        assert!(kind("vendor.firmware_v2").is_ok());
+        assert!(kind("Rugix-App").is_err());
+        assert!(kind("rugix app").is_err());
+        assert!(kind("-rugix").is_err());
+        assert!(kind("").is_err());
+        assert!(validate(&SetPackageKindAction::new(PackageId::generate())).is_ok());
     }
 }

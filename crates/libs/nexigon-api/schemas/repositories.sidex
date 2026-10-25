@@ -129,12 +129,22 @@ record RepositoryS3Config {
 }
 
 /// Resolve a repository by its name.
+///
+/// Within an organization, the repository is given by its path name. The
+/// organization defaults to that of the request, which is set by an organization
+/// API token, the `X-Nexigon-Organization` header, or the project of a device.
+/// Without an organization, the repository is given by its slug. A repository ID
+/// resolves in both cases.
 #[request(
     name = "repositories_ResolveName",
     response = ResolveRepositoryNameOutput
 )]
 record ResolveRepositoryNameAction {
-    /// Name of the repository.
+    /// Organization to resolve path names in.
+    ///
+    /// Defaults to the organization of the request. See the action for details.
+    organization_id?: OrganizationId,
+    /// Path name, slug, or ID of the repository.
     #[validate(
         { 1 <= _.size <= 128 },
         message = "Repository name must be between 1 and 128 characters."
@@ -175,7 +185,11 @@ record GetRepositoryDetailsOutput {
     repository_id: RepositoryId,
     /// Display name of the repository.
     display_name: string,
-    /// URL-safe slug of the repository, if one has been set.
+    /// Path name of the repository, unique within its organization.
+    ///
+    /// Absent on older Hub versions.
+    path_name?: string,
+    /// Slug of the repository, unique on the instance, if one has been set.
     slug?: string,
     /// Public name of the repository.
     ///
@@ -200,13 +214,26 @@ record CreateRepositoryAction {
     organization_id: OrganizationId,
     /// Display name of the repository.
     ///
-    /// Free-form, human-facing name. To give the repository a public URL
-    /// handle for path-based resolution, set a public name afterwards.
+    /// Free-form, human-facing name.
     #[validate(
         { 1 <= _.size <= 128 },
         message = "Display name must be between 1 and 128 characters."
     )]
     display_name: string,
+    /// Path name of the repository, unique within the organization.
+    ///
+    /// Defaults to `default`, with a numeric suffix such as `default-2` if it is
+    /// already taken.
+    #[validate(
+        { 1 <= _.size <= 128 },
+        message = "Path name must be between 1 and 128 characters."
+    )]
+    #[validate(
+        { matches(_, "^[a-zA-Z0-9][a-zA-Z0-9._-]*$") },
+        message = "Path name must start with a letter or digit and contain only letters, digits, dots, underscores, or hyphens.",
+        code = "format:repository_path_name"
+    )]
+    path_name?: string,
     /// Visibility of the repository.
     ///
     /// Default to private.
@@ -216,7 +243,7 @@ record CreateRepositoryAction {
 /// Output of creating a repository.
 #[json(tag = "result")]
 variant CreateRepositoryOutput {
-    /// A repository with the same name already exists.
+    /// A repository with the same path name already exists in the organization.
     NameAlreadyExists,
     /// The repository has been created.
     Created: CreateRepositorySuccess,
@@ -257,7 +284,43 @@ record SetRepositoryDisplayNameAction {
     display_name: string,
 }
 
+/// Set the path name of a repository.
+///
+/// Paths that use the previous path name no longer resolve.
+#[request(
+    name = "repositories_SetPathName",
+    response = SetRepositoryPathNameOutput
+)]
+record SetRepositoryPathNameAction {
+    /// ID of the repository.
+    repository_id: RepositoryId,
+    /// New path name of the repository.
+    #[validate(
+        { 1 <= _.size <= 128 },
+        message = "Path name must be between 1 and 128 characters."
+    )]
+    #[validate(
+        { matches(_, "^[a-zA-Z0-9][a-zA-Z0-9._-]*$") },
+        message = "Path name must start with a letter or digit and contain only letters, digits, dots, underscores, or hyphens.",
+        code = "format:repository_path_name"
+    )]
+    path_name: string,
+}
+
+/// Output of setting the path name of a repository.
+#[json(tag = "result")]
+variant SetRepositoryPathNameOutput {
+    /// A repository with the same path name already exists in the organization.
+    NameAlreadyExists,
+    /// The path name has been set.
+    Success,
+}
+
 /// Set the slug of a repository.
+///
+/// The slug is unique on the instance. It addresses the repository in paths
+/// resolved without an organization, for example, by anonymous clients of a public
+/// repository.
 ///
 /// Note: Setting the slug requires the `public_repositories` subscription feature.
 #[request(name = "repositories_SetSlug", response = SetRepositorySlugOutput)]
@@ -310,10 +373,19 @@ record QueryRepositoryPackagesItem {
     package_id: PackageId,
     /// Name of the package.
     name: string,
-    /// Free-form kind of the package (e.g., "rugix-app").
+    /// Kind of the package (e.g., "rugix-app").
     kind?: string,
     /// Timestamp when the package was created.
     created_at: Timestamp,
+    /// CommonMark description. Absent when not set or on older Hub versions.
+    description?: string,
+    /// Root-relative URL for the PNG on this Hub. Absent when no image is set.
+    image_url?: string,
+    /// Number of versions of the package. Absent on older Hub versions.
+    version_count?: u64,
+    /// Most recently created version. Absent when the package has no versions
+    /// or on older Hub versions.
+    latest_version?: QueryPackageVersionsItem,
 }
 
 /// Query the assets of a repository.
@@ -473,12 +545,22 @@ record QueryRepositoryProjectsItem {
 }
 
 /// Resolve a package by its path.
+///
+/// Within an organization, the repository is given by its path name. The
+/// organization defaults to that of the request, which is set by an organization
+/// API token, the `X-Nexigon-Organization` header, or the project of a device.
+/// Without an organization, the repository is given by its slug. A repository ID
+/// resolves in both cases.
 #[request(
     name = "repositories_ResolvePackageByPath",
     response = ResolvePackageByPathOutput
 )]
 record ResolvePackageByPathAction {
-    /// Name or ID of the repository.
+    /// Organization to resolve path names in.
+    ///
+    /// Defaults to the organization of the request. See the action for details.
+    organization_id?: OrganizationId,
+    /// Path name, slug, or ID of the repository.
     #[validate(
         { 1 <= _.size <= 128 },
         message = "Repository name must be between 1 and 128 characters."
@@ -539,7 +621,7 @@ record GetPackageDetailsOutput {
     package_id: PackageId,
     /// Name of the package.
     name: string,
-    /// Free-form kind of the package (e.g., "rugix-app").
+    /// Kind of the package (e.g., "rugix-app").
     kind?: string,
     /// Number of versions of the package.
     version_count: u64,
@@ -636,10 +718,15 @@ record CreatePackageAction {
         code = "format:package_name"
     )]
     name: string,
-    /// Free-form kind of the package (e.g., "rugix-app").
+    /// Kind of the package (e.g., "rugix-app").
     #[validate(
         { 1 <= _.size <= 64 },
         message = "Package kind must be between 1 and 64 characters."
+    )]
+    #[validate(
+        { matches(_, "^[a-z0-9][a-z0-9._-]*$") },
+        message = "Package kind must start with a lowercase letter or digit and contain only lowercase letters, digits, dots, underscores, or hyphens.",
+        code = "format:package_kind"
     )]
     kind?: string,
     /// Optional initial metadata.
@@ -742,6 +829,11 @@ record SetPackageKindAction {
         { 1 <= _.size <= 64 },
         message = "Package kind must be between 1 and 64 characters."
     )]
+    #[validate(
+        { matches(_, "^[a-z0-9][a-z0-9._-]*$") },
+        message = "Package kind must start with a lowercase letter or digit and contain only lowercase letters, digits, dots, underscores, or hyphens.",
+        code = "format:package_kind"
+    )]
     kind?: string,
 }
 
@@ -818,6 +910,10 @@ record QueryPackageVersionsItem {
     base_version_id?: PackageVersionId,
     /// Optional name of the base version.
     base_version_name?: string,
+    /// Number of assets of the version. Absent on older Hub versions.
+    asset_count?: u64,
+    /// Total size of the version's assets in bytes. Absent on older Hub versions.
+    asset_size?: u64,
 }
 
 /// Query a page of the tags of a package, most recently assigned first.
@@ -933,13 +1029,23 @@ record PackageVersionAsset {
 ///
 /// A path consists of a repository, a package, and a version tag. Devices can resolve
 /// versions in repositories linked to their project.
+///
+/// Within an organization, the repository is given by its path name. The
+/// organization defaults to that of the request, which is set by an organization
+/// API token, the `X-Nexigon-Organization` header, or the project of a device.
+/// Without an organization, the repository is given by its slug. A repository ID
+/// resolves in both cases.
 #[group(name = "device")]
 #[request(
     name = "repositories_ResolveVersionByPath",
     response = ResolvePackageVersionByPathOutput
 )]
 record ResolvePackageVersionByPathAction {
-    /// Name or ID of the repository.
+    /// Organization to resolve path names in.
+    ///
+    /// Defaults to the organization of the request. See the action for details.
+    organization_id?: OrganizationId,
+    /// Path name, slug, or ID of the repository.
     #[validate(
         { 1 <= _.size <= 128 },
         message = "Repository name must be between 1 and 128 characters."
@@ -1026,6 +1132,10 @@ record GetPackageVersionDetailsOutput {
     sealed?: bool,
     /// Version that a device must run before installing this version.
     base_version_id?: PackageVersionId,
+    /// Timestamp when the package version was created. Absent on older Hub versions.
+    created_at?: Timestamp,
+    /// Optional name of the base version.
+    base_version_name?: string,
 }
 
 /// Create a new package version.
@@ -1203,13 +1313,23 @@ record UntagPackageVersionAction {
 ///
 /// A path consists of a repository, a package, a version tag, and the asset's
 /// filename within the version.
+///
+/// Within an organization, the repository is given by its path name. The
+/// organization defaults to that of the request, which is set by an organization
+/// API token, the `X-Nexigon-Organization` header, or the project of a device.
+/// Without an organization, the repository is given by its slug. A repository ID
+/// resolves in both cases.
 #[group(name = "device")]
 #[request(
     name = "repositories_ResolveVersionAssetByPath",
     response = ResolvePackageVersionAssetByPathOutput
 )]
 record ResolvePackageVersionAssetByPathAction {
-    /// Name or ID of the repository.
+    /// Organization to resolve path names in.
+    ///
+    /// Defaults to the organization of the request. See the action for details.
+    organization_id?: OrganizationId,
+    /// Path name, slug, or ID of the repository.
     #[validate(
         { 1 <= _.size <= 128 },
         message = "Repository name must be between 1 and 128 characters."

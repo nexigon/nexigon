@@ -8,14 +8,15 @@ use std::collections::BTreeMap;
 use std::path::Path;
 
 use anyhow::Context;
-use anyhow::bail;
 use futures::FutureExt;
 use futures::future::BoxFuture;
 use nexigon_api::types::properties::OtaUpdater;
 use nexigon_api::types::properties::OtaUpdaterSlot;
 use serde::Deserialize;
 use serde::de::IgnoredAny;
-use tokio::process::Command;
+
+use crate::reconcile::process::run;
+use crate::reconcile::process::tool_version;
 
 /// Path of the build information written by Rugix Bakery.
 const RUGIX_BUILD_INFO_PATH: &str = "/etc/rugix/system-build-info.json";
@@ -338,35 +339,6 @@ fn rauc_updater(version: &str, status: &str) -> anyhow::Result<OtaUpdater> {
         .with_booted_slot(booted_slot.map(Into::into))
         .with_primary_slot(status.boot_primary.map(Into::into))
         .with_slots(Some(slots.into())))
-}
-
-/// Extract the version from output like `rugix-ctrl v1.3.0` or `rauc 1.15.2`.
-fn tool_version(output: &str) -> String {
-    let version = output.split_whitespace().last().unwrap_or_default();
-    version.strip_prefix('v').unwrap_or(version).to_owned()
-}
-
-/// Run a program and return its standard output.
-///
-/// Fails with the end of its standard error output if the program fails.
-async fn run(program: &str, args: &[&str]) -> anyhow::Result<String> {
-    let output = Command::new(program)
-        .args(args)
-        .kill_on_drop(true)
-        .output()
-        .await
-        .with_context(|| format!("failed to run {program}"))?;
-    if !output.status.success() {
-        let stderr = String::from_utf8_lossy(&output.stderr);
-        let tail = stderr.trim().lines().rev().take(5).collect::<Vec<_>>();
-        let tail = tail.into_iter().rev().collect::<Vec<_>>().join("\n");
-        bail!(
-            "`{program} {}` failed ({}): {tail}",
-            args.join(" "),
-            output.status
-        );
-    }
-    String::from_utf8(output.stdout).with_context(|| format!("{program} printed invalid UTF-8"))
 }
 
 /// Read a field from the contents of an os-release file.

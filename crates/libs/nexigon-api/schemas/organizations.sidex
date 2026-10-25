@@ -133,7 +133,11 @@ record QueryOrganizationRepositoriesItem {
     repository_id: RepositoryId,
     /// Display name of the repository.
     display_name: string,
-    /// URL-safe slug of the repository, if one has been set.
+    /// Path name of the repository, unique within its organization.
+    ///
+    /// Absent on older Hub versions.
+    path_name?: string,
+    /// Slug of the repository, unique on the instance, if one has been set.
     slug?: string,
     /// Public name of the repository.
     ///
@@ -312,6 +316,47 @@ record QueryOrganizationAuditLogAction {
     page?: PageRequest,
     /// ID of the organization.
     organization_id: OrganizationId,
+    /// Only return the events matching this filter.
+    ///
+    /// Ignored by Nexigon Hub 2026.3 and earlier.
+    filter?: OrganizationAuditLogFilter,
+    /// Only return events recorded at or after this time.
+    ///
+    /// Ignored by Nexigon Hub 2026.3 and earlier.
+    since?: Timestamp,
+    /// Only return events recorded before this time.
+    ///
+    /// Ignored by Nexigon Hub 2026.3 and earlier.
+    until?: Timestamp,
+}
+
+/// Filter for the audit log of an organization.
+#[json(tag = "kind")]
+variant OrganizationAuditLogFilter {
+    /// Only events of a project of the organization, including its devices.
+    Project: OrganizationAuditLogProjectFilter,
+    /// Only events of a repository of the organization.
+    Repository: OrganizationAuditLogRepositoryFilter,
+    /// Only events that a user performed or that concern them.
+    User: OrganizationAuditLogUserFilter,
+}
+
+/// Audit log filter selecting the events of a project.
+record OrganizationAuditLogProjectFilter {
+    /// ID of the project.
+    project_id: ProjectId,
+}
+
+/// Audit log filter selecting the events of a repository.
+record OrganizationAuditLogRepositoryFilter {
+    /// ID of the repository.
+    repository_id: RepositoryId,
+}
+
+/// Audit log filter selecting the events of a user.
+record OrganizationAuditLogUserFilter {
+    /// ID of the user.
+    user_id: UserId,
 }
 
 /// Output of querying the audit log of an organization.

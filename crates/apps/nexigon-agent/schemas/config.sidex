@@ -64,7 +64,8 @@ record Config {
 
 /// Integrations with update systems on the device.
 ///
-/// At most one system update integration may be enabled.
+/// At most one system update integration may be enabled. App management can be
+/// enabled alongside it.
 #[json(rename_all = "kebab-case")]
 record IntegrationsConfig {
     /// Rugix integration.
@@ -78,6 +79,50 @@ record IntegrationsConfig {
 record RugixIntegrationConfig {
     /// System updates with Rugix Ctrl.
     system_updates?: RugixSystemUpdatesConfig,
+    /// App management with Rugix Apps.
+    apps?: RugixAppsConfig,
+}
+
+/// App management with Rugix Apps.
+///
+/// Implements the app update contract of Nexigon Hub: the agent converges the
+/// apps on the device toward the desired state in `dev.nexigon.apps.config` and
+/// reports their status in `dev.nexigon.apps.status`. Requires a Rugix Ctrl
+/// version that supports `rugix-ctrl apps install --origin`.
+#[json(rename_all = "kebab-case")]
+record RugixAppsConfig {
+    /// Whether app management is enabled (defaults to false).
+    enabled?: bool,
+    /// Architecture that selects the bundles the device installs.
+    ///
+    /// Defaults to the architecture the agent was built for, using Rust's names
+    /// such as `x86_64`, `aarch64`, or `arm`. Set it to distinguish variants,
+    /// such as `armv6` and `armv7`.
+    arch?: string,
+    /// Seconds between checks (defaults to 14400).
+    check_interval_secs?: u64,
+    /// Maximum random delay of scheduled checks in seconds (defaults to 300).
+    ///
+    /// The delay spreads the checks of many devices, for example when their
+    /// maintenance windows open at the same time.
+    check_jitter_secs?: u64,
+    /// Verify bundles with the hash from the asset metadata when present
+    /// (defaults to false).
+    ///
+    /// Without a hash, Rugix Ctrl verifies the bundle signature.
+    use_bundle_hash?: bool,
+    /// Removal of old app versions after an update.
+    ///
+    /// The `gc` policy in `dev.nexigon.apps.config` overrides it.
+    gc?: RugixAppsGcConfig,
+}
+
+/// Removal of old app versions with `rugix-ctrl apps gc`.
+#[json(rename_all = "kebab-case")]
+record RugixAppsGcConfig {
+    /// Number of previously running versions to keep for each app (defaults
+    /// to 1).
+    keep?: u32,
 }
 
 /// System updates with Rugix Ctrl.
