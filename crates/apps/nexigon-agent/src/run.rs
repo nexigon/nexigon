@@ -3,6 +3,14 @@
 //! Used both by the binary's `run` subcommand and by callers that embed the
 //! agent in-process (notably the test helper that hosts multiple agents
 //! inside a single hub-side process).
+//!
+//! The agent talks to Nexigon Hub in sessions, one per connection. A session
+//! serves the channels that Nexigon Hub opens, such as terminals, TCP
+//! forwarding, and command handlers, and ends when its connection ends. The
+//! reconciliation loops, the operation poller, the system-info publisher, and
+//! the local API run for the lifetime of the agent. They use the connection of
+//! the current session through a [`HubLink`], so that a lost connection does
+//! not interrupt them.
 
 use std::future::Future;
 use std::net::Ipv4Addr;
@@ -21,26 +29,19 @@ use futures::StreamExt;
 use nexigon_agent_protocol::MAX_CONCURRENT_COMMANDS;
 use nexigon_api::types::actor::Actor;
 use nexigon_api::types::actor::GetActorAction;
-use nexigon_api::types::devices::ClaimDeviceOperationWorkAction;
-use nexigon_api::types::devices::DeviceCommandInvokeData;
-use nexigon_api::types::devices::DeviceCommandStatus;
-use nexigon_api::types::devices::DeviceOperationId;
-use nexigon_api::types::devices::DeviceOperationStepReport;
-use nexigon_api::types::devices::DeviceOperationStepReportStatus;
-use nexigon_api::types::devices::DeviceOperationWorkKind;
-use nexigon_api::types::devices::DeviceOperationWorkStep;
-use nexigon_api::types::devices::ReportDeviceOperationStepAction;
 use nexigon_api::types::devices::SetDevicePropertyAction;
 use nexigon_api::types::properties::DeviceCommandDescriptor;
 use nexigon_client::WebsocketConnection;
 use nexigon_ids::ids::DeviceId;
-use nexigon_ids::ids::DeviceOperationWorkClaimId;
 use nexigon_multiplex::ConnectionEvent;
+use nexigon_multiplex::ConnectionRef;
 use tokio::net::TcpStream;
+use tokio::sync::Mutex;
 use tokio::sync::Notify;
 use tokio::sync::Semaphore;
 use tokio::sync::mpsc;
 use tokio::sync::oneshot;
+use tokio::task::JoinHandle;
 use tokio::task::JoinSet;
 use tokio_util::sync::CancellationToken;
 use tracing::debug;
@@ -49,13 +50,17 @@ use tracing::info;
 use tracing::warn;
 
 use crate::config::Config;
-use crate::config::OperationsConfig;
-use crate::device_api::DeviceExecutor;
 use crate::device_api::connect_device_executor;
 use crate::handlers;
 use crate::handlers::CommandRegistry;
+use crate::hub_link::HubLink;
+use crate::hub_link::LinkController;
+use crate::hub_link::hub_link;
 use crate::operation_ledger::OperationLedger;
-use crate::operation_ledger::PreviousExecution;
+use crate::operations;
+use crate::operations::OperationPoller;
+use crate::reconnect::Reconnector;
+use crate::reconnect::reconnect_settings;
 use crate::system_info::get_system_info;
 use crate::system_updates::SystemUpdates;
 
@@ -63,13 +68,13 @@ use crate::system_updates::SystemUpdates;
 const MAX_CONCURRENT_TERMINALS: usize = 4;
 const TCP_CONNECT_TIMEOUT: Duration = Duration::from_secs(10);
 const TASK_SHUTDOWN_GRACE: Duration = Duration::from_secs(8);
+const SYSTEM_INFO_INTERVAL: Duration = Duration::from_secs(30 * 60);
 
 type BoxedTask = Pin<Box<dyn Future<Output = anyhow::Result<()>> + Send + 'static>>;
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 enum TaskKind {
     Connection,
-    ShutdownSignal,
     TcpConnect,
     TcpForward,
     #[cfg(target_os = "linux")]
@@ -85,7 +90,6 @@ impl TaskKind {
     const fn description(self) -> &'static str {
         match self {
             Self::Connection => "hub connection",
-            Self::ShutdownSignal => "shutdown signal",
             Self::TcpConnect => "TCP forwarding connection",
             Self::TcpForward => "TCP forwarding relay",
             #[cfg(target_os = "linux")]
@@ -180,11 +184,11 @@ async fn run_until_cancelled<T>(
     }
 }
 
-/// Run a Nexigon agent until `shutdown` resolves or the connection closes.
+/// Run a Nexigon agent until `shutdown` resolves.
 ///
-/// `shutdown` is awaited concurrently with the connection's event loop.
-/// When it resolves, the connection is dropped (which closes any open
-/// channels) and this function returns `Ok(())`.
+/// The agent reconnects to Nexigon Hub whenever its connection is lost. When
+/// `shutdown` resolves, the agent closes its connection and this function
+/// returns `Ok(())`.
 ///
 /// The caller must ensure a Rustls crypto provider has been installed
 /// before invoking `run`; see [`crate::install_crypto_provider`].
@@ -207,7 +211,9 @@ pub struct RunOptions {
     pub system_updates: Option<SystemUpdates>,
 }
 
-/// Run the agent loop on an already-established connection.
+/// Run the agent on an already-established connection.
+///
+/// The agent stops when the connection ends or `shutdown` resolves.
 pub async fn run_with_connection(
     config: Arc<Config>,
     config_dir: &Path,
@@ -215,14 +221,66 @@ pub async fn run_with_connection(
     shutdown: impl Future<Output = ()> + Send + 'static,
     options: RunOptions,
 ) -> anyhow::Result<()> {
+    run_sessions(
+        config,
+        config_dir,
+        Connections::Single(Some(connection)),
+        shutdown,
+        options,
+    )
+    .await
+}
+
+/// Connections on which the agent runs its sessions.
+// The agent holds a single value, so its size does not matter.
+#[allow(clippy::large_enum_variant)]
+pub(crate) enum Connections {
+    /// One established connection, after which the agent stops.
+    Single(Option<WebsocketConnection>),
+    /// Connections established, and re-established after losing them, by a
+    /// [`Reconnector`].
+    Reconnecting(Reconnector),
+}
+
+impl Connections {
+    /// Record that a session has started on the last connection.
+    fn session_started(&mut self) {
+        if let Self::Reconnecting(reconnector) = self {
+            reconnector.session_started();
+        }
+    }
+
+    /// Next connection, or `None` if the agent stops.
+    async fn next(
+        &mut self,
+        link: &LinkController,
+        shutdown: &CancellationToken,
+    ) -> anyhow::Result<Option<WebsocketConnection>> {
+        match self {
+            Self::Single(connection) => Ok(connection.take()),
+            Self::Reconnecting(reconnector) => reconnector.connect(link, shutdown).await,
+        }
+    }
+}
+
+/// Run the agent with one session per connection until the connections are
+/// exhausted or `shutdown` resolves.
+///
+/// With a single connection, the result is the result of its session.
+pub(crate) async fn run_sessions(
+    config: Arc<Config>,
+    config_dir: &Path,
+    mut connections: Connections,
+    shutdown: impl Future<Output = ()> + Send + 'static,
+    options: RunOptions,
+) -> anyhow::Result<()> {
     let RunOptions {
-        ready,
+        mut ready,
         system_updates,
     } = options;
-    let mut connection_ref = connection.make_ref();
 
     // Without valid settings, the agent runs without system updates.
-    let system_updates = system_updates.or_else(|| {
+    let mut system_updates = system_updates.or_else(|| {
         crate::system_updates::settings(&config).unwrap_or_else(|error| {
             error!(
                 error = format!("{error:#}"),
@@ -231,54 +289,39 @@ pub async fn run_with_connection(
             None
         })
     });
-    let app_updates = crate::apps::settings(&config);
+    let mut app_updates = crate::rugix_apps::settings(&config);
     let check_requested = Arc::new(Notify::new());
     let app_check_requested = Arc::new(Notify::new());
-    let commands_enabled = config
-        .commands
-        .as_ref()
-        .and_then(|h| h.enabled)
-        .unwrap_or(false);
-    let command_registry = if commands_enabled {
-        let commands_dir = config
-            .commands
-            .as_ref()
-            .and_then(|h| h.directory.as_deref())
-            .unwrap_or(Path::new("/etc/nexigon/agent/commands"));
-        let mut registry = load_command_registry(commands_dir);
-        if system_updates.is_some() {
-            let check_requested = check_requested.clone();
-            registry.register_builtin(
-                DeviceCommandDescriptor::new(crate::system_updates::CHECK_COMMAND)
-                    .with_description(Some("Request an immediate system update check.".into()))
-                    .with_category(Some("OTA".into())),
-                Arc::new(move || check_requested.notify_one()),
-            );
-        }
-        if app_updates.is_some() {
-            let app_check_requested = app_check_requested.clone();
-            registry.register_builtin(
-                DeviceCommandDescriptor::new(crate::apps::CHECK_COMMAND)
-                    .with_description(Some("Request an immediate check of the apps.".into()))
-                    .with_category(Some("Apps".into())),
-                Arc::new(move || app_check_requested.notify_one()),
-            );
-        }
-        Some(Arc::new(registry))
+    let command_registry = command_registry(
+        &config,
+        system_updates.is_some().then(|| check_requested.clone()),
+        app_updates.is_some().then(|| app_check_requested.clone()),
+    );
+    let command_slots = command_slots();
+    let endpoints = SessionEndpoints {
+        config: config.clone(),
+        command_registry: command_registry.clone(),
+        command_slots: command_slots.clone(),
+        supervisor_queue_capacity: crate::config::multiplex_settings(&config)
+            .context("invalid multiplex configuration")?
+            .supervisor_queue_capacity(),
+        connect_timeout: reconnect_settings(&config)
+            .context("invalid connection configuration")?
+            .connect_timeout(),
+    };
+    let mut operation_ledger = if operations::polling_enabled(config.operations.as_ref()) {
+        Some(
+            OperationLedger::load(&crate::data_path(&config, config_dir))
+                .await
+                .context("cannot open operation execution ledger")?,
+        )
     } else {
         None
     };
-    let command_slots = command_slots();
-    let endpoint_limits = EndpointLimits::new(command_slots.clone());
-    let cancellation = CancellationToken::new();
-    let supervisor_queue_capacity = crate::config::multiplex_settings(&config)
-        .context("invalid multiplex configuration")?
-        .supervisor_queue_capacity();
-    let (task_tx, mut task_rx) = mpsc::channel(supervisor_queue_capacity);
-    let mut tasks = JoinSet::new();
 
-    // The shutdown signal outlives the task group, so that the system update
-    // loop can tell a shutdown from a lost connection while it finishes.
+    // `shutdown_requested` signals a requested shutdown, while `stopping`
+    // also signals that the connections are exhausted. The system update loop
+    // tells them apart when it finishes an installation.
     let shutdown_requested = CancellationToken::new();
     let shutdown_watcher = tokio::spawn({
         let shutdown_requested = shutdown_requested.clone();
@@ -287,447 +330,431 @@ pub async fn run_with_connection(
             shutdown_requested.cancel();
         }
     });
-    let shutdown_cancellation = cancellation.clone();
-    let shutdown_signal = shutdown_requested.clone();
-    spawn_supervised(
-        &mut tasks,
-        SupervisedTask::new(TaskKind::ShutdownSignal, async move {
-            tokio::select! {
-                () = shutdown_signal.cancelled() => {
-                    debug!("shutdown signaled, stopping agent task group");
-                    shutdown_cancellation.cancel();
-                }
-                () = shutdown_cancellation.cancelled() => {}
-            }
-            Ok(())
-        }),
-    );
-
-    let event_loop_config = config.clone();
-    let event_loop_registry = command_registry.clone();
-    let event_loop_cancellation = cancellation.clone();
-    let event_loop_task_tx = task_tx.clone();
-    spawn_supervised(
-        &mut tasks,
-        SupervisedTask::new(TaskKind::Connection, async move {
-            run_connection_event_loop(
-                connection,
-                event_loop_config,
-                event_loop_registry,
-                endpoint_limits,
-                event_loop_task_tx,
-                event_loop_cancellation,
-            )
-            .await
-        }),
-    );
+    let stopping = shutdown_requested.child_token();
+    let (link_controller, link) = hub_link();
+    let mut agent_tasks = JoinSet::new();
+    #[cfg(unix)]
+    if let Some(local_api) = local_api_task(&config, link.clone(), stopping.clone()) {
+        spawn_supervised(&mut agent_tasks, local_api);
+    }
 
     // The system update and app loops finish a change in progress when the
     // agent stops, so they run outside the task group and its shutdown deadline.
-    let mut system_updates_task = None;
-    let mut app_updates_task = None;
-    let device_lock = Arc::new(tokio::sync::Mutex::new(()));
-    let agent_run = async {
-        let mut executor = connect_device_executor(&mut connection_ref)
-            .await
-            .context("cannot open executor channel")?;
-        let device_id = match executor
-            .execute(GetActorAction::new())
-            .await
-            .context("cannot execute GetActor")?
-            .map_err(|e| anyhow::anyhow!("GetActor failed: {}", e.message))?
-            .actor
-        {
-            Actor::Device(actor) => {
-                info!(device_id = %actor.device_id);
-                actor.device_id
-            }
-            _ => bail!("received unexpected actor type"),
-        };
-
-        if let Some(ready) = ready {
-            let _ = ready.send(device_id.clone());
-        }
-
-        let system_info_enabled = config
-            .telemetry
-            .as_ref()
-            .and_then(|t| t.system_info)
-            .unwrap_or(true);
-        if system_info_enabled {
-            let sysinfo_config = config.clone();
-            let sysinfo_device_id = device_id.clone();
-            let mut sysinfo_executor = connect_device_executor(&mut connection_ref)
-                .await
-                .context("cannot open sysinfo executor channel")?;
-            let sysinfo_cancellation = cancellation.clone();
-            spawn_supervised(
-                &mut tasks,
-                SupervisedTask::new(TaskKind::SystemInfo, async move {
-                    loop {
-                        let system_info = get_system_info(&sysinfo_config);
-                        let value = serde_json::to_value(system_info)
-                            .context("cannot serialize system information")?;
-                        let update = sysinfo_executor.execute(SetDevicePropertyAction::new(
-                            sysinfo_device_id.clone(),
-                            "dev.nexigon.system.info".to_owned(),
-                            value.into(),
-                        ));
-                        let update = tokio::select! {
-                            () = sysinfo_cancellation.cancelled() => return Ok(()),
-                            update = update => update,
-                        };
-                        match update {
-                            Ok(Ok(_)) => {}
-                            Ok(Err(error)) => {
-                                warn!(message = %error.message, "system-info update rejected");
-                            }
-                            Err(error) => {
-                                warn!(?error, "failed to publish system information");
-                            }
-                        }
-                        tokio::select! {
-                            () = sysinfo_cancellation.cancelled() => return Ok(()),
-                            () = tokio::time::sleep(Duration::from_secs(30 * 60)) => {}
-                        }
-                    }
-                }),
-            );
-        }
-
-        if let Some(settings) = system_updates {
-            match connect_device_executor(&mut connection_ref).await {
-                Ok(executor) => {
-                    system_updates_task = Some(tokio::spawn(crate::system_updates::run(
-                        settings,
-                        executor,
-                        device_id.clone(),
-                        device_lock.clone(),
-                        check_requested,
-                        cancellation.clone(),
-                        shutdown_requested.clone(),
-                    )));
-                }
-                Err(error) => error!(
-                    error = format!("{error:#}"),
-                    "cannot open the system update executor channel, system updates are disabled"
-                ),
-            }
-        }
-
-        if let Some(settings) = app_updates {
-            match connect_device_executor(&mut connection_ref).await {
-                Ok(executor) => {
-                    app_updates_task = Some(tokio::spawn(crate::apps::run(
-                        settings,
-                        executor,
-                        device_id.clone(),
-                        device_lock.clone(),
-                        app_check_requested,
-                        cancellation.clone(),
-                    )));
-                }
-                Err(error) => error!(
-                    error = format!("{error:#}"),
-                    "cannot open the app executor channel, app management is disabled"
-                ),
-            }
-        }
-
-        if let Some(registry) = &command_registry {
-            let manifest = registry.manifest();
-            let manifest =
-                serde_json::to_value(manifest).context("cannot serialize command manifest")?;
-            if let Err(error) = executor
-                .execute(SetDevicePropertyAction::new(
-                    device_id.clone(),
-                    "dev.nexigon.commands".to_owned(),
-                    manifest.into(),
-                ))
-                .await
-            {
-                warn!(?error, "failed to publish command manifest");
-            }
-        }
-
-        let operations_enabled = operation_polling_enabled(config.operations.as_ref());
-        if operations_enabled {
-            let mut operation_ledger =
-                OperationLedger::load(&crate::data_path(&config, config_dir))
-                    .await
-                    .context("cannot open operation execution ledger")?;
-            let poll_interval = Duration::from_secs(
-                config
-                    .operations
-                    .as_ref()
-                    .and_then(|o| o.poll_interval_secs)
-                    .unwrap_or(60),
-            );
-            let operations_command_registry = command_registry.clone();
-            let operations_command_slots = command_slots;
-            let operations_device_id = device_id.clone();
-            let mut operations_executor = connect_device_executor(&mut connection_ref)
-                .await
-                .context("cannot open operations executor channel")?;
-            let operation_cancellation = cancellation.clone();
-            let operation_loop = async move {
-                loop {
-                    if operation_cancellation.is_cancelled() {
-                        return Ok(());
-                    }
-                    // Reserve execution capacity before claiming work so a lease never
-                    // waits behind already-running interactive commands.
-                    let command_permit = if operations_command_registry.is_some() {
-                        let permit = tokio::select! {
-                            biased;
-                            () = operation_cancellation.cancelled() => return Ok(()),
-                            permit = operations_command_slots.clone().acquire_owned() => permit,
-                        };
-                        match permit {
-                            Ok(permit) => Some(permit),
-                            Err(_) => {
-                                anyhow::bail!("command concurrency limiter was closed");
-                            }
-                        }
-                    } else {
-                        None
-                    };
-                    // Whether this poll found anything. The hub releases a device operation's
-                    // next step as soon as the previous one is reported, so a poll that found
-                    // work is very likely to find more; sleeping out the whole idle interval
-                    // between the steps of one operation would waste that. Only an empty poll
-                    // means there is genuinely nothing to do.
-                    let mut found_work = false;
-                    let claim = operations_executor.execute(
-                        ClaimDeviceOperationWorkAction::new(operations_device_id.clone())
-                            // Commands are executed serially. Lease only the command we
-                            // are about to execute so later work cannot expire while an
-                            // earlier handler is still running.
-                            .with_limit(Some(1))
-                            .with_kinds(Some(vec![DeviceOperationWorkKind::DeviceCommand].into())),
+    let mut integrations: Vec<(&str, JoinHandle<anyhow::Result<()>>)> = Vec::new();
+    let device_lock = Arc::new(Mutex::new(()));
+    let mut device_id: Option<DeviceId> = None;
+    let mut manifest_published = false;
+    let mut session_result = Ok(());
+    let result = loop {
+        // Connecting and identifying the device are boxed because their futures
+        // are large, which would overflow the stack of unoptimized builds.
+        let connection =
+            match Box::pin(connections.next(&link_controller, &shutdown_requested)).await {
+                Ok(Some(connection)) => connection,
+                Ok(None) if matches!(connections, Connections::Single(_)) => break session_result,
+                Ok(None) => break Ok(()),
+                Err(error) => break Err(error),
+            };
+        let mut session =
+            match Box::pin(Session::start(connection, &endpoints, &shutdown_requested)).await {
+                Ok(Some(session)) => session,
+                Ok(None) => continue,
+                Err(error) => {
+                    warn!(
+                        error = format!("{error:#}"),
+                        "failed to start a session with Nexigon Hub"
                     );
-                    let result = tokio::select! {
-                        biased;
-                        () = operation_cancellation.cancelled() => return Ok(()),
-                        result = claim => result,
-                    };
-                    match result {
-                        Ok(Ok(output)) => {
-                            for item in output.work {
-                                let device_operation_id = item.device_operation_id;
-                                let step_index = item.step_index;
-                                let claim_id = item.claim_id;
-                                let report = match operation_ledger
-                                    .previous(&device_operation_id, step_index)
-                                {
-                                    PreviousExecution::Completed(report) => {
-                                        // A completed result may be returning under a fresh
-                                        // lease after an earlier reporting outage. Commit the
-                                        // current claim before trying it again so a crash
-                                        // cannot leave the outbox tied to the expired claim.
-                                        if let Err(error) = operation_ledger
-                                            .mark_completed(
-                                                &device_operation_id,
-                                                step_index,
-                                                &claim_id,
-                                                report.clone(),
-                                            )
-                                            .await
-                                        {
-                                            warn!(
-                                                ?error,
-                                                "failed to persist renewed operation claim"
-                                            );
-                                            continue;
-                                        }
-                                        report
-                                    }
-                                    PreviousExecution::InProgress => {
-                                        let report = DeviceOperationStepReport {
-                                            status: DeviceOperationStepReportStatus::Failed,
-                                            output: None,
-                                            error: Some(
-                                                ("previous command execution was interrupted after dispatch; refusing unsafe automatic replay"
-                                                    .to_owned()).into(),
-                                            ),
-                                        };
-                                        if let Err(error) = operation_ledger
-                                            .mark_completed(
-                                                &device_operation_id,
-                                                step_index,
-                                                &claim_id,
-                                                report.clone(),
-                                            )
-                                            .await
-                                        {
-                                            warn!(
-                                                ?error,
-                                                "failed to persist interrupted operation result"
-                                            );
-                                            continue;
-                                        }
-                                        report
-                                    }
-                                    PreviousExecution::None => match item.step {
-                                        DeviceOperationWorkStep::DeviceCommand(step) => {
-                                            if let Err(error) = operation_ledger
-                                                .mark_in_progress(
-                                                    &device_operation_id,
-                                                    step_index,
-                                                    &claim_id,
-                                                )
-                                                .await
-                                            {
-                                                warn!(
-                                                    ?error,
-                                                    "failed to persist operation dispatch; command not executed"
-                                                );
-                                                continue;
-                                            }
-                                            let done = if let Some(registry) =
-                                                operations_command_registry.as_ref()
-                                            {
-                                                let request = DeviceCommandInvokeData::new(
-                                                    step.command,
-                                                    step.input,
-                                                )
-                                                .with_stream_log(Some(false))
-                                                .with_timeout_secs(Some(
-                                                    step.timeout_secs.unwrap_or(3600),
-                                                ));
-                                                handlers::invoke_registered_command_with_cancellation(
-                                                    registry,
-                                                    request,
-                                                    &operation_cancellation,
-                                                )
-                                                .await
-                                            } else {
-                                                nexigon_api::types::devices::DeviceCommandDoneData {
-                                                    status: DeviceCommandStatus::Error,
-                                                    output: None,
-                                                    error: Some("commands not enabled".into()),
-                                                    log_tail: Vec::new().into(),
-                                                    duration_ms: 0,
-                                                }
-                                            };
-                                            if operation_cancellation.is_cancelled() {
-                                                return Ok(());
-                                            }
-                                            let status = match done.status {
-                                                DeviceCommandStatus::Ok => {
-                                                    DeviceOperationStepReportStatus::Succeeded
-                                                }
-                                                DeviceCommandStatus::Error => {
-                                                    DeviceOperationStepReportStatus::Failed
-                                                }
-                                            };
-                                            let report = DeviceOperationStepReport {
-                                                status,
-                                                output: done.output,
-                                                error: done.error,
-                                            };
-                                            if let Err(error) = operation_ledger
-                                                .mark_completed(
-                                                    &device_operation_id,
-                                                    step_index,
-                                                    &claim_id,
-                                                    report.clone(),
-                                                )
-                                                .await
-                                            {
-                                                warn!(
-                                                    ?error,
-                                                    "failed to persist operation result; result not reported"
-                                                );
-                                                continue;
-                                            }
-                                            report
-                                        }
-                                    },
-                                };
-                                found_work = true;
-                                // Retry transport failures promptly while this claim's lease
-                                // is certainly still current. The shortest valid command
-                                // lease is 61 seconds; these five attempts span 15 seconds.
-                                // A persistent outage falls back to normal lease expiry and
-                                // reacquisition, at which point the saved result is submitted
-                                // under the fresh claim without executing again.
-                                let acknowledged = report_operation_step_with_retry(
-                                    &mut operations_executor,
-                                    &operations_device_id,
-                                    &device_operation_id,
-                                    step_index,
-                                    &claim_id,
-                                    &report,
-                                    Some(&operation_cancellation),
-                                )
-                                .await;
-                                if acknowledged
-                                    && let Err(error) = operation_ledger
-                                        .remove(&device_operation_id, step_index)
-                                        .await
-                                {
-                                    warn!(?error, "failed to prune reported operation result");
-                                }
-                            }
-                        }
-                        Ok(Err(error)) => {
-                            warn!(message = %error.message, "operation work claim rejected");
-                        }
-                        Err(error) => {
-                            warn!(?error, "failed to claim operation work");
-                        }
-                    }
-                    drop(command_permit);
-                    if !found_work {
-                        tokio::select! {
-                            biased;
-                            () = operation_cancellation.cancelled() => return Ok(()),
-                            () = tokio::time::sleep(poll_interval) => {}
-                        }
-                    }
+                    link_controller.attempt_failed(format!("{error:#}"));
+                    session_result = Err(error);
+                    continue;
                 }
             };
-            spawn_supervised(
-                &mut tasks,
-                SupervisedTask::new(TaskKind::Operations, operation_loop),
+        connections.session_started();
+        if let Some(known) = &device_id
+            && *known != session.device_id
+        {
+            let error = anyhow::anyhow!(
+                "the device ID changed from {known} to {}; restart the agent",
+                session.device_id
             );
+            session.close().await;
+            break Err(error);
         }
-
-        #[cfg(unix)]
-        if let Some(local_api) = local_api_task(&config, &connection_ref, cancellation.clone()) {
-            spawn_supervised(&mut tasks, local_api);
+        link_controller.connected(session.device_id.clone(), session.connection_ref.clone());
+        if device_id.is_none() {
+            let session_device_id = session.device_id.clone();
+            device_id = Some(session_device_id.clone());
+            if let Some(ready) = ready.take() {
+                let _ = ready.send(session_device_id.clone());
+            }
+            let system_info_enabled = config
+                .telemetry
+                .as_ref()
+                .and_then(|t| t.system_info)
+                .unwrap_or(true);
+            if system_info_enabled {
+                spawn_supervised(
+                    &mut agent_tasks,
+                    SupervisedTask::new(
+                        TaskKind::SystemInfo,
+                        log_failure(
+                            TaskKind::SystemInfo,
+                            publish_system_info(
+                                config.clone(),
+                                link.clone(),
+                                session_device_id.clone(),
+                                stopping.clone(),
+                            ),
+                        ),
+                    ),
+                );
+            }
+            if let Some(ledger) = operation_ledger.take() {
+                let poller = OperationPoller {
+                    link: link.clone(),
+                    device_id: session_device_id.clone(),
+                    command_registry: command_registry.clone(),
+                    command_slots: command_slots.clone(),
+                    ledger,
+                    poll_interval: operations::poll_interval(&config),
+                };
+                spawn_supervised(
+                    &mut agent_tasks,
+                    SupervisedTask::new(
+                        TaskKind::Operations,
+                        log_failure(
+                            TaskKind::Operations,
+                            operations::run(poller, stopping.clone()),
+                        ),
+                    ),
+                );
+            }
+            if let Some(settings) = system_updates.take() {
+                integrations.push((
+                    "system update integration",
+                    tokio::spawn(crate::system_updates::run(
+                        settings,
+                        link.clone(),
+                        session_device_id.clone(),
+                        device_lock.clone(),
+                        check_requested.clone(),
+                        stopping.clone(),
+                        shutdown_requested.clone(),
+                    )),
+                ));
+            }
+            if let Some(settings) = app_updates.take() {
+                integrations.push((
+                    "app integration",
+                    tokio::spawn(crate::rugix_apps::run(
+                        settings,
+                        link.clone(),
+                        session_device_id,
+                        device_lock.clone(),
+                        app_check_requested.clone(),
+                        stopping.clone(),
+                    )),
+                ));
+            }
         }
-
-        drop(executor);
-        supervise_tasks(&mut tasks, &mut task_rx, &cancellation).await
+        if let Some(registry) = &command_registry
+            && !manifest_published
+        {
+            let publish = publish_command_manifest(&link, &session.device_id, registry);
+            manifest_published = run_until_cancelled(&shutdown_requested, publish)
+                .await
+                .unwrap_or(false);
+        }
+        session_result = session.run().await;
+        match &session_result {
+            Ok(()) if shutdown_requested.is_cancelled() => {}
+            Ok(()) => info!("connection to Nexigon Hub ended"),
+            Err(error) => warn!(
+                error = format!("{error:#}"),
+                "connection to Nexigon Hub failed"
+            ),
+        }
+        link_controller.disconnected(session_result.as_ref().err().map(|e| format!("{e:#}")));
+        session.close().await;
     };
-    let result = run_until_cancelled(&cancellation, agent_run)
-        .await
-        .unwrap_or(Ok(()));
 
-    cancellation.cancel();
-    drop(task_tx);
-    task_rx.close();
-    while task_rx.try_recv().is_ok() {}
-    drop(task_rx);
-    shutdown_tasks(&mut tasks).await;
-    if let Some(task) = system_updates_task {
+    stopping.cancel();
+    shutdown_tasks(&mut agent_tasks).await;
+    for (name, task) in integrations {
         match task.await {
             Ok(Ok(())) => {}
-            Ok(Err(error)) => error!(?error, "system update integration failed"),
-            Err(error) => error!(?error, "system update integration panicked"),
-        }
-    }
-    if let Some(task) = app_updates_task {
-        match task.await {
-            Ok(Ok(())) => {}
-            Ok(Err(error)) => error!(?error, "app integration failed"),
-            Err(error) => error!(?error, "app integration panicked"),
+            Ok(Err(error)) => error!(?error, "{name} failed"),
+            Err(error) => error!(?error, "{name} panicked"),
         }
     }
     shutdown_watcher.abort();
     result
+}
+
+/// Configuration and limits shared by all sessions.
+struct SessionEndpoints {
+    config: Arc<Config>,
+    command_registry: Option<Arc<CommandRegistry>>,
+    command_slots: Arc<Semaphore>,
+    supervisor_queue_capacity: usize,
+    /// Time allowed for identifying the device after connecting.
+    connect_timeout: Duration,
+}
+
+/// Tasks serving the channels of one connection.
+struct Session {
+    device_id: DeviceId,
+    connection_ref: ConnectionRef,
+    tasks: SessionTasks,
+}
+
+impl Session {
+    /// Start serving `connection` and identify the device.
+    ///
+    /// Returns `None` if `shutdown` is cancelled before the device is
+    /// identified.
+    #[tracing::instrument(level = "debug", skip_all)]
+    async fn start(
+        connection: WebsocketConnection,
+        endpoints: &SessionEndpoints,
+        shutdown: &CancellationToken,
+    ) -> anyhow::Result<Option<Self>> {
+        let mut connection_ref = connection.make_ref();
+        let tasks = SessionTasks::spawn(connection, endpoints, shutdown.child_token());
+        let identify = async {
+            let mut executor = connect_device_executor(&mut connection_ref)
+                .await
+                .context("cannot open executor channel")?;
+            let actor = executor
+                .execute(GetActorAction::new())
+                .await
+                .context("cannot execute GetActor")?
+                .map_err(|e| anyhow::anyhow!("GetActor failed: {}", e.message))?
+                .actor;
+            let Actor::Device(actor) = actor else {
+                bail!("received unexpected actor type");
+            };
+            info!(device_id = %actor.device_id);
+            Ok(actor.device_id)
+        };
+        let identify = async {
+            tokio::time::timeout(endpoints.connect_timeout, identify)
+                .await
+                .context("identifying the device timed out")?
+        };
+        let identified = run_until_cancelled(&tasks.cancellation, identify).await;
+        let device_id = match identified {
+            Some(Ok(identified)) => identified,
+            Some(Err(error)) => {
+                tasks.close().await;
+                return Err(error);
+            }
+            None => {
+                tasks.close().await;
+                return Ok(None);
+            }
+        };
+        Ok(Some(Self {
+            device_id,
+            connection_ref,
+            tasks,
+        }))
+    }
+
+    /// Serve the connection until it ends or the agent shuts down.
+    async fn run(&mut self) -> anyhow::Result<()> {
+        self.tasks.supervise().await
+    }
+
+    async fn close(self) {
+        self.tasks.close().await;
+    }
+}
+
+/// Supervised tasks of a session: the connection's event loop and the tasks
+/// serving its channels.
+struct SessionTasks {
+    tasks: JoinSet<TaskCompletion>,
+    task_tx: mpsc::Sender<SupervisedTask>,
+    task_rx: mpsc::Receiver<SupervisedTask>,
+    cancellation: CancellationToken,
+}
+
+impl SessionTasks {
+    fn spawn(
+        connection: WebsocketConnection,
+        endpoints: &SessionEndpoints,
+        cancellation: CancellationToken,
+    ) -> Self {
+        let (task_tx, task_rx) = mpsc::channel(endpoints.supervisor_queue_capacity);
+        let mut tasks = JoinSet::new();
+        spawn_supervised(
+            &mut tasks,
+            SupervisedTask::new(
+                TaskKind::Connection,
+                run_connection_event_loop(
+                    connection,
+                    endpoints.config.clone(),
+                    endpoints.command_registry.clone(),
+                    EndpointLimits::new(endpoints.command_slots.clone()),
+                    task_tx.clone(),
+                    cancellation.clone(),
+                ),
+            ),
+        );
+        Self {
+            tasks,
+            task_tx,
+            task_rx,
+            cancellation,
+        }
+    }
+
+    /// Supervise the tasks until the connection ends or the session is
+    /// cancelled.
+    async fn supervise(&mut self) -> anyhow::Result<()> {
+        supervise_tasks(&mut self.tasks, &mut self.task_rx, &self.cancellation).await
+    }
+
+    /// Stop the tasks, waiting for them up to a grace period.
+    async fn close(mut self) {
+        self.cancellation.cancel();
+        drop(self.task_tx);
+        self.task_rx.close();
+        while self.task_rx.try_recv().is_ok() {}
+        shutdown_tasks(&mut self.tasks).await;
+    }
+}
+
+/// Publish the manifest of the registered commands and return whether it has
+/// been published.
+async fn publish_command_manifest(
+    link: &HubLink,
+    device_id: &DeviceId,
+    registry: &CommandRegistry,
+) -> bool {
+    let manifest = match serde_json::to_value(registry.manifest()) {
+        Ok(manifest) => manifest,
+        Err(error) => {
+            warn!(?error, "cannot serialize command manifest");
+            return false;
+        }
+    };
+    let publish = SetDevicePropertyAction::new(
+        device_id.clone(),
+        "dev.nexigon.commands".to_owned(),
+        manifest.into(),
+    );
+    match link.executor().execute(publish).await {
+        Ok(Ok(_)) => true,
+        Ok(Err(error)) => {
+            warn!(message = %error.message, "command manifest rejected");
+            false
+        }
+        Err(error) => {
+            warn!(?error, "failed to publish command manifest");
+            false
+        }
+    }
+}
+
+/// Publish the system information periodically until cancelled.
+///
+/// After a failed publication, the next one follows a reconnection.
+async fn publish_system_info(
+    config: Arc<Config>,
+    link: HubLink,
+    device_id: DeviceId,
+    cancellation: CancellationToken,
+) -> anyhow::Result<()> {
+    let mut executor = link.executor();
+    loop {
+        let sessions = link.sessions();
+        let system_info = get_system_info(&config);
+        let value =
+            serde_json::to_value(system_info).context("cannot serialize system information")?;
+        let update = executor.execute(SetDevicePropertyAction::new(
+            device_id.clone(),
+            "dev.nexigon.system.info".to_owned(),
+            value.into(),
+        ));
+        let update = tokio::select! {
+            () = cancellation.cancelled() => return Ok(()),
+            update = update => update,
+        };
+        let published = match update {
+            Ok(Ok(_)) => true,
+            Ok(Err(error)) => {
+                warn!(message = %error.message, "system-info update rejected");
+                false
+            }
+            Err(error) => {
+                warn!(?error, "failed to publish system information");
+                false
+            }
+        };
+        tokio::select! {
+            () = cancellation.cancelled() => return Ok(()),
+            () = tokio::time::sleep(SYSTEM_INFO_INTERVAL) => {}
+            () = link.connected_after(sessions), if !published => {}
+        }
+    }
+}
+
+/// Log a failure or panic of a long-running task when it happens instead of
+/// when the agent stops.
+async fn log_failure(
+    kind: TaskKind,
+    task: impl Future<Output = anyhow::Result<()>>,
+) -> anyhow::Result<()> {
+    match AssertUnwindSafe(task).catch_unwind().await {
+        Ok(Ok(())) => {}
+        Ok(Err(error)) => error!(
+            task = kind.description(),
+            ?error,
+            "agent task failed and stays stopped until the agent restarts"
+        ),
+        Err(payload) => error!(
+            task = kind.description(),
+            panic = panic_message(payload),
+            "agent task panicked and stays stopped until the agent restarts"
+        ),
+    }
+    Ok(())
+}
+
+/// Load the command registry if commands are enabled, with the built-in
+/// commands that request immediate checks of the enabled integrations.
+fn command_registry(
+    config: &Config,
+    system_update_check: Option<Arc<Notify>>,
+    app_check: Option<Arc<Notify>>,
+) -> Option<Arc<CommandRegistry>> {
+    let commands = config.commands.as_ref();
+    if !commands.and_then(|h| h.enabled).unwrap_or(false) {
+        return None;
+    }
+    let commands_dir = commands
+        .and_then(|h| h.directory.as_deref())
+        .unwrap_or(Path::new("/etc/nexigon/agent/commands"));
+    let mut registry = load_command_registry(commands_dir);
+    if let Some(check_requested) = system_update_check {
+        registry.register_builtin(
+            DeviceCommandDescriptor::new(crate::system_updates::CHECK_COMMAND)
+                .with_description(Some("Request an immediate system update check.".into()))
+                .with_category(Some("OTA".into())),
+            Arc::new(move || check_requested.notify_one()),
+        );
+    }
+    if let Some(check_requested) = app_check {
+        registry.register_builtin(
+            DeviceCommandDescriptor::new(crate::rugix_apps::CHECK_COMMAND)
+                .with_description(Some("Request an immediate check of Rugix Apps.".into()))
+                .with_category(Some("Rugix Apps".into())),
+            Arc::new(move || check_requested.notify_one()),
+        );
+    }
+    Some(Arc::new(registry))
 }
 
 async fn run_connection_event_loop<S, E>(
@@ -957,9 +984,6 @@ async fn supervise_tasks(
                 if completion.kind == TaskKind::Connection {
                     return completion.result;
                 }
-                if completion.kind == TaskKind::ShutdownSignal && cancellation.is_cancelled() {
-                    return Ok(());
-                }
                 match completion.result {
                     Ok(()) => {
                         debug!(task = completion.kind.description(), "agent child task finished");
@@ -1019,12 +1043,6 @@ async fn shutdown_tasks(tasks: &mut JoinSet<TaskCompletion>) {
     }
 }
 
-fn operation_polling_enabled(config: Option<&OperationsConfig>) -> bool {
-    config
-        .and_then(|operations| operations.enabled)
-        .unwrap_or(false)
-}
-
 /// Load optional command support without making it an agent startup dependency.
 fn load_command_registry(commands_dir: &Path) -> CommandRegistry {
     match CommandRegistry::load_external(commands_dir) {
@@ -1044,108 +1062,10 @@ fn command_slots() -> Arc<Semaphore> {
     Arc::new(Semaphore::new(MAX_CONCURRENT_COMMANDS))
 }
 
-#[derive(Debug)]
-enum ReportAttempt {
-    Acknowledged,
-    Rejected(String),
-    TransportFailed(String),
-}
-
-trait OperationReporter {
-    fn report(
-        &mut self,
-        device_id: DeviceId,
-        operation_id: DeviceOperationId,
-        step_index: u32,
-        claim_id: DeviceOperationWorkClaimId,
-        report: DeviceOperationStepReport,
-    ) -> impl Future<Output = ReportAttempt>;
-}
-
-impl OperationReporter for DeviceExecutor {
-    async fn report(
-        &mut self,
-        device_id: DeviceId,
-        operation_id: DeviceOperationId,
-        step_index: u32,
-        claim_id: DeviceOperationWorkClaimId,
-        report: DeviceOperationStepReport,
-    ) -> ReportAttempt {
-        match self
-            .execute(ReportDeviceOperationStepAction::new(
-                device_id,
-                operation_id,
-                step_index,
-                claim_id,
-                report,
-            ))
-            .await
-        {
-            Ok(Ok(_)) => ReportAttempt::Acknowledged,
-            Ok(Err(error)) => ReportAttempt::Rejected(error.message.into()),
-            Err(error) => ReportAttempt::TransportFailed(error.to_string()),
-        }
-    }
-}
-
-async fn report_operation_step_with_retry(
-    reporter: &mut impl OperationReporter,
-    device_id: &DeviceId,
-    operation_id: &DeviceOperationId,
-    step_index: u32,
-    claim_id: &DeviceOperationWorkClaimId,
-    report: &DeviceOperationStepReport,
-    cancellation: Option<&CancellationToken>,
-) -> bool {
-    let mut retry_delay = Duration::from_secs(1);
-    for attempt in 1..=5 {
-        let report_attempt = reporter.report(
-            device_id.clone(),
-            operation_id.clone(),
-            step_index,
-            claim_id.clone(),
-            report.clone(),
-        );
-        tokio::pin!(report_attempt);
-        let report_attempt = if let Some(cancellation) = cancellation {
-            tokio::select! {
-                biased;
-                () = cancellation.cancelled() => return false,
-                result = &mut report_attempt => result,
-            }
-        } else {
-            report_attempt.await
-        };
-        match report_attempt {
-            ReportAttempt::Acknowledged => return true,
-            ReportAttempt::Rejected(message) => {
-                warn!(%message, "operation step report rejected");
-                return false;
-            }
-            ReportAttempt::TransportFailed(error) => {
-                warn!(%error, attempt, "failed to report operation step");
-                if attempt < 5 {
-                    if let Some(cancellation) = cancellation {
-                        tokio::select! {
-                            biased;
-                            () = cancellation.cancelled() => return false,
-                            () = tokio::time::sleep(retry_delay) => {}
-                        }
-                    } else {
-                        tokio::time::sleep(retry_delay).await;
-                    }
-                    retry_delay *= 2;
-                }
-            }
-        }
-    }
-    false
-}
-
 #[cfg(unix)]
 fn local_api_task(
     config: &Config,
-    connection_ref: &nexigon_multiplex::ConnectionRef,
+    link: HubLink,
     cancellation: CancellationToken,
 ) -> Option<SupervisedTask> {
     use crate::config::LocalApiConfig;
@@ -1162,15 +1082,16 @@ fn local_api_task(
         enabled: None,
         socket_path: None,
     });
-    let hub_ref = connection_ref.clone();
-    Some(SupervisedTask::new(TaskKind::LocalApi, async move {
-        crate::local_api::serve(&local_api_config, hub_ref, cancellation.cancelled_owned()).await
-    }))
+    Some(SupervisedTask::new(
+        TaskKind::LocalApi,
+        log_failure(TaskKind::LocalApi, async move {
+            crate::local_api::serve(&local_api_config, link, cancellation.cancelled_owned()).await
+        }),
+    ))
 }
 
 #[cfg(test)]
 mod tests {
-    use std::collections::VecDeque;
     use std::net::Ipv4Addr;
     use std::path::PathBuf;
     use std::sync::Arc;
@@ -1183,8 +1104,6 @@ mod tests {
     use bytes::Bytes;
     use futures::StreamExt;
     use futures::future::join_all;
-    use nexigon_api::types::devices::DeviceOperationStepReportStatus;
-    use nexigon_ids::Generate;
     use nexigon_multiplex::Connection;
     use nexigon_multiplex::ConnectionEvent;
     use nexigon_multiplex::ConnectionRef;
@@ -1199,29 +1118,20 @@ mod tests {
     use tokio::task::JoinSet;
     use tokio_util::sync::CancellationToken;
 
-    use super::DeviceId;
-    use super::DeviceOperationId;
-    use super::DeviceOperationStepReport;
-    use super::DeviceOperationWorkClaimId;
     use super::EndpointLimits;
     #[cfg(target_os = "linux")]
     use super::MAX_CONCURRENT_TERMINALS;
-    use super::OperationReporter;
-    use super::ReportAttempt;
     use super::SupervisedTask;
     use super::TCP_CONNECT_TIMEOUT;
     use super::TaskKind;
     use super::command_slots;
     use super::load_command_registry;
-    use super::operation_polling_enabled;
-    use super::report_operation_step_with_retry;
     use super::run_connection_event_loop;
     use super::run_until_cancelled;
     use super::shutdown_tasks;
     use super::spawn_supervised;
     use super::supervise_tasks;
     use crate::config::Config;
-    use crate::config::OperationsConfig;
 
     /// A commands-directory failure leaves an empty registry for agent startup.
     #[test]
@@ -1347,18 +1257,6 @@ mod tests {
             self.hub.abort();
             let _ = self.hub.await;
         }
-    }
-
-    #[test]
-    fn operation_polling_requires_explicit_opt_in() {
-        assert!(!operation_polling_enabled(None));
-        assert!(!operation_polling_enabled(Some(&OperationsConfig::new())));
-        assert!(!operation_polling_enabled(Some(
-            &OperationsConfig::new().with_enabled(Some(false)),
-        )));
-        assert!(operation_polling_enabled(Some(
-            &OperationsConfig::new().with_enabled(Some(true)),
-        )));
     }
 
     #[tokio::test]
@@ -1809,49 +1707,5 @@ mod tests {
             None
         );
         assert!(dropped.load(Ordering::SeqCst));
-    }
-
-    struct MockReporter {
-        attempts: VecDeque<ReportAttempt>,
-        calls: usize,
-    }
-
-    impl OperationReporter for MockReporter {
-        async fn report(
-            &mut self,
-            _: DeviceId,
-            _: DeviceOperationId,
-            _: u32,
-            _: DeviceOperationWorkClaimId,
-            _: DeviceOperationStepReport,
-        ) -> ReportAttempt {
-            self.calls += 1;
-            self.attempts.pop_front().expect("one result per call")
-        }
-    }
-
-    #[tokio::test(start_paused = true)]
-    async fn completed_operation_reports_retry_transport_failures() {
-        let mut reporter = MockReporter {
-            attempts: VecDeque::from([
-                ReportAttempt::TransportFailed("offline".to_owned()),
-                ReportAttempt::TransportFailed("still offline".to_owned()),
-                ReportAttempt::Acknowledged,
-            ]),
-            calls: 0,
-        };
-        let acknowledged = report_operation_step_with_retry(
-            &mut reporter,
-            &DeviceId::generate(),
-            &DeviceOperationId::generate(),
-            0,
-            &DeviceOperationWorkClaimId::generate(),
-            &DeviceOperationStepReport::new(DeviceOperationStepReportStatus::Succeeded),
-            None,
-        )
-        .await;
-
-        assert!(acknowledged);
-        assert_eq!(reporter.calls, 3);
     }
 }

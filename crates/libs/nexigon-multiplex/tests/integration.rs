@@ -127,6 +127,7 @@ impl TestPair {
     }
 }
 
+/// Both sides report the connection once the handshake completes.
 #[tokio::test]
 async fn test_connection_handshake() {
     init_tracing();
@@ -151,93 +152,7 @@ async fn test_connection_handshake() {
     assert!(matches!(event_b, Ok(ConnectionEvent::Connected)));
 }
 
-#[tokio::test]
-async fn test_open_channel() {
-    init_tracing();
-
-    let mut pair = TestPair::new();
-
-    // Side A opens a channel to side B.
-    let channel_a = pair
-        .conn_a_ref
-        .open(b"test-endpoint")
-        .await
-        .expect("failed to open channel");
-
-    // Side B should receive the accepted channel.
-    let (endpoint, _channel_b) =
-        tokio::time::timeout(std::time::Duration::from_secs(5), pair.chan_rx_b.recv())
-            .await
-            .expect("timeout")
-            .expect("channel not received");
-
-    assert_eq!(endpoint, "test-endpoint");
-
-    drop(channel_a);
-}
-
-#[tokio::test]
-async fn test_channel_data_a_to_b() {
-    init_tracing();
-
-    let mut pair = TestPair::new();
-
-    // A opens channel to B.
-    let mut channel_a = pair
-        .conn_a_ref
-        .open(b"data-test")
-        .await
-        .expect("failed to open channel");
-
-    let (_, mut channel_b) =
-        tokio::time::timeout(std::time::Duration::from_secs(5), pair.chan_rx_b.recv())
-            .await
-            .expect("timeout")
-            .expect("channel not received");
-
-    // Write data from A to B.
-    let test_data = b"Hello from A to B!";
-    channel_a.write_all(test_data).await.expect("write failed");
-    channel_a.flush().await.expect("flush failed");
-
-    // Read data on B.
-    let mut buf = vec![0u8; test_data.len()];
-    channel_b.read_exact(&mut buf).await.expect("read failed");
-
-    assert_eq!(&buf, test_data);
-}
-
-#[tokio::test]
-async fn test_channel_data_b_to_a() {
-    init_tracing();
-
-    let mut pair = TestPair::new();
-
-    // A opens channel to B.
-    let mut channel_a = pair
-        .conn_a_ref
-        .open(b"reverse-data-test")
-        .await
-        .expect("failed to open channel");
-
-    let (_, mut channel_b) =
-        tokio::time::timeout(std::time::Duration::from_secs(5), pair.chan_rx_b.recv())
-            .await
-            .expect("timeout")
-            .expect("channel not received");
-
-    // Write data from B to A.
-    let test_data = b"Hello from B to A!";
-    channel_b.write_all(test_data).await.expect("write failed");
-    channel_b.flush().await.expect("flush failed");
-
-    // Read data on A.
-    let mut buf = vec![0u8; test_data.len()];
-    channel_a.read_exact(&mut buf).await.expect("read failed");
-
-    assert_eq!(&buf, test_data);
-}
-
+/// Data flows in both directions of a channel at the same time.
 #[tokio::test]
 async fn test_bidirectional_data() {
     init_tracing();
@@ -293,6 +208,7 @@ async fn test_bidirectional_data() {
     .expect("timeout in bidirectional test");
 }
 
+/// Transfers beyond the initial credit replenish it in both directions.
 #[tokio::test]
 async fn test_large_data_transfer() {
     init_tracing();
@@ -382,6 +298,7 @@ async fn test_large_data_transfer() {
     assert_eq!(received, reverse_data);
 }
 
+/// Shutting down the sending half delivers pending data and then EOF.
 #[tokio::test]
 async fn test_channel_close_sender() {
     init_tracing();
@@ -424,6 +341,7 @@ async fn test_channel_close_sender() {
     assert_eq!(n, 0, "expected EOF after sender dropped");
 }
 
+/// Concurrent channels keep their endpoints and data apart.
 #[tokio::test]
 async fn test_multiple_channels() {
     init_tracing();
@@ -497,6 +415,7 @@ async fn test_multiple_channels() {
     assert_eq!(&buf3, b"data-for-ch-3");
 }
 
+/// Split halves work independently and can be merged into a channel again.
 #[tokio::test]
 async fn test_channel_split_and_merge() {
     init_tracing();
@@ -541,6 +460,7 @@ async fn test_channel_split_and_merge() {
     assert_eq!(&buf, b"merged");
 }
 
+/// Several writes before one flush arrive as one contiguous byte stream.
 #[tokio::test]
 async fn test_multiple_writes_before_flush() {
     init_tracing();
@@ -575,6 +495,7 @@ async fn test_multiple_writes_before_flush() {
     assert_eq!(&buf[5..], payload);
 }
 
+/// Either side of a connection can open channels.
 #[tokio::test]
 async fn test_channel_open_from_both_sides() {
     init_tracing();

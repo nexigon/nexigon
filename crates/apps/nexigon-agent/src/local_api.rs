@@ -1,16 +1,20 @@
 //! Unix-socket-based local API for in-host clients.
 //!
 //! Listens on a Unix socket and accepts handshakes defined by the
-//! [`nexigon_agent_api`] crate. The only endpoint supported in this
-//! revision is `"executor"`, which is bridged byte-for-byte to a hub-side
-//! executor channel — local clients can speak `nexigon-rpc` directly to the
-//! hub over the agent's existing connection.
+//! [`nexigon_agent_api`] crate. The `"executor"` endpoint is bridged
+//! byte-for-byte to a hub-side executor channel — local clients can speak
+//! `nexigon-rpc` directly to the hub over the agent's existing connection.
+//! While the agent is disconnected, it rejects the endpoint with
+//! [`ServerErrorCode::HubUnavailable`]. The `"status"` endpoint replies with
+//! the agent's status. The local API runs for the lifetime of the agent, across
+//! reconnections to Nexigon Hub.
 
 #![cfg(unix)]
 
 use std::future::Future;
 use std::os::unix::fs::PermissionsExt;
 use std::path::PathBuf;
+use std::time::Duration;
 
 use anyhow::Context;
 use nexigon_agent_api::DEFAULT_SOCKET_PATH;
@@ -22,7 +26,7 @@ use nexigon_agent_api::types::handshake::ServerError;
 use nexigon_agent_api::types::handshake::ServerErrorCode;
 use nexigon_agent_api::types::handshake::ServerHello;
 use nexigon_agent_api::types::handshake::ServerOk;
-use nexigon_multiplex::ConnectionRef;
+use serde::Serialize;
 use tokio::io::AsyncReadExt;
 use tokio::io::AsyncWriteExt;
 use tokio::net::UnixListener;
@@ -33,10 +37,13 @@ use tracing::info;
 use tracing::warn;
 
 use crate::config::LocalApiConfig;
+use crate::hub_link::HubLink;
 
 /// File mode applied to the socket after binding.
 const SOCKET_MODE: u32 = 0o660;
 const MAX_CONCURRENT_LOCAL_API_CLIENTS: usize = 32;
+/// Time to wait after a failed accept before accepting again.
+const ACCEPT_RETRY_DELAY: Duration = Duration::from_secs(1);
 
 /// Serve the agent local API until `shutdown` resolves.
 ///
@@ -44,11 +51,11 @@ const MAX_CONCURRENT_LOCAL_API_CLIENTS: usize = 32;
 /// dispatches each one to the endpoint requested in its `ClientHello`.
 /// The socket is removed when this function returns.
 ///
-/// `hub_ref` is cloned per accepted connection to open hub-side channels.
-/// A failure on a single client is logged and does not affect the listener.
-pub async fn serve(
+/// Clients reach Nexigon Hub through `link`. A failure on a single client is
+/// logged and does not affect the listener.
+pub(crate) async fn serve(
     config: &LocalApiConfig,
-    hub_ref: ConnectionRef,
+    link: HubLink,
     shutdown: impl Future<Output = ()>,
 ) -> anyhow::Result<()> {
     let socket_path = config
@@ -102,14 +109,22 @@ pub async fn serve(
                 }
             }
             res = listener.accept() => {
-                let (stream, _) = res.context("accepting local API connection")?;
+                let stream = match res {
+                    Ok((stream, _)) => stream,
+                    Err(error) => {
+                        // Errors such as running out of file descriptors are
+                        // usually temporary.
+                        warn!(?error, "failed to accept a local API connection");
+                        tokio::time::sleep(ACCEPT_RETRY_DELAY).await;
+                        continue;
+                    }
+                };
                 if clients.len() >= MAX_CONCURRENT_LOCAL_API_CLIENTS {
                     warn!("local API connection limit reached; rejecting client");
                     drop(stream);
                     continue;
                 }
-                let hub_ref = hub_ref.clone();
-                clients.spawn(handle_client(stream, hub_ref));
+                clients.spawn(handle_client(stream, link.clone()));
             }
         }
     }
@@ -125,7 +140,7 @@ pub async fn serve(
     Ok(())
 }
 
-async fn handle_client(mut stream: UnixStream, mut hub_ref: ConnectionRef) -> anyhow::Result<()> {
+async fn handle_client(mut stream: UnixStream, link: HubLink) -> anyhow::Result<()> {
     let mut magic = [0u8; 4];
     stream
         .read_exact(&mut magic)
@@ -174,23 +189,35 @@ async fn handle_client(mut stream: UnixStream, mut hub_ref: ConnectionRef) -> an
     }
     match hello.endpoint.as_str() {
         "executor" => {
+            let Some(mut hub_ref) = link.connection() else {
+                return reject(
+                    &mut stream,
+                    ServerErrorCode::HubUnavailable,
+                    "the agent is not connected to Nexigon Hub".to_owned(),
+                )
+                .await;
+            };
             let mut hub_channel = match hub_ref.open(b"executor").await {
                 Ok(channel) => channel,
                 Err(error) => {
                     warn!(?error, "hub executor channel is unavailable");
                     return reject(
                         &mut stream,
-                        ServerErrorCode::Internal,
+                        ServerErrorCode::HubUnavailable,
                         "hub executor is unavailable".to_owned(),
                     )
                     .await;
                 }
             };
-            send_hello(&mut stream, ServerHello::Ok(ServerOk { version: VERSION })).await?;
+            send_message(&mut stream, &ServerHello::Ok(ServerOk { version: VERSION })).await?;
             tokio::io::copy_bidirectional(&mut stream, &mut hub_channel)
                 .await
                 .context("splicing executor channel to hub")?;
             Ok(())
+        }
+        "status" => {
+            send_message(&mut stream, &ServerHello::Ok(ServerOk { version: VERSION })).await?;
+            send_message(&mut stream, &link.status()).await
         }
         other => {
             reject(
@@ -208,9 +235,9 @@ async fn reject(
     code: ServerErrorCode,
     message: String,
 ) -> anyhow::Result<()> {
-    send_hello(
+    send_message(
         stream,
-        ServerHello::Error(ServerError {
+        &ServerHello::Error(ServerError {
             code,
             message: message.into(),
         }),
@@ -218,8 +245,9 @@ async fn reject(
     .await
 }
 
-async fn send_hello(stream: &mut UnixStream, hello: ServerHello) -> anyhow::Result<()> {
-    let body = serde_json::to_vec(&hello).context("serializing server hello")?;
+/// Send one framed message.
+async fn send_message(stream: &mut UnixStream, message: &impl Serialize) -> anyhow::Result<()> {
+    let body = serde_json::to_vec(message).context("serializing local API message")?;
     stream.write_all(&MAGIC).await?;
     stream.write_all(&(body.len() as u32).to_be_bytes()).await?;
     stream.write_all(&body).await?;
@@ -243,36 +271,29 @@ impl Drop for SocketGuard {
 
 #[cfg(test)]
 mod tests {
+    use std::path::Path;
     use std::time::Duration;
 
     use bytes::Bytes;
     use futures::StreamExt;
+    use nexigon_agent_api::client::LocalConnectError;
+    use nexigon_agent_api::client::connect_local_executor;
+    use nexigon_agent_api::client::fetch_status;
+    use nexigon_agent_api::types::status::HubConnectionStatus;
+    use nexigon_ids::Generate;
+    use nexigon_ids::ids::DeviceId;
     use nexigon_multiplex::Connection;
     use nexigon_multiplex::ConnectionEvent;
     use nexigon_multiplex::transport::InMemory;
     use tempfile::tempdir;
 
     use super::*;
+    use crate::hub_link::hub_link;
 
-    #[tokio::test]
-    async fn shutdown_removes_listener_and_awaits_idle_clients() {
-        let root = tempdir().unwrap();
-        let socket_path = root.path().join("agent.sock");
-        let config = LocalApiConfig::new().with_socket_path(Some(socket_path.clone()));
-        let (_peer_transport, agent_transport) = InMemory::<Bytes, Bytes>::new_buffered(8);
-        let agent_connection = Connection::new(agent_transport);
-        let hub_ref = agent_connection.make_ref();
-        let (shutdown_tx, shutdown_rx) = tokio::sync::oneshot::channel::<()>();
-
-        let server = tokio::spawn(async move {
-            serve(&config, hub_ref, async move {
-                let _ = shutdown_rx.await;
-            })
-            .await
-        });
-        let mut idle_client = tokio::time::timeout(Duration::from_secs(2), async {
+    async fn connect_when_listening(socket_path: &Path) -> UnixStream {
+        tokio::time::timeout(Duration::from_secs(2), async {
             loop {
-                match UnixStream::connect(&socket_path).await {
+                match UnixStream::connect(socket_path).await {
                     Ok(stream) => break stream,
                     Err(error) if error.kind() == std::io::ErrorKind::NotFound => {
                         tokio::task::yield_now().await;
@@ -282,7 +303,24 @@ mod tests {
             }
         })
         .await
-        .expect("local API listener did not start");
+        .expect("local API listener did not start")
+    }
+
+    #[tokio::test]
+    async fn shutdown_removes_listener_and_awaits_idle_clients() {
+        let root = tempdir().unwrap();
+        let socket_path = root.path().join("agent.sock");
+        let config = LocalApiConfig::new().with_socket_path(Some(socket_path.clone()));
+        let (_controller, link) = hub_link();
+        let (shutdown_tx, shutdown_rx) = tokio::sync::oneshot::channel::<()>();
+
+        let server = tokio::spawn(async move {
+            serve(&config, link, async move {
+                let _ = shutdown_rx.await;
+            })
+            .await
+        });
+        let mut idle_client = connect_when_listening(&socket_path).await;
 
         shutdown_tx.send(()).unwrap();
         tokio::time::timeout(Duration::from_secs(2), server)
@@ -302,12 +340,57 @@ mod tests {
         );
     }
 
+    /// While disconnected, the status reports it and the executor endpoint is
+    /// rejected as retryable. Once connected, the status reports the device.
+    #[tokio::test]
+    async fn status_and_executor_follow_the_hub_connection() {
+        let root = tempdir().unwrap();
+        let socket_path = root.path().join("agent.sock");
+        let config = LocalApiConfig::new().with_socket_path(Some(socket_path.clone()));
+        let (controller, link) = hub_link();
+        let (shutdown_tx, shutdown_rx) = tokio::sync::oneshot::channel::<()>();
+        let server = tokio::spawn(async move {
+            serve(&config, link, async move {
+                let _ = shutdown_rx.await;
+            })
+            .await
+        });
+        drop(connect_when_listening(&socket_path).await);
+
+        let status = fetch_status(&socket_path).await.unwrap();
+        assert!(matches!(
+            status.connection,
+            HubConnectionStatus::Disconnected(_)
+        ));
+        assert!(status.device_id.is_none());
+        let Err(LocalConnectError::Rejected(error)) = connect_local_executor(&socket_path).await
+        else {
+            panic!("local API accepted an executor without a hub connection");
+        };
+        assert!(matches!(error.code, ServerErrorCode::HubUnavailable));
+
+        let (_hub_transport, agent_transport) = InMemory::<Bytes, Bytes>::new_buffered(8);
+        let agent_connection = Connection::new(agent_transport);
+        let device_id = DeviceId::generate();
+        controller.connected(device_id.clone(), agent_connection.make_ref());
+        let status = fetch_status(&socket_path).await.unwrap();
+        assert!(matches!(
+            status.connection,
+            HubConnectionStatus::Connected(_)
+        ));
+        assert_eq!(status.device_id, Some(device_id));
+
+        shutdown_tx.send(()).unwrap();
+        server.await.unwrap().unwrap();
+    }
+
     #[tokio::test]
     async fn upstream_rejection_is_reported_before_local_success() {
         let (hub_transport, agent_transport) = InMemory::<Bytes, Bytes>::new_buffered(8);
         let mut hub_connection = Connection::new(hub_transport);
         let mut agent_connection = Connection::new(agent_transport);
-        let hub_ref = agent_connection.make_ref();
+        let (controller, link) = hub_link();
+        controller.connected(DeviceId::generate(), agent_connection.make_ref());
         let hub_driver = tokio::spawn(async move {
             while let Some(event) = hub_connection.next().await {
                 match event {
@@ -328,7 +411,7 @@ mod tests {
         });
 
         let (mut client, server) = UnixStream::pair().unwrap();
-        let handler = tokio::spawn(handle_client(server, hub_ref));
+        let handler = tokio::spawn(handle_client(server, link));
         let hello = ClientHello::new(VERSION, "executor".to_owned());
         let body = serde_json::to_vec(&hello).unwrap();
         client.write_all(&MAGIC).await.unwrap();
@@ -349,7 +432,7 @@ mod tests {
         let ServerHello::Error(error) = response else {
             panic!("local API acknowledged an unavailable upstream executor");
         };
-        assert!(matches!(error.code, ServerErrorCode::Internal));
+        assert!(matches!(error.code, ServerErrorCode::HubUnavailable));
         assert_eq!(error.message, "hub executor is unavailable");
 
         handler

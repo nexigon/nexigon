@@ -41,7 +41,7 @@ variant DeviceProfileMode {
     /// Use one specific revision.
     Pinned: PinnedDeviceProfileMode,
     /// Use the revision of the profile's rollout once the rollout reaches the
-    /// device.
+    /// device. The device then applies the revision, even if it already uses it.
     ///
     /// A device that switches to this mode keeps its current revision until
     /// then. A device that gets the profile in this mode has no revision until
@@ -313,7 +313,8 @@ record QueryDeviceProfileRevisionsOutput {
 /// mode, replacing the profile's current rollout.
 ///
 /// Releases the first stage right away. The new rollout runs even if the rollout
-/// it replaces was halted.
+/// it replaces was halted. Every device of the rollout applies the revision once
+/// the rollout reaches it, even if the device already uses the revision.
 #[unstable(feature = "device_profiles")]
 #[request(
     name = "profiles_StartRollout",

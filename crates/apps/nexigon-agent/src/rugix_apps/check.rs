@@ -1,11 +1,11 @@
 //! One check of the app reconciliation loop.
 //!
-//! A check reads the desired state from `dev.nexigon.apps.config` and the
+//! A check reads the desired state from `dev.nexigon.rugix-apps.config` and the
 //! installed apps from Rugix Ctrl. It brings every managed app into its desired
 //! state and installs and activates the version that the app's path resolves
 //! to, if the hold, spread, retry, and maintenance window policies allow it. It
 //! publishes the status of the managed and installed apps in
-//! `dev.nexigon.apps.status`.
+//! `dev.nexigon.rugix-apps.status`.
 //!
 //! Every generation that the agent installs records its package version, so the
 //! device itself knows which versions its apps run. The previous status only
@@ -35,19 +35,17 @@ use jiff::Timestamp;
 use jiff::tz::TimeZone;
 use nexigon_api::types::devices::DeviceEventSeverity;
 use nexigon_api::types::devices::DeviceProperty;
-use nexigon_api::types::properties::AppDesiredState;
-use nexigon_api::types::properties::AppGcPolicy;
-use nexigon_api::types::properties::AppRuntime;
-use nexigon_api::types::properties::AppStatus;
-use nexigon_api::types::properties::AppUpdateBlocked;
-use nexigon_api::types::properties::AppUpdateCapability;
-use nexigon_api::types::properties::AppUpdateConfig;
-use nexigon_api::types::properties::AppUpdateState;
-use nexigon_api::types::properties::AppUpdateStatus;
-use nexigon_api::types::properties::ManagedAppConfig;
 use nexigon_api::types::properties::OtaUpdateRetryPolicy;
 use nexigon_api::types::repositories::PackageVersionAsset;
 use nexigon_api::types::repositories::PackageVersionId;
+use nexigon_api::types::rugix_apps::RugixAppConfig;
+use nexigon_api::types::rugix_apps::RugixAppDesiredState;
+use nexigon_api::types::rugix_apps::RugixAppGcPolicy;
+use nexigon_api::types::rugix_apps::RugixAppStatus;
+use nexigon_api::types::rugix_apps::RugixAppUpdateBlocked;
+use nexigon_api::types::rugix_apps::RugixAppUpdateState;
+use nexigon_api::types::rugix_apps::RugixAppsConfig;
+use nexigon_api::types::rugix_apps::RugixAppsStatus;
 use nexigon_ids::ids::DeviceId;
 use tokio::sync::Mutex;
 use tokio::sync::OwnedMutexGuard;
@@ -55,11 +53,11 @@ use tokio_util::sync::CancellationToken;
 use tracing::info;
 use tracing::warn;
 
-use super::AppUpdates;
+use super::RugixAppsSettings;
 use super::rugix::AppBundle;
 use super::rugix::AppInfo;
 use super::rugix::RugixApps;
-use crate::device_api::DeviceExecutor;
+use crate::hub_link::HubExecutor;
 use crate::reconcile::WindowGate;
 use crate::reconcile::error_delay;
 use crate::reconcile::hub::Hub;
@@ -74,32 +72,22 @@ use crate::reconcile::policy::spread_state;
 use crate::reconcile::window_gate;
 
 /// Device property holding the desired state.
-const CONFIG_PROPERTY: &str = "dev.nexigon.apps.config";
+const CONFIG_PROPERTY: &str = "dev.nexigon.rugix-apps.config";
 /// Device property holding the actual state.
-const STATUS_PROPERTY: &str = "dev.nexigon.apps.status";
+const STATUS_PROPERTY: &str = "dev.nexigon.rugix-apps.status";
 /// Event category of app events.
 const EVENT_CATEGORY: &str = "apps";
 /// Number of times a check starts over after the status changed concurrently.
 const MAX_STATUS_CONFLICTS: usize = 3;
 
-/// Optional features of the app update contract that the agent implements.
-const CAPABILITIES: [AppUpdateCapability; 6] = [
-    AppUpdateCapability::Hold,
-    AppUpdateCapability::Asset,
-    AppUpdateCapability::Window,
-    AppUpdateCapability::Retry,
-    AppUpdateCapability::Spread,
-    AppUpdateCapability::Gc,
-];
-
 /// Executes checks against Nexigon Hub and Rugix Ctrl for one device.
 pub(crate) struct Checker {
-    settings: AppUpdates,
+    settings: RugixAppsSettings,
     hub: Hub,
     rugix: RugixApps,
     /// Serializes changes of the device with the system update integration.
     device_lock: Arc<Mutex<()>>,
-    /// Signals a lost connection or a shutdown, which prevents new changes.
+    /// Signals that the agent stops, which prevents new changes.
     cancellation: CancellationToken,
     /// Version of the status read or written last, or `None` without a status.
     status_version: Option<u64>,
@@ -114,16 +102,16 @@ pub(crate) struct Checker {
 struct ManagedApp<'a> {
     name: &'a str,
     /// Configuration of the app with the policies that apply to it.
-    config: ManagedAppConfig,
+    config: RugixAppConfig,
     /// Status of the app published by the previous check, if the app's
     /// configuration has not changed since.
-    previous: Option<&'a AppStatus>,
+    previous: Option<&'a RugixAppStatus>,
 }
 
 impl Checker {
     pub(crate) fn new(
-        settings: AppUpdates,
-        executor: DeviceExecutor,
+        settings: RugixAppsSettings,
+        executor: HubExecutor,
         device_id: DeviceId,
         device_lock: Arc<Mutex<()>>,
         cancellation: CancellationToken,
@@ -166,11 +154,10 @@ impl Checker {
         let property = self.hub.property(CONFIG_PROPERTY).await?;
         let config_version = property.as_ref().map(|property| property.version);
         // Apps keep their previous status until the check reaches them.
-        let mut status = AppUpdateStatus::new(previous.apps.clone())
-            .with_capabilities(Some(CAPABILITIES.to_vec().into()))
+        let mut status = RugixAppsStatus::new(previous.apps.clone())
             .with_config_version(config_version)
             .with_arch(Some(self.settings.arch.clone().into()))
-            .with_runtime(Some(self.runtime().await));
+            .with_rugix_ctrl_version(self.rugix_ctrl_version().await.map(Into::into));
         let mut installed = match self.rugix.installed().await {
             Ok(installed) => installed,
             Err(error) => {
@@ -185,7 +172,7 @@ impl Checker {
             let error = format!("{error:#}");
             warn!(%error, "invalid app configuration");
             status.last_error = Some(error.into());
-            AppUpdateConfig::new()
+            RugixAppsConfig::new()
         });
         let managed = config.apps.clone().unwrap_or_default();
         status
@@ -194,8 +181,8 @@ impl Checker {
         for (name, info) in &installed {
             if !managed.contains_key(name.as_str()) {
                 let app_status = match info {
-                    Ok(info) => observed(AppStatus::new(false), info),
-                    Err(error) => failed(AppStatus::new(false), error),
+                    Ok(info) => observed(RugixAppStatus::new(false), info),
+                    Err(error) => failed(RugixAppStatus::new(false), error),
                 };
                 status.apps.insert(name.clone().into(), app_status);
             }
@@ -244,11 +231,11 @@ impl Checker {
     /// only if the agent stops.
     async fn reconcile(
         &mut self,
-        status: &mut AppUpdateStatus,
+        status: &mut RugixAppsStatus,
         app: ManagedApp<'_>,
         info: Option<anyhow::Result<AppInfo>>,
-    ) -> anyhow::Result<AppStatus> {
-        let mut app_status = AppStatus::new(true).with_config(Some(app.config.clone()));
+    ) -> anyhow::Result<RugixAppStatus> {
+        let mut app_status = RugixAppStatus::new(true).with_config(Some(app.config.clone()));
         let info = match info.transpose() {
             Ok(info) => info,
             Err(error) => return Ok(self.app_error(&app, app_status, error)),
@@ -266,28 +253,28 @@ impl Checker {
 
     async fn converge(
         &mut self,
-        status: &mut AppUpdateStatus,
+        status: &mut RugixAppsStatus,
         app: &ManagedApp<'_>,
         info: Option<AppInfo>,
-        mut app_status: AppStatus,
-    ) -> anyhow::Result<AppStatus> {
+        mut app_status: RugixAppStatus,
+    ) -> anyhow::Result<RugixAppStatus> {
         let desired = app
             .config
             .state
             .clone()
             .expect("the effective configuration has a state");
-        if matches!(desired, AppDesiredState::Removed) {
+        if matches!(desired, RugixAppDesiredState::Removed) {
             if info.is_none() {
-                return Ok(app_status.with_state(Some(AppUpdateState::Completed)));
+                return Ok(app_status.with_state(Some(RugixAppUpdateState::Completed)));
             }
             let _guard = self.lock_device().await?;
-            self.report(status, app.name, &app_status, AppUpdateState::Removing)
+            self.report(status, app.name, &app_status, RugixAppUpdateState::Removing)
                 .await?;
             self.rugix.remove(app.name).await?;
             info!(app = app.name, "removed app");
-            return Ok(AppStatus::new(true)
+            return Ok(RugixAppStatus::new(true)
                 .with_config(Some(app.config.clone()))
-                .with_state(Some(AppUpdateState::Completed)));
+                .with_state(Some(RugixAppUpdateState::Completed)));
         }
 
         let target = self.target(&app.config).await;
@@ -310,7 +297,7 @@ impl Checker {
             app_status = observed(app_status, info);
         }
         let Some((path, target_id)) = target? else {
-            return Ok(app_status.with_state(Some(AppUpdateState::Idle)));
+            return Ok(app_status.with_state(Some(RugixAppUpdateState::Idle)));
         };
         app_status.target_version_id = Some(target_id.clone());
         let target_generation = info
@@ -320,7 +307,7 @@ impl Checker {
         let converged = match (&info, target_generation) {
             (Some(info), Some(generation)) => {
                 info.deployed_generation() == Some(generation)
-                    || matches!(desired, AppDesiredState::Stopped)
+                    || matches!(desired, RugixAppDesiredState::Stopped)
             }
             _ => false,
         };
@@ -328,7 +315,7 @@ impl Checker {
             return Ok(app_status
                 .with_generation(target_generation)
                 .with_current_version_id(Some(target_id))
-                .with_state(Some(AppUpdateState::Completed))
+                .with_state(Some(RugixAppUpdateState::Completed))
                 .with_failure_count(Some(0)));
         }
         self.update(status, app, info.as_ref(), app_status, &path, &target_id)
@@ -338,7 +325,7 @@ impl Checker {
     /// Resolve the configured path of an app, if any.
     async fn target(
         &mut self,
-        config: &ManagedAppConfig,
+        config: &RugixAppConfig,
     ) -> anyhow::Result<Option<(VersionPath, PackageVersionId)>> {
         let Some(path) = config.path.as_deref() else {
             return Ok(None);
@@ -358,7 +345,7 @@ impl Checker {
     async fn apply_state(
         &mut self,
         app: &ManagedApp<'_>,
-        desired: &AppDesiredState,
+        desired: &RugixAppDesiredState,
         info: AppInfo,
         target_generation: Option<u64>,
     ) -> anyhow::Result<AppInfo> {
@@ -367,7 +354,7 @@ impl Checker {
             && target_generation != deployed
             && app.config.hold != Some(true);
         match (desired, deployed) {
-            (AppDesiredState::Running, Some(generation))
+            (RugixAppDesiredState::Running, Some(generation))
                 if !info.is_active() && !starts_with_target =>
             {
                 let _guard = self.lock_device().await?;
@@ -375,7 +362,7 @@ impl Checker {
                 self.rugix.activate(app.name, generation).await?;
                 info!(app = app.name, "started app");
             }
-            (AppDesiredState::Stopped, _) if info.is_active() => {
+            (RugixAppDesiredState::Stopped, _) if info.is_active() => {
                 let _guard = self.lock_device().await?;
                 self.changed = true;
                 self.rugix.deactivate(app.name).await?;
@@ -390,13 +377,13 @@ impl Checker {
     /// stopped, as far as the policies allow it.
     async fn update(
         &mut self,
-        status: &mut AppUpdateStatus,
+        status: &mut RugixAppsStatus,
         app: &ManagedApp<'_>,
         info: Option<&AppInfo>,
-        mut app_status: AppStatus,
+        mut app_status: RugixAppStatus,
         path: &VersionPath,
         target_id: &PackageVersionId,
-    ) -> anyhow::Result<AppStatus> {
+    ) -> anyhow::Result<RugixAppStatus> {
         let now = Timestamp::now();
         let retry = app
             .config
@@ -413,8 +400,8 @@ impl Checker {
             .unwrap_or(0);
         // An installation that completed before the agent stopped is no failure.
         let interrupted = previous.is_some_and(|previous| match previous.state {
-            Some(AppUpdateState::Installing) => target_generation.is_none(),
-            Some(AppUpdateState::Activating) => true,
+            Some(RugixAppUpdateState::Installing) => target_generation.is_none(),
+            Some(RugixAppUpdateState::Activating) => true,
             _ => false,
         });
         if interrupted {
@@ -440,7 +427,7 @@ impl Checker {
         let retry_at = if interrupted {
             next_retry(&retry, failures, now)
         } else if previous
-            .is_some_and(|previous| matches!(previous.state, Some(AppUpdateState::Failed)))
+            .is_some_and(|previous| matches!(previous.state, Some(RugixAppUpdateState::Failed)))
         {
             // Without a scheduled attempt, only a reached limit stops attempts.
             match previous.and_then(|previous| previous.next_attempt_at) {
@@ -469,10 +456,10 @@ impl Checker {
             }
         }
         match retry_at {
-            None => return Ok(app_status.with_state(Some(AppUpdateState::Failed))),
+            None => return Ok(app_status.with_state(Some(RugixAppUpdateState::Failed))),
             Some(retry_at) if now < retry_at => {
                 return Ok(app_status
-                    .with_state(Some(AppUpdateState::Failed))
+                    .with_state(Some(RugixAppUpdateState::Failed))
                     .with_next_attempt_at(Some(retry_at.into())));
             }
             Some(_) if limit_reached => {
@@ -506,8 +493,13 @@ impl Checker {
                 // do not count as attempts.
                 let guard = self.lock_device().await?;
                 let url = self.hub.download_url(&asset).await?;
-                self.report(status, app.name, &app_status, AppUpdateState::Installing)
-                    .await?;
+                self.report(
+                    status,
+                    app.name,
+                    &app_status,
+                    RugixAppUpdateState::Installing,
+                )
+                .await?;
                 let generation = match self.install(app.name, target_id, &asset, &url).await {
                     Ok(generation) => generation,
                     Err(error) => {
@@ -527,10 +519,15 @@ impl Checker {
             }
         };
 
-        let start = matches!(app.config.state, Some(AppDesiredState::Running));
+        let start = matches!(app.config.state, Some(RugixAppDesiredState::Running));
         if start {
-            self.report(status, app.name, &app_status, AppUpdateState::Activating)
-                .await?;
+            self.report(
+                status,
+                app.name,
+                &app_status,
+                RugixAppUpdateState::Activating,
+            )
+            .await?;
             if let Err(error) = self.rugix.activate(app.name, generation).await {
                 return Ok(self
                     .fail_attempt(app_status, app.name, target_id, &retry, failures, error)
@@ -570,7 +567,7 @@ impl Checker {
                 .with_current_version_id(Some(target_id.clone()))
         };
         Ok(app_status
-            .with_state(Some(AppUpdateState::Completed))
+            .with_state(Some(RugixAppUpdateState::Completed))
             .with_failure_count(Some(0))
             .with_last_error(None))
     }
@@ -612,7 +609,7 @@ impl Checker {
     async fn bundle(
         &mut self,
         app: &str,
-        config: &ManagedAppConfig,
+        config: &RugixAppConfig,
         version_id: &PackageVersionId,
     ) -> anyhow::Result<Option<PackageVersionAsset>> {
         for filename in bundle_filenames(app, config, &self.settings.arch) {
@@ -643,13 +640,13 @@ impl Checker {
     /// Record a failed attempt and schedule the next one.
     async fn fail_attempt(
         &mut self,
-        app_status: AppStatus,
+        app_status: RugixAppStatus,
         app: &str,
         version_id: &PackageVersionId,
         retry: &OtaUpdateRetryPolicy,
         failures: u32,
         error: anyhow::Error,
-    ) -> AppStatus {
+    ) -> RugixAppStatus {
         let error = format!("{error:#}");
         warn!(app, %error, "app update failed");
         self.event(
@@ -662,7 +659,7 @@ impl Checker {
         .await;
         let failures = failures + 1;
         app_status
-            .with_state(Some(AppUpdateState::Failed))
+            .with_state(Some(RugixAppUpdateState::Failed))
             .with_failure_count(Some(failures))
             .with_last_error(Some(error.into()))
             .with_next_attempt_at(next_retry(retry, failures, Timestamp::now()).map(Into::into))
@@ -674,9 +671,9 @@ impl Checker {
     fn app_error(
         &mut self,
         app: &ManagedApp<'_>,
-        app_status: AppStatus,
+        app_status: RugixAppStatus,
         error: anyhow::Error,
-    ) -> AppStatus {
+    ) -> RugixAppStatus {
         self.recheck = true;
         failed(app_status, &error)
             .with_target_version_id(
@@ -702,10 +699,10 @@ impl Checker {
     /// changed concurrently.
     async fn report(
         &mut self,
-        status: &mut AppUpdateStatus,
+        status: &mut RugixAppsStatus,
         app: &str,
-        app_status: &AppStatus,
-        state: AppUpdateState,
+        app_status: &RugixAppStatus,
+        state: RugixAppUpdateState,
     ) -> anyhow::Result<()> {
         self.changed = true;
         status
@@ -714,10 +711,10 @@ impl Checker {
         self.publish(status).await
     }
 
-    async fn previous_status(&mut self) -> anyhow::Result<AppUpdateStatus> {
+    async fn previous_status(&mut self) -> anyhow::Result<RugixAppsStatus> {
         let property = self.hub.property(STATUS_PROPERTY).await?;
         self.status_version = property.as_ref().map(|property| property.version);
-        let empty = || AppUpdateStatus::new(Default::default());
+        let empty = || RugixAppsStatus::new(Default::default());
         let Some(property) = property else {
             return Ok(empty());
         };
@@ -729,9 +726,8 @@ impl Checker {
     }
 
     /// Describe Rugix Ctrl, logging failures instead of failing the check.
-    async fn runtime(&self) -> AppRuntime {
-        let version = self
-            .rugix
+    async fn rugix_ctrl_version(&self) -> Option<String> {
+        self.rugix
             .version()
             .await
             .inspect_err(|error| {
@@ -740,15 +736,14 @@ impl Checker {
                     "failed to determine the version of Rugix Ctrl"
                 );
             })
-            .ok();
-        AppRuntime::new("rugix".to_owned()).with_version(version.map(Into::into))
+            .ok()
     }
 
     /// Publish the status unless it changed since it was read.
     ///
     /// Fails with [`StatusConflict`] if it changed, unless this check changed
     /// the device. Then the status replaces the changed one.
-    async fn publish(&mut self, status: &AppUpdateStatus) -> anyhow::Result<()> {
+    async fn publish(&mut self, status: &RugixAppsStatus) -> anyhow::Result<()> {
         let write = match self
             .hub
             .set_property(STATUS_PROPERTY, status, self.status_version)
@@ -796,9 +791,9 @@ impl Checker {
 struct StatusConflict;
 
 /// Read the desired state from the configuration property.
-fn parse_config(property: Option<&DeviceProperty>) -> anyhow::Result<AppUpdateConfig> {
+fn parse_config(property: Option<&DeviceProperty>) -> anyhow::Result<RugixAppsConfig> {
     let Some(property) = property else {
-        return Ok(AppUpdateConfig::new());
+        return Ok(RugixAppsConfig::new());
     };
     let value = serde_json::to_value(&property.value)?;
     serde_json::from_value(value).context("invalid app configuration")
@@ -810,12 +805,12 @@ fn parse_config(property: Option<&DeviceProperty>) -> anyhow::Result<AppUpdateCo
 /// `gc_keep` is the number of previously active generations to keep if neither
 /// sets it.
 fn effective_app_config(
-    config: &AppUpdateConfig,
-    app: &ManagedAppConfig,
+    config: &RugixAppsConfig,
+    app: &RugixAppConfig,
     gc_keep: u32,
-) -> ManagedAppConfig {
+) -> RugixAppConfig {
     let mut app = app.clone();
-    app.state = Some(app.state.unwrap_or(AppDesiredState::Running));
+    app.state = Some(app.state.unwrap_or(RugixAppDesiredState::Running));
     app.hold = app.hold.or(config.hold);
     app.window = app.window.or_else(|| config.window.clone());
     app.retry = Some(retry_policy_with_defaults(
@@ -828,19 +823,19 @@ fn effective_app_config(
         .or(config.gc.as_ref())
         .and_then(|gc| gc.keep)
         .unwrap_or(gc_keep);
-    app.gc = Some(AppGcPolicy::new().with_keep(Some(keep)));
+    app.gc = Some(RugixAppGcPolicy::new().with_keep(Some(keep)));
     app
 }
 
 /// Whether the effective configuration of an app is unchanged.
-fn same_app_config(previous: Option<&ManagedAppConfig>, current: &ManagedAppConfig) -> bool {
+fn same_app_config(previous: Option<&RugixAppConfig>, current: &RugixAppConfig) -> bool {
     previous.is_some_and(|previous| {
         serde_json::to_value(previous).ok() == serde_json::to_value(current).ok()
     })
 }
 
 /// Filenames of the bundles to install for an app, in order of preference.
-fn bundle_filenames(app: &str, config: &ManagedAppConfig, arch: &str) -> Vec<String> {
+fn bundle_filenames(app: &str, config: &RugixAppConfig, arch: &str) -> Vec<String> {
     match config.asset.as_deref() {
         Some(asset) => vec![asset.replace("{arch}", arch)],
         None => vec![format!("{app}-{arch}.rugixb"), format!("{app}.rugixb")],
@@ -848,7 +843,7 @@ fn bundle_filenames(app: &str, config: &ManagedAppConfig, arch: &str) -> Vec<Str
 }
 
 /// Record what the device reports about an installed app.
-fn observed(app_status: AppStatus, info: &AppInfo) -> AppStatus {
+fn observed(app_status: RugixAppStatus, info: &AppInfo) -> RugixAppStatus {
     let generation = info.deployed_generation();
     app_status
         .with_generation(generation)
@@ -861,10 +856,10 @@ fn observed(app_status: AppStatus, info: &AppInfo) -> AppStatus {
 /// Defer switching a running app to a new version while its maintenance window
 /// is closed.
 fn window_deferral(
-    app_status: &AppStatus,
-    config: &ManagedAppConfig,
+    app_status: &RugixAppStatus,
+    config: &RugixAppConfig,
     runs: bool,
-) -> Option<AppStatus> {
+) -> Option<RugixAppStatus> {
     let window = config.window.as_ref().filter(|_| runs)?;
     match window_gate(window, TimeZone::system()) {
         WindowGate::Open => None,
@@ -885,24 +880,24 @@ fn window_deferral(
 }
 
 fn blocked(
-    app_status: AppStatus,
+    app_status: RugixAppStatus,
     code: &str,
     message: Option<String>,
     next_attempt_at: Option<Timestamp>,
-) -> AppStatus {
+) -> RugixAppStatus {
     app_status
-        .with_state(Some(AppUpdateState::Blocked))
+        .with_state(Some(RugixAppUpdateState::Blocked))
         .with_blocked(Some(
-            AppUpdateBlocked::new(code.to_owned()).with_message(message.map(Into::into)),
+            RugixAppUpdateBlocked::new(code.to_owned()).with_message(message.map(Into::into)),
         ))
         .with_next_attempt_at(next_attempt_at.map(Into::into))
 }
 
 /// Record a change that cannot proceed, for example because of an invalid path.
-fn failed(app_status: AppStatus, error: &anyhow::Error) -> AppStatus {
+fn failed(app_status: RugixAppStatus, error: &anyhow::Error) -> RugixAppStatus {
     let error = format!("{error:#}");
     warn!(%error, "app update failed");
     app_status
-        .with_state(Some(AppUpdateState::Failed))
+        .with_state(Some(RugixAppUpdateState::Failed))
         .with_last_error(Some(error.into()))
 }

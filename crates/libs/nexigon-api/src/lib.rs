@@ -252,6 +252,7 @@ macro_rules! with_actions {
             ("repositories_GetVersionDetails", GetPackageVersionDetails, repositories::GetPackageVersionDetailsAction, repositories::GetPackageVersionDetailsOutput),
             ("repositories_CreateVersion", CreatePackageVersion, repositories::CreatePackageVersionAction, repositories::CreatePackageVersionOutput),
             ("repositories_DeleteVersion", DeletePackageVersion, repositories::DeletePackageVersionAction, outputs::Empty),
+            ("repositories_SetVersionRelease", SetPackageVersionRelease, repositories::SetPackageVersionReleaseAction, outputs::Empty),
             ("repositories_SealVersion", SealPackageVersion, repositories::SealPackageVersionAction, outputs::Empty),
             ("repositories_SetPackageVersionRetention", SetPackageVersionRetention, repositories::SetPackageVersionRetentionAction, outputs::Empty),
             ("repositories_SetVersionDeletionSchedule", SetPackageVersionDeletionSchedule, repositories::SetPackageVersionDeletionScheduleAction, outputs::Empty),
@@ -281,12 +282,6 @@ macro_rules! with_actions {
             // # Audit Log
             ("repositories_QueryAuditLog", QueryRepositoryAuditLogEvents, repositories::QueryAuditLogEventsAction, repositories::QueryAuditLogEventsOutput),
 
-            // # Vulnerabilities
-            ("vulnerabilities_IndexVersion", IndexVersionDocuments, vulnerabilities::IndexVersionDocumentsAction, vulnerabilities::IndexVersionDocumentsOutput),
-            ("vulnerabilities_IndexPackage", IndexPackageDocuments, vulnerabilities::IndexPackageDocumentsAction, vulnerabilities::IndexPackageDocumentsOutput),
-            ("vulnerabilities_GetVersionOverview", GetVersionVulnerabilityOverview, vulnerabilities::GetVersionVulnerabilityOverviewAction, vulnerabilities::GetVersionVulnerabilityOverviewOutput),
-            ("vulnerabilities_QueryComponents", QueryPackageVersionComponents, vulnerabilities::QueryPackageVersionComponentsAction, vulnerabilities::QueryPackageVersionComponentsOutput),
-            ("vulnerabilities_QueryFindings", QueryPackageVersionFindings, vulnerabilities::QueryPackageVersionFindingsAction, vulnerabilities::QueryPackageVersionFindingsOutput),
 
             // # Audit Log
             ("audit_QueryAuditLogEvents", QueryAuditLogEvents, audit::QueryAuditLogEventsAction, audit::QueryAuditLogEventsOutput),

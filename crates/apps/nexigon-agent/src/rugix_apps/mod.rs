@@ -1,11 +1,11 @@
 //! App management through Rugix Apps.
 //!
-//! When enabled in the agent configuration, the agent implements the app update
-//! contract of Nexigon Hub: it converges the apps on the device toward the
-//! desired state in `dev.nexigon.apps.config` and reports their status in
-//! `dev.nexigon.apps.status`. `settings` reads the integration from the
+//! When enabled in the agent configuration, the agent implements the Rugix Apps
+//! integration with Nexigon Hub: it converges the apps on the device toward the
+//! desired state in `dev.nexigon.rugix-apps.config` and reports their status in
+//! `dev.nexigon.rugix-apps.status`. `settings` reads the integration from the
 //! configuration. `run` checks the apps periodically, when a scheduled attempt
-//! is due, and when the `nexigon.apps.check` command requests a check. Scheduled
+//! is due, and when the `nexigon.rugix-apps.check` command requests a check. Scheduled
 //! checks are delayed randomly, like the checks of system updates.
 //!
 //! The agent changes apps only while it holds the device lock that it shares
@@ -26,12 +26,11 @@ use tracing::info;
 use tracing::warn;
 
 use crate::config::Config;
-use crate::device_api::DeviceExecutor;
+use crate::hub_link::HubLink;
 use crate::reconcile::DEFAULT_CHECK_INTERVAL;
 use crate::reconcile::DEFAULT_CHECK_JITTER;
-use crate::reconcile::error_delay;
 use crate::reconcile::next_check_delay;
-use crate::reconcile::random_delay;
+use crate::reconcile::wait_for_check;
 
 mod check;
 mod rugix;
@@ -39,14 +38,14 @@ mod rugix;
 use check::Checker;
 
 /// Device command that requests an immediate check.
-pub(crate) const CHECK_COMMAND: &str = "nexigon.apps.check";
+pub(crate) const CHECK_COMMAND: &str = "nexigon.rugix-apps.check";
 /// Number of previously active generations that garbage collection keeps by
 /// default, like Rugix Ctrl.
 const DEFAULT_GC_KEEP: u32 = 1;
 
-/// App management settings from the agent configuration.
+/// Rugix Apps settings from the agent configuration.
 #[derive(Debug, Clone)]
-pub(crate) struct AppUpdates {
+pub(crate) struct RugixAppsSettings {
     /// Architecture that selects the bundles the device installs.
     arch: String,
     check_interval: Duration,
@@ -59,8 +58,8 @@ pub(crate) struct AppUpdates {
     gc_keep: u32,
 }
 
-/// Read the app management settings from the agent configuration, if enabled.
-pub(crate) fn settings(config: &Config) -> Option<AppUpdates> {
+/// Read the Rugix Apps settings from the agent configuration, if enabled.
+pub(crate) fn settings(config: &Config) -> Option<RugixAppsSettings> {
     let apps = config
         .integrations
         .as_ref()?
@@ -69,7 +68,7 @@ pub(crate) fn settings(config: &Config) -> Option<AppUpdates> {
         .apps
         .as_ref()
         .filter(|apps| apps.enabled == Some(true))?;
-    Some(AppUpdates {
+    Some(RugixAppsSettings {
         arch: apps
             .arch
             .as_deref()
@@ -96,10 +95,10 @@ pub(crate) fn settings(config: &Config) -> Option<AppUpdates> {
 /// immediate check. Other checks wait for a random delay of up to the configured
 /// jitter. `cancellation` stops the loop between checks and before changes of
 /// the device. A change in progress runs to completion, so the caller must
-/// await the loop.
+/// await the loop. A lost connection to Nexigon Hub interrupts neither.
 pub(crate) async fn run(
-    settings: AppUpdates,
-    executor: DeviceExecutor,
+    settings: RugixAppsSettings,
+    link: HubLink,
     device_id: DeviceId,
     device_lock: Arc<Mutex<()>>,
     check_requested: Arc<Notify>,
@@ -109,30 +108,31 @@ pub(crate) async fn run(
     let check_jitter = settings.check_jitter;
     let mut checker = Checker::new(
         settings,
-        executor,
+        link.executor(),
         device_id,
         device_lock,
         cancellation.clone(),
     );
     while !cancellation.is_cancelled() {
+        let sessions = link.sessions();
         // A panicking check must not end the integration or the agent.
         let delay = match AssertUnwindSafe(checker.check()).catch_unwind().await {
-            Ok(Ok(next_attempt_at)) => next_check_delay(next_attempt_at, check_interval),
+            Ok(Ok(next_attempt_at)) => Some(next_check_delay(next_attempt_at, check_interval)),
             Ok(Err(error)) => {
                 warn!(error = format!("{error:#}"), "app check failed");
-                error_delay(check_interval)
+                None
             }
             Err(payload) => {
                 let panic = crate::run::panic_message(payload);
                 error!(panic, "app check panicked");
-                error_delay(check_interval)
+                None
             }
         };
         tokio::select! {
             biased;
             () = cancellation.cancelled() => return Ok(()),
             () = check_requested.notified() => info!("app check requested"),
-            () = tokio::time::sleep(delay + random_delay(check_jitter)) => {}
+            () = wait_for_check(&link, sessions, delay, check_interval, check_jitter) => {}
         }
     }
     Ok(())

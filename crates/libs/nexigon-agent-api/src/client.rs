@@ -1,7 +1,8 @@
 //! Client for the agent local API Unix socket.
 //!
 //! Lets in-host code execute hub actions through the agent's existing
-//! connection instead of opening a fresh hub link of its own.
+//! connection instead of opening a fresh hub link of its own, and query the
+//! agent's status.
 
 use std::io;
 use std::path::Path;
@@ -23,6 +24,7 @@ use crate::VERSION;
 use crate::types::handshake::ClientHello;
 use crate::types::handshake::ServerError;
 use crate::types::handshake::ServerHello;
+use crate::types::status::AgentStatus;
 
 /// Connect to the agent's local API and request the `executor` endpoint.
 ///
@@ -31,20 +33,16 @@ use crate::types::handshake::ServerHello;
 pub async fn connect_local_executor(
     socket_path: &Path,
 ) -> Result<LocalExecutor, LocalConnectError> {
-    let mut stream = UnixStream::connect(socket_path).await?;
-    let hello = ClientHello {
-        version: VERSION,
-        endpoint: "executor".into(),
-        options: None,
-    };
-    write_hello(&mut stream, &hello).await?;
-    match read_hello(&mut stream).await? {
-        ServerHello::Ok(_) => {
-            let (rx, tx) = tokio::io::split(stream);
-            Ok(LocalExecutor { rx, tx })
-        }
-        ServerHello::Error(error) => Err(LocalConnectError::Rejected(error)),
-    }
+    let stream = connect(socket_path, "executor").await?;
+    let (rx, tx) = tokio::io::split(stream);
+    Ok(LocalExecutor { rx, tx })
+}
+
+/// Query the agent's status through its local API.
+pub async fn fetch_status(socket_path: &Path) -> Result<AgentStatus, LocalConnectError> {
+    let mut stream = connect(socket_path, "status").await?;
+    let body = read_message(&mut stream).await?;
+    serde_json::from_slice(&body).map_err(LocalConnectError::MalformedStatus)
 }
 
 /// Executor that runs hub actions over the agent local API.
@@ -76,7 +74,7 @@ impl Execute for LocalExecutor {
     }
 }
 
-/// Error establishing a [`LocalExecutor`] connection.
+/// Error connecting to an endpoint of the agent's local API.
 #[derive(Debug, Error)]
 pub enum LocalConnectError {
     /// I/O error on the underlying Unix socket.
@@ -90,8 +88,8 @@ pub enum LocalConnectError {
         /// Magic actually received.
         actual: [u8; 4],
     },
-    /// Server replied with a payload exceeding [`MAX_HANDSHAKE_LEN`].
-    #[error("server hello exceeds maximum size: {len} > {max}", max = MAX_HANDSHAKE_LEN)]
+    /// Server replied with a message exceeding [`MAX_HANDSHAKE_LEN`].
+    #[error("server message exceeds maximum size: {len} > {max}", max = MAX_HANDSHAKE_LEN)]
     HelloTooLarge {
         /// Length the server announced.
         len: u32,
@@ -99,9 +97,28 @@ pub enum LocalConnectError {
     /// Server hello could not be parsed as JSON.
     #[error("malformed server hello: {0}")]
     MalformedHello(#[source] serde_json::Error),
+    /// Agent status could not be parsed as JSON.
+    #[error("malformed agent status: {0}")]
+    MalformedStatus(#[source] serde_json::Error),
     /// Agent rejected the handshake (returned a [`ServerHello::Error`]).
     #[error("agent rejected handshake: {} ({:?})", _0.message, _0.code)]
     Rejected(ServerError),
+}
+
+/// Connect to the local API and complete the handshake for `endpoint`.
+async fn connect(socket_path: &Path, endpoint: &str) -> Result<UnixStream, LocalConnectError> {
+    let mut stream = UnixStream::connect(socket_path).await?;
+    let hello = ClientHello {
+        version: VERSION,
+        endpoint: endpoint.into(),
+        options: None,
+    };
+    write_hello(&mut stream, &hello).await?;
+    let body = read_message(&mut stream).await?;
+    match serde_json::from_slice(&body).map_err(LocalConnectError::MalformedHello)? {
+        ServerHello::Ok(_) => Ok(stream),
+        ServerHello::Error(error) => Err(LocalConnectError::Rejected(error)),
+    }
 }
 
 async fn write_hello(stream: &mut UnixStream, hello: &ClientHello) -> io::Result<()> {
@@ -113,7 +130,8 @@ async fn write_hello(stream: &mut UnixStream, hello: &ClientHello) -> io::Result
     Ok(())
 }
 
-async fn read_hello(stream: &mut UnixStream) -> Result<ServerHello, LocalConnectError> {
+/// Read the JSON payload of one framed message.
+async fn read_message(stream: &mut UnixStream) -> Result<Vec<u8>, LocalConnectError> {
     let mut magic = [0u8; 4];
     stream.read_exact(&mut magic).await?;
     if magic != MAGIC {
@@ -130,5 +148,5 @@ async fn read_hello(stream: &mut UnixStream) -> Result<ServerHello, LocalConnect
     }
     let mut body = vec![0u8; len as usize];
     stream.read_exact(&mut body).await?;
-    serde_json::from_slice(&body).map_err(LocalConnectError::MalformedHello)
+    Ok(body)
 }

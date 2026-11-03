@@ -485,6 +485,8 @@ define_types! {
     PackageId => (FlatRawId, "pkg", 22, secret = false),
     /// Package version id (globally unique).
     PackageVersionId => (FlatRawId, "pkg_v", 22, secret = false),
+    /// VEX document import id (globally unique).
+    VexImportId => (FlatRawId, "vex_import", 22, secret = false),
 
     /// Fleet operation id (globally unique).
     FleetOperationId => (FlatRawId, "flt_op", 22, secret = false),

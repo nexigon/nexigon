@@ -103,6 +103,9 @@ record GetDeviceDetailsOutput {
     name?: string,
     /// Indicates whether the device is online.
     is_connected: bool,
+    /// Time when the device last disconnected, or when it was created if it never
+    /// connected. Unlike the connection log, it survives log retention.
+    last_seen?: Timestamp,
     /// Certificates of the device.
     certificates: [DeviceCertificate],
     /// Connections of the device.
@@ -475,6 +478,12 @@ record ValidateDeviceHttpProxyTokenSuccess {
 /// Nexigon Hub stores events as a history of device behavior. Each event has an ID
 /// that is unique per device. An event published again with the same ID is not
 /// stored again, so publishing can safely be retried.
+///
+/// Nexigon Hub may limit the number of events that a device can store per day and
+/// per billing period. If storing the new events of a batch would exceed a limit,
+/// Nexigon Hub rejects the whole batch with a `RateLimited` error that states when
+/// to retry. A batch with more new events than a limit allows fails with an
+/// `Invalid` error. Events with an already stored ID do not count toward the limits.
 #[group(name = "device")]
 #[request(name = "devices_PublishEvents", response = Empty)]
 record PublishDeviceEventsAction {

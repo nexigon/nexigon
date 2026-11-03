@@ -1,5 +1,11 @@
 //! Nexigon Agent library.
 //!
+//! [`run`] runs the agent until it is shut down. When the connection to Nexigon
+//! Hub is lost or cannot be established, the agent reconnects with exponential
+//! backoff and random jitter, configured in the `[connection]` section.
+//! Interactive sessions such as terminals end with the connection, while the
+//! integrations below and the local API keep running.
+//!
 //! In addition to telemetry, provisioning, and interactive remote commands, the agent
 //! polls the Hub for asynchronous device-operation **command** steps. Before dispatching
 //! a command it records the attempt in a durable local ledger. A completed result is
@@ -13,8 +19,8 @@
 //! with [`run_with_connection`] may provide their own [`system_updates::SystemUpdater`].
 //!
 //! With app management enabled, the agent installs, updates, and removes apps with
-//! Rugix Apps. It reconciles the desired state in `dev.nexigon.apps.config` and reports
-//! the apps' status in `dev.nexigon.apps.status`.
+//! Rugix Apps. It reconciles the desired state in `dev.nexigon.rugix-apps.config` and
+//! reports the apps' status in `dev.nexigon.rugix-apps.status`.
 
 use std::future::Future;
 use std::io::ErrorKind;
@@ -29,6 +35,7 @@ use jiff::Timestamp;
 use nexigon_agent_protocol::AGENT_HELLO_VERSION;
 use nexigon_agent_protocol::AgentHello;
 use nexigon_agent_protocol::encode_agent_hello;
+use nexigon_client::ClientBuilder;
 use nexigon_client::ClientIdentity;
 use nexigon_client::ClientToken;
 use nexigon_client::WebsocketConnection;
@@ -44,15 +51,18 @@ use tracing::info;
 
 pub use nexigon_client::install_crypto_provider;
 
-mod apps;
 pub mod config;
 pub mod device_api;
 pub mod handlers;
+mod hub_link;
 #[cfg(unix)]
-pub mod local_api;
+mod local_api;
 mod operation_ledger;
+mod operations;
 pub mod provisioning;
 mod reconcile;
+mod reconnect;
+mod rugix_apps;
 pub mod system_info;
 pub mod system_updates;
 #[cfg(target_os = "linux")]
@@ -66,6 +76,9 @@ pub use run::run_with_connection;
 
 use crate::config::Config;
 use crate::config::MultiplexSettings;
+use crate::reconnect::Reconnector;
+use crate::reconnect::reconnect_settings;
+use crate::run::Connections;
 
 /// Default directory for persistent agent data.
 pub const DEFAULT_DATA_PATH: &str = "/var/lib/nexigon/agent";
@@ -184,6 +197,19 @@ async fn connect_with_identity(
     identity: DeviceIdentity,
     register_connection: bool,
 ) -> anyhow::Result<WebsocketConnection> {
+    client_builder(config, credentials, identity, register_connection)?
+        .connect()
+        .await
+        .context("cannot connect to Nexigon Hub")
+}
+
+/// Build the client that connects the device to Nexigon Hub.
+fn client_builder(
+    config: &Config,
+    credentials: &ResolvedCredentials,
+    identity: DeviceIdentity,
+    register_connection: bool,
+) -> anyhow::Result<ClientBuilder> {
     let multiplex_settings =
         crate::config::multiplex_settings(config).context("invalid multiplex configuration")?;
     let connection_limits = hub_connection_limits(multiplex_settings);
@@ -198,7 +224,7 @@ async fn connect_with_identity(
         multiplex_settings.max_channel_requests_per_second,
     ))
     .context("cannot encode Agent connection metadata")?;
-    let connection = nexigon_client::ClientBuilder::new(
+    let builder = ClientBuilder::new(
         credentials
             .hub_url
             .parse()
@@ -215,11 +241,8 @@ async fn connect_with_identity(
         config
             .dangerous_accept_invalid_certificates
             .unwrap_or(false),
-    )
-    .connect()
-    .await
-    .context("cannot connect to Nexigon Hub")?;
-    Ok(connection)
+    );
+    Ok(builder)
 }
 
 /// Build multiplex limits that can absorb the configured channel burst.
@@ -420,6 +443,7 @@ pub(crate) async fn run_agent(
 
     let result = async {
         let (config, config_dir) = load_config(&config_path).await?;
+        let reconnect = reconnect_settings(&config).context("invalid connection configuration")?;
         let (credentials, identity) = match resolve_credentials(&config, &config_dir).await? {
             Some(credentials) => {
                 let identity = load_device_identity(&config, &config_dir).await?;
@@ -443,20 +467,14 @@ pub(crate) async fn run_agent(
                 (credentials.resolved(), identity)
             }
         };
-        // Network connection setup is cancellation-safe. Identity loading is deliberately
-        // completed before this race because the fingerprint subprocess does not yet have the
-        // bounded/cancellation-aware contract tracked by P1-12.
-        let connection = tokio::select! {
-            biased;
-            () = shutdown_signal(shutdown_rx.clone()) => return Ok(()),
-            connection = connect_with_identity(&config, &credentials, identity, true) => connection?,
-        };
-        // Once connected, run_with_connection owns cooperative cancellation and awaited task
-        // cleanup. Do not race and drop the whole session from this outer layer.
-        run_with_connection(
+        // Identity loading is deliberately completed before connecting because the
+        // fingerprint subprocess does not yet have the bounded/cancellation-aware contract
+        // tracked by P1-12. The agent owns cooperative cancellation from here on.
+        let client = client_builder(&config, &credentials, identity, true)?;
+        run::run_sessions(
             config,
             &config_dir,
-            connection,
+            Connections::Reconnecting(Reconnector::new(client, reconnect)),
             shutdown_signal(shutdown_rx.clone()),
             RunOptions {
                 ready,
@@ -478,8 +496,8 @@ pub(crate) async fn run_agent(
 
 /// Handle for an agent running in the background.
 ///
-/// Returned by [`spawn`]. The agent runs until either [`AgentHandle::stop`]
-/// is called or the connection to the hub is lost.
+/// Returned by [`spawn`]. The agent runs until [`AgentHandle::stop`] is called
+/// and reconnects whenever the connection to the hub is lost.
 pub struct AgentHandle {
     /// Resolves to the device id once the agent has registered with the hub.
     pub ready: oneshot::Receiver<DeviceId>,

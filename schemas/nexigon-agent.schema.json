@@ -40,6 +40,9 @@
     "forwarding": {
       "$ref": "#/$defs/nexigon_agent.config.ForwardingConfig"
     },
+    "connection": {
+      "$ref": "#/$defs/nexigon_agent.config.ConnectionConfig"
+    },
     "multiplex": {
       "$ref": "#/$defs/nexigon_agent.config.MultiplexConfig"
     },
@@ -76,6 +79,26 @@
         },
         "directory": {
           "$ref": "#/$defs/nexigon_agent.config.PathBuf"
+        }
+      },
+      "required": [],
+      "unevaluatedProperties": false
+    },
+    "nexigon_agent.config.ConnectionConfig": {
+      "type": "object",
+      "description": "Connection to Nexigon Hub.",
+      "properties": {
+        "connect-timeout-secs": {
+          "type": [
+            "integer",
+            "string"
+          ],
+          "format": "uint64",
+          "minimum": 0,
+          "pattern": "^[0-9]+$"
+        },
+        "reconnect": {
+          "$ref": "#/$defs/nexigon_agent.config.ReconnectConfig"
         }
       },
       "required": [],
@@ -281,9 +304,44 @@
       "required": [],
       "unevaluatedProperties": false
     },
+    "nexigon_agent.config.ReconnectConfig": {
+      "type": "object",
+      "description": "Reconnection after the connection is lost or cannot be established.\n\nThe agent connects right away when it starts. Before each later attempt, it\nwaits for a random delay between zero and an upper bound. The bound starts\nat `initial-delay-secs` and doubles after each failed attempt, up to\n`max-delay-secs`. The random delay spreads the attempts of devices that lost\ntheir connections at the same time, for example when Nexigon Hub restarts.\nIf Nexigon Hub asks the agent to retry later, the agent waits at least that\nlong, up to `max-delay-secs`, plus the random delay.",
+      "properties": {
+        "initial-delay-secs": {
+          "type": [
+            "integer",
+            "string"
+          ],
+          "format": "uint64",
+          "minimum": 0,
+          "pattern": "^[0-9]+$"
+        },
+        "max-delay-secs": {
+          "type": [
+            "integer",
+            "string"
+          ],
+          "format": "uint64",
+          "minimum": 0,
+          "pattern": "^[0-9]+$"
+        },
+        "stable-after-secs": {
+          "type": [
+            "integer",
+            "string"
+          ],
+          "format": "uint64",
+          "minimum": 0,
+          "pattern": "^[0-9]+$"
+        }
+      },
+      "required": [],
+      "unevaluatedProperties": false
+    },
     "nexigon_agent.config.RugixAppsConfig": {
       "type": "object",
-      "description": "App management with Rugix Apps.\n\nImplements the app update contract of Nexigon Hub: the agent converges the\napps on the device toward the desired state in `dev.nexigon.apps.config` and\nreports their status in `dev.nexigon.apps.status`. Requires a Rugix Ctrl\nversion that supports `rugix-ctrl apps install --origin`.",
+      "description": "Nexigon integration with Rugix Apps.\n\nThe agent converges the\napps on the device toward the desired state in `dev.nexigon.rugix-apps.config` and\nreports their status in `dev.nexigon.rugix-apps.status`. Requires a Rugix Ctrl\nversion that supports `rugix-ctrl apps install --origin`.",
       "properties": {
         "enabled": {
           "type": "boolean"

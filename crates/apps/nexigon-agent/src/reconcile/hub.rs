@@ -26,6 +26,7 @@ use nexigon_api::types::repositories::PackageVersionId;
 use nexigon_api::types::repositories::RepositoryAssetStatus;
 use nexigon_api::types::repositories::ResolvePackageVersionByPathAction;
 use nexigon_api::types::repositories::ResolvePackageVersionByPathOutput;
+use nexigon_client::Execute;
 use nexigon_ids::Generate;
 use nexigon_ids::ids::DeviceEventId;
 use nexigon_ids::ids::DeviceId;
@@ -35,10 +36,11 @@ use serde::de::DeserializeOwned;
 use tracing::warn;
 
 use crate::device_api::DeviceExecutor;
+use crate::hub_link::LinkExecutor;
 
 /// Nexigon Hub as seen by one device.
-pub(crate) struct Hub {
-    executor: DeviceExecutor,
+pub(crate) struct Hub<E = LinkExecutor> {
+    executor: DeviceExecutor<E>,
     device_id: DeviceId,
     /// Package versions fetched since the cache was last cleared.
     details: HashMap<PackageVersionId, GetPackageVersionDetailsOutput>,
@@ -53,8 +55,8 @@ pub(crate) enum PropertyWrite {
     Conflict,
 }
 
-impl Hub {
-    pub(crate) fn new(executor: DeviceExecutor, device_id: DeviceId) -> Self {
+impl<E: Execute> Hub<E> {
+    pub(crate) fn new(executor: DeviceExecutor<E>, device_id: DeviceId) -> Self {
         Self {
             executor,
             device_id,
@@ -109,7 +111,9 @@ impl Hub {
         }
     }
 
-    /// Resolve a version path, or return `None` if it does not exist.
+    /// Resolve a version path, or return `None` if it is invalid or does not exist.
+    ///
+    /// Nexigon Hub errors propagate so callers can retry the check.
     pub(crate) async fn resolve(
         &mut self,
         path: &VersionPath,
@@ -119,15 +123,14 @@ impl Hub {
             path.package.clone(),
             path.version.clone(),
         );
-        // Version strings that are not valid tags cannot resolve. The future is
-        // boxed for the reason given at `call`.
-        match Box::pin(self.executor.execute(action))
-            .await
-            .context("failed to reach Nexigon Hub")?
-        {
-            Ok(ResolvePackageVersionByPathOutput::Found(found)) => Ok(Some(found.version_id)),
-            Ok(ResolvePackageVersionByPathOutput::NotFound) | Err(_) => Ok(None),
+        // Image versions need not be valid repository tags.
+        if sidex::validation::validate(&action).is_err() {
+            return Ok(None);
         }
+        Ok(match call(&mut self.executor, action).await? {
+            ResolvePackageVersionByPathOutput::Found(found) => Some(found.version_id),
+            ResolvePackageVersionByPathOutput::NotFound => None,
+        })
     }
 
     pub(crate) async fn version_details(
@@ -269,11 +272,86 @@ struct RugixAssetMetadata {
 /// Action futures are large. Boxing them keeps the futures of checks small,
 /// which would otherwise overflow the stack of unoptimized builds.
 async fn call<A: Action + DeviceGroupMarker>(
-    executor: &mut DeviceExecutor,
+    executor: &mut DeviceExecutor<impl Execute>,
     action: A,
 ) -> anyhow::Result<A::Output> {
     Box::pin(executor.execute(action))
         .await
         .context("failed to reach Nexigon Hub")?
         .map_err(|error| anyhow!("Nexigon Hub rejected the request: {}", error.message))
+}
+
+#[cfg(test)]
+mod tests {
+    use std::any::Any;
+    use std::collections::VecDeque;
+
+    use nexigon_api::types::errors::ActionError;
+    use nexigon_api::types::errors::ActionErrorKind;
+    use nexigon_api::types::repositories::ResolvePackageVersionByPathSuccess;
+    use nexigon_ids::ids::PackageId;
+    use nexigon_ids::ids::RepositoryId;
+    use nexigon_rpc::ExecuteError;
+
+    use super::*;
+
+    /// Rejected lookups remain errors, and a later successful lookup can recover.
+    #[tokio::test]
+    async fn resolution_errors_are_not_missing_versions() {
+        let version_id = PackageVersionId::generate();
+        let found =
+            ResolvePackageVersionByPathOutput::Found(ResolvePackageVersionByPathSuccess::new(
+                RepositoryId::generate(),
+                PackageId::generate(),
+                version_id.clone(),
+            ));
+        let mut responses = VecDeque::new();
+        for kind in [
+            ActionErrorKind::Unavailable,
+            ActionErrorKind::RateLimited,
+            ActionErrorKind::Internal,
+            ActionErrorKind::Forbidden,
+        ] {
+            responses.push_back(Err(ActionError::new(kind, "lookup rejected".to_owned())));
+        }
+        responses.push_back(Ok(ResolvePackageVersionByPathOutput::NotFound));
+        responses.push_back(Ok(found));
+        let executor = DeviceExecutor::new(ResolutionExecutor(responses));
+        let mut hub = Hub::new(executor, DeviceId::generate());
+        let path = VersionPath::parse("repository/package/stable").unwrap();
+        for _ in 0..4 {
+            let error = hub.resolve(&path).await.unwrap_err();
+            assert!(error.to_string().contains("lookup rejected"));
+        }
+        assert!(hub.resolve(&path).await.unwrap().is_none());
+        assert_eq!(hub.resolve(&path).await.unwrap(), Some(version_id));
+    }
+
+    /// An image version that cannot be a tag needs no request to Nexigon Hub.
+    #[tokio::test]
+    async fn invalid_image_version_does_not_resolve() {
+        let executor = DeviceExecutor::new(ResolutionExecutor(VecDeque::new()));
+        let mut hub = Hub::new(executor, DeviceId::generate());
+        let path = VersionPath::parse("repository/package/image version").unwrap();
+        assert!(hub.resolve(&path).await.unwrap().is_none());
+    }
+
+    struct ResolutionExecutor(VecDeque<Result<ResolvePackageVersionByPathOutput, ActionError>>);
+
+    impl Execute for ResolutionExecutor {
+        async fn execute<A: Action>(
+            &mut self,
+            _action: A,
+        ) -> Result<Result<A::Output, ActionError>, ExecuteError> {
+            assert_eq!(A::NAME, ResolvePackageVersionByPathAction::NAME);
+            Ok(self
+                .0
+                .pop_front()
+                .expect("unexpected lookup")
+                .map(|output| {
+                    let output: Box<dyn Any> = Box::new(output);
+                    *output.downcast::<A::Output>().unwrap()
+                }))
+        }
+    }
 }

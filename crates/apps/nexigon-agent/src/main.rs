@@ -15,9 +15,15 @@ use nexigon_agent::install_crypto_provider;
 #[cfg(unix)]
 use nexigon_agent_api::DEFAULT_SOCKET_PATH;
 #[cfg(unix)]
+use nexigon_agent_api::client::LocalConnectError;
+#[cfg(unix)]
 use nexigon_agent_api::client::LocalExecutor;
 #[cfg(unix)]
 use nexigon_agent_api::client::connect_local_executor;
+#[cfg(unix)]
+use nexigon_agent_api::client::fetch_status;
+#[cfg(unix)]
+use nexigon_agent_api::types::handshake::ServerErrorCode;
 use nexigon_api::Action;
 use nexigon_api::types::actor::Actor;
 use nexigon_api::types::actor::GetActorAction;
@@ -66,6 +72,14 @@ async fn main() -> anyhow::Result<()> {
             })
             .await?;
         }
+        #[cfg(unix)]
+        Cmd::Status => {
+            let socket_path = local_api_socket_path(&config_path).await;
+            let status = fetch_status(&socket_path)
+                .await
+                .with_context(|| format!("cannot query the agent at {}", socket_path.display()))?;
+            println!("{}", serde_json::to_string(&status).unwrap());
+        }
         Cmd::Device(cmd) => {
             let mut session = OneShot::open(&config_path).await?;
             run_device_cmd(&mut session.executor, &session.actor, cmd).await?;
@@ -88,7 +102,9 @@ async fn main() -> anyhow::Result<()> {
 ///
 /// Resolves the device actor and an executor that targets either the
 /// agent's local API socket (preferred — reuses the agent's existing
-/// hub connection) or a fresh hub link as a fallback.
+/// hub connection) or a fresh hub link as a fallback if the agent is not
+/// running. If the agent runs but is not connected, the command fails rather
+/// than adding a connection of its own while Nexigon Hub is unreachable.
 struct OneShot {
     executor: DeviceExecutor<OneShotExecutor>,
     actor: nexigon_api::types::actor::DeviceActor,
@@ -98,8 +114,8 @@ struct OneShot {
 impl OneShot {
     #[cfg(unix)]
     async fn open(config_path: &Path) -> anyhow::Result<Self> {
-        let socket_path = Path::new(DEFAULT_SOCKET_PATH);
-        match connect_local_executor(socket_path).await {
+        let socket_path = local_api_socket_path(config_path).await;
+        match connect_local_executor(&socket_path).await {
             Ok(executor) => {
                 debug!(?socket_path, "connected to agent local API");
                 let mut executor = DeviceExecutor::new(OneShotExecutor::Local(executor));
@@ -109,6 +125,11 @@ impl OneShot {
                     actor,
                     _connection_task: None,
                 })
+            }
+            Err(LocalConnectError::Rejected(error))
+                if matches!(error.code, ServerErrorCode::HubUnavailable) =>
+            {
+                bail!("the agent cannot reach Nexigon Hub: {}", error.message);
             }
             Err(e) => {
                 warn!(
@@ -161,6 +182,25 @@ impl Execute for OneShotExecutor {
             OneShotExecutor::Remote(executor) => executor.execute(action).await,
         }
     }
+}
+
+/// Path of the local API socket in the agent configuration.
+///
+/// Falls back to the default path if the configuration cannot be read, for
+/// example by a user who may access the socket but not the configuration.
+#[cfg(unix)]
+async fn local_api_socket_path(config_path: &Path) -> PathBuf {
+    match nexigon_agent::load_config(config_path).await {
+        Ok((config, _)) => config
+            .local_api
+            .as_ref()
+            .and_then(|local_api| local_api.socket_path.clone()),
+        Err(error) => {
+            debug!(?error, "cannot read the agent configuration");
+            None
+        }
+    }
+    .unwrap_or_else(|| PathBuf::from(DEFAULT_SOCKET_PATH))
 }
 
 async fn resolve_device_actor(
@@ -295,6 +335,9 @@ pub struct Args {
 enum Cmd {
     /// Run the agent.
     Run,
+    /// Print the status of the running agent as JSON.
+    #[cfg(unix)]
+    Status,
     /// Device subcommand.
     #[clap(subcommand)]
     Device(DeviceCmd),
