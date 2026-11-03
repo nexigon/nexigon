@@ -880,6 +880,8 @@ record QueryPackageVersionsAction {
 
 /// Conditions on package versions.
 record PackageVersionFilter {
+    /// Only return versions with this release status.
+    release?: bool,
     /// Case-insensitive substring of the version's name, ID, or one of its tags.
     search?: string,
 }
@@ -904,6 +906,8 @@ record QueryPackageVersionsItem {
     delete_at?: Timestamp,
     /// Sealed versions reject content changes and all deletion. Absent on older Hub versions.
     sealed?: bool,
+    /// Releases are retained indefinitely. Independent of sealing. Absent on older Hub versions.
+    release?: bool,
     /// Tags of the package version.
     tags: [PackageVersionTag],
     /// Version that a device must run before installing this version.
@@ -1130,6 +1134,8 @@ record GetPackageVersionDetailsOutput {
     delete_at?: Timestamp,
     /// Sealed versions reject content changes and all deletion. Absent on older Hub versions.
     sealed?: bool,
+    /// Releases are retained indefinitely. Independent of sealing. Absent on older Hub versions.
+    release?: bool,
     /// Version that a device must run before installing this version.
     base_version_id?: PackageVersionId,
     /// Timestamp when the package version was created. Absent on older Hub versions.
@@ -1572,18 +1578,18 @@ record DeleteRepositoryS3ConfigAction {
     repository_id: RepositoryId,
 }
 
-/// Opt-in retention of unsealed versions, evaluated per package by creation time.
+/// Opt-in retention of versions that are neither sealed nor releases, evaluated per package by creation time.
 /// Either exceeded limit makes a version eligible for deletion, including existing versions.
-/// Retention skips versions that are the base of another version.
+/// Retention skips sealed versions, releases, and versions that are the base of another version.
 record PackageVersionRetention {
     enabled: bool,
-    /// Maximum number of newest unsealed versions to keep. Sealed versions do not count.
+    /// Maximum number of newest eligible versions to keep. Protected versions do not count.
     #[validate(
         { 1 <= _ <= 2147483647 },
         message = "Version count must be a positive integer."
     )]
     max_versions?: u32,
-    /// Maximum age in fixed 24-hour days. This can expire every unsealed version.
+    /// Maximum age in fixed 24-hour days. This can expire every eligible version.
     #[validate(
         { 1 <= _ <= 2147483647 },
         message = "Maximum age must be a positive number of days."
@@ -1606,4 +1612,14 @@ record SetPackageVersionRetentionAction {
 #[request(name = "repositories_SealVersion", response = Empty)]
 record SealPackageVersionAction {
     version_id: PackageVersionId,
+}
+
+/// Set or remove release status. Requires permission to manage versions.
+/// Releases are retained indefinitely and block deletion of their package or repository.
+/// Marking a release cancels scheduled deletion. Removing the marker does not restore it.
+/// Release status does not seal contents and can also change on sealed versions.
+#[request(name = "repositories_SetVersionRelease", response = Empty)]
+record SetPackageVersionReleaseAction {
+    version_id: PackageVersionId,
+    release: bool,
 }

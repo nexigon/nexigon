@@ -2,6 +2,7 @@
 
 use std::future::Future;
 use std::sync::Arc;
+use std::time::Duration;
 
 use bytes::Bytes;
 use futures::Stream;
@@ -15,6 +16,7 @@ use thiserror::Error;
 use tokio::net::TcpStream;
 use tokio_tungstenite::MaybeTlsStream;
 use tokio_tungstenite::tungstenite::client::IntoClientRequest;
+use tokio_tungstenite::tungstenite::http::header::RETRY_AFTER;
 use tracing::debug;
 use tracing::error;
 use tracing::info;
@@ -582,6 +584,23 @@ pub enum ClientError {
     /// Action error.
     #[error("action error: {}", _0.message)]
     ActionError(ActionError),
+}
+
+impl ClientError {
+    /// Time the server asked the client to wait before connecting again.
+    ///
+    /// Read from the `Retry-After` header of a rejected WebSocket handshake.
+    /// Only the delay-seconds form of the header is supported.
+    pub fn retry_after(&self) -> Option<Duration> {
+        let Self::Ws(error) = self else {
+            return None;
+        };
+        let tokio_tungstenite::tungstenite::Error::Http(response) = error.as_ref() else {
+            return None;
+        };
+        let value = response.headers().get(RETRY_AFTER)?.to_str().ok()?;
+        value.trim().parse().ok().map(Duration::from_secs)
+    }
 }
 
 impl From<tokio_tungstenite::tungstenite::Error> for ClientError {
@@ -1159,6 +1178,36 @@ mod tests {
         assert!(request.device_fingerprint.is_empty());
         assert!(request.client_certificate.is_empty());
         drop(connection);
+        server.await.unwrap();
+    }
+
+    /// A rejected handshake exposes the delay that the server requested.
+    #[tokio::test]
+    // The callback error type is fixed by tungstenite's handshake API.
+    #[allow(clippy::result_large_err)]
+    async fn rejected_handshake_reports_retry_after() {
+        let listener = TcpListener::bind("127.0.0.1:0").await.unwrap();
+        let address = listener.local_addr().unwrap();
+        let server = tokio::spawn(async move {
+            let (stream, _) = listener.accept().await.unwrap();
+            let _ = accept_hdr_async(stream, |_: &Request, _: Response| {
+                Err(tokio_tungstenite::tungstenite::http::Response::builder()
+                    .status(429)
+                    .header("Retry-After", "7")
+                    .body(None)
+                    .unwrap())
+            })
+            .await;
+        });
+        let error = builder(
+            Url::parse(&format!("http://{address}")).unwrap(),
+            UserToken::generate(),
+        )
+        .dangerous_with_allow_plaintext(true)
+        .connect()
+        .await
+        .unwrap_err();
+        assert_eq!(error.retry_after(), Some(std::time::Duration::from_secs(7)));
         server.await.unwrap();
     }
 

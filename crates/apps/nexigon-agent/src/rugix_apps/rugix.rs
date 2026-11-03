@@ -8,10 +8,10 @@ use std::collections::BTreeMap;
 
 use anyhow::Context;
 use jiff::Timestamp;
-use nexigon_api::types::properties::AppWorkloadMessage;
-use nexigon_api::types::properties::AppWorkloadStatus;
 use nexigon_api::types::repositories::PackageVersionAsset;
 use nexigon_api::types::repositories::PackageVersionId;
+use nexigon_api::types::rugix_apps::RugixAppWorkloadMessage;
+use nexigon_api::types::rugix_apps::RugixAppWorkloadStatus;
 use serde::Deserialize;
 use serde::Serialize;
 use serde::de::IgnoredAny;
@@ -176,17 +176,17 @@ impl AppInfo {
     }
 
     /// Live status of the app's workload.
-    pub(crate) fn workload(&self) -> AppWorkloadStatus {
+    pub(crate) fn workload(&self) -> RugixAppWorkloadStatus {
         match &self.status {
-            RugixWorkloadStatus::Running => AppWorkloadStatus::Running,
+            RugixWorkloadStatus::Running => RugixAppWorkloadStatus::Running,
             RugixWorkloadStatus::Unhealthy { message } => {
-                AppWorkloadStatus::Unhealthy(AppWorkloadMessage::new(message.clone()))
+                RugixAppWorkloadStatus::Unhealthy(RugixAppWorkloadMessage::new(message.clone()))
             }
-            RugixWorkloadStatus::Stopped => AppWorkloadStatus::Stopped,
+            RugixWorkloadStatus::Stopped => RugixAppWorkloadStatus::Stopped,
             RugixWorkloadStatus::Failed { message } => {
-                AppWorkloadStatus::Failed(AppWorkloadMessage::new(message.clone()))
+                RugixAppWorkloadStatus::Failed(RugixAppWorkloadMessage::new(message.clone()))
             }
-            RugixWorkloadStatus::Unknown => AppWorkloadStatus::Unknown,
+            RugixWorkloadStatus::Unknown => RugixAppWorkloadStatus::Unknown,
         }
     }
 }
@@ -298,7 +298,7 @@ mod tests {
         assert_eq!(active.generation_of(&version("c")), None);
         assert_eq!(active.version_of(2), Some(&version("b")));
         assert_eq!(active.version_of(3), None);
-        assert!(matches!(active.workload(), AppWorkloadStatus::Stopped));
+        assert!(matches!(active.workload(), RugixAppWorkloadStatus::Stopped));
 
         let inactive = info(r#"{"state":"inactive"}"#);
         assert_eq!(inactive.active_generation(), None);

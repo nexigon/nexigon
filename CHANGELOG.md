@@ -2,6 +2,30 @@
 
 ## Unreleased
 
+- Preserve system update status when a repository lookup is rejected
+  by Nexigon Hub, for example because execution capacity is exhausted. Retry
+  the check instead of treating the version as missing.
+
+- Remove the unstable `vulnerabilities_*` actions from the API. Nexigon Hub now
+  indexes SBOMs linked through `relations.sbom` automatically and manages
+  vulnerabilities in its web interface. `relations.vdr` and `relations.vex`
+  are no longer indexed; import VEX documents for a package instead.
+- Reconnect the Agent to Nexigon Hub when the connection is lost or cannot be
+  established, instead of exiting. Before each attempt after the first, the
+  Agent waits for a random delay of up to 30 seconds, doubling after each
+  failed attempt up to 10 minutes. A `Retry-After` header of Nexigon Hub
+  extends the delay by up to 10 minutes. Configure the delays and the connect
+  timeout in the new `[connection]` section. Terminals, TCP forwarding, and
+  command handler channels end with the connection. The system update and app
+  integrations, operation polling, and the local API keep running, and a
+  command step of an operation keeps running through a lost connection.
+- Add `nexigon-agent status`, which prints the connection state and device ID
+  of the running Agent as JSON, and the `status` endpoint of the local API.
+  While the Agent is not connected, the local API rejects the `executor`
+  endpoint with the new `HubUnavailable` error code, and the Agent's
+  `device`, `events`, and `repositories` commands fail instead of connecting
+  to Nexigon Hub on their own. The commands use the socket path from
+  `[local-api]` in the configuration.
 - Add `nexigon auth status` to verify authentication and print the authenticated
   user or organization and token ID as JSON.
 - Require `--organization <org-id>` for resource commands with a user token.
@@ -25,16 +49,16 @@
   publishes the status with compare-and-swap. If the status changed during a
   check, for example because the failure count was cleared in Nexigon Hub, the
   check starts over from the changed status.
-- Add app management with Rugix Apps, enabled with `[integrations.rugix.apps]`.
+- Add the Rugix Apps integration, enabled with `[integrations.rugix.apps]`.
   The Agent installs, updates, stops, and removes the apps listed in
-  `dev.nexigon.apps.config` and reports the status of all apps in
-  `dev.nexigon.apps.status`. It installs the bundle for the device's
+  `dev.nexigon.rugix-apps.config` and reports the status of all apps in
+  `dev.nexigon.rugix-apps.status`. It installs the bundle for the device's
   architecture, `<app>-<arch>.rugixb` by default, and supports holds,
   maintenance windows, spreads, and retries. Outside a maintenance window, it
   installs new versions without activating them. After an update, it removes
   old versions except for the number of previously running versions that the
   `gc` policy or `gc.keep` in the integration configuration keeps, 1 by
-  default. With commands enabled, the `nexigon.apps.check` command starts an
+  default. With commands enabled, the `nexigon.rugix-apps.check` command starts an
   immediate check. The integration requires a Rugix Ctrl version that supports
   `rugix-ctrl apps install --origin`. System updates and app changes do not run
   at the same time.

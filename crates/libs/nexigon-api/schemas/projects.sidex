@@ -502,6 +502,8 @@ record QueryAuditLogEventsOutput {
 }
 
 /// Add a repository to the project.
+///
+/// The repository must belong to the project's organization.
 #[request(name = "projects_LinkRepository", response = Empty)]
 record AddProjectRepositoryAction {
     /// ID of the project.
@@ -536,7 +538,8 @@ record ProjectOtlpConfig {
     )]
     endpoint?: string,
     /// HTTP headers to include with OTLP requests (e.g., for authentication).
-    /// Values are masked when read back.
+    /// Values are masked when read back. Setting a header to its masked value
+    /// keeps the stored value, provided that the endpoint stays the same.
     headers: [string: string],
 }
 

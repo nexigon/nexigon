@@ -20,6 +20,7 @@ record ClientHello {
     /// Known endpoints:
     ///   - `"executor"`: splices to a hub-side executor channel; the
     ///     stream then carries `nexigon-rpc` actions/results.
+    ///   - `"status"`: replies with the agent's status; see `AgentStatus`.
     endpoint: string,
     /// Endpoint-specific options. Interpretation depends on `endpoint`.
     options?: JsonValue,
@@ -60,6 +61,9 @@ variant ServerErrorCode {
     EndpointDisabled,
     /// `ClientHello` was malformed or missing required fields.
     InvalidRequest,
+    /// The agent is not connected to Nexigon Hub or Nexigon Hub refused the
+    /// request; a later retry may succeed.
+    HubUnavailable,
     /// Internal agent error; retry is unlikely to help.
     Internal,
 }

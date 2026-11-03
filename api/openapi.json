@@ -2588,7 +2588,7 @@
           "profiles"
         ],
         "summary": "StartRollout",
-        "description": "**Unstable (feature `device_profiles`).**\n\nStart a rollout of a profile revision to the profile's devices in rollout\nmode, replacing the profile's current rollout.\n\nReleases the first stage right away. The new rollout runs even if the rollout\nit replaces was halted.",
+        "description": "**Unstable (feature `device_profiles`).**\n\nStart a rollout of a profile revision to the profile's devices in rollout\nmode, replacing the profile's current rollout.\n\nReleases the first stage right away. The new rollout runs even if the rollout\nit replaces was halted. Every device of the rollout applies the revision once\nthe rollout reaches it, even if the device already uses the revision.",
         "operationId": "profiles_StartRollout",
         "requestBody": {
           "content": {
@@ -3738,7 +3738,7 @@
           "projects"
         ],
         "summary": "LinkRepository",
-        "description": "Add a repository to the project.",
+        "description": "Add a repository to the project.\n\nThe repository must belong to the project's organization.",
         "operationId": "projects_LinkRepository",
         "requestBody": {
           "content": {
@@ -4750,7 +4750,7 @@
           "devices"
         ],
         "summary": "PublishEvents",
-        "description": "**Group `device`:** Part of the Device API, which Nexigon Agent and other software on devices use. Changes remain backward compatible for at least five years.\n\nPublish events of a device.\n\nNexigon Hub stores events as a history of device behavior. Each event has an ID\nthat is unique per device. An event published again with the same ID is not\nstored again, so publishing can safely be retried.",
+        "description": "**Group `device`:** Part of the Device API, which Nexigon Agent and other software on devices use. Changes remain backward compatible for at least five years.\n\nPublish events of a device.\n\nNexigon Hub stores events as a history of device behavior. Each event has an ID\nthat is unique per device. An event published again with the same ID is not\nstored again, so publishing can safely be retried.\n\nNexigon Hub may limit the number of events that a device can store per day and\nper billing period. If storing the new events of a batch would exceed a limit,\nNexigon Hub rejects the whole batch with a `RateLimited` error that states when\nto retry. A batch with more new events than a limit allows fails with an\n`Invalid` error. Events with an already stored ID do not count toward the limits.",
         "operationId": "devices_PublishEvents",
         "requestBody": {
           "content": {
@@ -7688,6 +7688,52 @@
         }
       }
     },
+    "/api/v1/actions/invoke/repositories_SetVersionRelease": {
+      "post": {
+        "tags": [
+          "repositories"
+        ],
+        "summary": "SetVersionRelease",
+        "description": "Set or remove release status. Requires permission to manage versions.\nReleases are retained indefinitely and block deletion of their package or repository.\nMarking a release cancels scheduled deletion. Removing the marker does not restore it.\nRelease status does not seal contents and can also change on sealed versions.",
+        "operationId": "repositories_SetVersionRelease",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/nexigon_api.repositories.SetPackageVersionReleaseAction"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/nexigon_api.outputs.Empty"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenAction"
+          },
+          "429": {
+            "$ref": "#/components/responses/ActionRateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalAction"
+          },
+          "503": {
+            "$ref": "#/components/responses/ActionUnavailable"
+          }
+        }
+      }
+    },
     "/api/v1/actions/invoke/repositories_SealVersion": {
       "post": {
         "tags": [
@@ -8816,236 +8862,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/nexigon_api.repositories.QueryAuditLogEventsOutput"
-                }
-              }
-            }
-          },
-          "400": {
-            "$ref": "#/components/responses/InvalidAction"
-          },
-          "403": {
-            "$ref": "#/components/responses/ForbiddenAction"
-          },
-          "429": {
-            "$ref": "#/components/responses/ActionRateLimited"
-          },
-          "500": {
-            "$ref": "#/components/responses/InternalAction"
-          },
-          "503": {
-            "$ref": "#/components/responses/ActionUnavailable"
-          }
-        }
-      }
-    },
-    "/api/v1/actions/invoke/vulnerabilities_IndexVersion": {
-      "post": {
-        "tags": [
-          "vulnerabilities"
-        ],
-        "summary": "IndexVersion",
-        "description": "**Unstable (feature `vulnerability_management`).**\n\nTrigger indexing of every CycloneDX or SPDX document referenced by the\nversion's artifact assets via `relations.{sbom,vdr,vex}`.\n\nThe hub fetches the referenced documents from the repository's S3\nstorage and rebuilds the index for this version. The repository\nmust have S3 configured.",
-        "operationId": "vulnerabilities_IndexVersion",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/nexigon_api.vulnerabilities.IndexVersionDocumentsAction"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/nexigon_api.vulnerabilities.IndexVersionDocumentsOutput"
-                }
-              }
-            }
-          },
-          "400": {
-            "$ref": "#/components/responses/InvalidAction"
-          },
-          "403": {
-            "$ref": "#/components/responses/ForbiddenAction"
-          },
-          "429": {
-            "$ref": "#/components/responses/ActionRateLimited"
-          },
-          "500": {
-            "$ref": "#/components/responses/InternalAction"
-          },
-          "503": {
-            "$ref": "#/components/responses/ActionUnavailable"
-          }
-        }
-      }
-    },
-    "/api/v1/actions/invoke/vulnerabilities_IndexPackage": {
-      "post": {
-        "tags": [
-          "vulnerabilities"
-        ],
-        "summary": "IndexPackage",
-        "description": "**Unstable (feature `vulnerability_management`).**\n\nTrigger indexing of every CycloneDX or SPDX document referenced by the\npackage's metadata via `relations.{vex}` (typically just VEX).\n\nMirrors `IndexVersionDocumentsAction`. Used after attaching a new\npackage-level VEX asset and pointing the package's metadata at it.",
-        "operationId": "vulnerabilities_IndexPackage",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/nexigon_api.vulnerabilities.IndexPackageDocumentsAction"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/nexigon_api.vulnerabilities.IndexPackageDocumentsOutput"
-                }
-              }
-            }
-          },
-          "400": {
-            "$ref": "#/components/responses/InvalidAction"
-          },
-          "403": {
-            "$ref": "#/components/responses/ForbiddenAction"
-          },
-          "429": {
-            "$ref": "#/components/responses/ActionRateLimited"
-          },
-          "500": {
-            "$ref": "#/components/responses/InternalAction"
-          },
-          "503": {
-            "$ref": "#/components/responses/ActionUnavailable"
-          }
-        }
-      }
-    },
-    "/api/v1/actions/invoke/vulnerabilities_GetVersionOverview": {
-      "post": {
-        "tags": [
-          "vulnerabilities"
-        ],
-        "summary": "GetVersionOverview",
-        "description": "**Unstable (feature `vulnerability_management`).**\n\nGet the vulnerability overview for a package version: artifact list,\nSBOM/VDR/VEX descriptors per artifact, package-level VEX, and\n(when indexing is enabled) the rolled-up severity summary.",
-        "operationId": "vulnerabilities_GetVersionOverview",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/nexigon_api.vulnerabilities.GetVersionVulnerabilityOverviewAction"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/nexigon_api.vulnerabilities.GetVersionVulnerabilityOverviewOutput"
-                }
-              }
-            }
-          },
-          "400": {
-            "$ref": "#/components/responses/InvalidAction"
-          },
-          "403": {
-            "$ref": "#/components/responses/ForbiddenAction"
-          },
-          "429": {
-            "$ref": "#/components/responses/ActionRateLimited"
-          },
-          "500": {
-            "$ref": "#/components/responses/InternalAction"
-          },
-          "503": {
-            "$ref": "#/components/responses/ActionUnavailable"
-          }
-        }
-      }
-    },
-    "/api/v1/actions/invoke/vulnerabilities_QueryComponents": {
-      "post": {
-        "tags": [
-          "vulnerabilities"
-        ],
-        "summary": "QueryComponents",
-        "description": "**Unstable (feature `vulnerability_management`).**\n\nQuery the components extracted from a package version's SBOMs.",
-        "operationId": "vulnerabilities_QueryComponents",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/nexigon_api.vulnerabilities.QueryPackageVersionComponentsAction"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/nexigon_api.vulnerabilities.QueryPackageVersionComponentsOutput"
-                }
-              }
-            }
-          },
-          "400": {
-            "$ref": "#/components/responses/InvalidAction"
-          },
-          "403": {
-            "$ref": "#/components/responses/ForbiddenAction"
-          },
-          "429": {
-            "$ref": "#/components/responses/ActionRateLimited"
-          },
-          "500": {
-            "$ref": "#/components/responses/InternalAction"
-          },
-          "503": {
-            "$ref": "#/components/responses/ActionUnavailable"
-          }
-        }
-      }
-    },
-    "/api/v1/actions/invoke/vulnerabilities_QueryFindings": {
-      "post": {
-        "tags": [
-          "vulnerabilities"
-        ],
-        "summary": "QueryFindings",
-        "description": "**Unstable (feature `vulnerability_management`).**",
-        "operationId": "vulnerabilities_QueryFindings",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/nexigon_api.vulnerabilities.QueryPackageVersionFindingsAction"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/nexigon_api.vulnerabilities.QueryPackageVersionFindingsOutput"
                 }
               }
             }
@@ -11311,6 +11127,9 @@
           },
           "isConnected": {
             "type": "boolean"
+          },
+          "lastSeen": {
+            "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
           },
           "certificates": {
             "type": "array",
@@ -16202,288 +16021,6 @@
         "required": [],
         "unevaluatedProperties": false
       },
-      "nexigon_api.properties.AppDesiredState": {
-        "enum": [
-          "running",
-          "stopped",
-          "removed"
-        ],
-        "description": "**Unstable (feature `app_updates`).**\n\nDesired state of a managed app."
-      },
-      "nexigon_api.properties.AppGcPolicy": {
-        "type": "object",
-        "description": "**Unstable (feature `app_updates`).**\n\nRemoval of old versions of an app.\n\nAfter switching an app to a new version, the integration removes old versions\nto free storage. It keeps the running version and the most recent previously\nrunning versions, to which the app can switch back without downloading them\nagain.",
-        "properties": {
-          "keep": {
-            "type": "integer",
-            "format": "uint32",
-            "maximum": 4294967295,
-            "minimum": 0
-          }
-        },
-        "required": [],
-        "unevaluatedProperties": false
-      },
-      "nexigon_api.properties.AppRuntime": {
-        "type": "object",
-        "description": "**Unstable (feature `app_updates`).**\n\nRuntime that installs and runs apps on a device, such as Rugix Apps.",
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "version": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "name"
-        ],
-        "unevaluatedProperties": false
-      },
-      "nexigon_api.properties.AppStatus": {
-        "type": "object",
-        "description": "**Unstable (feature `app_updates`).**\n\nStatus of an app on a device.",
-        "properties": {
-          "managed": {
-            "type": "boolean"
-          },
-          "config": {
-            "$ref": "#/components/schemas/nexigon_api.properties.ManagedAppConfig"
-          },
-          "state": {
-            "$ref": "#/components/schemas/nexigon_api.properties.AppUpdateState"
-          },
-          "blocked": {
-            "$ref": "#/components/schemas/nexigon_api.properties.AppUpdateBlocked"
-          },
-          "generation": {
-            "type": [
-              "integer",
-              "string"
-            ],
-            "format": "uint64",
-            "minimum": 0,
-            "pattern": "^[0-9]+$"
-          },
-          "currentVersionId": {
-            "$ref": "#/components/schemas/nexigon_api.repositories.PackageVersionId"
-          },
-          "targetVersionId": {
-            "$ref": "#/components/schemas/nexigon_api.repositories.PackageVersionId"
-          },
-          "asset": {
-            "type": "string"
-          },
-          "failureCount": {
-            "type": "integer",
-            "format": "uint32",
-            "maximum": 4294967295,
-            "minimum": 0
-          },
-          "lastError": {
-            "type": "string"
-          },
-          "nextAttemptAt": {
-            "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
-          },
-          "workload": {
-            "$ref": "#/components/schemas/nexigon_api.properties.AppWorkloadStatus"
-          }
-        },
-        "required": [
-          "managed"
-        ],
-        "unevaluatedProperties": false
-      },
-      "nexigon_api.properties.AppUpdateBlocked": {
-        "type": "object",
-        "description": "**Unstable (feature `app_updates`).**\n\nInformation about a blocked app update.",
-        "properties": {
-          "code": {
-            "type": "string"
-          },
-          "message": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "code"
-        ],
-        "unevaluatedProperties": false
-      },
-      "nexigon_api.properties.AppUpdateCapability": {
-        "enum": [
-          "window",
-          "retry",
-          "spread",
-          "hold",
-          "asset",
-          "gc"
-        ],
-        "description": "**Unstable (feature `app_updates`).**\n\nOptional feature of the app update contract."
-      },
-      "nexigon_api.properties.AppUpdateConfig": {
-        "type": "object",
-        "description": "**Unstable (feature `app_updates`).**\n\nApp update configuration (`dev.nexigon.apps.config`).\n\nDesired state of the apps on a device. The integration manages the apps listed\nin `apps` and leaves other installed apps untouched. Removing an app from\n`apps` ends its management without uninstalling it. To uninstall an app, set\nits `state` to `removed`.\n\nThe policies `hold`, `window`, `retry`, `spread`, and `gc` apply to every app\nthat does not set its own. They govern version changes. Changes of an app's\n`state` apply at the next check.",
-        "properties": {
-          "apps": {
-            "type": "object",
-            "additionalProperties": {
-              "$ref": "#/components/schemas/nexigon_api.properties.ManagedAppConfig"
-            }
-          },
-          "hold": {
-            "type": "boolean"
-          },
-          "window": {
-            "$ref": "#/components/schemas/nexigon_api.properties.OtaUpdateWindow"
-          },
-          "retry": {
-            "$ref": "#/components/schemas/nexigon_api.properties.OtaUpdateRetryPolicy"
-          },
-          "spread": {
-            "$ref": "#/components/schemas/nexigon_api.properties.OtaUpdateSpread"
-          },
-          "gc": {
-            "$ref": "#/components/schemas/nexigon_api.properties.AppGcPolicy"
-          }
-        },
-        "required": [],
-        "unevaluatedProperties": false
-      },
-      "nexigon_api.properties.AppUpdateState": {
-        "enum": [
-          "idle",
-          "installing",
-          "activating",
-          "removing",
-          "completed",
-          "failed",
-          "blocked"
-        ],
-        "description": "**Unstable (feature `app_updates`).**\n\nState of an app's update process.\n\nThe resting states are `idle`, `completed`, `failed`, and `blocked`."
-      },
-      "nexigon_api.properties.AppUpdateStatus": {
-        "type": "object",
-        "description": "**Unstable (feature `app_updates`).**\n\nApp update status (`dev.nexigon.apps.status`).\n\nActual state of the apps on a device, published by its app integration.\n\nThe integration writes the status with the version it read last\n(compare-and-swap), so that it does not overwrite concurrent changes. Other\nwriters may only clear the `failure_count` and `next_attempt_at` of an app,\nwhich requests a new attempt.",
-        "properties": {
-          "capabilities": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/nexigon_api.properties.AppUpdateCapability"
-            }
-          },
-          "configVersion": {
-            "type": [
-              "integer",
-              "string"
-            ],
-            "format": "uint64",
-            "minimum": 0,
-            "pattern": "^[0-9]+$"
-          },
-          "lastError": {
-            "type": "string"
-          },
-          "arch": {
-            "type": "string"
-          },
-          "runtime": {
-            "$ref": "#/components/schemas/nexigon_api.properties.AppRuntime"
-          },
-          "apps": {
-            "type": "object",
-            "additionalProperties": {
-              "$ref": "#/components/schemas/nexigon_api.properties.AppStatus"
-            }
-          }
-        },
-        "required": [
-          "apps"
-        ],
-        "unevaluatedProperties": false
-      },
-      "nexigon_api.properties.AppWorkloadMessage": {
-        "type": "object",
-        "description": "**Unstable (feature `app_updates`).**\n\nExplanation of an app's workload status.",
-        "properties": {
-          "message": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "message"
-        ],
-        "unevaluatedProperties": false
-      },
-      "nexigon_api.properties.AppWorkloadStatus": {
-        "description": "**Unstable (feature `app_updates`).**\n\nLive status of an app's workload.",
-        "oneOf": [
-          {
-            "type": "object",
-            "properties": {
-              "state": {
-                "const": "running"
-              }
-            },
-            "required": [
-              "state"
-            ]
-          },
-          {
-            "type": "object",
-            "properties": {
-              "state": {
-                "const": "unhealthy"
-              },
-              "message": {
-                "type": "string"
-              }
-            },
-            "required": [
-              "state",
-              "message"
-            ]
-          },
-          {
-            "type": "object",
-            "properties": {
-              "state": {
-                "const": "stopped"
-              }
-            },
-            "required": [
-              "state"
-            ]
-          },
-          {
-            "type": "object",
-            "properties": {
-              "state": {
-                "const": "failed"
-              },
-              "message": {
-                "type": "string"
-              }
-            },
-            "required": [
-              "state",
-              "message"
-            ]
-          },
-          {
-            "type": "object",
-            "properties": {
-              "state": {
-                "const": "unknown"
-              }
-            },
-            "required": [
-              "state"
-            ]
-          }
-        ]
-      },
       "nexigon_api.properties.DeviceCommandDescriptor": {
         "type": "object",
         "description": "**Unstable (feature `device_commands`).**\n\nDescriptor for an on-demand command.",
@@ -16636,44 +16173,6 @@
           "name",
           "port"
         ],
-        "unevaluatedProperties": false
-      },
-      "nexigon_api.properties.ManagedAppConfig": {
-        "type": "object",
-        "description": "**Unstable (feature `app_updates`).**\n\nDesired state of a managed app.\n\nA policy set here replaces the policy of the configuration for this app.",
-        "properties": {
-          "path": {
-            "type": "string"
-          },
-          "asset": {
-            "type": "string"
-          },
-          "state": {
-            "$ref": "#/components/schemas/nexigon_api.properties.AppDesiredState"
-          },
-          "hold": {
-            "type": "boolean"
-          },
-          "window": {
-            "$ref": "#/components/schemas/nexigon_api.properties.OtaUpdateWindow"
-          },
-          "retry": {
-            "$ref": "#/components/schemas/nexigon_api.properties.OtaUpdateRetryPolicy"
-          },
-          "spread": {
-            "$ref": "#/components/schemas/nexigon_api.properties.OtaUpdateSpread"
-          },
-          "gc": {
-            "$ref": "#/components/schemas/nexigon_api.properties.AppGcPolicy"
-          },
-          "rollout": {
-            "type": "integer",
-            "format": "uint32",
-            "maximum": 4294967295,
-            "minimum": 0
-          }
-        },
-        "required": [],
         "unevaluatedProperties": false
       },
       "nexigon_api.properties.MemoryInfo": {
@@ -17900,6 +17399,9 @@
           "sealed": {
             "type": "boolean"
           },
+          "release": {
+            "type": "boolean"
+          },
           "baseVersionId": {
             "$ref": "#/components/schemas/nexigon_api.repositories.PackageVersionId"
           },
@@ -18271,6 +17773,9 @@
         "type": "object",
         "description": "Conditions on package versions.",
         "properties": {
+          "release": {
+            "type": "boolean"
+          },
           "search": {
             "type": "string"
           }
@@ -18284,7 +17789,7 @@
       },
       "nexigon_api.repositories.PackageVersionRetention": {
         "type": "object",
-        "description": "Opt-in retention of unsealed versions, evaluated per package by creation time.\nEither exceeded limit makes a version eligible for deletion, including existing versions.\nRetention skips versions that are the base of another version.",
+        "description": "Opt-in retention of versions that are neither sealed nor releases, evaluated per package by creation time.\nEither exceeded limit makes a version eligible for deletion, including existing versions.\nRetention skips sealed versions, releases, and versions that are the base of another version.",
         "properties": {
           "enabled": {
             "type": "boolean"
@@ -18465,6 +17970,9 @@
             "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
           },
           "sealed": {
+            "type": "boolean"
+          },
+          "release": {
             "type": "boolean"
           },
           "tags": {
@@ -19532,6 +19040,22 @@
         ],
         "unevaluatedProperties": false
       },
+      "nexigon_api.repositories.SetPackageVersionReleaseAction": {
+        "type": "object",
+        "properties": {
+          "versionId": {
+            "$ref": "#/components/schemas/nexigon_api.repositories.PackageVersionId"
+          },
+          "release": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "versionId",
+          "release"
+        ],
+        "unevaluatedProperties": false
+      },
       "nexigon_api.repositories.SetPackageVersionRetentionAction": {
         "type": "object",
         "properties": {
@@ -19803,6 +19327,293 @@
         },
         "required": [
           "name"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.rugix_apps.RugixAppConfig": {
+        "type": "object",
+        "description": "**Unstable (feature `rugix_apps`).**\n\nDesired state of a managed app.\n\nA policy set here replaces the policy of the configuration for this app.",
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "asset": {
+            "type": "string"
+          },
+          "state": {
+            "$ref": "#/components/schemas/nexigon_api.rugix_apps.RugixAppDesiredState"
+          },
+          "hold": {
+            "type": "boolean"
+          },
+          "window": {
+            "$ref": "#/components/schemas/nexigon_api.properties.OtaUpdateWindow"
+          },
+          "retry": {
+            "$ref": "#/components/schemas/nexigon_api.properties.OtaUpdateRetryPolicy"
+          },
+          "spread": {
+            "$ref": "#/components/schemas/nexigon_api.properties.OtaUpdateSpread"
+          },
+          "gc": {
+            "$ref": "#/components/schemas/nexigon_api.rugix_apps.RugixAppGcPolicy"
+          },
+          "rollout": {
+            "type": "integer",
+            "format": "uint32",
+            "maximum": 4294967295,
+            "minimum": 0
+          }
+        },
+        "required": [],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.rugix_apps.RugixAppDesiredState": {
+        "enum": [
+          "running",
+          "stopped",
+          "removed"
+        ],
+        "description": "**Unstable (feature `rugix_apps`).**\n\nDesired state of a managed app."
+      },
+      "nexigon_api.rugix_apps.RugixAppGcPolicy": {
+        "type": "object",
+        "description": "**Unstable (feature `rugix_apps`).**\n\nRemoval of old versions of an app.\n\nAfter switching an app to a new version, the integration removes old versions\nto free storage. It keeps the running version and the most recent previously\nrunning versions, to which the app can switch back without downloading them\nagain.",
+        "properties": {
+          "keep": {
+            "type": "integer",
+            "format": "uint32",
+            "maximum": 4294967295,
+            "minimum": 0
+          }
+        },
+        "required": [],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.rugix_apps.RugixAppStatus": {
+        "type": "object",
+        "description": "**Unstable (feature `rugix_apps`).**\n\nStatus of an app on a device.",
+        "properties": {
+          "managed": {
+            "type": "boolean"
+          },
+          "config": {
+            "$ref": "#/components/schemas/nexigon_api.rugix_apps.RugixAppConfig"
+          },
+          "state": {
+            "$ref": "#/components/schemas/nexigon_api.rugix_apps.RugixAppUpdateState"
+          },
+          "blocked": {
+            "$ref": "#/components/schemas/nexigon_api.rugix_apps.RugixAppUpdateBlocked"
+          },
+          "generation": {
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "uint64",
+            "minimum": 0,
+            "pattern": "^[0-9]+$"
+          },
+          "currentVersionId": {
+            "$ref": "#/components/schemas/nexigon_api.repositories.PackageVersionId"
+          },
+          "targetVersionId": {
+            "$ref": "#/components/schemas/nexigon_api.repositories.PackageVersionId"
+          },
+          "asset": {
+            "type": "string"
+          },
+          "failureCount": {
+            "type": "integer",
+            "format": "uint32",
+            "maximum": 4294967295,
+            "minimum": 0
+          },
+          "lastError": {
+            "type": "string"
+          },
+          "nextAttemptAt": {
+            "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
+          },
+          "workload": {
+            "$ref": "#/components/schemas/nexigon_api.rugix_apps.RugixAppWorkloadStatus"
+          }
+        },
+        "required": [
+          "managed"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.rugix_apps.RugixAppUpdateBlocked": {
+        "type": "object",
+        "description": "**Unstable (feature `rugix_apps`).**\n\nInformation about a blocked app update.",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "code"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.rugix_apps.RugixAppUpdateState": {
+        "enum": [
+          "idle",
+          "installing",
+          "activating",
+          "removing",
+          "completed",
+          "failed",
+          "blocked"
+        ],
+        "description": "**Unstable (feature `rugix_apps`).**\n\nState of an app's update process.\n\nThe resting states are `idle`, `completed`, `failed`, and `blocked`."
+      },
+      "nexigon_api.rugix_apps.RugixAppWorkloadMessage": {
+        "type": "object",
+        "description": "**Unstable (feature `rugix_apps`).**\n\nExplanation of an app's workload status.",
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "message"
+        ],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.rugix_apps.RugixAppWorkloadStatus": {
+        "description": "**Unstable (feature `rugix_apps`).**\n\nLive status of an app's workload.",
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "running"
+              }
+            },
+            "required": [
+              "state"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "unhealthy"
+              },
+              "message": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "state",
+              "message"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "stopped"
+              }
+            },
+            "required": [
+              "state"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "failed"
+              },
+              "message": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "state",
+              "message"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "state": {
+                "const": "unknown"
+              }
+            },
+            "required": [
+              "state"
+            ]
+          }
+        ]
+      },
+      "nexigon_api.rugix_apps.RugixAppsConfig": {
+        "type": "object",
+        "description": "**Unstable (feature `rugix_apps`).**\n\nRugix Apps configuration (`dev.nexigon.rugix-apps.config`).\n\nDesired state of the apps on a device. The integration manages the apps listed\nin `apps` and leaves other installed apps untouched. Removing an app from\n`apps` ends its management without uninstalling it. To uninstall an app, set\nits `state` to `removed`.\n\nThe policies `hold`, `window`, `retry`, `spread`, and `gc` apply to every app\nthat does not set its own. They govern version changes. Changes of an app's\n`state` apply at the next check.",
+        "properties": {
+          "apps": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/nexigon_api.rugix_apps.RugixAppConfig"
+            }
+          },
+          "hold": {
+            "type": "boolean"
+          },
+          "window": {
+            "$ref": "#/components/schemas/nexigon_api.properties.OtaUpdateWindow"
+          },
+          "retry": {
+            "$ref": "#/components/schemas/nexigon_api.properties.OtaUpdateRetryPolicy"
+          },
+          "spread": {
+            "$ref": "#/components/schemas/nexigon_api.properties.OtaUpdateSpread"
+          },
+          "gc": {
+            "$ref": "#/components/schemas/nexigon_api.rugix_apps.RugixAppGcPolicy"
+          }
+        },
+        "required": [],
+        "unevaluatedProperties": false
+      },
+      "nexigon_api.rugix_apps.RugixAppsStatus": {
+        "type": "object",
+        "description": "**Unstable (feature `rugix_apps`).**\n\nRugix Apps status (`dev.nexigon.rugix-apps.status`).\n\nActual state of the apps on a device, published by the Rugix Apps integration.\n\nThe integration writes the status with the version it read last\n(compare-and-swap), so that it does not overwrite concurrent changes. Other\nwriters may only clear the `failure_count` and `next_attempt_at` of an app,\nwhich requests a new attempt.",
+        "properties": {
+          "configVersion": {
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "uint64",
+            "minimum": 0,
+            "pattern": "^[0-9]+$"
+          },
+          "lastError": {
+            "type": "string"
+          },
+          "arch": {
+            "type": "string"
+          },
+          "rugixCtrlVersion": {
+            "type": "string"
+          },
+          "apps": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/nexigon_api.rugix_apps.RugixAppStatus"
+            }
+          }
+        },
+        "required": [
+          "apps"
         ],
         "unevaluatedProperties": false
       },
@@ -20640,485 +20451,6 @@
       "nexigon_api.users.UserTokenId": {
         "type": "string",
         "description": "**Group `admin`:** Part of the Admin API, which requires instance administrator permissions. Backward-incompatible changes are more frequent than for other actions.\n\n**Group `device`:** Part of the Device API, which Nexigon Agent and other software on devices use. Changes remain backward compatible for at least five years.\n\nUnique ID of a user token."
-      },
-      "nexigon_api.vulnerabilities.ArtifactDescriptor": {
-        "type": "object",
-        "description": "Per-artifact view of attached vulnerability documents.",
-        "properties": {
-          "assetId": {
-            "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryAssetId"
-          },
-          "filename": {
-            "type": "string"
-          },
-          "sbom": {
-            "$ref": "#/components/schemas/nexigon_api.vulnerabilities.AttachedDocument"
-          },
-          "vdrs": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/nexigon_api.vulnerabilities.AttachedVdrDocument"
-            }
-          },
-          "vex": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/nexigon_api.vulnerabilities.AttachedVexDocument"
-            }
-          },
-          "severitySummary": {
-            "$ref": "#/components/schemas/nexigon_api.vulnerabilities.SeveritySummary"
-          },
-          "componentCount": {
-            "type": "integer",
-            "format": "uint32",
-            "maximum": 4294967295,
-            "minimum": 0
-          }
-        },
-        "required": [
-          "assetId",
-          "filename",
-          "vdrs",
-          "vex"
-        ],
-        "unevaluatedProperties": false
-      },
-      "nexigon_api.vulnerabilities.AttachedDocument": {
-        "type": "object",
-        "properties": {
-          "assetId": {
-            "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryAssetId"
-          },
-          "repositoryId": {
-            "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryId"
-          },
-          "filename": {
-            "type": "string"
-          },
-          "size": {
-            "type": [
-              "integer",
-              "string"
-            ],
-            "format": "uint64",
-            "minimum": 0,
-            "pattern": "^[0-9]+$"
-          }
-        },
-        "required": [
-          "assetId",
-          "repositoryId",
-          "filename",
-          "size"
-        ],
-        "unevaluatedProperties": false
-      },
-      "nexigon_api.vulnerabilities.AttachedVdrDocument": {
-        "type": "object",
-        "properties": {
-          "document": {
-            "$ref": "#/components/schemas/nexigon_api.vulnerabilities.AttachedDocument"
-          },
-          "sourceTool": {
-            "type": "string"
-          },
-          "severitySummary": {
-            "$ref": "#/components/schemas/nexigon_api.vulnerabilities.SeveritySummary"
-          }
-        },
-        "required": [
-          "document"
-        ],
-        "unevaluatedProperties": false
-      },
-      "nexigon_api.vulnerabilities.AttachedVexDocument": {
-        "type": "object",
-        "properties": {
-          "document": {
-            "$ref": "#/components/schemas/nexigon_api.vulnerabilities.AttachedDocument"
-          },
-          "origin": {
-            "$ref": "#/components/schemas/nexigon_api.vulnerabilities.VexStatementOrigin"
-          },
-          "statementCount": {
-            "type": "integer",
-            "format": "uint32",
-            "maximum": 4294967295,
-            "minimum": 0
-          }
-        },
-        "required": [
-          "document",
-          "origin"
-        ],
-        "unevaluatedProperties": false
-      },
-      "nexigon_api.vulnerabilities.GetVersionVulnerabilityOverviewAction": {
-        "type": "object",
-        "properties": {
-          "versionId": {
-            "$ref": "#/components/schemas/nexigon_api.repositories.PackageVersionId"
-          }
-        },
-        "required": [
-          "versionId"
-        ],
-        "unevaluatedProperties": false
-      },
-      "nexigon_api.vulnerabilities.GetVersionVulnerabilityOverviewOutput": {
-        "type": "object",
-        "properties": {
-          "versionId": {
-            "$ref": "#/components/schemas/nexigon_api.repositories.PackageVersionId"
-          },
-          "indexingEnabled": {
-            "type": "boolean"
-          },
-          "artifacts": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/nexigon_api.vulnerabilities.ArtifactDescriptor"
-            }
-          },
-          "packageVex": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/nexigon_api.vulnerabilities.AttachedVexDocument"
-            }
-          },
-          "severitySummary": {
-            "$ref": "#/components/schemas/nexigon_api.vulnerabilities.SeveritySummary"
-          },
-          "componentCount": {
-            "type": "integer",
-            "format": "uint32",
-            "maximum": 4294967295,
-            "minimum": 0
-          }
-        },
-        "required": [
-          "versionId",
-          "indexingEnabled",
-          "artifacts",
-          "packageVex"
-        ],
-        "unevaluatedProperties": false
-      },
-      "nexigon_api.vulnerabilities.IndexPackageDocumentsAction": {
-        "type": "object",
-        "properties": {
-          "packageId": {
-            "$ref": "#/components/schemas/nexigon_api.repositories.PackageId"
-          }
-        },
-        "required": [
-          "packageId"
-        ],
-        "unevaluatedProperties": false
-      },
-      "nexigon_api.vulnerabilities.IndexPackageDocumentsOutput": {
-        "type": "object",
-        "properties": {
-          "indexed": {
-            "type": "boolean"
-          },
-          "documentCount": {
-            "type": "integer",
-            "format": "uint32",
-            "maximum": 4294967295,
-            "minimum": 0
-          }
-        },
-        "required": [
-          "indexed",
-          "documentCount"
-        ],
-        "unevaluatedProperties": false
-      },
-      "nexigon_api.vulnerabilities.IndexVersionDocumentsAction": {
-        "type": "object",
-        "properties": {
-          "versionId": {
-            "$ref": "#/components/schemas/nexigon_api.repositories.PackageVersionId"
-          }
-        },
-        "required": [
-          "versionId"
-        ],
-        "unevaluatedProperties": false
-      },
-      "nexigon_api.vulnerabilities.IndexVersionDocumentsOutput": {
-        "type": "object",
-        "description": "Output of `IndexVersionDocumentsAction`.",
-        "properties": {
-          "indexed": {
-            "type": "boolean"
-          },
-          "artifactCount": {
-            "type": "integer",
-            "format": "uint32",
-            "maximum": 4294967295,
-            "minimum": 0
-          },
-          "documentCount": {
-            "type": "integer",
-            "format": "uint32",
-            "maximum": 4294967295,
-            "minimum": 0
-          }
-        },
-        "required": [
-          "indexed",
-          "artifactCount",
-          "documentCount"
-        ],
-        "unevaluatedProperties": false
-      },
-      "nexigon_api.vulnerabilities.PackageVersionComponent": {
-        "type": "object",
-        "properties": {
-          "artifactFilename": {
-            "type": "string"
-          },
-          "bomRef": {
-            "type": "string"
-          },
-          "purl": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "version": {
-            "type": "string"
-          },
-          "type": {
-            "type": "string"
-          },
-          "licenses": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "supplier": {
-            "type": "string"
-          },
-          "description": {
-            "type": "string"
-          },
-          "vulnSummary": {
-            "$ref": "#/components/schemas/nexigon_api.vulnerabilities.SeveritySummary"
-          }
-        },
-        "required": [
-          "artifactFilename",
-          "bomRef",
-          "name",
-          "type",
-          "licenses"
-        ],
-        "unevaluatedProperties": false
-      },
-      "nexigon_api.vulnerabilities.PackageVersionFinding": {
-        "type": "object",
-        "properties": {
-          "artifactFilename": {
-            "type": "string"
-          },
-          "componentPurl": {
-            "type": "string"
-          },
-          "componentName": {
-            "type": "string"
-          },
-          "componentVersion": {
-            "type": "string"
-          },
-          "vulnerabilityId": {
-            "type": "string"
-          },
-          "severity": {
-            "type": "string"
-          },
-          "cvssScore": {
-            "type": [
-              "number",
-              "string"
-            ],
-            "pattern": "^(NaN|[+-]?Infinity)$"
-          },
-          "description": {
-            "type": "string"
-          },
-          "sourceTool": {
-            "type": "string"
-          },
-          "effectiveState": {
-            "type": "string"
-          },
-          "justification": {
-            "type": "string"
-          },
-          "detail": {
-            "type": "string"
-          },
-          "responses": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "stateOrigin": {
-            "$ref": "#/components/schemas/nexigon_api.vulnerabilities.VexStatementOrigin"
-          }
-        },
-        "required": [
-          "artifactFilename",
-          "componentPurl",
-          "componentName",
-          "vulnerabilityId",
-          "severity",
-          "effectiveState",
-          "responses"
-        ],
-        "unevaluatedProperties": false
-      },
-      "nexigon_api.vulnerabilities.QueryPackageVersionComponentsAction": {
-        "type": "object",
-        "properties": {
-          "versionId": {
-            "$ref": "#/components/schemas/nexigon_api.repositories.PackageVersionId"
-          },
-          "artifactFilename": {
-            "type": "string"
-          },
-          "search": {
-            "type": "string"
-          },
-          "componentType": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "versionId"
-        ],
-        "unevaluatedProperties": false
-      },
-      "nexigon_api.vulnerabilities.QueryPackageVersionComponentsOutput": {
-        "type": "object",
-        "properties": {
-          "indexingEnabled": {
-            "type": "boolean"
-          },
-          "components": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/nexigon_api.vulnerabilities.PackageVersionComponent"
-            }
-          }
-        },
-        "required": [
-          "indexingEnabled",
-          "components"
-        ],
-        "unevaluatedProperties": false
-      },
-      "nexigon_api.vulnerabilities.QueryPackageVersionFindingsAction": {
-        "type": "object",
-        "properties": {
-          "versionId": {
-            "$ref": "#/components/schemas/nexigon_api.repositories.PackageVersionId"
-          },
-          "artifactFilename": {
-            "type": "string"
-          },
-          "minSeverity": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "versionId"
-        ],
-        "unevaluatedProperties": false
-      },
-      "nexigon_api.vulnerabilities.QueryPackageVersionFindingsOutput": {
-        "type": "object",
-        "properties": {
-          "indexingEnabled": {
-            "type": "boolean"
-          },
-          "findings": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/nexigon_api.vulnerabilities.PackageVersionFinding"
-            }
-          }
-        },
-        "required": [
-          "indexingEnabled",
-          "findings"
-        ],
-        "unevaluatedProperties": false
-      },
-      "nexigon_api.vulnerabilities.SeveritySummary": {
-        "type": "object",
-        "properties": {
-          "critical": {
-            "type": "integer",
-            "format": "uint32",
-            "maximum": 4294967295,
-            "minimum": 0
-          },
-          "high": {
-            "type": "integer",
-            "format": "uint32",
-            "maximum": 4294967295,
-            "minimum": 0
-          },
-          "medium": {
-            "type": "integer",
-            "format": "uint32",
-            "maximum": 4294967295,
-            "minimum": 0
-          },
-          "low": {
-            "type": "integer",
-            "format": "uint32",
-            "maximum": 4294967295,
-            "minimum": 0
-          },
-          "info": {
-            "type": "integer",
-            "format": "uint32",
-            "maximum": 4294967295,
-            "minimum": 0
-          },
-          "unknown": {
-            "type": "integer",
-            "format": "uint32",
-            "maximum": 4294967295,
-            "minimum": 0
-          }
-        },
-        "required": [
-          "critical",
-          "high",
-          "medium",
-          "low",
-          "info",
-          "unknown"
-        ],
-        "unevaluatedProperties": false
-      },
-      "nexigon_api.vulnerabilities.VexStatementOrigin": {
-        "enum": [
-          "Operator",
-          "Vendor",
-          "Scanner"
-        ],
-        "description": "Origin of a VEX statement, used by the effective-state precedence\nrule (operator > vendor > scanner)."
       }
     },
     "responses": {

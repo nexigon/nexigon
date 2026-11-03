@@ -29,13 +29,12 @@ use tracing::info;
 use tracing::warn;
 
 use crate::config::Config;
-use crate::device_api::DeviceExecutor;
+use crate::hub_link::HubLink;
 use crate::reconcile::DEFAULT_CHECK_INTERVAL;
 use crate::reconcile::DEFAULT_CHECK_JITTER;
 use crate::reconcile::MIN_CHECK_DELAY;
-use crate::reconcile::error_delay;
 use crate::reconcile::next_check_delay;
-use crate::reconcile::random_delay;
+use crate::reconcile::wait_for_check;
 
 mod check;
 mod planning;
@@ -160,10 +159,10 @@ pub(crate) fn settings(config: &Config) -> anyhow::Result<Option<SystemUpdates>>
 /// `cancellation` stops the loop between checks and before installations. An installation
 /// in progress runs to completion, so the caller must await the loop. After it,
 /// the device reboots into the installed version unless `shutdown` signals
-/// that the agent stops.
+/// that the agent stops. A lost connection to Nexigon Hub interrupts neither.
 pub(crate) async fn run(
     settings: SystemUpdates,
-    executor: DeviceExecutor,
+    link: HubLink,
     device_id: DeviceId,
     device_lock: Arc<Mutex<()>>,
     check_requested: Arc<Notify>,
@@ -174,14 +173,14 @@ pub(crate) async fn run(
     let check_jitter = settings.check_jitter;
     let mut checker = Checker::new(
         settings,
-        executor,
+        link.executor(),
         device_id,
         device_lock,
         cancellation.clone(),
         shutdown,
     );
     while !cancellation.is_cancelled() {
-        let error_delay = error_delay(check_interval);
+        let sessions = link.sessions();
         // A panicking check must not end the integration or the agent.
         let delay = match AssertUnwindSafe(checker.check()).catch_unwind().await {
             Ok(Ok(outcome)) if outcome.rebooting => {
@@ -190,27 +189,26 @@ pub(crate) async fn run(
                     () = cancellation.cancelled() => return Ok(()),
                     () = tokio::time::sleep(REBOOT_TIMEOUT) => {
                         warn!("the device did not reboot into the installed version");
-                        MIN_CHECK_DELAY
+                        Some(MIN_CHECK_DELAY)
                     }
                 }
             }
-            Ok(Ok(outcome)) => next_check_delay(outcome.next_attempt_at, check_interval),
+            Ok(Ok(outcome)) => Some(next_check_delay(outcome.next_attempt_at, check_interval)),
             Ok(Err(error)) => {
                 warn!(error = format!("{error:#}"), "system update check failed");
-                error_delay
+                None
             }
             Err(payload) => {
                 let panic = crate::run::panic_message(payload);
                 error!(panic, "system update check panicked");
-                error_delay
+                None
             }
         };
-        let delay = delay + random_delay(check_jitter);
         tokio::select! {
             biased;
             () = cancellation.cancelled() => return Ok(()),
             () = check_requested.notified() => info!("update check requested"),
-            () = tokio::time::sleep(delay) => {}
+            () = wait_for_check(&link, sessions, delay, check_interval, check_jitter) => {}
         }
     }
     Ok(())

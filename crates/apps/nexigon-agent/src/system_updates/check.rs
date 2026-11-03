@@ -52,7 +52,7 @@ use super::planning::Running;
 use super::planning::next_version;
 use super::updater::Bundle;
 use super::updater::SystemIdentity;
-use crate::device_api::DeviceExecutor;
+use crate::hub_link::HubExecutor;
 use crate::reconcile::WindowGate;
 use crate::reconcile::hub::Hub;
 use crate::reconcile::hub::PropertyWrite;
@@ -101,7 +101,7 @@ pub(crate) struct CheckOutcome {
 pub(crate) struct Checker {
     settings: SystemUpdates,
     hub: Hub,
-    /// Signals a lost connection or a shutdown, which prevents new installations.
+    /// Signals that the agent stops, which prevents new installations.
     cancellation: CancellationToken,
     /// Signals a shutdown, which also prevents rebooting into an installed version.
     shutdown: CancellationToken,
@@ -122,7 +122,7 @@ pub(crate) struct Checker {
 impl Checker {
     pub(crate) fn new(
         settings: SystemUpdates,
-        executor: DeviceExecutor,
+        executor: HubExecutor,
         device_id: DeviceId,
         device_lock: Arc<Mutex<()>>,
         cancellation: CancellationToken,

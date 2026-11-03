@@ -1,0 +1,45 @@
+//! Agent status.
+//!
+//! The `status` endpoint replies to a successful handshake with one
+//! `AgentStatus`, framed like the handshake messages, and closes the
+//! connection.
+
+/// Unique ID of a device.
+#[rust(type = "nexigon_api::types::devices::DeviceId")]
+#[json(type = "string")]
+opaque DeviceId
+
+/// Status of the agent.
+record AgentStatus {
+    /// ID of the device, known once the agent has connected to Nexigon Hub.
+    device_id?: DeviceId,
+    /// Connection to Nexigon Hub.
+    connection: HubConnectionStatus,
+}
+
+/// State of the connection to Nexigon Hub.
+#[json(tag = "state")]
+variant HubConnectionStatus {
+    /// The agent is connected to Nexigon Hub.
+    Connected: HubConnected,
+    /// The agent is establishing a connection or waiting before the next attempt.
+    Disconnected: HubDisconnected,
+}
+
+/// Connection to Nexigon Hub that is established.
+record HubConnected {
+    /// Time at which the connection was established.
+    since: timestamp,
+}
+
+/// Connection to Nexigon Hub that is not established.
+record HubDisconnected {
+    /// Time at which the agent started or lost its last connection.
+    since: timestamp,
+    /// Failed connection attempts since the agent was last connected.
+    failed_attempts: u32,
+    /// Time of the next connection attempt, if the agent is waiting for it.
+    next_attempt_at?: timestamp,
+    /// Why the last connection attempt failed or the last connection ended.
+    last_error?: string,
+}

@@ -46,6 +46,8 @@ record Config {
     exports?: [ExportConfig],
     /// Additional TCP ports, beyond exported services. Disabled unless explicitly enabled.
     forwarding?: ForwardingConfig,
+    /// Connection to Nexigon Hub.
+    connection?: ConnectionConfig,
     /// Multiplex connection capacity and burst handling.
     multiplex?: MultiplexConfig,
     /// Remote terminal configuration.
@@ -79,15 +81,15 @@ record IntegrationsConfig {
 record RugixIntegrationConfig {
     /// System updates with Rugix Ctrl.
     system_updates?: RugixSystemUpdatesConfig,
-    /// App management with Rugix Apps.
+    /// Nexigon integration with Rugix Apps.
     apps?: RugixAppsConfig,
 }
 
-/// App management with Rugix Apps.
+/// Nexigon integration with Rugix Apps.
 ///
-/// Implements the app update contract of Nexigon Hub: the agent converges the
-/// apps on the device toward the desired state in `dev.nexigon.apps.config` and
-/// reports their status in `dev.nexigon.apps.status`. Requires a Rugix Ctrl
+/// The agent converges the
+/// apps on the device toward the desired state in `dev.nexigon.rugix-apps.config` and
+/// reports their status in `dev.nexigon.rugix-apps.status`. Requires a Rugix Ctrl
 /// version that supports `rugix-ctrl apps install --origin`.
 #[json(rename_all = "kebab-case")]
 record RugixAppsConfig {
@@ -113,7 +115,7 @@ record RugixAppsConfig {
     use_bundle_hash?: bool,
     /// Removal of old app versions after an update.
     ///
-    /// The `gc` policy in `dev.nexigon.apps.config` overrides it.
+    /// The `gc` policy in `dev.nexigon.rugix-apps.config` overrides it.
     gc?: RugixAppsGcConfig,
 }
 
@@ -267,6 +269,45 @@ record ForwardingConfig {
     ///
     /// Each port permits raw TCP access. HTTP export ports are allowed separately.
     allowed_tcp_ports?: [TcpPort],
+}
+
+/// Connection to Nexigon Hub.
+#[json(rename_all = "kebab-case")]
+record ConnectionConfig {
+    /// Time allowed for connecting and for identifying the device in seconds
+    /// (defaults to 30).
+    ///
+    /// Must be at least 1.
+    connect_timeout_secs?: u64,
+    /// Reconnection after the connection is lost or cannot be established.
+    reconnect?: ReconnectConfig,
+}
+
+/// Reconnection after the connection is lost or cannot be established.
+///
+/// The agent connects right away when it starts. Before each later attempt, it
+/// waits for a random delay between zero and an upper bound. The bound starts
+/// at `initial-delay-secs` and doubles after each failed attempt, up to
+/// `max-delay-secs`. The random delay spreads the attempts of devices that lost
+/// their connections at the same time, for example when Nexigon Hub restarts.
+/// If Nexigon Hub asks the agent to retry later, the agent waits at least that
+/// long, up to `max-delay-secs`, plus the random delay.
+#[json(rename_all = "kebab-case")]
+record ReconnectConfig {
+    /// Upper bound of the delay before the first attempt in seconds
+    /// (defaults to 30).
+    ///
+    /// Must be at least 1.
+    initial_delay_secs?: u64,
+    /// Upper bound of the random delay before any attempt in seconds (defaults
+    /// to 600).
+    ///
+    /// Must not be lower than `initial-delay-secs`.
+    max_delay_secs?: u64,
+    /// Time in seconds after which a connection on which the device has been
+    /// identified counts as stable, which resets the bound to
+    /// `initial-delay-secs` (defaults to 60).
+    stable_after_secs?: u64,
 }
 
 /// Multiplex connection capacity and burst handling.

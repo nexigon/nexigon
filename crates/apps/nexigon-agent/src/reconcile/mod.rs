@@ -5,7 +5,9 @@
 //! [`hub::Hub`] reads and writes these properties and the package versions they
 //! refer to, [`policy`] decides when an attempt may start, and [`process`] runs
 //! the tools that change the device. The functions of this module schedule the
-//! checks of a loop.
+//! checks of a loop. The loops run for the lifetime of the agent and reach
+//! Nexigon Hub through the agent's [`HubLink`], so a failed check is retried
+//! soon after the agent reconnects.
 
 use std::time::Duration;
 
@@ -13,6 +15,8 @@ use jiff::Timestamp;
 use jiff::tz::TimeZone;
 use nexigon_api::types::properties::OtaUpdateRetryPolicy;
 use nexigon_api::types::properties::OtaUpdateWindow;
+
+use crate::hub_link::HubLink;
 
 pub(crate) mod hub;
 pub(crate) mod policy;
@@ -55,6 +59,33 @@ pub(crate) fn next_check_delay(
 /// Random delay of up to `jitter`.
 pub(crate) fn random_delay(jitter: Duration) -> Duration {
     jitter.mul_f64(rand::random::<f64>())
+}
+
+/// Wait until the next scheduled check, or until the next check after a failed
+/// one if `delay` is `None`.
+///
+/// A failed check has most likely failed because the agent was disconnected.
+/// A session that starts after the first `sessions` sessions therefore ends the
+/// wait early, after a random delay of up to `jitter`.
+pub(crate) async fn wait_for_check(
+    link: &HubLink,
+    sessions: u64,
+    delay: Option<Duration>,
+    check_interval: Duration,
+    jitter: Duration,
+) {
+    let Some(delay) = delay else {
+        let reconnected = async {
+            link.connected_after(sessions).await;
+            tokio::time::sleep(random_delay(jitter)).await;
+        };
+        tokio::select! {
+            () = tokio::time::sleep(error_delay(check_interval) + random_delay(jitter)) => {}
+            () = reconnected => {}
+        }
+        return;
+    };
+    tokio::time::sleep(delay + random_delay(jitter)).await;
 }
 
 /// Whether a maintenance window allows an activation now.
@@ -111,4 +142,40 @@ fn clock_synchronized() -> bool {
 #[cfg(not(target_os = "linux"))]
 fn clock_synchronized() -> bool {
     true
+}
+
+#[cfg(test)]
+mod tests {
+    use std::time::Duration;
+
+    use bytes::Bytes;
+    use nexigon_ids::Generate;
+    use nexigon_ids::ids::DeviceId;
+    use nexigon_multiplex::Connection;
+    use nexigon_multiplex::transport::InMemory;
+
+    use super::wait_for_check;
+    use crate::hub_link::hub_link;
+
+    /// After a failed check, a new session ends the wait before the error delay.
+    #[tokio::test(start_paused = true)]
+    async fn failed_check_is_retried_after_reconnecting() {
+        let (controller, link) = hub_link();
+        let wait = tokio::spawn({
+            let link = link.clone();
+            async move {
+                wait_for_check(&link, 0, None, Duration::from_secs(3600), Duration::ZERO).await;
+            }
+        });
+        tokio::time::sleep(Duration::from_secs(60)).await;
+        assert!(!wait.is_finished());
+
+        let (_hub_transport, agent_transport) = InMemory::<Bytes, Bytes>::new_buffered(1);
+        let connection = Connection::new(agent_transport);
+        controller.connected(DeviceId::generate(), connection.make_ref());
+        tokio::time::timeout(Duration::from_secs(1), wait)
+            .await
+            .expect("the wait did not end after reconnecting")
+            .unwrap();
+    }
 }
