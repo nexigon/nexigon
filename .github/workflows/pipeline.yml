@@ -8,10 +8,6 @@ on:
   workflow_dispatch:
 
 env:
-  # Download link for the `cargo-deny` binary to use.
-  CARGO_DENY_URL: https://github.com/EmbarkStudios/cargo-deny/releases/download/0.19.0/cargo-deny-0.19.0-x86_64-unknown-linux-musl.tar.gz
-  # Download link for the `sidex` binary to use.
-  SIDEX_URL: https://github.com/silitics/sidex/releases/download/v0.5.0/sidex-x86_64-unknown-linux-musl.tar.gz
   # Download link for the `cross` binary to use.
   CROSS_URL: https://github.com/cross-rs/cross/releases/download/v0.2.5/cross-x86_64-unknown-linux-gnu.tar.gz
 
@@ -21,34 +17,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - name: Install Rust Toolchain
-        uses: dtolnay/rust-toolchain@2c76c034f9e32a5d6e2c104dc4df23a22476db04 # nightly (2026-10-16)
-        with:
-          toolchain: nightly-2026-07-11
-          components: rustfmt, clippy
-      - name: Install Taplo
-        uses: dtolnay/install@57f7e777ffdf686356dacb00dd97cd42aa170733 # taplo-cli (2025-05-24)
-      - name: Install Cargo Deny
-        run: curl -s -L "$CARGO_DENY_URL" | tar xvzf - -C /usr/local/bin --strip-components=1 --wildcards --no-anchored 'cargo-deny'
-      - name: Install Sidex
-        run: curl -fsSL "$SIDEX_URL" | tar xzf - -C /usr/local/bin sidex
+      - uses: cachix/install-nix-action@75c75c31ebece974e48ebc36b4ad125bd97bd97b # v31
+      - uses: jdx/mise-action@8418fedb1110381a0d3ba51a7a415d7c1b884550 # v5.2.2
       - name: Run Checks
-        run: |
-          bash -n installer/*.sh
-          bash -n scripts/*.sh
-          installer/test-install-hub.sh
-          cargo deny check
-          cargo fmt --check
-          cargo clippy --all-targets --all-features -- -D warnings
-          taplo fmt --check
-          for directory in \
-            crates/libs/nexigon-api \
-            crates/libs/nexigon-agent-api \
-            crates/libs/nexigon-agent-protocol \
-            crates/apps/nexigon-cli \
-            crates/apps/nexigon-agent; do
-              (cd "$directory" && sidex fmt --check && sidex check)
-          done
+        run: mise run check
+
   test:
     name: Test
     needs: check
@@ -58,10 +31,11 @@ jobs:
         os: [ubuntu-latest, macos-latest, windows-latest]
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - name: Install Rust Toolchain
-        uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec # stable (2026-10-16)
+      - uses: jdx/mise-action@8418fedb1110381a0d3ba51a7a415d7c1b884550 # v5.2.2
+        with:
+          install: false
       - name: Run Tests
-        run: cargo test
+        run: mise exec rust@stable -- cargo test
   build:
     name: Build
     runs-on: ${{ matrix.os }}
@@ -103,30 +77,27 @@ jobs:
         with:
           fetch-tags: true
           fetch-depth: 0
-      - name: Install Rust Toolchain
-        uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec # stable (2026-10-16)
-        if: ${{ !matrix.cross }}
+      - uses: jdx/mise-action@8418fedb1110381a0d3ba51a7a415d7c1b884550 # v5.2.2
         with:
-          target: ${{ matrix.target }}
+          install: false
+      - name: Install target for native builds
+        if: ${{ !matrix.cross }}
+        shell: bash
+        env:
+          BUILD_TARGET: ${{ matrix.target }}
+        run: mise exec rust@stable -- rustup target add "$BUILD_TARGET" --toolchain stable
       - name: Install Cross
         if: ${{ matrix.cross }}
         run: curl -s -L "$CROSS_URL" | tar xvzf - -C /usr/local/bin
       - name: Determine Version
+        shell: bash
         run: echo "NEXIGON_GIT_VERSION=$(git describe --tags --always)" >> "$GITHUB_ENV"
       - name: Run Build
         shell: bash
-        run: |
-          set -euo pipefail
-          TARGET="${{ matrix.target }}"
-          if [ "${{ matrix.cross }}" == "true" ]; then
-              cross build --locked --release --bins --target "$TARGET"
-          else
-              cargo build --locked --release --bins --target "$TARGET"
-          fi
-          mkdir -p build/binaries
-          shopt -s extglob
-          cd "target/$TARGET/release"
-          tar -czf "../../../build/binaries/$TARGET.tar.gz" nexigon-+([a-z])?(.exe)
+        env:
+          BUILD_TARGET: ${{ matrix.target }}
+          BUILD_CROSS: ${{ matrix.cross }}
+        run: mise exec rust@stable -- bash scripts/build-binaries.sh "$BUILD_TARGET" "${BUILD_CROSS:-false}"
       - name: Upload Binaries
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
@@ -225,10 +196,11 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - name: Install Rust Toolchain
-        uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec # stable (2026-10-16)
+      - uses: jdx/mise-action@8418fedb1110381a0d3ba51a7a415d7c1b884550 # v5.2.2
+        with:
+          install: false
       - name: Install cargo-cyclonedx
-        run: cargo install cargo-cyclonedx --version 0.5.9 --locked
+        run: mise exec rust@stable -- cargo install cargo-cyclonedx --version 0.5.9 --locked
       - name: Download Binaries
         uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
@@ -250,7 +222,7 @@ jobs:
         run: |
           mkdir -p build/release
           cp build/binaries/* build/debs/* build/source/* build/release/
-          ./scripts/prepare-release-assets.sh build/release
+          mise exec rust@stable -- bash scripts/prepare-release-assets.sh build/release
           find build/release -maxdepth 1 -type f -printf '%f\n' | sort
       - name: Create GitHub Release
         env:

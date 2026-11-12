@@ -43,6 +43,17 @@
           };
         };
 
+        devShells.default = pkgs.mkShell {
+          packages = with pkgs; [
+            mise
+            cargo-deny
+            shellcheck
+            jq
+            openssl
+            pkg-config
+          ];
+        };
+
         packages.default = pkgs.rustPlatform.buildRustPackage {
           name = "nexigon";
           src = ./.;

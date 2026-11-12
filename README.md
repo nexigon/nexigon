@@ -38,6 +38,19 @@ The agent converts the Hub domain to an HTTPS endpoint. If the pairing value
 omits the domain, the agent instead tries the Hub endpoints from its
 provisioning configuration.
 
+## Development
+
+Install [mise](https://mise.jdx.dev/) and Nix with flakes enabled, then run:
+
+```sh
+mise install
+mise run check
+mise run test
+```
+
+Use `mise run build [target]` to build binary archives. Cross-compilation with
+`--cross` also requires Cross and its supported container runtime.
+
 ## Security
 
 For information about reporting security vulnerabilities, see [SECURITY.md](SECURITY.md).
