@@ -3,7 +3,7 @@ rust = { version = "nightly-2026-07-11", profile = "default", components = "rust
 taplo = "latest"
 python = "latest"
 uv = "latest"
-"github:silitics/sidex" = { version = "0.5.0", exe = "sidex" }
+"github:silitics/sidex" = "0.5.0"
 
 [tasks.check]
 shell = "nix develop \"{{config_root}}\" --command bash -euo pipefail -c"
