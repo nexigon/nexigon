@@ -46,7 +46,7 @@ for binary in "${binaries[@]}"; do
 done
 
 mkdir -p build/binaries
-archive="$(mktemp "$repository_root/build/binaries/.$target.XXXXXX")"
+archive="$(mktemp "build/binaries/.$target.XXXXXX")"
 trap 'rm -f -- "$archive"' EXIT
 tar -czf "$archive" -C "$release_directory" "${binaries[@]}"
 mv -- "$archive" "build/binaries/$target.tar.gz"
