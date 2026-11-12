@@ -4,96 +4,51 @@ taplo = "latest"
 python = "latest"
 uv = "latest"
 "github:silitics/sidex" = { version = "0.5.0", exe = "sidex" }
-"nix:cargo-deny" = "latest"
 
 [tasks.check]
+shell = "nix develop \"{{config_root}}\" --command bash -euo pipefail -c"
 description = "Lint and check formatting."
-run = [
-  "cargo deny check",
-  "cargo fmt --check",
-  "cargo clippy --all-targets --all-features -- -D warnings",
-  "taplo fmt --check",
-  "cd crates/libs/nexigon-api && sidex fmt --check && sidex check",
-  "cd crates/libs/nexigon-agent-api && sidex fmt --check && sidex check",
-  "cd crates/libs/nexigon-agent-protocol && sidex fmt --check && sidex check",
-  "cd crates/apps/nexigon-cli && sidex fmt --check && sidex check",
-  "cd crates/apps/nexigon-agent && sidex fmt --check && sidex check",
-]
+run = "bash \"{{config_root}}/scripts/check.sh\""
 
 [tasks.fmt]
 description = "Format all files."
-run = [
-  "cargo fmt",
-  "taplo fmt",
-  "cd crates/libs/nexigon-api && sidex fmt",
-  "cd crates/libs/nexigon-agent-api && sidex fmt",
-  "cd crates/libs/nexigon-agent-protocol && sidex fmt",
-  "cd crates/apps/nexigon-cli && sidex fmt",
-  "cd crates/apps/nexigon-agent && sidex fmt",
-]
+run = "bash scripts/fmt.sh"
 
 [tasks.fix]
+shell = "nix develop \"{{config_root}}\" --command bash -euo pipefail -c"
 description = "Auto-fix lint findings, then format."
-run = [
-  "cargo clippy --all-targets --all-features --fix --allow-dirty --allow-staged",
-  "cd crates/libs/nexigon-api && sidex check --fix",
-  "cd crates/libs/nexigon-agent-api && sidex check --fix",
-  "cd crates/libs/nexigon-agent-protocol && sidex check --fix",
-  "cd crates/apps/nexigon-cli && sidex check --fix",
-  "cd crates/apps/nexigon-agent && sidex check --fix",
-  "mise run fmt",
-]
+run = "bash \"{{config_root}}/scripts/fix.sh\""
 
 [tasks.doc]
+shell = "nix develop \"{{config_root}}\" --command bash -euo pipefail -c"
 description = "Generate Rust documentation."
-run = "cargo +nightly doc --all-features --document-private-items"
+run = "cargo doc --all-features --document-private-items"
 
 [tasks.test]
+shell = "nix develop \"{{config_root}}\" --command bash -euo pipefail -c"
 description = "Run tests."
 run = "cargo test"
 
 [tasks.generate]
+shell = "nix develop \"{{config_root}}\" --command bash -euo pipefail -c"
 description = "Regenerate JSON schemas and OpenAPI spec."
-run = [
-  "cd crates/libs/nexigon-api && sidex generate json-schema ../../../build/api-json-schema",
-  "cd crates/apps/nexigon-cli && sidex generate json-schema ../../../build/cli-json-schema",
-  "cd crates/apps/nexigon-agent && sidex generate json-schema ../../../build/agent-json-schema",
-  "mv build/api-json-schema/schema-defs.json crates/utils/nexigon-gen-openapi/schemas.json",
-  "mv build/cli-json-schema/nexigon_cli.config.Config.schema.json schemas/nexigon-cli.schema.json",
-  "mv build/agent-json-schema/nexigon_agent.config.Config.schema.json schemas/nexigon-agent.schema.json",
-  "cargo run --bin nexigon-gen-openapi >api/openapi.json",
-  "mise run fmt",
-]
+run = "bash scripts/generate-api.sh \"$@\""
 
 [tasks.build]
+shell = "nix develop \"{{config_root}}\" --command bash -euo pipefail -c"
 description = "Build release binaries. Defaults to the host target."
 usage = '''
 arg "[target]" default="" help="Build target triple (defaults to host)"
 flag "--cross" help="Use cross instead of cargo (for cross-compilation)"
 '''
-run = '''
-#!/usr/bin/env bash
-set -euo pipefail
-TARGET="{{arg(name="target")}}"
-if [ -z "$TARGET" ]; then
-    TARGET=$(rustc --version --verbose | grep -o 'host:.*' | awk '{print $2}')
-fi
-export NEXIGON_GIT_VERSION="${NEXIGON_GIT_VERSION:-$(git describe --tags --always 2>/dev/null || echo unknown)}"
-if [ "{{flag(name="cross")}}" == "true" ]; then
-    cross build --locked --release --bins --target "$TARGET"
-else
-    cargo build --locked --release --bins --target "$TARGET"
-fi
-mkdir -p build/binaries
-shopt -s extglob
-cd "target/$TARGET/release"
-tar -czf "../../../build/binaries/$TARGET.tar.gz" nexigon-+([a-z])?(.exe)
-'''
+run = "bash scripts/build-binaries.sh \"$usage_target\" \"${usage_cross:-false}\""
 
 [tasks."run-cli"]
+shell = "nix develop \"{{config_root}}\" --command bash -euo pipefail -c"
 description = "Run Nexigon CLI. Forward args after `--`."
 run = 'cargo run --bin nexigon-cli -- "$@"'
 
 [tasks."run-agent"]
+shell = "nix develop \"{{config_root}}\" --command bash -euo pipefail -c"
 description = "Run Nexigon Agent. Forward args after `--`."
 run = 'cargo run --bin nexigon-agent -- "$@"'

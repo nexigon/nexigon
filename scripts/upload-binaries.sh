@@ -2,7 +2,22 @@
 
 set -euo pipefail
 
-NEXIGON_CLI=${NEXIGON_CLI:-"just run-cli"}
+cd -- "$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
+
+run_cli() {
+    if [[ -n "${NEXIGON_CLI:-}" ]]; then
+        "$NEXIGON_CLI" "$@"
+    else
+        mise run run-cli -- "$@"
+    fi
+}
+
+shopt -s nullglob
+archives=(build/binaries/*.tar.gz)
+if [[ ${#archives[@]} -eq 0 ]]; then
+    echo "No binary archives found in build/binaries. Build them before uploading." >&2
+    exit 1
+fi
 
 TIMESTAMP=$(date +"%Y%m%d%H%M%S")
 
@@ -15,35 +30,42 @@ DESCRIBED_VERSION=$(git describe --tags --always)
 
 
 function upload_binaries() {
-    local build_version_info version_id filename target asset_info asset_id
+    local build_version_info version_id filename target asset_info asset_id archive uploaded
 
     local crate=$1
     # Check whether the build version already exists. Otherwise, create it.
-    build_version_info=$($NEXIGON_CLI repositories versions resolve "nexigon-downloads/$crate/$BUILD_VERSION")
+    build_version_info=$(run_cli repositories versions resolve "nexigon-downloads/$crate/$BUILD_VERSION")
     if [ "$(echo "$build_version_info" | jq -r '.result')" == "Found" ]; then
         echo "Build version already exists, updating it."
-        version_id=$(echo "$build_version_info" | jq -r '.versionId')
+        version_id=$(echo "$build_version_info" | jq -er '.versionId')
     else
         echo "Build version does not exist, creating it."
-        version_id=$($NEXIGON_CLI repositories versions create "nexigon-downloads/$crate" --tag "$BUILD_VERSION,locked" | jq -r '.versionId')
+        version_id=$(run_cli repositories versions create "nexigon-downloads/$crate" --tag "$BUILD_VERSION,locked" | jq -er '.versionId')
     fi
 
     echo "VERSION_ID=$version_id"
     echo "DESCRIBED_VERSION=$DESCRIBED_VERSION"
 
-    for archive in build/binaries/*.tar.gz; do
+    for archive in "${archives[@]}"; do
+        uploaded=false
         filename=$(basename "$archive")
         target=${filename%.tar.gz}
         mkdir -p "build/binaries/$target"
-        if tar -xzf "$archive" -C "build/binaries/$target" "$crate"; then
-            asset_info=$($NEXIGON_CLI repositories assets upload nexigon-downloads "build/binaries/$target/$crate")
-            asset_id=$(echo "$asset_info" | jq -r '.assetId')
-            $NEXIGON_CLI repositories versions assets add "$version_id" "$asset_id" "$target/$crate"
+        if tar -xzf "$archive" -C "build/binaries/$target" "$crate" 2>/dev/null; then
+            uploaded=true
+            asset_info=$(run_cli repositories assets upload nexigon-downloads "build/binaries/$target/$crate")
+            asset_id=$(echo "$asset_info" | jq -er '.assetId')
+            run_cli repositories versions assets add "$version_id" "$asset_id" "$target/$crate"
         fi
-        if tar -xzf "$archive" -C "build/binaries/$target" "$crate.exe"; then
-            asset_info=$($NEXIGON_CLI repositories assets upload nexigon-downloads "build/binaries/$target/$crate.exe")
-            asset_id=$(echo "$asset_info" | jq -r '.assetId')
-            $NEXIGON_CLI repositories versions assets add "$version_id" "$asset_id" "$target/$crate.exe"
+        if tar -xzf "$archive" -C "build/binaries/$target" "$crate.exe" 2>/dev/null; then
+            uploaded=true
+            asset_info=$(run_cli repositories assets upload nexigon-downloads "build/binaries/$target/$crate.exe")
+            asset_id=$(echo "$asset_info" | jq -er '.assetId')
+            run_cli repositories versions assets add "$version_id" "$asset_id" "$target/$crate.exe"
+        fi
+        if [[ "$uploaded" != true ]]; then
+            echo "Archive $archive contains neither $crate nor $crate.exe." >&2
+            exit 1
         fi
     done
 
@@ -59,7 +81,7 @@ function upload_binaries() {
         tag_args+=(--tag "v${BASH_REMATCH[1]}.${BASH_REMATCH[2]},reassign")
     fi
 
-    $NEXIGON_CLI repositories versions tag "$version_id" "${tag_args[@]}"
+    run_cli repositories versions tag "$version_id" "${tag_args[@]}"
 }
 
 upload_binaries "nexigon-agent"
