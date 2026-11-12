@@ -95,6 +95,11 @@ impl RugixApps {
         .map(drop)
     }
 
+    /// Start the workload of the active generation of an app.
+    pub(crate) async fn start(&self, app: &str) -> anyhow::Result<()> {
+        run(RUGIX_CTRL, &["apps", "start", app]).await.map(drop)
+    }
+
     /// Deactivate an app, which stops its workload, also after a reboot.
     pub(crate) async fn deactivate(&self, app: &str) -> anyhow::Result<()> {
         run(RUGIX_CTRL, &["apps", "deactivate", app])
@@ -134,6 +139,13 @@ impl AppInfo {
             self.lifecycle.state,
             LifecycleState::Active | LifecycleState::Starting | LifecycleState::Stopping
         )
+    }
+
+    /// Whether the app is active but its workload does not run, for example
+    /// because it exited or did not restart after a reboot.
+    pub(crate) fn is_halted(&self) -> bool {
+        matches!(self.lifecycle.state, LifecycleState::Active)
+            && matches!(self.status, RugixWorkloadStatus::Stopped)
     }
 
     /// Number of the active generation, if the app is active.
@@ -266,8 +278,9 @@ mod tests {
     use super::*;
 
     /// Generations are found by the package version in their origin, the active
-    /// generation only counts while the app is active, and a deactivated app
-    /// deploys its most recently activated generation.
+    /// generation only counts while the app is active, a deactivated app
+    /// deploys its most recently activated generation, and only an active app
+    /// with a stopped workload is halted.
     #[test]
     fn generations_from_app_info() {
         let version =
@@ -299,9 +312,14 @@ mod tests {
         assert_eq!(active.version_of(2), Some(&version("b")));
         assert_eq!(active.version_of(3), None);
         assert!(matches!(active.workload(), RugixAppWorkloadStatus::Stopped));
+        assert!(active.is_halted());
 
         let inactive = info(r#"{"state":"inactive"}"#);
         assert_eq!(inactive.active_generation(), None);
         assert_eq!(inactive.deployed_generation(), Some(2));
+        assert!(!inactive.is_halted());
+
+        let starting = info(r#"{"state":"starting","generation":2}"#);
+        assert!(!starting.is_halted());
     }
 }

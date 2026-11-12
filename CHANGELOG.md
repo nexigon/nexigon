@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+- Start the workload of an app that is supposed to run but stopped while its
+  generation stayed active, for example because its containers did not restart
+  after a reboot. Previously, the Agent reported such an app as up to date and
+  left it stopped.
+
+- Authenticate the Agent with a device private key held by hardware, such as
+  a TPM, a PKCS#11 token, or the Raspberry Pi firmware, instead of a key file.
+  Configure a signer script for the key in the new `[signer]` section. The
+  Agent obtains the public key from the script and has it sign the device
+  certificate and each TLS handshake. With a signer, the Agent does not
+  generate a key file.
+
 - Preserve system update status when a repository lookup is rejected
   by Nexigon Hub, for example because execution capacity is exhausted. Retry
   the check instead of treating the version as missing.

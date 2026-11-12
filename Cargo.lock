@@ -1275,6 +1275,7 @@ name = "nexigon-cert"
 version = "0.1.0"
 dependencies = [
  "rcgen",
+ "ring",
  "serde",
  "sha1",
  "sha2",

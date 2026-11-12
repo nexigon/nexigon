@@ -11,6 +11,7 @@ homepage.workspace = true
 bytes.workspace = true
 futures.workspace = true
 nexigon-api.workspace = true
+nexigon-cert.workspace = true
 nexigon-ids.workspace = true
 nexigon-multiplex.workspace = true
 nexigon-rpc.workspace = true
@@ -26,6 +27,5 @@ urlencoding.workspace = true
 x509-cert.workspace = true
 
 [dev-dependencies]
-nexigon-cert.workspace = true
 rcgen.workspace = true
 tokio-rustls = "0.26"

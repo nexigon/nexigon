@@ -22,6 +22,9 @@
     "ssl-key": {
       "$ref": "#/$defs/nexigon_agent.config.PathBuf"
     },
+    "signer": {
+      "$ref": "#/$defs/nexigon_agent.config.SignerConfig"
+    },
     "dangerous-allow-plaintext": {
       "type": "boolean"
     },
@@ -441,6 +444,28 @@
         }
       },
       "required": [],
+      "unevaluatedProperties": false
+    },
+    "nexigon_agent.config.SignerConfig": {
+      "type": "object",
+      "description": "Signer script for a device private key held by hardware.\n\nThe agent runs the signer script to read the public key and to sign the\ndevice certificate and TLS handshakes. With a signer, the agent does not\ngenerate a key file.",
+      "properties": {
+        "script": {
+          "$ref": "#/$defs/nexigon_agent.config.PathBuf"
+        },
+        "timeout-secs": {
+          "type": [
+            "integer",
+            "string"
+          ],
+          "format": "uint64",
+          "minimum": 0,
+          "pattern": "^[0-9]+$"
+        }
+      },
+      "required": [
+        "script"
+      ],
       "unevaluatedProperties": false
     },
     "nexigon_agent.config.TcpPort": {

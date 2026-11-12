@@ -63,6 +63,7 @@ pub mod provisioning;
 mod reconcile;
 mod reconnect;
 mod rugix_apps;
+mod signer;
 pub mod system_info;
 pub mod system_updates;
 #[cfg(target_os = "linux")]
@@ -76,6 +77,7 @@ pub use run::run_with_connection;
 
 use crate::config::Config;
 use crate::config::MultiplexSettings;
+use crate::config::SignerConfig;
 use crate::reconnect::Reconnector;
 use crate::reconnect::reconnect_settings;
 use crate::run::Connections;
@@ -283,29 +285,10 @@ pub(crate) async fn load_device_identity(
             .as_deref()
             .unwrap_or(Path::new("/etc/nexigon/agent/ssl/cert.pem")),
     );
-    let key_path = config_dir.join(
-        config
-            .ssl_key
-            .as_deref()
-            .unwrap_or(Path::new("/etc/nexigon/agent/ssl/key.pem")),
-    );
-    let cert_exists = regular_file_exists(&cert_path, "SSL certificate").await?;
-    let key_exists = private_file_exists(&key_path, "SSL private key").await?;
-    match (cert_exists, key_exists) {
-        (false, true) => bail!("found SSL key but certificate is missing"),
-        (true, false) => bail!("found SSL certificate but private key is missing"),
-        (false, false) => {
-            info!(?cert_path, "generating SSL certificate and key");
-            generate_device_identity_files(
-                &cert_path,
-                &key_path,
-                config.ssl_cert.is_none(),
-                config.ssl_key.is_none(),
-            )
-            .await?;
-        }
-        (true, true) => {}
-    }
+    let client_identity = match &config.signer {
+        Some(signer) => load_signer_identity(config, config_dir, signer, &cert_path).await?,
+        None => load_pem_identity(config, config_dir, &cert_path).await?,
+    };
     let fingerprint_data =
         tokio::process::Command::new(config_dir.join(&config.fingerprint_script))
             .stderr(Stdio::inherit())
@@ -315,7 +298,89 @@ pub(crate) async fn load_device_identity(
             .context("running fingerprint script")?
             .stdout;
     let fingerprint = DeviceFingerprint::from_data(&fingerprint_data);
-    let cert = nexigon_common::secure_file::read_regular(&cert_path)
+    Ok(DeviceIdentity {
+        client_identity,
+        fingerprint,
+    })
+}
+
+/// Load the identity with the private key held by the configured signer.
+///
+/// Generates a certificate signed by the signer if none exists.
+async fn load_signer_identity(
+    config: &Config,
+    config_dir: &Path,
+    signer: &SignerConfig,
+    cert_path: &Path,
+) -> anyhow::Result<ClientIdentity> {
+    if config.ssl_key.is_some() {
+        bail!("set either ssl-key or signer, not both");
+    }
+    let key = signer::load_signer_key(signer, config_dir)
+        .await
+        .context("cannot load device key from signer")?;
+    if !regular_file_exists(cert_path, "SSL certificate").await? {
+        info!(?cert_path, "generating SSL certificate with signer");
+        let certificate = tokio::task::spawn_blocking({
+            let key = key.clone();
+            move || nexigon_cert::generate_self_signed_certificate_for(&key)
+        })
+        .await
+        .expect("certificate generation does not panic")
+        .map_err(anyhow::Error::from_boxed)
+        .context("cannot generate SSL certificate with signer")?;
+        nexigon_common::secure_file::write_public(
+            cert_path,
+            certificate.to_pem(),
+            config.ssl_cert.is_none(),
+        )
+        .await
+        .context("cannot create certificate atomically")?;
+    }
+    let cert = nexigon_common::secure_file::read_regular(cert_path)
+        .await
+        .context("cannot read certificate")?;
+    let cert = String::from_utf8(cert).context("certificate is not valid UTF-8")?;
+    ClientIdentity::from_external_key(&cert, key).with_context(|| {
+        format!(
+            "cannot use SSL certificate {} with the signer's key",
+            cert_path.display()
+        )
+    })
+}
+
+/// Load the identity with the private key from a PEM file.
+///
+/// Generates a private key and certificate if neither exists.
+async fn load_pem_identity(
+    config: &Config,
+    config_dir: &Path,
+    cert_path: &Path,
+) -> anyhow::Result<ClientIdentity> {
+    let key_path = config_dir.join(
+        config
+            .ssl_key
+            .as_deref()
+            .unwrap_or(Path::new("/etc/nexigon/agent/ssl/key.pem")),
+    );
+    let cert_exists = regular_file_exists(cert_path, "SSL certificate").await?;
+    let key_exists = private_file_exists(&key_path, "SSL private key").await?;
+    match (cert_exists, key_exists) {
+        (false, true) => bail!("found SSL key but certificate is missing"),
+        (true, false) => bail!("found SSL certificate but private key is missing"),
+        (false, false) => {
+            info!(?cert_path, "generating SSL certificate and key");
+            generate_device_identity_files(
+                cert_path,
+                &key_path,
+                config.ssl_cert.is_none(),
+                config.ssl_key.is_none(),
+            )
+            .await?;
+        }
+        (true, true) => {}
+    }
+    let cert = nexigon_common::secure_file::read_regular(cert_path)
         .await
         .context("cannot read certificate")?;
     let key = nexigon_common::secure_file::read_private(&key_path)
@@ -323,11 +388,7 @@ pub(crate) async fn load_device_identity(
         .context("cannot read private key")?;
     let cert = String::from_utf8(cert).context("certificate is not valid UTF-8")?;
     let key = String::from_utf8(key).context("private key is not valid UTF-8")?;
-    let identity = ClientIdentity::from_pem(&cert, &key).context("cannot parse identity")?;
-    Ok(DeviceIdentity {
-        client_identity: identity,
-        fingerprint,
-    })
+    ClientIdentity::from_pem(&cert, &key).context("cannot parse identity")
 }
 
 async fn generate_device_identity_files(
@@ -606,5 +667,120 @@ mod credential_file_tests {
         let link_path = root.path().join("agent-link.toml");
         std::os::unix::fs::symlink(&config_path, &link_path).unwrap();
         assert!(load_config(&link_path).await.is_err());
+    }
+}
+
+#[cfg(all(test, unix))]
+mod signer_identity_tests {
+    use std::os::unix::fs::PermissionsExt;
+    use std::path::Path;
+
+    use tempfile::TempDir;
+    use tempfile::tempdir;
+
+    use super::load_config;
+    use super::load_device_identity;
+
+    /// Without a certificate, the agent obtains the public key from the signer
+    /// script, has it sign a new certificate, and reuses that certificate later.
+    #[tokio::test]
+    async fn signer_generates_and_reuses_the_certificate() {
+        let root = device_with_signer(&signer_script(OPENSSL_SIGN), "");
+        let (config, config_dir) = load_config(&root.path().join("agent.toml")).await.unwrap();
+
+        load_device_identity(&config, &config_dir).await.unwrap();
+        let certificate = std::fs::read(root.path().join("cert.pem")).unwrap();
+        load_device_identity(&config, &config_dir).await.unwrap();
+
+        assert_eq!(
+            std::fs::read(root.path().join("cert.pem")).unwrap(),
+            certificate
+        );
+    }
+
+    /// The signer signs on a runtime worker thread, where rustls signs TLS
+    /// handshakes, and its signature verifies with the public key.
+    #[tokio::test(flavor = "multi_thread")]
+    async fn signer_signs_on_a_runtime_worker() {
+        let root = device_with_signer(&signer_script(OPENSSL_SIGN), "");
+        let (config, config_dir) = load_config(&root.path().join("agent.toml")).await.unwrap();
+        let key = crate::signer::load_signer_key(config.signer.as_ref().unwrap(), &config_dir)
+            .await
+            .unwrap();
+
+        tokio::spawn(async move { key.sign(b"handshake transcript") })
+            .await
+            .unwrap()
+            .unwrap();
+    }
+
+    /// Signer failures, timeouts, and invalid signatures are reported clearly,
+    /// and the agent neither creates a certificate nor falls back to a key file.
+    #[tokio::test]
+    async fn signer_failures_are_reported_without_creating_an_identity() {
+        let locked = signer_script("echo 'key is SIGN_LOCKED' >&2; exit 3");
+        let hanging = signer_script("sleep 10");
+        let invalid = signer_script("cat >/dev/null; printf 'not a signature'");
+        for (script, timeout, expected) in [
+            (
+                locked.as_str(),
+                "",
+                "failed operation `sign` with exit status: 3: key is SIGN_LOCKED",
+            ),
+            (
+                hanging.as_str(),
+                "timeout-secs = 1",
+                "timed out after 1 seconds in operation `sign`",
+            ),
+            (
+                invalid.as_str(),
+                "",
+                "signature does not verify with the public key",
+            ),
+        ] {
+            let root = device_with_signer(script, timeout);
+            let (config, config_dir) = load_config(&root.path().join("agent.toml")).await.unwrap();
+
+            let error = load_device_identity(&config, &config_dir)
+                .await
+                .unwrap_err();
+
+            assert!(format!("{error:#}").contains(expected), "{error:#}");
+            assert!(!root.path().join("cert.pem").exists());
+        }
+    }
+
+    /// Signs stdin with the software key `$KEY`.
+    const OPENSSL_SIGN: &str = "openssl dgst -sha256 -sign \"$KEY\"";
+
+    /// Signer script that reads the public key of the software key `$KEY` with
+    /// OpenSSL and runs the given command for the `sign` operation. Requires an
+    /// `openssl` executable.
+    fn signer_script(sign: &str) -> String {
+        format!(
+            "#!/bin/sh\nset -e\nKEY=\"$(dirname \"$0\")/key.pem\"\ncase \"$1\" in\n  public-key) openssl pkey -in \"$KEY\" -pubout -outform DER ;;\n  sign) {sign} ;;\nesac\n"
+        )
+    }
+
+    /// Create a device directory with the given signer script and options.
+    fn device_with_signer(script: &str, signer_options: &str) -> TempDir {
+        let root = tempdir().unwrap();
+        let (_, key) = nexigon_cert::generate_self_signed_certificate();
+        std::fs::write(root.path().join("key.pem"), key).unwrap();
+        write_executable(&root.path().join("fingerprint"), "#!/bin/sh\necho device\n");
+        write_executable(&root.path().join("signer"), script);
+        std::fs::write(
+            root.path().join("agent.toml"),
+            format!(
+                "fingerprint-script = \"fingerprint\"\nssl-cert = \"cert.pem\"\n\n[signer]\nscript = \"signer\"\n{signer_options}\n"
+            ),
+        )
+        .unwrap();
+        root
+    }
+
+    fn write_executable(path: &Path, contents: &str) {
+        std::fs::write(path, contents).unwrap();
+        std::fs::set_permissions(path, std::fs::Permissions::from_mode(0o755)).unwrap();
     }
 }

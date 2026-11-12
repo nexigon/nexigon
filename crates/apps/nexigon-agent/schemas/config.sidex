@@ -31,7 +31,12 @@ record Config {
     /// Path to the device certificate.
     ssl_cert?: PathBuf,
     /// Path to the device private key.
+    ///
+    /// Must not be set together with `signer`.
     ssl_key?: PathBuf,
+    /// Signer script for a device private key held by hardware, used instead
+    /// of `ssl-key`.
+    signer?: SignerConfig,
     /// Allow credentials to be sent over plaintext HTTP/WebSocket.
     ///
     /// This is intended only for explicitly trusted development networks.
@@ -62,6 +67,21 @@ record Config {
     provisioning?: ProvisioningConfig,
     /// Integrations with update systems on the device.
     integrations?: IntegrationsConfig,
+}
+
+/// Signer script for a device private key held by hardware.
+///
+/// The agent runs the signer script to read the public key and to sign the
+/// device certificate and TLS handshakes. With a signer, the agent does not
+/// generate a key file.
+#[json(rename_all = "kebab-case")]
+record SignerConfig {
+    /// Executable implementing the signer protocol.
+    script: PathBuf,
+    /// Seconds after which a signer operation fails (defaults to 10).
+    ///
+    /// Must be at least 1.
+    timeout_secs?: u64,
 }
 
 /// Integrations with update systems on the device.

@@ -1490,8 +1490,9 @@ async fn terminate_command_child(child: &mut tokio::process::Child, process_grou
     child.wait().await.ok();
 }
 
+/// Kill a process group, returning whether the signal was sent.
 #[cfg(unix)]
-fn kill_command_process_group(process_group: Option<i32>) -> bool {
+pub(crate) fn kill_command_process_group(process_group: Option<i32>) -> bool {
     process_group.is_some_and(|group| {
         nix::sys::signal::killpg(
             nix::unistd::Pid::from_raw(group),
@@ -1502,7 +1503,7 @@ fn kill_command_process_group(process_group: Option<i32>) -> bool {
 }
 
 #[cfg(not(unix))]
-fn kill_command_process_group(_process_group: Option<i32>) -> bool {
+pub(crate) fn kill_command_process_group(_process_group: Option<i32>) -> bool {
     false
 }
 

@@ -225,7 +225,6 @@ fn is_permanent(error: &ClientError) -> bool {
         error,
         ClientError::UnsupportedUrlScheme(_)
             | ClientError::PlaintextTransportDisabled
-            | ClientError::InvalidClientIdentity { .. }
             | ClientError::CryptoProviderUnavailable
     )
 }

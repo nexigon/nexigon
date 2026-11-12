@@ -14,7 +14,9 @@
 //! either changes.
 //!
 //! A check first starts or stops each app according to its desired state,
-//! regardless of the update policies. A version change then has two steps.
+//! regardless of the update policies. An app that should run but whose
+//! workload stopped, for example after a reboot, starts again. A version
+//! change then has two steps.
 //! Installing downloads the bundle into a new generation without interrupting
 //! the app, so it may happen outside the maintenance window. Activating switches
 //! the app to the generation, which the window restricts while the app runs. A
@@ -339,9 +341,10 @@ impl Checker {
 
     /// Start or stop an installed app according to its desired state.
     ///
-    /// A stopped app whose target version is installed starts with that version,
-    /// which [`Self::update`] activates as a version change. Returns the
-    /// information about the app after the change.
+    /// Also starts the workload of an active app if it stopped. A stopped app
+    /// whose target version is installed starts with that version, which
+    /// [`Self::update`] activates as a version change. Returns the information
+    /// about the app after the change.
     async fn apply_state(
         &mut self,
         app: &ManagedApp<'_>,
@@ -361,6 +364,12 @@ impl Checker {
                 self.changed = true;
                 self.rugix.activate(app.name, generation).await?;
                 info!(app = app.name, "started app");
+            }
+            (RugixAppDesiredState::Running, Some(_)) if info.is_halted() && !starts_with_target => {
+                let _guard = self.lock_device().await?;
+                self.changed = true;
+                self.rugix.start(app.name).await?;
+                info!(app = app.name, "started stopped app workload");
             }
             (RugixAppDesiredState::Stopped, _) if info.is_active() => {
                 let _guard = self.lock_device().await?;
@@ -470,7 +479,9 @@ impl Checker {
             Some(_) => {}
         }
 
-        let runs = info.is_some_and(AppInfo::is_active);
+        // A halted app is not interrupted, so the maintenance window does not
+        // restrict switching it to the target version.
+        let runs = info.is_some_and(|info| info.is_active() && !info.is_halted());
         let (generation, guard) = match target_generation {
             Some(generation) => {
                 if let Some(deferred) = window_deferral(&app_status, &app.config, runs) {

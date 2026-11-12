@@ -255,7 +255,8 @@ record CreateRepositorySuccess {
     repository_id: RepositoryId,
 }
 
-/// Delete a repository.
+/// Delete a repository with all of its packages and versions, also sealed versions and
+/// releases.
 #[request(name = "repositories_Delete", response = Empty)]
 record DeleteRepositoryAction {
     /// ID of the repository.
@@ -904,7 +905,8 @@ record QueryPackageVersionsItem {
     created_at: Timestamp,
     /// Explicit deletion deadline. Package retention can delete the version earlier.
     delete_at?: Timestamp,
-    /// Sealed versions reject content changes and all deletion. Absent on older Hub versions.
+    /// Sealed versions reject content changes and deletion, except by deleting their
+    /// repository. Absent on older Hub versions.
     sealed?: bool,
     /// Releases are retained indefinitely. Independent of sealing. Absent on older Hub versions.
     release?: bool,
@@ -980,8 +982,8 @@ record AddTagItem {
         message = "Tag must be between 1 and 128 characters."
     )]
     #[validate(
-        { matches(_, "^[a-zA-Z0-9][a-zA-Z0-9._+-]*$") },
-        message = "Tag must start with a letter or digit and contain only letters, digits, dots, plus signs, underscores, or hyphens.",
+        { matches(_, "^[a-zA-Z0-9][a-zA-Z0-9._+~-]*$") },
+        message = "Tag must start with a letter or digit and contain only letters, digits, dots, plus signs, tildes, underscores, or hyphens.",
         code = "format:tag"
     )]
     tag: string,
@@ -1004,8 +1006,8 @@ record RemoveTagItem {
         message = "Tag must be between 1 and 128 characters."
     )]
     #[validate(
-        { matches(_, "^[a-zA-Z0-9][a-zA-Z0-9._+-]*$") },
-        message = "Tag must start with a letter or digit and contain only letters, digits, dots, plus signs, underscores, or hyphens.",
+        { matches(_, "^[a-zA-Z0-9][a-zA-Z0-9._+~-]*$") },
+        message = "Tag must start with a letter or digit and contain only letters, digits, dots, plus signs, tildes, underscores, or hyphens.",
         code = "format:tag"
     )]
     tag: string,
@@ -1077,8 +1079,8 @@ record ResolvePackageVersionByPathAction {
         message = "Tag must be between 1 and 128 characters."
     )]
     #[validate(
-        { matches(_, "^[a-zA-Z0-9][a-zA-Z0-9._+-]*$") },
-        message = "Tag must start with a letter or digit and contain only letters, digits, dots, plus signs, underscores, or hyphens.",
+        { matches(_, "^[a-zA-Z0-9][a-zA-Z0-9._+~-]*$") },
+        message = "Tag must start with a letter or digit and contain only letters, digits, dots, plus signs, tildes, underscores, or hyphens.",
         code = "format:tag"
     )]
     tag: string,
@@ -1132,7 +1134,8 @@ record GetPackageVersionDetailsOutput {
     metadata: [string: JsonValue],
     /// Explicit deletion deadline. Package retention can delete the version earlier.
     delete_at?: Timestamp,
-    /// Sealed versions reject content changes and all deletion. Absent on older Hub versions.
+    /// Sealed versions reject content changes and deletion, except by deleting their
+    /// repository. Absent on older Hub versions.
     sealed?: bool,
     /// Releases are retained indefinitely. Independent of sealing. Absent on older Hub versions.
     release?: bool,
@@ -1363,8 +1366,8 @@ record ResolvePackageVersionAssetByPathAction {
         message = "Tag must be between 1 and 128 characters."
     )]
     #[validate(
-        { matches(_, "^[a-zA-Z0-9][a-zA-Z0-9._+-]*$") },
-        message = "Tag must start with a letter or digit and contain only letters, digits, dots, plus signs, underscores, or hyphens.",
+        { matches(_, "^[a-zA-Z0-9][a-zA-Z0-9._+~-]*$") },
+        message = "Tag must start with a letter or digit and contain only letters, digits, dots, plus signs, tildes, underscores, or hyphens.",
         code = "format:tag"
     )]
     tag: string,
@@ -1606,8 +1609,8 @@ record SetPackageVersionRetentionAction {
 
 /// Permanently seal a version. Requires permission to manage versions.
 /// Sealing cancels scheduled deletion and blocks changes to the name, metadata,
-/// base version, and attachments, as well as deletion of the version, package,
-/// or repository.
+/// base version, and attachments, as well as deletion of the version or package.
+/// Deleting the repository deletes sealed versions, too.
 /// Tags remain editable. Sealing cannot be reversed.
 #[request(name = "repositories_SealVersion", response = Empty)]
 record SealPackageVersionAction {
@@ -1615,7 +1618,8 @@ record SealPackageVersionAction {
 }
 
 /// Set or remove release status. Requires permission to manage versions.
-/// Releases are retained indefinitely and block deletion of their package or repository.
+/// Releases are retained indefinitely and block deletion of their package. Deleting the
+/// repository deletes releases, too.
 /// Marking a release cancels scheduled deletion. Removing the marker does not restore it.
 /// Release status does not seal contents and can also change on sealed versions.
 #[request(name = "repositories_SetVersionRelease", response = Empty)]

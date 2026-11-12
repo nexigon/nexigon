@@ -367,31 +367,35 @@ mod tests {
     use crate::types::repositories::ResolvePackageVersionByPathAction;
     use crate::types::repositories::SetPackageKindAction;
 
-    /// Verifies that repository version operations accept build metadata in tags.
+    /// Verifies that repository version operations accept plus signs and tildes in tags.
     #[test]
-    fn repository_version_tags_accept_plus_signs() {
-        let tag = "build-2026.3.0-rolling+g7c2de6a".to_owned();
+    fn repository_version_tags_accept_plus_signs_and_tildes() {
+        for tag in ["build-2026.3.0-rolling+g7c2de6a", "1.0.0~rc1"] {
+            let tag = tag.to_owned();
 
-        assert!(validate(&AddTagItem::new(tag.clone())).is_ok());
-        assert!(validate(&RemoveTagItem::new(tag.clone())).is_ok());
-        assert!(
-            validate(&ResolvePackageVersionByPathAction::new(
-                "repository".to_owned(),
-                "package".to_owned(),
-                tag.clone(),
-            ))
-            .is_ok()
-        );
-        assert!(
-            validate(&ResolvePackageVersionAssetByPathAction::new(
-                "repository".to_owned(),
-                "package".to_owned(),
-                tag,
-                "release.json".to_owned(),
-            ))
-            .is_ok()
-        );
-        assert!(validate(&AddTagItem::new("build/invalid".to_owned())).is_err());
+            assert!(validate(&AddTagItem::new(tag.clone())).is_ok());
+            assert!(validate(&RemoveTagItem::new(tag.clone())).is_ok());
+            assert!(
+                validate(&ResolvePackageVersionByPathAction::new(
+                    "repository".to_owned(),
+                    "package".to_owned(),
+                    tag.clone(),
+                ))
+                .is_ok()
+            );
+            assert!(
+                validate(&ResolvePackageVersionAssetByPathAction::new(
+                    "repository".to_owned(),
+                    "package".to_owned(),
+                    tag,
+                    "release.json".to_owned(),
+                ))
+                .is_ok()
+            );
+        }
+        for tag in ["build/invalid", "~rc1", ""] {
+            assert!(validate(&AddTagItem::new(tag.to_owned())).is_err());
+        }
     }
 
     /// Verifies that package kinds are lowercase identifiers.

@@ -524,6 +524,8 @@ define_types! {
     SubscriptionId => (FlatRawId, "subscription", 22, secret = false),
     /// Billing period ID (globally unique).
     BillingPeriodId => (FlatRawId, "billing_period", 22, secret = false),
+    /// Plan ID (globally unique).
+    PlanId => (FlatRawId, "plan", 22, secret = false),
 }
 
 /// Check whether a character is a base 58 digit.

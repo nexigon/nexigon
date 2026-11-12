@@ -8078,7 +8078,7 @@
   },
   "nexigon_api.repositories.DeleteRepositoryAction": {
     "type": "object",
-    "description": "Delete a repository.",
+    "description": "Delete a repository with all of its packages and versions, also sealed versions and\nreleases.",
     "properties": {
       "repositoryId": {
         "$ref": "#/components/schemas/nexigon_api.repositories.RepositoryId"
@@ -9785,7 +9785,7 @@
   },
   "nexigon_api.repositories.SealPackageVersionAction": {
     "type": "object",
-    "description": "Permanently seal a version. Requires permission to manage versions.\nSealing cancels scheduled deletion and blocks changes to the name, metadata,\nbase version, and attachments, as well as deletion of the version, package,\nor repository.\nTags remain editable. Sealing cannot be reversed.",
+    "description": "Permanently seal a version. Requires permission to manage versions.\nSealing cancels scheduled deletion and blocks changes to the name, metadata,\nbase version, and attachments, as well as deletion of the version or package.\nDeleting the repository deletes sealed versions, too.\nTags remain editable. Sealing cannot be reversed.",
     "properties": {
       "versionId": {
         "$ref": "#/components/schemas/nexigon_api.repositories.PackageVersionId"
@@ -9995,7 +9995,7 @@
   },
   "nexigon_api.repositories.SetPackageVersionReleaseAction": {
     "type": "object",
-    "description": "Set or remove release status. Requires permission to manage versions.\nReleases are retained indefinitely and block deletion of their package or repository.\nMarking a release cancels scheduled deletion. Removing the marker does not restore it.\nRelease status does not seal contents and can also change on sealed versions.",
+    "description": "Set or remove release status. Requires permission to manage versions.\nReleases are retained indefinitely and block deletion of their package. Deleting the\nrepository deletes releases, too.\nMarking a release cancels scheduled deletion. Removing the marker does not restore it.\nRelease status does not seal contents and can also change on sealed versions.",
     "properties": {
       "versionId": {
         "$ref": "#/components/schemas/nexigon_api.repositories.PackageVersionId"

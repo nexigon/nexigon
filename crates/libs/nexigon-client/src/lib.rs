@@ -26,6 +26,7 @@ use x509_cert::der::Decode;
 
 use nexigon_api::Action;
 use nexigon_api::types::errors::ActionError;
+use nexigon_cert::ExternalKey;
 use nexigon_ids::Id;
 use nexigon_ids::ids::DeploymentToken;
 use nexigon_ids::ids::DeviceFingerprint;
@@ -40,8 +41,10 @@ use nexigon_multiplex::ConnectionLimits;
 use nexigon_multiplex::ConnectionRef;
 use nexigon_rpc::ExecuteError;
 
+use crate::external_key::ExternalSigningKey;
 use crate::websocket::WebSocketTransport;
 
+mod external_key;
 mod websocket;
 
 /// Install Rustls crypto provider.
@@ -58,31 +61,15 @@ pub fn install_crypto_provider() {
 pub struct ClientIdentity {
     /// Client certificate in PEM format.
     certificate_pem: String,
-    /// Client certificate chain in leaf-to-root DER order.
-    certificate_chain_der: Vec<CertificateDer<'static>>,
-    /// Client private key in DER format.
-    private_key_der: PrivateKeyDer<'static>,
+    /// Client certificate chain in leaf-to-root DER order and its private key.
+    certified_key: Arc<rustls::sign::CertifiedKey>,
 }
 
 impl ClientIdentity {
     /// Create a new [`ClientIdentity`] with the given PEM-encoded certificate and private
     /// key.
     pub fn from_pem(certificate_pem: &str, private_key_pem: &str) -> Result<Self, InvalidPemError> {
-        let certificate_chain_der = CertificateDer::pem_slice_iter(certificate_pem.as_bytes())
-            .collect::<Result<Vec<_>, _>>()
-            .map_err(InvalidPemError::CertificatePem)?;
-        if certificate_chain_der.is_empty() {
-            return Err(InvalidPemError::EmptyCertificateChain);
-        }
-        for (index, certificate) in certificate_chain_der.iter().enumerate() {
-            x509_cert::Certificate::from_der(certificate.as_ref()).map_err(|source| {
-                InvalidPemError::InvalidCertificate {
-                    index: index + 1,
-                    source,
-                }
-            })?;
-        }
-
+        let certificate_chain_der = parse_certificate_chain(certificate_pem)?;
         let mut private_keys = PrivateKeyDer::pem_slice_iter(private_key_pem.as_bytes())
             .collect::<Result<Vec<_>, _>>()
             .map_err(InvalidPemError::PrivateKeyPem)?;
@@ -96,17 +83,35 @@ impl ClientIdentity {
         install_crypto_provider();
         let provider = rustls::crypto::CryptoProvider::get_default()
             .ok_or(InvalidPemError::CryptoProviderUnavailable)?;
-        rustls::sign::CertifiedKey::from_der(
-            certificate_chain_der.clone(),
-            private_key_der.clone_key(),
-            provider,
-        )
-        .map_err(InvalidPemError::InvalidPrivateKey)?;
+        let certified_key =
+            rustls::sign::CertifiedKey::from_der(certificate_chain_der, private_key_der, provider)
+                .map_err(InvalidPemError::InvalidPrivateKey)?;
 
         Ok(Self {
             certificate_pem: certificate_pem.to_owned(),
+            certified_key: Arc::new(certified_key),
+        })
+    }
+
+    /// Create a new [`ClientIdentity`] with the given PEM-encoded certificate and a
+    /// private key held by an external signer.
+    ///
+    /// The signer signs during each TLS handshake.
+    pub fn from_external_key(
+        certificate_pem: &str,
+        key: ExternalKey,
+    ) -> Result<Self, InvalidPemError> {
+        let certificate_chain_der = parse_certificate_chain(certificate_pem)?;
+        let certified_key = rustls::sign::CertifiedKey::new(
             certificate_chain_der,
-            private_key_der,
+            Arc::new(ExternalSigningKey(key)),
+        );
+        certified_key
+            .keys_match()
+            .map_err(InvalidPemError::InvalidPrivateKey)?;
+        Ok(Self {
+            certificate_pem: certificate_pem.to_owned(),
+            certified_key: Arc::new(certified_key),
         })
     }
 }
@@ -143,6 +148,27 @@ pub enum InvalidPemError {
     /// No rustls cryptography provider is available.
     #[error("no rustls cryptography provider is available to validate the client identity")]
     CryptoProviderUnavailable,
+}
+
+/// Parse a PEM-encoded certificate chain and validate each certificate.
+fn parse_certificate_chain(
+    certificate_pem: &str,
+) -> Result<Vec<CertificateDer<'static>>, InvalidPemError> {
+    let certificate_chain_der = CertificateDer::pem_slice_iter(certificate_pem.as_bytes())
+        .collect::<Result<Vec<_>, _>>()
+        .map_err(InvalidPemError::CertificatePem)?;
+    if certificate_chain_der.is_empty() {
+        return Err(InvalidPemError::EmptyCertificateChain);
+    }
+    for (index, certificate) in certificate_chain_der.iter().enumerate() {
+        x509_cert::Certificate::from_der(certificate.as_ref()).map_err(|source| {
+            InvalidPemError::InvalidCertificate {
+                index: index + 1,
+                source,
+            }
+        })?;
+    }
+    Ok(certificate_chain_der)
 }
 
 /// Load and validate the operating system's native TLS trust roots.
@@ -362,12 +388,9 @@ impl ClientBuilder {
             let client_builder = rustls::ClientConfig::builder().with_root_certificates(root_store);
             let mut client_config = if let Some(identity) = &self.identity {
                 debug!("TLS has been enabled, using client certificate");
-                client_builder
-                    .with_client_auth_cert(
-                        identity.certificate_chain_der.clone(),
-                        identity.private_key_der.clone_key(),
-                    )
-                    .map_err(|source| ClientError::InvalidClientIdentity { source })?
+                client_builder.with_client_cert_resolver(Arc::new(
+                    rustls::sign::SingleCertAndKey::from(identity.certified_key.clone()),
+                ))
             } else {
                 debug!("TLS has been enabled but no client certificate has been provided");
                 client_builder.with_no_client_auth()
@@ -547,13 +570,6 @@ pub enum ClientError {
         /// One-based position in the native certificate result.
         index: usize,
         /// Certificate parsing error.
-        #[source]
-        source: rustls::Error,
-    },
-    /// A client identity failed final rustls configuration validation.
-    #[error("cannot configure the TLS client identity: {source}")]
-    InvalidClientIdentity {
-        /// Identity validation error.
         #[source]
         source: rustls::Error,
     },
@@ -965,9 +981,9 @@ mod tests {
         let (certificate, private_key) = nexigon_cert::generate_self_signed_certificate();
         let identity = ClientIdentity::from_pem(&certificate.to_pem(), &private_key).unwrap();
 
-        assert_eq!(identity.certificate_chain_der.len(), 1);
+        assert_eq!(identity.certified_key.cert.len(), 1);
         assert_eq!(
-            identity.certificate_chain_der[0].as_ref(),
+            identity.certified_key.cert[0].as_ref(),
             certificate.to_der()
         );
     }
@@ -1078,13 +1094,13 @@ mod tests {
         let certificate_pem = format!("{}{}", chain.leaf.pem(), chain.intermediate.pem());
         let identity =
             ClientIdentity::from_pem(&certificate_pem, &chain.leaf_key.serialize_pem()).unwrap();
-        assert_eq!(identity.certificate_chain_der.len(), 2);
+        assert_eq!(identity.certified_key.cert.len(), 2);
         assert_eq!(
-            identity.certificate_chain_der[0].as_ref(),
+            identity.certified_key.cert[0].as_ref(),
             chain.leaf.der().as_ref()
         );
         assert_eq!(
-            identity.certificate_chain_der[1].as_ref(),
+            identity.certified_key.cert[1].as_ref(),
             chain.intermediate.der().as_ref()
         );
 
@@ -1106,6 +1122,68 @@ mod tests {
         assert!(accepted.await.unwrap());
         drop(connection);
         server.await.unwrap();
+    }
+
+    /// An external key signs its self-signed certificate and the TLS handshake, which
+    /// a server verifying both accepts.
+    #[tokio::test]
+    async fn external_key_authenticates_with_its_self_signed_certificate_for_mtls() {
+        let key = software_external_key();
+        let certificate = nexigon_cert::generate_self_signed_certificate_for(&key).unwrap();
+        let identity = ClientIdentity::from_external_key(&certificate.to_pem(), key).unwrap();
+
+        let (address, accepted, server) =
+            mtls_server(CertificateDer::from(certificate.to_der())).await;
+        let connection = builder(
+            Url::parse(&format!("https://localhost:{}", address.port())).unwrap(),
+            UserToken::generate(),
+        )
+        .with_identity(Some(identity))
+        .dangerous_with_accept_invalid_certificates(true)
+        .connect()
+        .await
+        .unwrap();
+        assert!(accepted.await.unwrap());
+        drop(connection);
+        server.await.unwrap();
+    }
+
+    /// A certificate for another key is rejected for an external key.
+    #[test]
+    fn external_key_rejects_a_certificate_for_another_key() {
+        let (certificate, _) = nexigon_cert::generate_self_signed_certificate();
+
+        assert!(matches!(
+            ClientIdentity::from_external_key(&certificate.to_pem(), software_external_key()),
+            Err(InvalidPemError::InvalidPrivateKey(_))
+        ));
+    }
+
+    /// Signer backed by an in-memory key.
+    #[derive(Debug)]
+    struct SoftwareSigner(Arc<dyn rustls::sign::SigningKey>);
+
+    impl nexigon_cert::Signer for SoftwareSigner {
+        fn sign(&self, message: &[u8]) -> Result<Vec<u8>, nexigon_cert::SignError> {
+            let signer = self
+                .0
+                .choose_scheme(&[rustls::SignatureScheme::ECDSA_NISTP256_SHA256])
+                .unwrap();
+            Ok(signer.sign(message)?)
+        }
+    }
+
+    fn software_external_key() -> nexigon_cert::ExternalKey {
+        let key_pair = KeyPair::generate().unwrap();
+        let signing_key = rustls::crypto::aws_lc_rs::sign::any_ecdsa_type(
+            &PrivateKeyDer::try_from(key_pair.serialize_der()).unwrap(),
+        )
+        .unwrap();
+        nexigon_cert::ExternalKey::new(
+            &key_pair.public_key_der(),
+            Arc::new(SoftwareSigner(signing_key)),
+        )
+        .unwrap()
     }
 
     #[test]
