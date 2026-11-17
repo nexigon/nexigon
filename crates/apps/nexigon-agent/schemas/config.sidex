@@ -57,7 +57,7 @@ record Config {
     multiplex?: MultiplexConfig,
     /// Remote terminal configuration.
     terminal?: TerminalConfig,
-    /// On-demand command configuration.
+    /// Custom command configuration.
     commands?: CommandsConfig,
     /// Device-polled operation configuration.
     operations?: OperationsConfig,
@@ -388,12 +388,15 @@ record TerminalConfig {
     allowed_users?: [string],
 }
 
-/// On-demand command configuration.
+/// Custom command configuration.
+///
+/// Enabled integrations offer their built-in commands regardless of this
+/// section, such as `nexigon.ota.check` and `nexigon.rugix-apps.check`.
 #[json(rename_all = "kebab-case")]
 record CommandsConfig {
-    /// Whether on-demand commands are enabled (defaults to false).
+    /// Whether custom commands are enabled (defaults to false).
     enabled?: bool,
-    /// Directory containing command definition files (defaults to /etc/nexigon/agent/commands).
+    /// Directory containing custom command definition files (defaults to /etc/nexigon/agent/commands).
     directory?: PathBuf,
 }
 

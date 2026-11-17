@@ -525,7 +525,9 @@ record AgentTerminalConfig {
 
 /// Agent commands feature configuration.
 record AgentCommandsConfig {
-    /// Whether on-demand commands are enabled.
+    /// Whether custom commands are enabled.
+    ///
+    /// Built-in commands of enabled integrations are available regardless.
     enabled?: bool,
 }
 

@@ -723,21 +723,28 @@ async fn log_failure(
     Ok(())
 }
 
-/// Load the command registry if commands are enabled, with the built-in
-/// commands that request immediate checks of the enabled integrations.
+/// Build the command registry from the built-in commands of the enabled
+/// integrations and, if custom commands are enabled, their definitions.
+///
+/// Without either, the agent offers no commands.
 fn command_registry(
     config: &Config,
     system_update_check: Option<Arc<Notify>>,
     app_check: Option<Arc<Notify>>,
 ) -> Option<Arc<CommandRegistry>> {
     let commands = config.commands.as_ref();
-    if !commands.and_then(|h| h.enabled).unwrap_or(false) {
+    let custom_commands = commands.and_then(|h| h.enabled).unwrap_or(false);
+    if !custom_commands && system_update_check.is_none() && app_check.is_none() {
         return None;
     }
-    let commands_dir = commands
-        .and_then(|h| h.directory.as_deref())
-        .unwrap_or(Path::new("/etc/nexigon/agent/commands"));
-    let mut registry = load_command_registry(commands_dir);
+    let mut registry = if custom_commands {
+        let commands_dir = commands
+            .and_then(|h| h.directory.as_deref())
+            .unwrap_or(Path::new("/etc/nexigon/agent/commands"));
+        load_command_registry(commands_dir)
+    } else {
+        CommandRegistry::default()
+    };
     if let Some(check_requested) = system_update_check {
         registry.register_builtin(
             DeviceCommandDescriptor::new(crate::system_updates::CHECK_COMMAND)
@@ -1112,6 +1119,7 @@ mod tests {
     use tempfile::TempDir;
     use tokio::io::AsyncReadExt;
     use tokio::io::AsyncWriteExt;
+    use tokio::sync::Notify;
     use tokio::sync::mpsc;
     use tokio::sync::oneshot;
     use tokio::task::JoinHandle;
@@ -1124,6 +1132,7 @@ mod tests {
     use super::SupervisedTask;
     use super::TCP_CONNECT_TIMEOUT;
     use super::TaskKind;
+    use super::command_registry;
     use super::command_slots;
     use super::load_command_registry;
     use super::run_connection_event_loop;
@@ -1143,6 +1152,81 @@ mod tests {
         let registry = load_command_registry(&not_a_directory);
 
         assert!(registry.manifest().commands.is_empty());
+    }
+
+    /// Names of the commands in the manifest of a registry.
+    fn command_names(config: &Config, system_updates: bool, apps: bool) -> Option<Vec<String>> {
+        let registry = command_registry(
+            config,
+            system_updates.then(|| Arc::new(Notify::new())),
+            apps.then(|| Arc::new(Notify::new())),
+        )?;
+        Some(
+            registry
+                .manifest()
+                .commands
+                .iter()
+                .map(|command| command.name.to_string())
+                .collect(),
+        )
+    }
+
+    /// Create a commands directory with the `custom` command and its handler.
+    fn custom_commands_directory() -> TempDir {
+        let directory = TempDir::new().unwrap();
+        let definition = directory.path().join("custom.toml");
+        std::fs::write(
+            &definition,
+            "[command]\nname = \"custom\"\n\n[exec]\nhandler = [\"./custom.sh\"]\n",
+        )
+        .unwrap();
+        let handler = directory.path().join("custom.sh");
+        std::fs::write(&handler, "#!/bin/sh\n").unwrap();
+        // The agent skips definitions and handlers that group or others can write.
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::PermissionsExt;
+            std::fs::set_permissions(&definition, std::fs::Permissions::from_mode(0o600)).unwrap();
+            std::fs::set_permissions(&handler, std::fs::Permissions::from_mode(0o700)).unwrap();
+        }
+        directory
+    }
+
+    /// Enabled integrations offer their check commands without `[commands]`.
+    #[test]
+    fn integrations_offer_check_commands_without_custom_commands() {
+        let directory = custom_commands_directory();
+        let config: Config = toml::from_str(&format!(
+            "fingerprint-script = 'unused'\n[commands]\ndirectory = '{}'",
+            directory.path().display()
+        ))
+        .unwrap();
+
+        assert_eq!(command_names(&config, false, false), None);
+        assert_eq!(
+            command_names(&config, true, true).unwrap(),
+            [
+                crate::system_updates::CHECK_COMMAND,
+                crate::rugix_apps::CHECK_COMMAND
+            ]
+        );
+    }
+
+    /// `[commands]` adds custom commands to the check commands.
+    #[test]
+    fn custom_commands_extend_check_commands() {
+        let directory = custom_commands_directory();
+        let config: Config = toml::from_str(&format!(
+            "fingerprint-script = 'unused'\n[commands]\nenabled = true\ndirectory = '{}'",
+            directory.path().display()
+        ))
+        .unwrap();
+
+        assert_eq!(command_names(&config, false, false).unwrap(), ["custom"]);
+        assert_eq!(
+            command_names(&config, false, true).unwrap(),
+            ["custom", crate::rugix_apps::CHECK_COMMAND]
+        );
     }
 
     struct EndpointTestAgent {

@@ -75,7 +75,7 @@
   "$defs": {
     "nexigon_agent.config.CommandsConfig": {
       "type": "object",
-      "description": "On-demand command configuration.",
+      "description": "Custom command configuration.\n\nEnabled integrations offer their built-in commands regardless of this\nsection, such as `nexigon.ota.check` and `nexigon.rugix-apps.check`.",
       "properties": {
         "enabled": {
           "type": "boolean"

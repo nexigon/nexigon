@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Offer the built-in `nexigon.ota.check` and `nexigon.rugix-apps.check`
+  commands whenever the system update or Rugix Apps integration is enabled.
+  Previously, they also required `[commands]`, which now enables only custom
+  commands.
+
 - Start the workload of an app that is supposed to run but stopped while its
   generation stayed active, for example because its containers did not restart
   after a reboot. Previously, the Agent reported such an app as up to date and
