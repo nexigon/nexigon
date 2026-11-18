@@ -77,10 +77,7 @@ impl AppControl {
     ) -> Result<(), String> {
         let Input { app } =
             serde_json::from_value(input).map_err(|error| format!("invalid input: {error}"))?;
-        // Rugix Ctrl would read such a name as an option.
-        if app.is_empty() || app.starts_with('-') {
-            return Err(format!("invalid app name {app:?}"));
-        }
+        check_app_name(&app)?;
         // A check that runs while the command waits may change the managed apps.
         let guard = self.device_lock.clone().lock_owned().await;
         match self.managed_apps() {
@@ -110,6 +107,14 @@ impl AppControl {
             Err(error) => Err(format!("the change of the app failed: {error}")),
         }
     }
+}
+
+/// Reject an app name that is empty or that Rugix Ctrl would read as an option.
+pub(crate) fn check_app_name(app: &str) -> Result<(), String> {
+    if app.is_empty() || app.starts_with('-') {
+        return Err(format!("invalid app name {app:?}"));
+    }
+    Ok(())
 }
 
 #[cfg(test)]

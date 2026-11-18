@@ -10465,6 +10465,103 @@
     "required": [],
     "unevaluatedProperties": false
   },
+  "nexigon_api.rugix_apps.RugixAppLogRecord": {
+    "type": "object",
+    "description": "Log record of an app's workload.",
+    "properties": {
+      "timestamp": {
+        "$ref": "#/components/schemas/nexigon_api.datetime.Timestamp"
+      },
+      "source": {
+        "type": "string"
+      },
+      "severity": {
+        "$ref": "#/components/schemas/nexigon_api.rugix_apps.RugixAppLogSeverity"
+      },
+      "stream": {
+        "$ref": "#/components/schemas/nexigon_api.rugix_apps.RugixAppLogStream"
+      },
+      "generation": {
+        "type": [
+          "integer",
+          "string"
+        ],
+        "format": "uint64",
+        "minimum": 0,
+        "pattern": "^[0-9]+$"
+      },
+      "message": {
+        "type": "string"
+      },
+      "fields": {
+        "type": "object",
+        "additionalProperties": {
+          "$ref": "#/components/schemas/nexigon_api.json.JsonValue"
+        }
+      },
+      "truncated": {
+        "type": "boolean"
+      }
+    },
+    "required": [
+      "message"
+    ],
+    "unevaluatedProperties": false
+  },
+  "nexigon_api.rugix_apps.RugixAppLogSeverity": {
+    "description": "Severity of a log record.",
+    "anyOf": [
+      {
+        "enum": [
+          "trace",
+          "debug",
+          "info",
+          "warning",
+          "error",
+          "critical"
+        ]
+      },
+      {
+        "type": "string"
+      }
+    ]
+  },
+  "nexigon_api.rugix_apps.RugixAppLogStream": {
+    "description": "Output stream of a log record.",
+    "anyOf": [
+      {
+        "enum": [
+          "stdout",
+          "stderr"
+        ]
+      },
+      {
+        "type": "string"
+      }
+    ]
+  },
+  "nexigon_api.rugix_apps.RugixAppLogs": {
+    "type": "object",
+    "description": "Output of the `nexigon.rugix-apps.logs` command.\n\nThe most recent log records of an app's workload, as reported by Rugix Ctrl.\nThe output stays within 64 KiB, encoded as compact JSON, the default limit\nfor the output of an operation's command step. To that end, the integration\ncuts messages longer than 2 KiB, drops the fields of records that still\nexceed 4 KiB, and omits the oldest records that do not fit.",
+    "properties": {
+      "records": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/nexigon_api.rugix_apps.RugixAppLogRecord"
+        }
+      },
+      "omitted": {
+        "type": "integer",
+        "format": "uint32",
+        "maximum": 4294967295,
+        "minimum": 0
+      }
+    },
+    "required": [
+      "records"
+    ],
+    "unevaluatedProperties": false
+  },
   "nexigon_api.rugix_apps.RugixAppStatus": {
     "type": "object",
     "description": "Status of an app on a device.",

@@ -1,6 +1,7 @@
 //! Nexigon integration with Rugix Apps.
 
 import datetime::Timestamp
+import json::JsonValue
 import properties::OtaUpdateRetryPolicy
 import properties::OtaUpdateSpread
 import properties::OtaUpdateWindow
@@ -333,4 +334,66 @@ record RugixAppWorkloadOther {
 record RugixAppWorkloadMessage {
     /// Human-readable explanation.
     message: string,
+}
+
+/// Output of the `nexigon.rugix-apps.logs` command.
+///
+/// The most recent log records of an app's workload, as reported by Rugix Ctrl.
+/// The output stays within 64 KiB, encoded as compact JSON, the default limit
+/// for the output of an operation's command step. To that end, the integration
+/// cuts messages longer than 2 KiB, drops the fields of records that still
+/// exceed 4 KiB, and omits the oldest records that do not fit.
+record RugixAppLogs {
+    /// Log records in chronological order.
+    records: [RugixAppLogRecord],
+    /// Number of older records that the integration omitted to fit the limit.
+    omitted?: u32,
+}
+
+/// Log record of an app's workload.
+record RugixAppLogRecord {
+    /// Time at which the record was logged, if known.
+    timestamp?: Timestamp,
+    /// Producer of the record, such as a Compose service or a process name, if
+    /// known.
+    source?: string,
+    /// Severity of the record, if known.
+    severity?: RugixAppLogSeverity,
+    /// Output stream to which the record was written, if known.
+    stream?: RugixAppLogStream,
+    /// Generation whose workload produced the record, if known.
+    generation?: u64,
+    /// Message of the record.
+    message: string,
+    /// Structured fields of the record.
+    fields?: [string: JsonValue],
+    /// Whether Rugix Ctrl or the integration cut the message or dropped the
+    /// fields of the record.
+    truncated?: bool,
+}
+
+/// Severity of a log record.
+#[json(tagged = externally, rename_all = "lowercase")]
+variant RugixAppLogSeverity {
+    Trace,
+    Debug,
+    Info,
+    Warning,
+    Error,
+    Critical,
+    /// Severity that a later version defines.
+    #[json(fallback)]
+    Other: string,
+}
+
+/// Output stream of a log record.
+#[json(tagged = externally, rename_all = "lowercase")]
+variant RugixAppLogStream {
+    /// Standard output.
+    Stdout,
+    /// Standard error.
+    Stderr,
+    /// Stream that a later version defines.
+    #[json(fallback)]
+    Other: string,
 }

@@ -10,6 +10,7 @@ use anyhow::Context;
 use jiff::Timestamp;
 use nexigon_api::types::repositories::PackageVersionAsset;
 use nexigon_api::types::repositories::PackageVersionId;
+use nexigon_api::types::rugix_apps::RugixAppLogRecord;
 use nexigon_api::types::rugix_apps::RugixAppWorkloadMessage;
 use nexigon_api::types::rugix_apps::RugixAppWorkloadStatus;
 use serde::Deserialize;
@@ -124,6 +125,23 @@ impl RugixApps {
     /// Remove an app, including its persistent data.
     pub(crate) async fn remove(&self, app: &str) -> anyhow::Result<()> {
         run(RUGIX_CTRL, &["apps", "remove", app]).await.map(drop)
+    }
+
+    /// Most recent log records of an app's workload, at most `lines`, in
+    /// chronological order.
+    ///
+    /// Requires Rugix Ctrl 1.4.1 or later.
+    pub(crate) async fn logs(
+        &self,
+        app: &str,
+        lines: u32,
+    ) -> anyhow::Result<Vec<RugixAppLogRecord>> {
+        let output = run(
+            RUGIX_CTRL,
+            &["apps", "logs", "--json", "--lines", &lines.to_string(), app],
+        )
+        .await?;
+        parse_log_records(&output)
     }
 
     /// Remove generations other than the active one and the `keep` most recent
@@ -287,9 +305,58 @@ struct NexigonOrigin {
     asset_id: Option<String>,
 }
 
+/// Parse the output of `rugix-ctrl apps logs --json`, one record per line.
+fn parse_log_records(output: &str) -> anyhow::Result<Vec<RugixAppLogRecord>> {
+    output
+        .lines()
+        .map(|line| serde_json::from_str(line).context("failed to parse a log record"))
+        .collect()
+}
+
 #[cfg(test)]
 mod tests {
+    use nexigon_api::types::rugix_apps::RugixAppLogSeverity;
+    use nexigon_api::types::rugix_apps::RugixAppLogStream;
+
     use super::*;
+
+    /// Records of Rugix Ctrl parse with all their properties, and values that a
+    /// later version of Rugix Ctrl defines are kept.
+    #[test]
+    fn log_records_from_rugix_ctrl() {
+        let records = parse_log_records(concat!(
+            r#"{"timestamp":"2026-11-18T08:30:03.123456789Z","source":"log-writer","#,
+            r#""severity":"warning","stream":"stderr","generation":1,"#,
+            r#""message":"structured hello","fields":{"answer":42},"truncated":true}"#,
+            "\n",
+            r#"{"severity":"notice","message":"plain line"}"#,
+            "\n",
+        ))
+        .unwrap();
+
+        let structured = &records[0];
+        assert_eq!(structured.message, "structured hello");
+        assert_eq!(structured.source.as_deref(), Some("log-writer"));
+        assert!(matches!(
+            structured.severity,
+            Some(RugixAppLogSeverity::Warning)
+        ));
+        assert!(matches!(structured.stream, Some(RugixAppLogStream::Stderr)));
+        assert_eq!(structured.generation, Some(1));
+        assert_eq!(structured.truncated, Some(true));
+        assert_eq!(
+            serde_json::to_value(structured).unwrap()["timestamp"],
+            "2026-11-18T08:30:03.123456789Z"
+        );
+        assert_eq!(
+            serde_json::to_value(structured).unwrap()["fields"]["answer"],
+            42
+        );
+        assert!(matches!(
+            &records[1].severity,
+            Some(RugixAppLogSeverity::Other(severity)) if severity == "notice"
+        ));
+    }
 
     /// Generations are found by the package version in their origin, the active
     /// generation only counts while the app is active, a deactivated app

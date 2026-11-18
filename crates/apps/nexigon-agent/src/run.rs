@@ -776,10 +776,21 @@ fn command_registry(
                     .with_input(Some(AppCommand::input_schema().into())),
                 Arc::new(move |input| {
                     let apps = apps.clone();
-                    Box::pin(async move { apps.run_command(command, input).await })
+                    Box::pin(async move { apps.run_command(command, input).await.map(|()| None) })
                 }),
             );
         }
+        registry.register_builtin(
+            DeviceCommandDescriptor::new(crate::rugix_apps::logs::LOGS_COMMAND)
+                .with_description(Some(
+                    "Get the most recent log records of an app's workload.".into(),
+                ))
+                .with_category(Some("Rugix Apps".into()))
+                .with_input(Some(crate::rugix_apps::logs::input_schema().into())),
+            Arc::new(|input| {
+                Box::pin(async move { crate::rugix_apps::logs::read_logs(input).await.map(Some) })
+            }),
+        );
     }
     Some(Arc::new(registry))
 }
@@ -788,7 +799,7 @@ fn command_registry(
 fn notify_handler(check_requested: Arc<Notify>) -> BuiltinHandler {
     Arc::new(move |_| {
         check_requested.notify_one();
-        Box::pin(async { Ok(()) })
+        Box::pin(async { Ok(None) })
     })
 }
 
@@ -1222,8 +1233,9 @@ mod tests {
     }
 
     /// Commands of the Rugix Apps integration in the order of the manifest.
-    const APP_COMMANDS: [&str; 5] = [
+    const APP_COMMANDS: [&str; 6] = [
         crate::rugix_apps::CHECK_COMMAND,
+        "nexigon.rugix-apps.logs",
         "nexigon.rugix-apps.remove",
         "nexigon.rugix-apps.rollback",
         "nexigon.rugix-apps.start",

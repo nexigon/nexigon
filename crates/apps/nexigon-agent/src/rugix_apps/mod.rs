@@ -8,7 +8,8 @@
 //! is due, and when the `nexigon.rugix-apps.check` command requests a check. Scheduled
 //! checks are delayed randomly, like the checks of system updates. The
 //! [`commands`] start, stop, roll back, and remove apps that the configuration
-//! does not manage.
+//! does not manage. The [`logs`] command returns the most recent log records of
+//! an app.
 //!
 //! The agent changes apps only while it holds the device lock that it shares
 //! with the system update integration, so that a reboot into a new system does
@@ -37,6 +38,7 @@ use crate::reconcile::wait_for_check;
 
 mod check;
 pub(crate) mod commands;
+pub(crate) mod logs;
 mod rugix;
 
 use check::Checker;

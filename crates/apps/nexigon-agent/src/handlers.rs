@@ -112,10 +112,13 @@ pub struct CommandRegistry {
 
 /// Handler of a command implemented by the agent itself.
 ///
-/// The handler receives the input of the command and returns an error message
-/// if the command fails. Built-in commands produce no output.
-pub(crate) type BuiltinHandler =
-    Arc<dyn Fn(serde_json::Value) -> BoxFuture<'static, Result<(), String>> + Send + Sync>;
+/// The handler receives the input of the command and returns its output, if
+/// any, or an error message if the command fails.
+pub(crate) type BuiltinHandler = Arc<
+    dyn Fn(serde_json::Value) -> BoxFuture<'static, Result<Option<serde_json::Value>, String>>
+        + Send
+        + Sync,
+>;
 
 /// Command implemented by the agent itself.
 struct BuiltinCommand {
@@ -152,13 +155,13 @@ impl BuiltinCommand {
             },
             None => invocation.await,
         };
-        let (status, error) = match result {
-            Ok(()) => (DeviceCommandStatus::Ok, None),
-            Err(error) => (DeviceCommandStatus::Error, Some(error.into())),
+        let (status, output, error) = match result {
+            Ok(output) => (DeviceCommandStatus::Ok, output.map(Into::into), None),
+            Err(error) => (DeviceCommandStatus::Error, None, Some(error.into())),
         };
         DeviceCommandDoneData {
             status,
-            output: None,
+            output,
             error,
             log_tail: Vec::new().into(),
             duration_ms: u64::try_from(started.elapsed().as_millis()).unwrap_or(u64::MAX),

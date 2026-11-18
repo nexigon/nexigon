@@ -45,6 +45,11 @@ See the [release notes](releases/v0.7.0.md).
   manage. They take the same input as the commands of the earlier
   `nexigon-rugix-apps` recipes and reject managed apps, whose state the
   configuration determines.
+- The `nexigon.rugix-apps.logs` command returns the most recent log records of
+  an app, 100 by default and up to 1000, with Rugix Ctrl 1.4.1 or later. The
+  Agent cuts messages after 2 KiB and omits the oldest records, so that the
+  output fits the 64 KiB that Nexigon Hub stores for an operation's command
+  step by default.
 - The property formats of both integrations are stable. Later versions only add
   optional fields, states, capabilities, and codes, which readers accept as
   unknown values, so that an Agent can read a status that a newer Agent wrote,
