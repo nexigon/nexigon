@@ -1247,6 +1247,9 @@ mod tests {
     }
 
     /// `[commands]` adds custom commands to the check commands.
+    ///
+    /// Only Unix supports custom commands, whose loading relies on file permissions.
+    #[cfg(unix)]
     #[test]
     fn custom_commands_extend_check_commands() {
         let directory = custom_commands_directory();
