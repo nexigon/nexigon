@@ -19,10 +19,12 @@ pkgs.testers.runNixOSTest {
         port = 16947;
         deviceName = "nixos-test";
       };
+      settings.integrations.rauc.system-updates.enabled = true;
     };
   };
 
-  # Exercise provisioning, private configuration, and state retention across service restarts.
+  # Exercise provisioning, private configuration, the tools of enabled integrations, and state
+  # retention across service restarts.
   testScript = ''
     import tomllib
 
@@ -34,6 +36,8 @@ pkgs.testers.runNixOSTest {
     config = tomllib.loads(machine.succeed("cat /run/nexigon/agent.toml"))
     assert config["data-path"] == "/var/lib/test-agent"
     assert config["provisioning"]["device-name"] == "nixos-test"
+    # Enabled integrations find their tools on the service's path.
+    machine.succeed("systemctl show nexigon-agent.service -p Environment | grep -q '${pkgs.rauc}/bin'")
     machine.succeed("touch /var/lib/test-agent/retained")
     machine.succeed("systemctl restart nexigon-agent.service")
     machine.wait_until_succeeds("curl --fail --silent http://127.0.0.1:16947/ | grep -q ready")

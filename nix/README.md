@@ -58,6 +58,23 @@ private runtime file on service startup. Use pairing-key provisioning for
 credentials: values in `settings`, including tokens, are stored in the readable
 Nix store.
 
+## Update Integrations
+
+The system update and app integrations run `rugix-ctrl` or `rauc`. When
+`settings.integrations` enables one, the module adds its tool to the service's
+path:
+
+- Rugix Ctrl from `services.rugix.package` if the Rugix NixOS module is
+  enabled, and otherwise `pkgs.rugix-ctrl` from the Rugix overlay.
+- RAUC from `pkgs.rauc`.
+
+```nix
+services.nexigon-agent.settings.integrations.rugix = {
+  system-updates.enabled = true;
+  apps.enabled = true;
+};
+```
+
 ## TCP Forwarding
 
 Agent 0.6 disables TCP forwarding by default. To allow SSH and a local HTTP
@@ -88,5 +105,5 @@ nix build .#checks.x86_64-linux.nixos
 ```
 
 The check boots a NixOS VM and verifies the provisioning endpoint, generated
-configuration, private file and directory permissions, and state retention
-after an agent service restart.
+configuration, private file and directory permissions, the tools of enabled
+integrations, and state retention after an agent service restart.

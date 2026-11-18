@@ -1,6 +1,7 @@
 {
   config,
   lib,
+  options,
   pkgs,
   ...
 }:
@@ -20,6 +21,30 @@ let
     exec ${pkgs.coreutils}/bin/cat /etc/machine-id
   '';
   configFile = toml.generate "nexigon-agent.toml" cfg.settings;
+  integrationEnabled =
+    path: lib.attrByPath ([ "integrations" ] ++ path ++ [ "enabled" ]) false cfg.settings;
+  # The integrations run `rugix-ctrl` and `rauc`, which the service needs on its path.
+  rugixIntegration =
+    integrationEnabled [
+      "rugix"
+      "system-updates"
+    ]
+    || integrationEnabled [
+      "rugix"
+      "apps"
+    ];
+  raucIntegration = integrationEnabled [
+    "rauc"
+    "system-updates"
+  ];
+  rugixCtrl =
+    if options ? services.rugix.package && config.services.rugix.enable then
+      config.services.rugix.package
+    else
+      pkgs.rugix-ctrl or (throw ''
+        The Rugix integration of Nexigon Agent requires Rugix Ctrl. Enable
+        services.rugix or provide pkgs.rugix-ctrl through the Rugix overlay.
+      '');
 in
 
 {
@@ -117,7 +142,9 @@ in
         pkgs.bash
         pkgs.coreutils
         pkgs.systemd
-      ];
+      ]
+      ++ optional rugixIntegration rugixCtrl
+      ++ optional raucIntegration pkgs.rauc;
       serviceConfig = {
         Type = "exec";
         RuntimeDirectory = "nexigon";
