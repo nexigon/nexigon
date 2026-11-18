@@ -528,9 +528,9 @@ pub(crate) async fn run_agent(
                 (credentials.resolved(), identity)
             }
         };
-        // Identity loading is deliberately completed before connecting because the
-        // fingerprint subprocess does not yet have the bounded/cancellation-aware contract
-        // tracked by P1-12. The agent owns cooperative cancellation from here on.
+        // Identity loading completes before connecting because the fingerprint
+        // script runs without a timeout and cannot be cancelled. The agent owns
+        // cooperative cancellation from here on.
         let client = client_builder(&config, &credentials, identity, true)?;
         run::run_sessions(
             config,

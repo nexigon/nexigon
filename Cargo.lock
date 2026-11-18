@@ -1189,7 +1189,7 @@ version = "0.1.0"
 
 [[package]]
 name = "nexigon-agent"
-version = "0.6.1"
+version = "0.7.0"
 dependencies = [
  "anyhow",
  "bytes",
@@ -1286,7 +1286,7 @@ dependencies = [
 
 [[package]]
 name = "nexigon-cli"
-version = "0.6.1"
+version = "0.7.0"
 dependencies = [
  "anyhow",
  "clap",

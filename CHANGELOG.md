@@ -1,44 +1,73 @@
 # Changelog
 
-## Unreleased
+## 0.7.0 (unreleased)
 
-- Document the size limits of Nexigon Hub on the affected API fields. By
-  default, Nexigon Hub rejects property values, profile values, step values,
-  command inputs, metadata, and property schemas above 64 KiB, events above
-  4 KiB, batches of more than 1000 events, and device token claims above 4 KiB.
-  Add `omittedOutputBytes` to the state of operation steps, which holds the size
-  of a command output that exceeded the limit and was not stored.
+See the [release notes](releases/v0.7.0.md).
 
-- Truncate the error text that the Agent attaches to its own system update and
-  app events to 2 KiB to keep these events small, since Nexigon Hub now limits
-  the size of events.
+### Agent
 
-- Offer the built-in `nexigon.ota.check` and `nexigon.rugix-apps.check`
-  commands whenever the system update or Rugix Apps integration is enabled.
-  Previously, they also required `[commands]`, which now enables only custom
-  commands.
-
-- Start the workload of an app that is supposed to run but stopped while its
-  generation stayed active, for example because its containers did not restart
-  after a reboot. Previously, the Agent reported such an app as up to date and
-  left it stopped.
-
-- Authenticate the Agent with a device private key held by hardware, such as
-  a TPM, a PKCS#11 token, or the Raspberry Pi firmware, instead of a key file.
-  Configure a signer script for the key in the new `[signer]` section. The
-  Agent obtains the public key from the script and has it sign the device
-  certificate and each TLS handshake. With a signer, the Agent does not
-  generate a key file.
-
-- Preserve system update status when a repository lookup is rejected
-  by Nexigon Hub, for example because execution capacity is exhausted. Retry
-  the check instead of treating the version as missing.
-
-- Remove the unstable `vulnerabilities_*` actions from the API. Nexigon Hub now
-  indexes SBOMs linked through `relations.sbom` automatically and manages
-  vulnerabilities in its web interface. `relations.vdr` and `relations.vex`
-  are no longer indexed; import VEX documents for a package instead.
-- Reconnect the Agent to Nexigon Hub when the connection is lost or cannot be
+- Add system updates with Rugix Ctrl and RAUC, enabled with
+  `[integrations.rugix.system-updates]` or `[integrations.rauc.system-updates]`.
+  The Agent follows the desired state in `dev.nexigon.ota.config`, reports
+  progress in `dev.nexigon.ota.status`, and supports holds, maintenance
+  windows, spreads, retries, and checkpoint releases. `asset` in the
+  integration configuration or in `dev.nexigon.ota.config` chooses the asset
+  that a device installs from each version. It defaults to the bundle of the
+  running system, such as `<system>.rugixb`. A version without the asset
+  blocks the update with the code `no-asset`.
+- Add the Rugix Apps integration, enabled with `[integrations.rugix.apps]`.
+  The Agent installs, updates, starts, stops, and removes the apps listed in
+  `dev.nexigon.rugix-apps.config` and reports the status of all apps in
+  `dev.nexigon.rugix-apps.status`. It installs the bundle for the device's
+  architecture, `<app>-<arch>.rugixb` by default, and supports holds,
+  maintenance windows, spreads, and retries. Outside a maintenance window, it
+  installs new versions without activating them. An app that should run
+  starts again when its workload stopped, for example after a reboot. After an
+  update, the Agent removes old versions except for the number of previously
+  running versions that the `gc` policy or `gc.keep` in the integration
+  configuration keeps, 1 by default. An app with an invalid configuration
+  stays as it is, while the other apps reach their desired states. The
+  integration requires Rugix Ctrl 1.4 or later.
+- Both integrations publish their status with compare-and-swap, so that a
+  concurrent change, such as a failure count cleared in Nexigon Hub, starts a
+  new check instead of being overwritten. A failure count resets when the
+  version or the effective configuration changes. The status reports the
+  reason of a failed attempt as `failureCode`, such as `rolled-back`, and the
+  optional features that the integration supports as `capabilities`. System
+  updates and app changes do not run at the same time.
+- Truncate the error text that the Agent attaches to its own system update
+  and app events to 2 KiB, since Nexigon Hub limits the size of events.
+- The `nexigon.ota.check` and `nexigon.rugix-apps.check` commands start an
+  immediate check whenever their integration is enabled. `[commands]` enables
+  only custom commands.
+- The Rugix Apps integration offers the `nexigon.rugix-apps.start`, `stop`,
+  `rollback`, and `remove` commands for apps that the configuration does not
+  manage. They take the same input as the commands of the earlier
+  `nexigon-rugix-apps` recipes and reject managed apps, whose state the
+  configuration determines.
+- The property formats of both integrations are stable. Later versions only add
+  optional fields, states, capabilities, and codes, which readers accept as
+  unknown values, so that an Agent can read a status that a newer Agent wrote,
+  for example after a rollback to an older system. Each property has a
+  `formatVersion`, 1 when absent, which a change increments if earlier readers
+  must not interpret it. The Agent does not apply a configuration with a later
+  format version and reports the blocked code `unsupported-config-format`.
+- Stopping the Agent interrupts a system update or app installation in
+  progress, and the next check reports it as a failed attempt. RAUC finishes
+  an interrupted installation in the background, so the next check waits for
+  it and keeps the running system active. A lost connection or a hold lets an
+  installation finish. The Agent handles SIGTERM,
+  so service managers stop it gracefully. Calls of `rugix-ctrl`, `rauc`, and
+  `systemctl` fail after 10 minutes, except installations, which include the
+  download.
+- The systemd unit of the installer gives the Agent 30 seconds to stop and no
+  longer refers to a PID file.
+- The NixOS module puts Rugix Ctrl and RAUC on the service path when the
+  configuration enables their integrations.
+- Hosts that run the Agent in-process can provide their own update system
+  through the `SystemUpdater` trait. `run_with_connection` takes `RunOptions`
+  instead of the readiness channel.
+- Reconnect to Nexigon Hub when the connection is lost or cannot be
   established, instead of exiting. Before each attempt after the first, the
   Agent waits for a random delay of up to 30 seconds, doubling after each
   failed attempt up to 10 minutes. A `Retry-After` header of Nexigon Hub
@@ -50,60 +79,37 @@
 - Add `nexigon-agent status`, which prints the connection state and device ID
   of the running Agent as JSON, and the `status` endpoint of the local API.
   While the Agent is not connected, the local API rejects the `executor`
-  endpoint with the new `HubUnavailable` error code, and the Agent's
-  `device`, `events`, and `repositories` commands fail instead of connecting
-  to Nexigon Hub on their own. The commands use the socket path from
-  `[local-api]` in the configuration.
-- Add `nexigon auth status` to verify authentication and print the authenticated
-  user or organization and token ID as JSON.
+  endpoint with the new `HubUnavailable` error code.
+- The Agent's `device`, `events`, and `repositories` commands use the
+  connection of a running Agent through the local API and fail while it is not
+  connected to Nexigon Hub. Without a running Agent, they connect on their own
+  as before. They use the socket path from `[local-api]` in the configuration.
+  The local `repositories create` command requires `--organization <org-id>`.
+- Authenticate the Agent with a device private key held by hardware, such as a
+  TPM, a PKCS#11 token, or the Raspberry Pi firmware, instead of a key file.
+  Configure a signer script for the key in the new `[signer]` section. The
+  Agent obtains the public key from the script and has it sign the device
+  certificate and each TLS handshake. With a signer, the Agent does not
+  generate a key file.
+- The Agent invokes only Device API actions, except in its `repositories`
+  commands.
+
+### CLI
+
+- Add `nexigon-cli auth status` to verify authentication and print the
+  authenticated user or organization and token ID as JSON.
 - Require `--organization <org-id>` for resource commands with a user token.
   Organization API tokens infer their organization and reject a conflicting
-  option. `projects list` lists projects in the selected organization. Resource
-  lookups outside that organization return `NotFound`. API clients can select
-  an organization with the `X-Nexigon-Organization` request header.
+  option. `projects list` lists projects in the selected organization.
+  Resource lookups outside that organization return `NotFound`.
 - Replace the positional organization in `projects create <org-id> <name>` and
   `repositories create <org-id> <display-name>` with `--organization <org-id>`.
-  With an organization API token, omit the option. For the Agent's local
-  `repositories create` command, supply `--organization <org-id>` explicitly.
+  With an organization API token, omit the option.
 - Set a repository's path name with `repositories create --path-name` and
   `repositories set-path-name`. Within an organization, repository names in
   paths are path names.
-- Add system updates with Rugix Ctrl and RAUC, enabled with
-  `[integrations.rugix.system-updates]` or `[integrations.rauc.system-updates]`.
-  The Agent follows the desired state in `dev.nexigon.ota.config`, reports
-  progress in `dev.nexigon.ota.status`, and supports holds, maintenance
-  windows, spreads, retries, and checkpoint releases. With commands enabled,
-  the `nexigon.ota.check` command starts an immediate check. The Agent
-  publishes the status with compare-and-swap. If the status changed during a
-  check, for example because the failure count was cleared in Nexigon Hub, the
-  check starts over from the changed status.
-- Add the Rugix Apps integration, enabled with `[integrations.rugix.apps]`.
-  The Agent installs, updates, stops, and removes the apps listed in
-  `dev.nexigon.rugix-apps.config` and reports the status of all apps in
-  `dev.nexigon.rugix-apps.status`. It installs the bundle for the device's
-  architecture, `<app>-<arch>.rugixb` by default, and supports holds,
-  maintenance windows, spreads, and retries. Outside a maintenance window, it
-  installs new versions without activating them. After an update, it removes
-  old versions except for the number of previously running versions that the
-  `gc` policy or `gc.keep` in the integration configuration keeps, 1 by
-  default. With commands enabled, the `nexigon.rugix-apps.check` command starts an
-  immediate check. The integration requires a Rugix Ctrl version that supports
-  `rugix-ctrl apps install --origin`. System updates and app changes do not run
-  at the same time.
-- Choose the asset that a device installs from each version with `asset` in
-  the integration configuration or in `dev.nexigon.ota.config`. It defaults to
-  the bundle of the running system, such as `<system>.rugixb`. A version
-  without the asset blocks the update with the `no-asset` code.
-- Define checkpoint releases with the CLI commands
-  `repositories versions create --base` and `repositories versions set-base`.
-- Let hosts that run the Agent in-process provide their own update system
-  through the `SystemUpdater` trait. `run_with_connection` takes `RunOptions`
-  instead of the readiness channel.
-- Fix a stack overflow of update checks in debug builds.
-- Fix a stack overflow of `actions execute` in debug builds of the CLI.
-- Write 64-bit integers beyond ±(2^53 − 1) as decimal strings and non-finite
-  floats as `NaN`, `+Infinity`, or `-Infinity` in JSON. Readers accept both
-  forms.
+- Define checkpoint releases with `repositories versions create --base` and
+  `repositories versions set-base`.
 - `projects devices list` lists one page of devices, newest first. Use
   `--limit` and `--cursor` to page through large projects. This requires Hub
   2026.4.0 or later, and CLI 0.6.1 and earlier cannot list devices on that Hub.
@@ -112,11 +118,16 @@
   find versions by name, ID, or tag. The new `repositories packages tags list`
   lists the tags of a package and their versions with the same options. Both
   require Hub 2026.4.0 or later.
+- Fix a stack overflow of `actions execute` in debug builds.
+
+### API
+
+- API clients can select an organization with the `X-Nexigon-Organization`
+  request header.
 - Mark the actions of the Device API, which remain backward compatible for at
   least five years, and of the Admin API, which require instance administrator
-  permissions and change more often. The Rust, TypeScript, and Python API types
-  document the API they belong to. The Agent invokes only Device API actions,
-  except in its `repositories` commands.
+  permissions and change more often. The Rust, TypeScript, and Python API
+  types document the API they belong to.
 - Add the Admin API actions `users_Deactivate`, `users_Reactivate`,
   `organizations_Deactivate`, and `organizations_Reactivate`. User and
   organization queries return a `deactivation` field for deactivated accounts
@@ -132,6 +143,27 @@
   `fleet_ReleaseOperationStage`, and `fleet_CloseOperation` replace
   `fleet_PauseOperation` and `fleet_AdvanceOperationStage`. The `DeviceTask`
   step is removed. Agent 0.6 keeps running the commands of fleet operations.
+- Remove the unstable `vulnerabilities_*` actions. Nexigon Hub indexes SBOMs
+  linked through `relations.sbom` automatically and manages vulnerabilities in
+  its web interface. `relations.vdr` and `relations.vex` are no longer indexed;
+  import VEX documents for a package instead.
+- Document the size limits of Nexigon Hub on the affected API fields. By
+  default, Nexigon Hub rejects property values, profile values, step values,
+  command inputs, metadata, and property schemas above 64 KiB, events above
+  4 KiB, batches of more than 1000 events, and device token claims above 4 KiB.
+  Add `omittedOutputBytes` to the state of operation steps, which holds the size
+  of a command output that exceeded the limit and was not stored.
+- Write 64-bit integers beyond ±(2^53 − 1) as decimal strings and non-finite
+  floats as `NaN`, `+Infinity`, or `-Infinity` in JSON. Readers accept both
+  forms.
+- The Python API types represent variant cases without a payload as strings,
+  such as `"Forbidden"`, instead of classes, such as
+  `ActionErrorKind_Forbidden`.
+
+### Dependencies
+
+- Update Sidex to 0.6.1.
+
 - Update Tokio to 1.54.1 for RUSTSEC-2026-0386, which reports that
   `AsyncFd::new` violates I/O safety.
 
