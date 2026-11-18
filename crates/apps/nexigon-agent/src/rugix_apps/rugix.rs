@@ -17,6 +17,7 @@ use serde::Serialize;
 use serde::de::IgnoredAny;
 
 use crate::reconcile::process::run;
+use crate::reconcile::process::run_install;
 use crate::reconcile::process::tool_version;
 
 /// Rugix Ctrl executable.
@@ -66,6 +67,9 @@ impl RugixApps {
     }
 
     /// Install a bundle as a new generation without activating it.
+    ///
+    /// Dropping the returned future interrupts the installation, which leaves
+    /// an incomplete generation.
     pub(crate) async fn install(&self, bundle: AppBundle<'_>) -> anyhow::Result<()> {
         let origin = serde_json::to_string(&Origin {
             nexigon: NexigonOrigin {
@@ -79,7 +83,7 @@ impl RugixApps {
             args.extend(["--bundle-hash", hash]);
         }
         args.push(bundle.url);
-        run(RUGIX_CTRL, &args).await.map(drop)
+        run_install(RUGIX_CTRL, &args).await.map(drop)
     }
 
     /// Activate a generation of an app, which starts its workload.

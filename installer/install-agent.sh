@@ -116,10 +116,8 @@ After=network.target
 
 [Service]
 Type=exec
-PIDFile=/run/nexigon-agent.pid
 ExecStart=/usr/bin/nexigon-agent run
-ExecStop=-/sbin/start-stop-daemon --quiet --stop --retry QUIT/5 --pidfile /run/nexigon-agent.pid
-TimeoutStopSec=5
+TimeoutStopSec=30
 KillMode=mixed
 Restart=always
 RestartSec=60s

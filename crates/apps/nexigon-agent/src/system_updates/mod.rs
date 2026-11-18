@@ -156,10 +156,11 @@ pub(crate) fn settings(config: &Config) -> anyhow::Result<Option<SystemUpdates>>
 /// The first check runs immediately, so that a newly booted system is committed
 /// without delay. `check_requested` wakes the loop for an immediate check.
 /// Other checks wait for a random delay of up to the configured jitter.
-/// `cancellation` stops the loop between checks and before installations. An installation
-/// in progress runs to completion, so the caller must await the loop. After it,
-/// the device reboots into the installed version unless `shutdown` signals
-/// that the agent stops. A lost connection to Nexigon Hub interrupts neither.
+/// `cancellation` stops the loop between checks and interrupts an installation
+/// in progress. Other changes of the device, such as a commit, run to
+/// completion, so the caller must await the loop. After an installation, the
+/// device reboots into the installed version unless `shutdown` signals that the
+/// agent stops. A lost connection to Nexigon Hub interrupts neither.
 pub(crate) async fn run(
     settings: SystemUpdates,
     link: HubLink,

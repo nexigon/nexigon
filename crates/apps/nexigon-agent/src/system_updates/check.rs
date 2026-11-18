@@ -102,7 +102,8 @@ pub(crate) struct CheckOutcome {
 pub(crate) struct Checker {
     settings: SystemUpdates,
     hub: Hub,
-    /// Signals that the agent stops, which prevents new installations.
+    /// Signals that the agent stops, which prevents new installations and
+    /// interrupts one in progress.
     cancellation: CancellationToken,
     /// Signals a shutdown, which also prevents rebooting into an installed version.
     shutdown: CancellationToken,
@@ -265,6 +266,11 @@ impl Checker {
                 completed = true;
             } else if matches!(state, OtaUpdateState::Installing) {
                 failure = Some("the installation was interrupted".to_owned());
+                // The update system may have finished the installation after
+                // the agent stopped. Until the running system is active again,
+                // the status keeps the installation, so that the next check
+                // tries again.
+                self.deactivate().await?;
             } else {
                 failure = Some(format!(
                     "the update was rolled back: the device runs {} instead of the installed version",
@@ -428,8 +434,9 @@ impl Checker {
     ///
     /// Once the installation starts, it runs to completion even if the
     /// connection is lost or updates are put on hold, so that the attempt is not
-    /// wasted. If the agent is stopped, it does not reboot into the installed
-    /// version.
+    /// wasted. If the agent stops, it interrupts the installation, which the
+    /// next check reports as a failed attempt, and does not reboot into an
+    /// installed version.
     async fn attempt(
         &mut self,
         status: OtaUpdateStatus,
@@ -466,7 +473,19 @@ impl Checker {
             hash: bundle_hash.as_deref(),
             image_version: image_version.as_deref(),
         });
-        if let Err(error) = installation.await {
+        // Dropping the installation interrupts it.
+        let installed = tokio::select! {
+            result = installation => Some(result),
+            () = self.cancellation.cancelled() => None,
+        };
+        let Some(installed) = installed else {
+            // The next check keeps the running system active.
+            warn!("interrupted the installation because the agent stops");
+            bail!("the agent is stopping");
+        };
+        if let Err(error) = installed {
+            // A failed installation must not activate with a later reboot.
+            self.deactivate().await?;
             return self
                 .fail_attempt(status, identity, retry, failures, error)
                 .await;
@@ -524,6 +543,20 @@ impl Checker {
             next_attempt_at: None,
             rebooting: true,
         })
+    }
+
+    /// Keep the running system active after an installation that did not
+    /// complete.
+    ///
+    /// The update system may first have to finish the installation, so this
+    /// fails if the agent stops in the meantime.
+    async fn deactivate(&self) -> anyhow::Result<()> {
+        tokio::select! {
+            result = self.settings.updater.deactivate() => {
+                result.context("failed to keep the running system active")
+            }
+            () = self.cancellation.cancelled() => bail!("the agent is stopping"),
+        }
     }
 
     /// Record a failed attempt and schedule the next one.

@@ -6,6 +6,7 @@
 
 use std::collections::BTreeMap;
 use std::path::Path;
+use std::time::Duration;
 
 use anyhow::Context;
 use futures::FutureExt;
@@ -16,20 +17,23 @@ use serde::Deserialize;
 use serde::de::IgnoredAny;
 
 use crate::reconcile::process::run;
+use crate::reconcile::process::run_install;
 use crate::reconcile::process::tool_version;
 
 /// Path of the build information written by Rugix Bakery.
 const RUGIX_BUILD_INFO_PATH: &str = "/etc/rugix/system-build-info.json";
 /// Path of the operating system identification file.
 const OS_RELEASE_PATH: &str = "/etc/os-release";
+/// Time between checks whether RAUC still installs a bundle.
+const RAUC_POLL_INTERVAL: Duration = Duration::from_secs(5);
 
 /// Update system that installs bundles and boots into them.
 ///
 /// A check commits a newly booted system that awaits its commit, installs a
-/// bundle, and reboots into it. If the agent stops or the maintenance window
-/// closes between the installation and the reboot, the check deactivates the
-/// installed bundle instead. The methods follow these steps of the update
-/// checks, so they may change with them; implementations belong to hosts that
+/// bundle, and reboots into it. If the agent stops during the installation or
+/// before the reboot, or the maintenance window closes before the reboot, the
+/// check deactivates the installed bundle instead. The methods follow these steps of the
+/// update checks, so they may change with them; implementations belong to hosts that
 /// run the agent in-process, such as simulators.
 pub trait SystemUpdater: Send + Sync {
     /// Filename of the bundle for a system in a package version.
@@ -48,9 +52,16 @@ pub trait SystemUpdater: Send + Sync {
     fn commit(&self) -> BoxFuture<'_, anyhow::Result<()>>;
 
     /// Install a bundle without rebooting.
+    ///
+    /// The check drops the returned future to interrupt the installation when
+    /// the agent stops.
     fn install<'a>(&'a self, bundle: Bundle<'a>) -> BoxFuture<'a, anyhow::Result<()>>;
 
     /// Keep the running system active after installing a bundle.
+    ///
+    /// An installation that the check interrupted may continue in the update
+    /// system, so implementations wait until it has ended. The check drops the
+    /// returned future when the agent stops.
     fn deactivate(&self) -> BoxFuture<'_, anyhow::Result<()>>;
 
     /// Describe the update system, its slots, and the boot state.
@@ -177,9 +188,11 @@ impl SystemUpdater for Updater {
                         args.extend(["--bundle-hash", hash]);
                     }
                     args.push(bundle.url);
-                    run("rugix-ctrl", &args).await.map(drop)
+                    run_install("rugix-ctrl", &args).await.map(drop)
                 }
-                Self::Rauc => run("rauc", &["install", bundle.url]).await.map(drop),
+                Self::Rauc => run_install("rauc", &["install", bundle.url])
+                    .await
+                    .map(drop),
             }
         }
         .boxed()
@@ -187,13 +200,21 @@ impl SystemUpdater for Updater {
 
     /// Rugix Ctrl activates an installed bundle only when rebooting into it,
     /// while RAUC marks it as the system to boot next.
+    ///
+    /// Killing `rauc install` does not stop the RAUC service, which finishes
+    /// the installation and rejects marking slots until then.
     fn deactivate(&self) -> BoxFuture<'_, anyhow::Result<()>> {
         async move {
             match self {
                 Self::Rugix { .. } => Ok(()),
-                Self::Rauc => run("rauc", &["status", "mark-active", "booted"])
-                    .await
-                    .map(drop),
+                Self::Rauc => {
+                    while rauc_installs().await {
+                        tokio::time::sleep(RAUC_POLL_INTERVAL).await;
+                    }
+                    run("rauc", &["status", "mark-active", "booted"])
+                        .await
+                        .map(drop)
+                }
             }
         }
         .boxed()
@@ -339,6 +360,25 @@ fn rauc_updater(version: &str, status: &str) -> anyhow::Result<OtaUpdater> {
         .with_booted_slot(booted_slot.map(Into::into))
         .with_primary_slot(status.boot_primary.map(Into::into))
         .with_slots(Some(slots.into())))
+}
+
+/// Whether the RAUC service installs a bundle.
+///
+/// Assumes that it does not if its state cannot be read, so that the caller
+/// does not wait forever.
+async fn rauc_installs() -> bool {
+    let operation = run(
+        "busctl",
+        &[
+            "get-property",
+            "de.pengutronix.rauc",
+            "/",
+            "de.pengutronix.rauc.Installer",
+            "Operation",
+        ],
+    )
+    .await;
+    operation.is_ok_and(|operation| operation.trim() == r#"s "installing""#)
 }
 
 /// Read a field from the contents of an os-release file.

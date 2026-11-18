@@ -92,7 +92,8 @@ pub(crate) struct Checker {
     rugix: RugixApps,
     /// Serializes changes of the device with the system update integration.
     device_lock: Arc<Mutex<()>>,
-    /// Signals that the agent stops, which prevents new changes.
+    /// Signals that the agent stops, which prevents new changes and
+    /// interrupts an installation in progress.
     cancellation: CancellationToken,
     /// Version of the status read or written last, or `None` without a status.
     status_version: Option<u64>,
@@ -527,7 +528,21 @@ impl Checker {
                     RugixAppUpdateState::Installing,
                 )
                 .await?;
-                let generation = match self.install(app.name, target_id, &asset, &url).await {
+                // Dropping the installation interrupts it, which the next
+                // check reports as a failed attempt.
+                let cancellation = self.cancellation.clone();
+                let installed = tokio::select! {
+                    result = self.install(app.name, target_id, &asset, &url) => Some(result),
+                    () = cancellation.cancelled() => None,
+                };
+                let Some(installed) = installed else {
+                    warn!(
+                        app = app.name,
+                        "interrupted the installation because the agent stops"
+                    );
+                    bail!("the agent is stopping");
+                };
+                let generation = match installed {
                     Ok(generation) => generation,
                     Err(error) => {
                         return Ok(self

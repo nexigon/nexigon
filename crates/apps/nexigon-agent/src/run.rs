@@ -338,8 +338,9 @@ pub(crate) async fn run_sessions(
         spawn_supervised(&mut agent_tasks, local_api);
     }
 
-    // The system update and app loops finish a change in progress when the
-    // agent stops, so they run outside the task group and its shutdown deadline.
+    // When the agent stops, the system update and app loops interrupt an
+    // installation but finish other changes in progress, so they run outside
+    // the task group and its shutdown deadline.
     let mut integrations: Vec<(&str, JoinHandle<anyhow::Result<()>>)> = Vec::new();
     let device_lock = Arc::new(Mutex::new(()));
     let mut device_id: Option<DeviceId> = None;

@@ -65,12 +65,7 @@ async fn main() -> anyhow::Result<()> {
 
     match args.cmd {
         Cmd::Run => {
-            nexigon_agent::run(&config_path, async {
-                if let Err(e) = tokio::signal::ctrl_c().await {
-                    tracing::warn!("ctrl_c handler error: {e}");
-                }
-            })
-            .await?;
+            nexigon_agent::run(&config_path, stop_requested()).await?;
         }
         #[cfg(unix)]
         Cmd::Status => {
@@ -96,6 +91,35 @@ async fn main() -> anyhow::Result<()> {
         }
     }
     Ok(())
+}
+
+/// Resolve when the agent is asked to stop with SIGINT or, on Unix, SIGTERM,
+/// which service managers such as systemd send.
+async fn stop_requested() {
+    #[cfg(unix)]
+    let terminate = async {
+        match tokio::signal::unix::signal(tokio::signal::unix::SignalKind::terminate()) {
+            Ok(mut terminate) => {
+                terminate.recv().await;
+            }
+            Err(error) => {
+                warn!("cannot handle SIGTERM: {error}");
+                std::future::pending::<()>().await;
+            }
+        }
+    };
+    #[cfg(not(unix))]
+    let terminate = std::future::pending::<()>();
+    let interrupt = async {
+        if let Err(error) = tokio::signal::ctrl_c().await {
+            tracing::warn!("cannot handle SIGINT: {error}");
+            std::future::pending::<()>().await;
+        }
+    };
+    tokio::select! {
+        () = terminate => info!("received SIGTERM, stopping"),
+        () = interrupt => info!("received SIGINT, stopping"),
+    }
 }
 
 /// Session scaffolding for one-shot CLI subcommands.

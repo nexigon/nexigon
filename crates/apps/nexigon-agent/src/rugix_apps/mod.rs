@@ -94,8 +94,9 @@ pub(crate) fn settings(config: &Config) -> Option<RugixAppsSettings> {
 /// The first check runs immediately. `check_requested` wakes the loop for an
 /// immediate check. Other checks wait for a random delay of up to the configured
 /// jitter. `cancellation` stops the loop between checks and before changes of
-/// the device. A change in progress runs to completion, so the caller must
-/// await the loop. A lost connection to Nexigon Hub interrupts neither.
+/// the device, and interrupts the installation of a bundle. Other changes in
+/// progress run to completion, so the caller must await the loop. A lost
+/// connection to Nexigon Hub interrupts neither.
 pub(crate) async fn run(
     settings: RugixAppsSettings,
     link: HubLink,
