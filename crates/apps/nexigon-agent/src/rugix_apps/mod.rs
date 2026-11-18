@@ -6,12 +6,15 @@
 //! `dev.nexigon.rugix-apps.status`. `settings` reads the integration from the
 //! configuration. `run` checks the apps periodically, when a scheduled attempt
 //! is due, and when the `nexigon.rugix-apps.check` command requests a check. Scheduled
-//! checks are delayed randomly, like the checks of system updates.
+//! checks are delayed randomly, like the checks of system updates. The
+//! [`commands`] start, stop, roll back, and remove apps that the configuration
+//! does not manage.
 //!
 //! The agent changes apps only while it holds the device lock that it shares
 //! with the system update integration, so that a reboot into a new system does
 //! not interrupt the installation of an app.
 
+use std::collections::BTreeSet;
 use std::panic::AssertUnwindSafe;
 use std::sync::Arc;
 use std::time::Duration;
@@ -33,6 +36,7 @@ use crate::reconcile::next_check_delay;
 use crate::reconcile::wait_for_check;
 
 mod check;
+pub(crate) mod commands;
 mod rugix;
 
 use check::Checker;
@@ -42,6 +46,42 @@ pub(crate) const CHECK_COMMAND: &str = "nexigon.rugix-apps.check";
 /// Number of previously active generations that garbage collection keeps by
 /// default, like Rugix Ctrl.
 const DEFAULT_GC_KEEP: u32 = 1;
+
+/// State that the checks share with the app commands.
+#[derive(Clone, Default)]
+pub(crate) struct AppControl {
+    /// Serializes changes of the device with the system update integration.
+    pub(crate) device_lock: Arc<Mutex<()>>,
+    /// Wakes the loop for an immediate check.
+    pub(crate) check_requested: Arc<Notify>,
+    /// Apps that the configuration lists, as of the last check, or `None`
+    /// before the first check read the configuration.
+    managed: Arc<std::sync::Mutex<Option<BTreeSet<String>>>>,
+}
+
+impl AppControl {
+    /// Share the device lock with the system update integration.
+    pub(crate) fn new(device_lock: Arc<Mutex<()>>) -> Self {
+        Self {
+            device_lock,
+            ..Self::default()
+        }
+    }
+
+    fn managed_apps(&self) -> Option<BTreeSet<String>> {
+        self.managed
+            .lock()
+            .unwrap_or_else(|error| error.into_inner())
+            .clone()
+    }
+
+    fn set_managed_apps(&self, apps: BTreeSet<String>) {
+        *self
+            .managed
+            .lock()
+            .unwrap_or_else(|error| error.into_inner()) = Some(apps);
+    }
+}
 
 /// Rugix Apps settings from the agent configuration.
 #[derive(Debug, Clone)]
@@ -101,17 +141,17 @@ pub(crate) async fn run(
     settings: RugixAppsSettings,
     link: HubLink,
     device_id: DeviceId,
-    device_lock: Arc<Mutex<()>>,
-    check_requested: Arc<Notify>,
+    control: AppControl,
     cancellation: CancellationToken,
 ) -> anyhow::Result<()> {
     let check_interval = settings.check_interval;
     let check_jitter = settings.check_jitter;
+    let check_requested = control.check_requested.clone();
     let mut checker = Checker::new(
         settings,
         link.executor(),
         device_id,
-        device_lock,
+        control,
         cancellation.clone(),
     );
     while !cancellation.is_cancelled() {

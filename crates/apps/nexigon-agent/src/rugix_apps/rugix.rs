@@ -104,6 +104,16 @@ impl RugixApps {
         run(RUGIX_CTRL, &["apps", "start", app]).await.map(drop)
     }
 
+    /// Stop the workload of an app.
+    pub(crate) async fn stop(&self, app: &str) -> anyhow::Result<()> {
+        run(RUGIX_CTRL, &["apps", "stop", app]).await.map(drop)
+    }
+
+    /// Activate the previously active generation of an app.
+    pub(crate) async fn rollback(&self, app: &str) -> anyhow::Result<()> {
+        run(RUGIX_CTRL, &["apps", "rollback", app]).await.map(drop)
+    }
+
     /// Deactivate an app, which stops its workload, also after a reboot.
     pub(crate) async fn deactivate(&self, app: &str) -> anyhow::Result<()> {
         run(RUGIX_CTRL, &["apps", "deactivate", app])

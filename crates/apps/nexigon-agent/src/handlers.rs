@@ -23,6 +23,7 @@ use std::os::unix::ffi::OsStringExt;
 use std::path::Component;
 
 use anyhow::Context;
+use futures::future::BoxFuture;
 use nexigon_agent_protocol::FRAME_READ_TIMEOUT;
 use nexigon_agent_protocol::MAX_COMMAND_OUTPUT_BYTES;
 use nexigon_agent_protocol::MAX_COMMAND_OUTPUT_LINE_LEN;
@@ -109,24 +110,58 @@ pub struct CommandRegistry {
     builtins: HashMap<String, BuiltinCommand>,
 }
 
-/// Command implemented by the agent itself.
+/// Handler of a command implemented by the agent itself.
 ///
-/// Built-in commands take no input, start their work in the background, and
-/// complete immediately without output.
+/// The handler receives the input of the command and returns an error message
+/// if the command fails. Built-in commands produce no output.
+pub(crate) type BuiltinHandler =
+    Arc<dyn Fn(serde_json::Value) -> BoxFuture<'static, Result<(), String>> + Send + Sync>;
+
+/// Command implemented by the agent itself.
 struct BuiltinCommand {
     descriptor: DeviceCommandDescriptor,
-    start: Arc<dyn Fn() + Send + Sync>,
+    handler: BuiltinHandler,
 }
 
 impl BuiltinCommand {
-    fn invoke(&self) -> DeviceCommandDoneData {
-        (self.start)();
+    /// Run the command, which fails if it does not finish within its timeout
+    /// or `cancellation` signals that the agent stops first.
+    async fn invoke(
+        &self,
+        request: &DeviceCommandInvokeData,
+        cancellation: Option<&CancellationToken>,
+    ) -> DeviceCommandDoneData {
+        let started = std::time::Instant::now();
+        let input = serde_json::to_value(&request.input).unwrap_or_default();
+        let timeout = bounded_command_timeout(request.timeout_secs.map(u64::from), None);
+        let invocation = async {
+            tokio::time::timeout(timeout, (self.handler)(input))
+                .await
+                .unwrap_or_else(|_| {
+                    Err(format!(
+                        "the command did not finish within {} seconds; a change that it started \
+                         continues, and the device reports its result",
+                        timeout.as_secs()
+                    ))
+                })
+        };
+        let result = match cancellation {
+            Some(cancellation) => tokio::select! {
+                result = invocation => result,
+                () = cancellation.cancelled() => Err("the agent is stopping".to_owned()),
+            },
+            None => invocation.await,
+        };
+        let (status, error) = match result {
+            Ok(()) => (DeviceCommandStatus::Ok, None),
+            Err(error) => (DeviceCommandStatus::Error, Some(error.into())),
+        };
         DeviceCommandDoneData {
-            status: DeviceCommandStatus::Ok,
+            status,
             output: None,
-            error: None,
+            error,
             log_tail: Vec::new().into(),
-            duration_ms: 0,
+            duration_ms: u64::try_from(started.elapsed().as_millis()).unwrap_or(u64::MAX),
         }
     }
 }
@@ -206,14 +241,19 @@ impl CommandRegistry {
     pub(crate) fn register_builtin(
         &mut self,
         descriptor: DeviceCommandDescriptor,
-        start: Arc<dyn Fn() + Send + Sync>,
+        handler: BuiltinHandler,
     ) {
         let name = descriptor.name.to_string();
         if self.commands.remove(&name).is_some() {
             warn!(%name, "built-in command replaces an external command definition");
         }
-        self.builtins
-            .insert(name, BuiltinCommand { descriptor, start });
+        self.builtins.insert(
+            name,
+            BuiltinCommand {
+                descriptor,
+                handler,
+            },
+        );
     }
 
     /// Get a command by name.
@@ -1108,7 +1148,7 @@ async fn handle_handler_channel_inner(
     );
 
     if let Some(builtin) = registry.builtins.get(&*request.command) {
-        let frame = DeviceCommandDeviceFrame::Done(builtin.invoke());
+        let frame = DeviceCommandDeviceFrame::Done(builtin.invoke(&request, cancellation).await);
         write_command_frame(&mut chan_writer, &frame).await.ok();
         chan_writer.shutdown().await.ok();
         return Ok(());
@@ -1186,7 +1226,7 @@ async fn invoke_registered_command_inner(
         };
     }
     if let Some(builtin) = registry.builtins.get(&*request.command) {
-        return builtin.invoke();
+        return builtin.invoke(&request, cancellation).await;
     }
     let Some(command) = registry.get_loaded(&request.command) else {
         return DeviceCommandDoneData {

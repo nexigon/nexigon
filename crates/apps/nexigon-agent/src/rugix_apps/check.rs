@@ -32,7 +32,6 @@
 //! check has changed the device, it writes its status regardless.
 
 use std::collections::BTreeMap;
-use std::sync::Arc;
 
 use anyhow::Context;
 use anyhow::bail;
@@ -57,12 +56,12 @@ use nexigon_api::types::rugix_apps::RugixAppsStatus;
 use nexigon_ids::ids::DeviceId;
 use serde::Deserialize;
 use serde_json::Value;
-use tokio::sync::Mutex;
 use tokio::sync::OwnedMutexGuard;
 use tokio_util::sync::CancellationToken;
 use tracing::info;
 use tracing::warn;
 
+use super::AppControl;
 use super::RugixAppsSettings;
 use super::rugix::AppBundle;
 use super::rugix::AppInfo;
@@ -107,8 +106,8 @@ pub(crate) struct Checker {
     settings: RugixAppsSettings,
     hub: Hub,
     rugix: RugixApps,
-    /// Serializes changes of the device with the system update integration.
-    device_lock: Arc<Mutex<()>>,
+    /// Device lock and the apps that the commands must not change.
+    control: AppControl,
     /// Signals that the agent stops, which prevents new changes and
     /// interrupts an installation in progress.
     cancellation: CancellationToken,
@@ -136,14 +135,14 @@ impl Checker {
         settings: RugixAppsSettings,
         executor: HubExecutor,
         device_id: DeviceId,
-        device_lock: Arc<Mutex<()>>,
+        control: AppControl,
         cancellation: CancellationToken,
     ) -> Self {
         Self {
             settings,
             hub: Hub::new(executor, device_id),
             rugix: RugixApps,
-            device_lock,
+            control,
             cancellation,
             status_version: None,
             changed: false,
@@ -205,6 +204,14 @@ impl Checker {
         }
         let managed = config.apps.clone().unwrap_or_default();
         let listed = |name: &str| managed.contains_key(name) || invalid.contains_key(name);
+        // The commands must not change apps that the configuration lists.
+        self.control.set_managed_apps(
+            managed
+                .keys()
+                .map(|name| name.to_string())
+                .chain(invalid.keys().cloned())
+                .collect(),
+        );
         status
             .apps
             .retain(|name, _| listed(name.as_str()) || installed.contains_key(name.as_str()));
@@ -816,7 +823,7 @@ impl Checker {
 
     /// Acquire the device lock before changing the device.
     async fn lock_device(&mut self) -> anyhow::Result<OwnedMutexGuard<()>> {
-        let guard = self.device_lock.clone().lock_owned().await;
+        let guard = self.control.device_lock.clone().lock_owned().await;
         if self.cancellation.is_cancelled() {
             bail!("the agent is stopping");
         }

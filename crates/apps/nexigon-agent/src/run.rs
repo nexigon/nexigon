@@ -52,6 +52,7 @@ use tracing::warn;
 use crate::config::Config;
 use crate::device_api::connect_device_executor;
 use crate::handlers;
+use crate::handlers::BuiltinHandler;
 use crate::handlers::CommandRegistry;
 use crate::hub_link::HubLink;
 use crate::hub_link::LinkController;
@@ -61,6 +62,8 @@ use crate::operations;
 use crate::operations::OperationPoller;
 use crate::reconnect::Reconnector;
 use crate::reconnect::reconnect_settings;
+use crate::rugix_apps::AppControl;
+use crate::rugix_apps::commands::AppCommand;
 use crate::system_info::get_system_info;
 use crate::system_updates::SystemUpdates;
 
@@ -290,12 +293,14 @@ pub(crate) async fn run_sessions(
         })
     });
     let mut app_updates = crate::rugix_apps::settings(&config);
+    // Serializes changes of the device between the integrations.
+    let device_lock = Arc::new(Mutex::new(()));
     let check_requested = Arc::new(Notify::new());
-    let app_check_requested = Arc::new(Notify::new());
+    let app_control = AppControl::new(device_lock.clone());
     let command_registry = command_registry(
         &config,
         system_updates.is_some().then(|| check_requested.clone()),
-        app_updates.is_some().then(|| app_check_requested.clone()),
+        app_updates.is_some().then(|| app_control.clone()),
     );
     let command_slots = command_slots();
     let endpoints = SessionEndpoints {
@@ -342,7 +347,6 @@ pub(crate) async fn run_sessions(
     // installation but finish other changes in progress, so they run outside
     // the task group and its shutdown deadline.
     let mut integrations: Vec<(&str, JoinHandle<anyhow::Result<()>>)> = Vec::new();
-    let device_lock = Arc::new(Mutex::new(()));
     let mut device_id: Option<DeviceId> = None;
     let mut manifest_published = false;
     let mut session_result = Ok(());
@@ -451,8 +455,7 @@ pub(crate) async fn run_sessions(
                         settings,
                         link.clone(),
                         session_device_id,
-                        device_lock.clone(),
-                        app_check_requested.clone(),
+                        app_control.clone(),
                         stopping.clone(),
                     )),
                 ));
@@ -488,6 +491,9 @@ pub(crate) async fn run_sessions(
             Err(error) => error!(?error, "{name} panicked"),
         }
     }
+    // Commands may still change apps after their invocations ended. A service
+    // manager may end the agent before they finish, after its stop timeout.
+    let _ = device_lock.lock().await;
     shutdown_watcher.abort();
     result
 }
@@ -731,11 +737,11 @@ async fn log_failure(
 fn command_registry(
     config: &Config,
     system_update_check: Option<Arc<Notify>>,
-    app_check: Option<Arc<Notify>>,
+    apps: Option<AppControl>,
 ) -> Option<Arc<CommandRegistry>> {
     let commands = config.commands.as_ref();
     let custom_commands = commands.and_then(|h| h.enabled).unwrap_or(false);
-    if !custom_commands && system_update_check.is_none() && app_check.is_none() {
+    if !custom_commands && system_update_check.is_none() && apps.is_none() {
         return None;
     }
     let mut registry = if custom_commands {
@@ -751,18 +757,39 @@ fn command_registry(
             DeviceCommandDescriptor::new(crate::system_updates::CHECK_COMMAND)
                 .with_description(Some("Request an immediate system update check.".into()))
                 .with_category(Some("OTA".into())),
-            Arc::new(move || check_requested.notify_one()),
+            notify_handler(check_requested),
         );
     }
-    if let Some(check_requested) = app_check {
+    if let Some(apps) = apps {
         registry.register_builtin(
             DeviceCommandDescriptor::new(crate::rugix_apps::CHECK_COMMAND)
                 .with_description(Some("Request an immediate check of Rugix Apps.".into()))
                 .with_category(Some("Rugix Apps".into())),
-            Arc::new(move || check_requested.notify_one()),
+            notify_handler(apps.check_requested.clone()),
         );
+        for command in AppCommand::ALL {
+            let apps = apps.clone();
+            registry.register_builtin(
+                DeviceCommandDescriptor::new(command.name())
+                    .with_description(Some(command.description().into()))
+                    .with_category(Some("Rugix Apps".into()))
+                    .with_input(Some(AppCommand::input_schema().into())),
+                Arc::new(move |input| {
+                    let apps = apps.clone();
+                    Box::pin(async move { apps.run_command(command, input).await })
+                }),
+            );
+        }
     }
     Some(Arc::new(registry))
+}
+
+/// Handler of a command that requests a check of an integration.
+fn notify_handler(check_requested: Arc<Notify>) -> BuiltinHandler {
+    Arc::new(move |_| {
+        check_requested.notify_one();
+        Box::pin(async { Ok(()) })
+    })
 }
 
 async fn run_connection_event_loop<S, E>(
@@ -1127,6 +1154,7 @@ mod tests {
     use tokio::task::JoinSet;
     use tokio_util::sync::CancellationToken;
 
+    use super::AppControl;
     use super::EndpointLimits;
     #[cfg(target_os = "linux")]
     use super::MAX_CONCURRENT_TERMINALS;
@@ -1160,7 +1188,7 @@ mod tests {
         let registry = command_registry(
             config,
             system_updates.then(|| Arc::new(Notify::new())),
-            apps.then(|| Arc::new(Notify::new())),
+            apps.then(AppControl::default),
         )?;
         Some(
             registry
@@ -1193,7 +1221,16 @@ mod tests {
         directory
     }
 
-    /// Enabled integrations offer their check commands without `[commands]`.
+    /// Commands of the Rugix Apps integration in the order of the manifest.
+    const APP_COMMANDS: [&str; 5] = [
+        crate::rugix_apps::CHECK_COMMAND,
+        "nexigon.rugix-apps.remove",
+        "nexigon.rugix-apps.rollback",
+        "nexigon.rugix-apps.start",
+        "nexigon.rugix-apps.stop",
+    ];
+
+    /// Enabled integrations offer their commands without `[commands]`.
     #[test]
     fn integrations_offer_check_commands_without_custom_commands() {
         let directory = custom_commands_directory();
@@ -1204,13 +1241,9 @@ mod tests {
         .unwrap();
 
         assert_eq!(command_names(&config, false, false), None);
-        assert_eq!(
-            command_names(&config, true, true).unwrap(),
-            [
-                crate::system_updates::CHECK_COMMAND,
-                crate::rugix_apps::CHECK_COMMAND
-            ]
-        );
+        let mut expected = vec![crate::system_updates::CHECK_COMMAND];
+        expected.extend(APP_COMMANDS);
+        assert_eq!(command_names(&config, true, true).unwrap(), expected);
     }
 
     /// `[commands]` adds custom commands to the check commands.
@@ -1224,10 +1257,9 @@ mod tests {
         .unwrap();
 
         assert_eq!(command_names(&config, false, false).unwrap(), ["custom"]);
-        assert_eq!(
-            command_names(&config, false, true).unwrap(),
-            ["custom", crate::rugix_apps::CHECK_COMMAND]
-        );
+        let mut expected = vec!["custom"];
+        expected.extend(APP_COMMANDS);
+        assert_eq!(command_names(&config, false, true).unwrap(), expected);
     }
 
     struct EndpointTestAgent {
