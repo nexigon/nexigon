@@ -15,8 +15,10 @@
 //!
 //! A check first starts or stops each app according to its desired state,
 //! regardless of the update policies. An app that should run but whose
-//! workload stopped, for example after a reboot, starts again. A version
-//! change then has two steps.
+//! workload stopped, for example after a reboot, starts again. If its target
+//! version is already installed, it starts after the update instead: with the
+//! target version if the update activates it, and with the deployed version
+//! otherwise. A version change has two steps.
 //! Installing downloads the bundle into a new generation without interrupting
 //! the app, so it may happen outside the maintenance window. Activating switches
 //! the app to the generation, which the window restricts while the app runs. A
@@ -281,19 +283,20 @@ impl Checker {
         }
 
         let target = self.target(&app.config).await;
+        // An app that should run starts with an installed target version if
+        // the update activates it. Otherwise, it starts with the deployed
+        // version after the update.
+        let defer_start = matches!(desired, RugixAppDesiredState::Running)
+            && info.as_ref().is_some_and(|info| match &target {
+                Ok(Some((_, target_id))) => info
+                    .generation_of(target_id)
+                    .is_some_and(|generation| info.deployed_generation() != Some(generation)),
+                _ => false,
+            });
         // Starting and stopping an app are no version changes, so the update
         // policies do not apply to them.
         let info = match info {
-            Some(info) => {
-                let target_generation = match &target {
-                    Ok(Some((_, target_id))) => info.generation_of(target_id),
-                    _ => None,
-                };
-                Some(
-                    self.apply_state(app, &desired, info, target_generation)
-                        .await?,
-                )
-            }
+            Some(info) => Some(self.apply_state(app, &desired, info, defer_start).await?),
             None => None,
         };
         if let Some(info) = &info {
@@ -321,8 +324,22 @@ impl Checker {
                 .with_state(Some(RugixAppUpdateState::Completed))
                 .with_failure_count(Some(0)));
         }
-        self.update(status, app, info.as_ref(), app_status, &path, &target_id)
-            .await
+        let result = self
+            .update(status, app, info.as_ref(), app_status, &path, &target_id)
+            .await;
+        let activated = matches!(
+            &result,
+            Ok(app_status) if matches!(app_status.state, Some(RugixAppUpdateState::Completed))
+        );
+        if !defer_start || activated || self.cancellation.is_cancelled() {
+            return result;
+        }
+        // The update did not activate the target version, for example because
+        // its next attempt is not due yet, so the app starts with the deployed
+        // version.
+        let info = self.rugix.info(app.name).await?;
+        let info = self.apply_state(app, &desired, info, false).await?;
+        result.map(|app_status| observed(app_status, &info))
     }
 
     /// Resolve the configured path of an app, if any.
@@ -342,31 +359,27 @@ impl Checker {
 
     /// Start or stop an installed app according to its desired state.
     ///
-    /// Also starts the workload of an active app if it stopped. A stopped app
-    /// whose target version is installed starts with that version, which
-    /// [`Self::update`] activates as a version change. Returns the information
-    /// about the app after the change.
+    /// Also starts the workload of an active app if it stopped. With
+    /// `defer_start`, an app that should run is left as it is, so that
+    /// [`Self::update`] can start it with its target version. Returns the
+    /// information about the app after the change.
     async fn apply_state(
         &mut self,
         app: &ManagedApp<'_>,
         desired: &RugixAppDesiredState,
         info: AppInfo,
-        target_generation: Option<u64>,
+        defer_start: bool,
     ) -> anyhow::Result<AppInfo> {
-        let deployed = info.deployed_generation();
-        let starts_with_target = target_generation.is_some()
-            && target_generation != deployed
-            && app.config.hold != Some(true);
-        match (desired, deployed) {
+        match (desired, info.deployed_generation()) {
             (RugixAppDesiredState::Running, Some(generation))
-                if !info.is_active() && !starts_with_target =>
+                if !info.is_active() && !defer_start =>
             {
                 let _guard = self.lock_device().await?;
                 self.changed = true;
                 self.rugix.activate(app.name, generation).await?;
                 info!(app = app.name, "started app");
             }
-            (RugixAppDesiredState::Running, Some(_)) if info.is_halted() && !starts_with_target => {
+            (RugixAppDesiredState::Running, Some(_)) if info.is_halted() && !defer_start => {
                 let _guard = self.lock_device().await?;
                 self.changed = true;
                 self.rugix.start(app.name).await?;
@@ -485,10 +498,12 @@ impl Checker {
         let runs = info.is_some_and(|info| info.is_active() && !info.is_halted());
         let (generation, guard) = match target_generation {
             Some(generation) => {
+                // A system update may hold the lock until the window closes.
+                let guard = self.lock_device().await?;
                 if let Some(deferred) = window_deferral(&app_status, &app.config, runs) {
                     return Ok(deferred);
                 }
-                (generation, self.lock_device().await?)
+                (generation, guard)
             }
             None => {
                 let Some(asset) = self.bundle(app.name, &app.config, target_id).await? else {
@@ -687,12 +702,17 @@ impl Checker {
         error: anyhow::Error,
     ) -> RugixAppStatus {
         self.recheck = true;
+        let previous = app.previous;
+        // Only a failed attempt schedules the next one.
+        let next_attempt_at = previous
+            .filter(|previous| matches!(previous.state, Some(RugixAppUpdateState::Failed)))
+            .and_then(|previous| previous.next_attempt_at);
         failed(app_status, &error)
             .with_target_version_id(
-                app.previous
-                    .and_then(|previous| previous.target_version_id.clone()),
+                previous.and_then(|previous| previous.target_version_id.clone()),
             )
-            .with_failure_count(app.previous.and_then(|previous| previous.failure_count))
+            .with_failure_count(previous.and_then(|previous| previous.failure_count))
+            .with_next_attempt_at(next_attempt_at)
     }
 
     /// Acquire the device lock before changing the device.
