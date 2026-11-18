@@ -2404,7 +2404,7 @@
           "profiles"
         ],
         "summary": "SaveRevision",
-        "description": "**Unstable (feature `device_profiles`).**\n\nSave new property values of a device profile as its next revision.\n\nEvery device that has the profile in `Latest` mode applies the new values\nright away.",
+        "description": "**Unstable (feature `device_profiles`).**\n\nSave new property values of a device profile as its next revision.\n\nEvery device that has the profile in `Latest` mode applies the new values\nright away. Deletes old revisions that no device or rollout uses beyond the\nrecent revisions that Nexigon Hub keeps.",
         "operationId": "profiles_SaveRevision",
         "requestBody": {
           "content": {
@@ -2450,7 +2450,7 @@
           "profiles"
         ],
         "summary": "QueryRevisions",
-        "description": "**Unstable (feature `device_profiles`).**\n\nList the revisions of a device profile, newest first.",
+        "description": "**Unstable (feature `device_profiles`).**\n\nList the existing revisions of a device profile, newest first.",
         "operationId": "profiles_QueryRevisions",
         "requestBody": {
           "content": {

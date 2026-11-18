@@ -8,6 +8,10 @@
 //! it uses the latest revision, a pinned revision, or the revision of the
 //! profile's rollout. A rollout applies a revision to the devices in rollout
 //! mode in stages.
+//!
+//! Nexigon Hub keeps a number of recent revisions of each profile, 20 by
+//! default, and every revision that a device or the profile's rollout uses.
+//! Saving a revision deletes the others, so revision numbers can have gaps.
 
 import datetime::Timestamp
 import devices::DeviceGroupSelector
@@ -189,7 +193,8 @@ record DeleteDeviceProfileAction {
 /// Save new property values of a device profile as its next revision.
 ///
 /// Every device that has the profile in `Latest` mode applies the new values
-/// right away.
+/// right away. Deletes old revisions that no device or rollout uses beyond the
+/// recent revisions that Nexigon Hub keeps.
 #[unstable(feature = "device_profiles")]
 #[request(
     name = "profiles_SaveRevision",
@@ -286,7 +291,7 @@ record UnassignDeviceProfileDevicesOutput {
     removed: u32,
 }
 
-/// List the revisions of a device profile, newest first.
+/// List the existing revisions of a device profile, newest first.
 #[unstable(feature = "device_profiles")]
 #[request(
     name = "profiles_QueryRevisions",
