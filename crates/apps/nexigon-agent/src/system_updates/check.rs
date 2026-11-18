@@ -27,8 +27,10 @@ use jiff::tz::TimeZone;
 use nexigon_api::types::devices::DeviceEventSeverity;
 use nexigon_api::types::devices::DeviceProperty;
 use nexigon_api::types::properties::OtaUpdateBlocked;
+use nexigon_api::types::properties::OtaUpdateBlockedCode;
 use nexigon_api::types::properties::OtaUpdateCapability;
 use nexigon_api::types::properties::OtaUpdateConfig;
+use nexigon_api::types::properties::OtaUpdateFailureCode;
 use nexigon_api::types::properties::OtaUpdateRetryPolicy;
 use nexigon_api::types::properties::OtaUpdateState;
 use nexigon_api::types::properties::OtaUpdateStatus;
@@ -54,9 +56,12 @@ use super::updater::Bundle;
 use super::updater::SystemIdentity;
 use crate::hub_link::HubExecutor;
 use crate::reconcile::WindowGate;
+use crate::reconcile::hub::FORMAT_VERSION;
 use crate::reconcile::hub::Hub;
 use crate::reconcile::hub::PropertyWrite;
+use crate::reconcile::hub::UnsupportedFormat;
 use crate::reconcile::hub::VersionPath;
+use crate::reconcile::hub::check_format;
 use crate::reconcile::hub::metadata;
 use crate::reconcile::hub::rugix_bundle_hash;
 use crate::reconcile::hub::truncate_event_text;
@@ -171,6 +176,7 @@ impl Checker {
         let config_version = property.as_ref().map(|property| property.version);
         let identity = self.settings.updater.identity().await?;
         let mut status = OtaUpdateStatus::new()
+            .with_format_version(Some(FORMAT_VERSION))
             .with_capabilities(Some(CAPABILITIES.to_vec().into()))
             .with_config_version(config_version)
             .with_current_version(Some(identity.version.clone().into()))
@@ -221,7 +227,21 @@ impl Checker {
 
         let config = match config {
             Ok(config) => config,
-            Err(error) => return self.finish(failed(status, &error)).await,
+            Err(error) => {
+                let Some(unsupported) = error.downcast_ref::<UnsupportedFormat>() else {
+                    return self.finish(failed(status, &error)).await;
+                };
+                warn!(%error, "unsupported update configuration");
+                let blocked = OtaUpdateBlocked::new(OtaUpdateBlockedCode::UnsupportedConfigFormat)
+                    .with_message(Some(unsupported.config_message().into()));
+                return self
+                    .finish(
+                        status
+                            .with_state(Some(OtaUpdateState::Blocked))
+                            .with_blocked(Some(blocked)),
+                    )
+                    .await;
+            }
         };
         status.config = Some(config.clone().with_retry(Some(retry.clone())));
 
@@ -242,11 +262,10 @@ impl Checker {
 
         let mut completed = false;
         let mut failure = None;
-        if let Some(
-            state @ (OtaUpdateState::Installing
-            | OtaUpdateState::Rebooting
-            | OtaUpdateState::Committing),
-        ) = &previous.state
+        if let Some(state) = previous
+            .state
+            .as_ref()
+            .filter(|state| attempt_in_progress(state))
         {
             if self
                 .runs_installed_version(&previous, running_id.as_ref(), &identity)
@@ -265,20 +284,35 @@ impl Checker {
                 }
                 completed = true;
             } else if matches!(state, OtaUpdateState::Installing) {
-                failure = Some("the installation was interrupted".to_owned());
+                failure = Some((
+                    OtaUpdateFailureCode::Interrupted,
+                    "the installation was interrupted".to_owned(),
+                ));
                 // The update system may have finished the installation after
                 // the agent stopped. Until the running system is active again,
                 // the status keeps the installation, so that the next check
                 // tries again.
                 self.deactivate().await?;
             } else {
-                failure = Some(format!(
-                    "the update was rolled back: the device runs {} instead of the installed version",
-                    identity.version
+                // A deliberate rollback keeps the reason that the integration
+                // reported, such as a failed health check.
+                let reason = previous
+                    .last_error
+                    .as_ref()
+                    .filter(|_| matches!(state, OtaUpdateState::Rollback));
+                failure = Some((
+                    OtaUpdateFailureCode::RolledBack,
+                    match reason {
+                        Some(reason) => format!("the update was rolled back: {reason}"),
+                        None => format!(
+                            "the update was rolled back: the device runs {} instead of the installed version",
+                            identity.version
+                        ),
+                    },
                 ));
             }
         }
-        if let Some(error) = &failure {
+        if let Some((code, error)) = &failure {
             if !self.outcome_reported {
                 warn!(%error, "update failed");
                 self.event(
@@ -290,6 +324,7 @@ impl Checker {
                 .await;
                 self.outcome_reported = true;
             }
+            status.failure_code = Some(code.clone());
             status.last_error = Some(error.clone().into());
         }
 
@@ -310,6 +345,7 @@ impl Checker {
                     status
                         .with_state(Some(OtaUpdateState::Completed))
                         .with_failure_count(Some(0))
+                        .with_failure_code(None)
                         .with_last_error(None),
                 )
                 .await;
@@ -318,19 +354,26 @@ impl Checker {
         let next = match self.plan(running_id.as_ref(), &target).await? {
             NextVersion::Install(next) => next,
             NextVersion::NoUpdatePath => {
-                return self.finish(blocked(status, "no-update-path", None)).await;
+                return self
+                    .finish(blocked(status, OtaUpdateBlockedCode::NoUpdatePath, None))
+                    .await;
             }
             NextVersion::UnknownCurrentVersion => {
                 return self
-                    .finish(blocked(status, "unknown-current-version", None))
+                    .finish(blocked(
+                        status,
+                        OtaUpdateBlockedCode::UnknownCurrentVersion,
+                        None,
+                    ))
                     .await;
             }
         };
         status.next_version_id = Some(next.clone());
 
-        // The failure count belongs to the next version and the configuration.
+        // The failure count belongs to the next version and the effective
+        // configuration.
         let same_attempt = previous.next_version_id.as_ref() == Some(&next)
-            && previous.config_version == config_version;
+            && same_config(previous.config.as_ref(), status.config.as_ref());
         let mut failures = if same_attempt && !completed {
             previous.failure_count.unwrap_or(0)
         } else {
@@ -340,6 +383,7 @@ impl Checker {
             failures += 1;
         } else if same_attempt && !completed {
             // The error of the last failed attempt stays until the attempt succeeds.
+            status.failure_code = previous.failure_code.clone();
             status.last_error = previous.last_error.clone();
         }
         let limit_reached = retry
@@ -347,7 +391,7 @@ impl Checker {
             .is_some_and(|max_attempts| failures >= max_attempts);
         let retry_at = if failure.is_some() && same_attempt {
             next_retry(&retry, failures, now)
-        } else if same_attempt && matches!(previous.state, Some(OtaUpdateState::Failed)) {
+        } else if same_attempt && keeps_retry_schedule(previous.state.as_ref()) {
             // Without a scheduled attempt, only a reached limit stops attempts.
             match previous.next_attempt_at {
                 Some(at) => Some(at.into()),
@@ -360,7 +404,9 @@ impl Checker {
         status.failure_count = Some(failures);
 
         if config.hold == Some(true) {
-            return self.finish(blocked(status, "hold", None)).await;
+            return self
+                .finish(blocked(status, OtaUpdateBlockedCode::Hold, None))
+                .await;
         }
 
         if let Some(spread) = &config.spread {
@@ -376,7 +422,9 @@ impl Checker {
                 spread_position(&self.hub.device_id().to_string(), &target_id.to_string());
             if let SpreadState::Waiting { released_at } = spread_state(spread, start, position, now)
             {
-                return self.finish(blocked(status, "spread", released_at)).await;
+                return self
+                    .finish(blocked(status, OtaUpdateBlockedCode::Spread, released_at))
+                    .await;
             }
         }
 
@@ -410,7 +458,7 @@ impl Checker {
             .as_deref()
             .expect("the effective configuration names an asset");
         let Some(asset) = self.hub.available_asset(&next, filename).await? else {
-            let blocked = OtaUpdateBlocked::new("no-asset").with_message(Some(
+            let blocked = OtaUpdateBlocked::new(OtaUpdateBlockedCode::NoAsset).with_message(Some(
                 format!("The next version has no available asset {filename}.").into(),
             ));
             return self
@@ -487,7 +535,14 @@ impl Checker {
             // A failed installation must not activate with a later reboot.
             self.deactivate().await?;
             return self
-                .fail_attempt(status, identity, retry, failures, error)
+                .fail_attempt(
+                    status,
+                    identity,
+                    retry,
+                    failures,
+                    OtaUpdateFailureCode::InstallFailed,
+                    error,
+                )
                 .await;
         }
         if self.shutdown.is_cancelled() {
@@ -535,7 +590,14 @@ impl Checker {
             // A later, unrelated reboot must not activate the update.
             self.settings.updater.deactivate().await?;
             return self
-                .fail_attempt(status, identity, retry, failures, error)
+                .fail_attempt(
+                    status,
+                    identity,
+                    retry,
+                    failures,
+                    OtaUpdateFailureCode::RebootFailed,
+                    error,
+                )
                 .await;
         }
         self.reboot_guard = Some(device_guard);
@@ -566,6 +628,7 @@ impl Checker {
         identity: &SystemIdentity,
         retry: &OtaUpdateRetryPolicy,
         failures: u32,
+        code: OtaUpdateFailureCode,
         error: anyhow::Error,
     ) -> anyhow::Result<CheckOutcome> {
         let error = format!("{error:#}");
@@ -582,6 +645,7 @@ impl Checker {
             status
                 .with_state(Some(OtaUpdateState::Failed))
                 .with_failure_count(Some(failures))
+                .with_failure_code(Some(code))
                 .with_last_error(Some(error.into()))
                 .with_next_attempt_at(
                     next_retry(retry, failures, Timestamp::now()).map(Into::into),
@@ -653,6 +717,10 @@ impl Checker {
             return Ok(OtaUpdateStatus::new());
         };
         let value = serde_json::to_value(&property.value)?;
+        if let Err(error) = check_format(&value) {
+            warn!(%error, "ignoring the previous status");
+            return Ok(OtaUpdateStatus::new());
+        }
         Ok(serde_json::from_value(value).unwrap_or_else(|error| {
             warn!(%error, "ignoring an invalid previous status");
             OtaUpdateStatus::new()
@@ -769,7 +837,9 @@ struct StatusConflict;
 
 /// Apply the configuration property to the defaults of the agent configuration.
 ///
-/// Without a configured asset, the bundle of the running system applies.
+/// Without a configured asset, the bundle of the running system applies. Fails
+/// with [`UnsupportedFormat`] if the property has a format version that the
+/// agent does not support.
 fn effective_config(
     defaults: OtaUpdateConfig,
     running_bundle: &str,
@@ -778,10 +848,13 @@ fn effective_config(
     let mut config = serde_json::to_value(defaults)?;
     if let Some(property) = property {
         let patch = serde_json::to_value(&property.value)?;
+        check_format(&patch)?;
         merge_patch(&mut config, &patch);
     }
     let mut config: OtaUpdateConfig =
         serde_json::from_value(config).context("invalid update configuration")?;
+    // The effective configuration has the format of this version.
+    config.format_version = None;
     config
         .asset
         .get_or_insert_with(|| running_bundle.to_owned().into());
@@ -822,13 +895,15 @@ fn window_closed(
                     .clone()
                     .with_state(Some(OtaUpdateState::Blocked))
                     .with_blocked(Some(
-                        OtaUpdateBlocked::new("window")
+                        OtaUpdateBlocked::new(OtaUpdateBlockedCode::Window)
                             .with_message(Some("The device clock is not synchronized.".into())),
                     )),
                 recheck_at,
             });
         }
-        WindowGate::Closed { opens_at } => blocked(status.clone(), "window", opens_at),
+        WindowGate::Closed { opens_at } => {
+            blocked(status.clone(), OtaUpdateBlockedCode::Window, opens_at)
+        }
         WindowGate::Invalid(error) => status
             .clone()
             .with_state(Some(OtaUpdateState::Failed))
@@ -844,13 +919,48 @@ fn window_closed(
 
 fn blocked(
     status: OtaUpdateStatus,
-    code: &str,
+    code: OtaUpdateBlockedCode,
     next_attempt_at: Option<Timestamp>,
 ) -> OtaUpdateStatus {
     status
         .with_state(Some(OtaUpdateState::Blocked))
         .with_blocked(Some(OtaUpdateBlocked::new(code)))
         .with_next_attempt_at(next_attempt_at.map(Into::into))
+}
+
+/// Whether a previous state belongs to an attempt whose outcome the next check
+/// determines.
+///
+/// A later integration rolls back deliberately in the state `rollback`, for
+/// example after a failed health check, and may reboot into a system with this
+/// integration.
+fn attempt_in_progress(state: &OtaUpdateState) -> bool {
+    matches!(
+        state,
+        OtaUpdateState::Installing
+            | OtaUpdateState::Rebooting
+            | OtaUpdateState::Committing
+            | OtaUpdateState::Rollback
+    )
+}
+
+/// Whether the retry schedule of a previous status still applies.
+///
+/// States that a later version defines keep the schedule, so that they never
+/// cause an attempt before it is due.
+fn keeps_retry_schedule(state: Option<&OtaUpdateState>) -> bool {
+    matches!(
+        state,
+        Some(OtaUpdateState::Failed | OtaUpdateState::Other(_))
+    )
+}
+
+/// Whether the effective configuration is unchanged.
+fn same_config(previous: Option<&OtaUpdateConfig>, current: Option<&OtaUpdateConfig>) -> bool {
+    previous.is_some_and(|previous| {
+        serde_json::to_value(previous).ok()
+            == current.and_then(|current| serde_json::to_value(current).ok())
+    })
 }
 
 /// Record an update that cannot proceed, for example because of an invalid
@@ -866,6 +976,25 @@ fn failed(status: OtaUpdateStatus, error: &anyhow::Error) -> OtaUpdateStatus {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    /// A deliberate rollback of a later integration is an attempt in progress,
+    /// and unknown states keep the retry schedule.
+    #[test]
+    fn previous_states() {
+        let state = |value: &str| -> OtaUpdateState {
+            serde_json::from_value(serde_json::Value::String(value.to_owned())).unwrap()
+        };
+        for value in ["installing", "rebooting", "committing", "rollback"] {
+            assert!(attempt_in_progress(&state(value)), "{value}");
+        }
+        for value in ["idle", "completed", "failed", "blocked", "downloading"] {
+            assert!(!attempt_in_progress(&state(value)), "{value}");
+        }
+        assert!(keeps_retry_schedule(Some(&state("failed"))));
+        assert!(keeps_retry_schedule(Some(&state("downloading"))));
+        assert!(!keeps_retry_schedule(Some(&state("blocked"))));
+        assert!(!keeps_retry_schedule(None));
+    }
 
     /// The property overrides the asset of the agent configuration, and
     /// removing the asset with `null` selects the bundle of the running system.
@@ -887,6 +1016,21 @@ mod tests {
             "other.rugixb"
         );
         assert_eq!(asset(image, Some(r#"{"asset":null}"#)), "running.rugixb");
+    }
+
+    /// A configuration with a format version that the agent does not support
+    /// is not applied.
+    #[test]
+    fn unsupported_format() {
+        let config = |value: &str| {
+            let property = config_property(value);
+            effective_config(OtaUpdateConfig::new(), "running.rugixb", Some(&property))
+        };
+        let error = config(r#"{"formatVersion":2,"hold":true}"#).unwrap_err();
+        assert!(error.is::<UnsupportedFormat>());
+        let config = config(r#"{"formatVersion":1,"hold":true}"#).unwrap();
+        assert_eq!(config.hold, Some(true));
+        assert_eq!(config.format_version, None);
     }
 
     fn config_property(value: &str) -> DeviceProperty {

@@ -31,6 +31,7 @@
 //! check that loses such a race starts over from the changed status. Once a
 //! check has changed the device, it writes its status regardless.
 
+use std::collections::BTreeMap;
 use std::sync::Arc;
 
 use anyhow::Context;
@@ -42,15 +43,20 @@ use nexigon_api::types::devices::DeviceProperty;
 use nexigon_api::types::properties::OtaUpdateRetryPolicy;
 use nexigon_api::types::repositories::PackageVersionAsset;
 use nexigon_api::types::repositories::PackageVersionId;
+use nexigon_api::types::rugix_apps::RugixAppBlockedCode;
 use nexigon_api::types::rugix_apps::RugixAppConfig;
 use nexigon_api::types::rugix_apps::RugixAppDesiredState;
+use nexigon_api::types::rugix_apps::RugixAppFailureCode;
 use nexigon_api::types::rugix_apps::RugixAppGcPolicy;
 use nexigon_api::types::rugix_apps::RugixAppStatus;
 use nexigon_api::types::rugix_apps::RugixAppUpdateBlocked;
 use nexigon_api::types::rugix_apps::RugixAppUpdateState;
+use nexigon_api::types::rugix_apps::RugixAppsCapability;
 use nexigon_api::types::rugix_apps::RugixAppsConfig;
 use nexigon_api::types::rugix_apps::RugixAppsStatus;
 use nexigon_ids::ids::DeviceId;
+use serde::Deserialize;
+use serde_json::Value;
 use tokio::sync::Mutex;
 use tokio::sync::OwnedMutexGuard;
 use tokio_util::sync::CancellationToken;
@@ -64,9 +70,11 @@ use super::rugix::RugixApps;
 use crate::hub_link::HubExecutor;
 use crate::reconcile::WindowGate;
 use crate::reconcile::error_delay;
+use crate::reconcile::hub::FORMAT_VERSION;
 use crate::reconcile::hub::Hub;
 use crate::reconcile::hub::PropertyWrite;
 use crate::reconcile::hub::VersionPath;
+use crate::reconcile::hub::check_format;
 use crate::reconcile::hub::rugix_bundle_hash;
 use crate::reconcile::hub::truncate_event_text;
 use crate::reconcile::next_retry;
@@ -80,6 +88,15 @@ use crate::reconcile::window_gate;
 const CONFIG_PROPERTY: &str = "dev.nexigon.rugix-apps.config";
 /// Device property holding the actual state.
 const STATUS_PROPERTY: &str = "dev.nexigon.rugix-apps.status";
+/// Optional features of the Rugix Apps contract that the agent implements.
+const CAPABILITIES: [RugixAppsCapability; 6] = [
+    RugixAppsCapability::Hold,
+    RugixAppsCapability::Asset,
+    RugixAppsCapability::Window,
+    RugixAppsCapability::Retry,
+    RugixAppsCapability::Spread,
+    RugixAppsCapability::Gc,
+];
 /// Event category of app events.
 const EVENT_CATEGORY: &str = "apps";
 /// Number of times a check starts over after the status changed concurrently.
@@ -161,7 +178,9 @@ impl Checker {
         let config_version = property.as_ref().map(|property| property.version);
         // Apps keep their previous status until the check reaches them.
         let mut status = RugixAppsStatus::new(previous.apps.clone())
+            .with_format_version(Some(FORMAT_VERSION))
             .with_config_version(config_version)
+            .with_capabilities(Some(CAPABILITIES.to_vec().into()))
             .with_arch(Some(self.settings.arch.clone().into()))
             .with_rugix_ctrl_version(self.rugix_ctrl_version().await.map(Into::into));
         let mut installed = match self.rugix.installed().await {
@@ -174,24 +193,56 @@ impl Checker {
                 return Err(error);
             }
         };
-        let config = parse_config(property.as_ref()).unwrap_or_else(|error| {
-            let error = format!("{error:#}");
+        let ParsedConfig {
+            config,
+            invalid,
+            error,
+            unsupported,
+        } = parse_config(property.as_ref());
+        if let Some(error) = error {
             warn!(%error, "invalid app configuration");
             status.last_error = Some(error.into());
-            RugixAppsConfig::new()
-        });
+        }
         let managed = config.apps.clone().unwrap_or_default();
+        let listed = |name: &str| managed.contains_key(name) || invalid.contains_key(name);
         status
             .apps
-            .retain(|name, _| managed.contains_key(name) || installed.contains_key(name.as_str()));
+            .retain(|name, _| listed(name.as_str()) || installed.contains_key(name.as_str()));
         for (name, info) in &installed {
-            if !managed.contains_key(name.as_str()) {
+            if !listed(name.as_str()) {
                 let app_status = match info {
                     Ok(info) => observed(RugixAppStatus::new(false), info),
                     Err(error) => failed(RugixAppStatus::new(false), error),
                 };
                 status.apps.insert(name.clone().into(), app_status);
             }
+        }
+        // An app with an invalid configuration stays as it is.
+        for (name, error) in &invalid {
+            warn!(app = %name, %error, "invalid app configuration");
+            let mut app_status = previous
+                .apps
+                .get(name.as_str())
+                .cloned()
+                .unwrap_or_else(|| RugixAppStatus::new(true));
+            app_status.managed = true;
+            if let Some(Ok(info)) = installed.remove(name.as_str()) {
+                app_status = observed(app_status, &info);
+            }
+            let app_status = if unsupported {
+                blocked(
+                    app_status,
+                    RugixAppBlockedCode::UnsupportedConfigFormat,
+                    Some(error.clone()),
+                    None,
+                )
+            } else {
+                app_status
+                    .with_state(Some(RugixAppUpdateState::Failed))
+                    .with_failure_code(None)
+                    .with_last_error(Some(error.clone().into()))
+            };
+            status.apps.insert(name.clone().into(), app_status);
         }
 
         let mut next_attempt_at: Option<Timestamp> = None;
@@ -440,19 +491,19 @@ impl Checker {
             )
             .await;
             failures += 1;
+            app_status.failure_code = Some(RugixAppFailureCode::Interrupted);
             app_status.last_error = Some(error.into());
-        } else {
+        } else if let Some(previous) = previous {
             // The error of the last failed attempt stays until the attempt succeeds.
-            app_status.last_error = previous.and_then(|previous| previous.last_error.clone());
+            app_status.failure_code = previous.failure_code.clone();
+            app_status.last_error = previous.last_error.clone();
         }
         let limit_reached = retry
             .max_attempts
             .is_some_and(|max_attempts| failures >= max_attempts);
         let retry_at = if interrupted {
             next_retry(&retry, failures, now)
-        } else if previous
-            .is_some_and(|previous| matches!(previous.state, Some(RugixAppUpdateState::Failed)))
-        {
+        } else if previous.is_some_and(|previous| keeps_retry_schedule(previous.state.as_ref())) {
             // Without a scheduled attempt, only a reached limit stops attempts.
             match previous.and_then(|previous| previous.next_attempt_at) {
                 Some(at) => Some(at.into()),
@@ -465,7 +516,7 @@ impl Checker {
         app_status.failure_count = Some(failures);
 
         if app.config.hold == Some(true) {
-            return Ok(blocked(app_status, "hold", None, None));
+            return Ok(blocked(app_status, RugixAppBlockedCode::Hold, None, None));
         }
         if let Some(spread) = &app.config.spread {
             let start = match spread.start_at {
@@ -476,7 +527,12 @@ impl Checker {
                 spread_position(&self.hub.device_id().to_string(), &target_id.to_string());
             if let SpreadState::Waiting { released_at } = spread_state(spread, start, position, now)
             {
-                return Ok(blocked(app_status, "spread", None, released_at));
+                return Ok(blocked(
+                    app_status,
+                    RugixAppBlockedCode::Spread,
+                    None,
+                    released_at,
+                ));
             }
         }
         match retry_at {
@@ -513,7 +569,12 @@ impl Checker {
                         bundle_filenames(app.name, &app.config, &self.settings.arch).join(" or "),
                         self.settings.arch,
                     );
-                    return Ok(blocked(app_status, "no-asset", Some(message), None));
+                    return Ok(blocked(
+                        app_status,
+                        RugixAppBlockedCode::NoAsset,
+                        Some(message),
+                        None,
+                    ));
                 };
                 app_status.asset = Some(asset.filename.clone());
                 // A system update may hold the lock for long, so the download
@@ -546,7 +607,17 @@ impl Checker {
                     Ok(generation) => generation,
                     Err(error) => {
                         return Ok(self
-                            .fail_attempt(app_status, app.name, target_id, &retry, failures, error)
+                            .fail_attempt(
+                                app_status,
+                                app.name,
+                                target_id,
+                                &retry,
+                                failures,
+                                AttemptFailure {
+                                    code: RugixAppFailureCode::InstallFailed,
+                                    error,
+                                },
+                            )
                             .await);
                     }
                 };
@@ -572,7 +643,17 @@ impl Checker {
             .await?;
             if let Err(error) = self.rugix.activate(app.name, generation).await {
                 return Ok(self
-                    .fail_attempt(app_status, app.name, target_id, &retry, failures, error)
+                    .fail_attempt(
+                        app_status,
+                        app.name,
+                        target_id,
+                        &retry,
+                        failures,
+                        AttemptFailure {
+                            code: RugixAppFailureCode::ActivateFailed,
+                            error,
+                        },
+                    )
                     .await);
             }
             // Garbage collection keeps installed generations until they or a
@@ -611,6 +692,7 @@ impl Checker {
         Ok(app_status
             .with_state(Some(RugixAppUpdateState::Completed))
             .with_failure_count(Some(0))
+            .with_failure_code(None)
             .with_last_error(None))
     }
 
@@ -687,8 +769,9 @@ impl Checker {
         version_id: &PackageVersionId,
         retry: &OtaUpdateRetryPolicy,
         failures: u32,
-        error: anyhow::Error,
+        failure: AttemptFailure,
     ) -> RugixAppStatus {
+        let AttemptFailure { code, error } = failure;
         let error = format!("{error:#}");
         warn!(app, %error, "app update failed");
         self.event(
@@ -703,6 +786,7 @@ impl Checker {
         app_status
             .with_state(Some(RugixAppUpdateState::Failed))
             .with_failure_count(Some(failures))
+            .with_failure_code(Some(code))
             .with_last_error(Some(error.into()))
             .with_next_attempt_at(next_retry(retry, failures, Timestamp::now()).map(Into::into))
     }
@@ -766,6 +850,10 @@ impl Checker {
             return Ok(empty());
         };
         let value = serde_json::to_value(&property.value)?;
+        if let Err(error) = check_format(&value) {
+            warn!(%error, "ignoring the previous status");
+            return Ok(empty());
+        }
         Ok(serde_json::from_value(value).unwrap_or_else(|error| {
             warn!(%error, "ignoring an invalid previous status");
             empty()
@@ -832,18 +920,97 @@ impl Checker {
     }
 }
 
+/// Failed step of an update attempt.
+struct AttemptFailure {
+    /// Failure code that the status reports.
+    code: RugixAppFailureCode,
+    error: anyhow::Error,
+}
+
 /// The status changed since the check read it.
 #[derive(Debug, thiserror::Error)]
 #[error("the app status changed concurrently")]
 struct StatusConflict;
 
+/// Desired state read from the configuration property.
+struct ParsedConfig {
+    /// Configuration with the apps whose configuration is valid.
+    config: RugixAppsConfig,
+    /// Apps whose configuration is invalid, with the error.
+    invalid: BTreeMap<String, String>,
+    /// Why the configuration as a whole is invalid, if it is.
+    error: Option<String>,
+    /// Whether the configuration has a format version that the agent does not
+    /// support, so that every app is left out.
+    unsupported: bool,
+}
+
 /// Read the desired state from the configuration property.
-fn parse_config(property: Option<&DeviceProperty>) -> anyhow::Result<RugixAppsConfig> {
-    let Some(property) = property else {
-        return Ok(RugixAppsConfig::new());
+///
+/// An app whose configuration is invalid is left out, so that it does not keep
+/// the other apps from their desired states. If the policies of the
+/// configuration are invalid or the agent does not support its format version,
+/// every app is left out.
+fn parse_config(property: Option<&DeviceProperty>) -> ParsedConfig {
+    let mut parsed = ParsedConfig {
+        config: RugixAppsConfig::new(),
+        invalid: BTreeMap::new(),
+        error: None,
+        unsupported: false,
     };
-    let value = serde_json::to_value(&property.value)?;
-    serde_json::from_value(value).context("invalid app configuration")
+    let Some(property) = property else {
+        return parsed;
+    };
+    let mut value = match serde_json::to_value(&property.value) {
+        Ok(value) => value,
+        Err(error) => {
+            parsed.error = Some(format!("invalid app configuration: {error}"));
+            return parsed;
+        }
+    };
+    if let Err(unsupported) = check_format(&value) {
+        let error = unsupported.config_message();
+        if let Some(Value::Object(apps)) = value.get("apps") {
+            for name in apps.keys() {
+                parsed.invalid.insert(name.clone(), error.clone());
+            }
+        }
+        parsed.error = Some(error);
+        parsed.unsupported = true;
+        return parsed;
+    }
+    if let Some(Value::Object(apps)) = value.get_mut("apps") {
+        apps.retain(|name, app| match RugixAppConfig::deserialize(&*app) {
+            Ok(RugixAppConfig {
+                state: Some(RugixAppDesiredState::Other(state)),
+                ..
+            }) => {
+                let error = format!("invalid app configuration: unknown desired state {state:?}");
+                parsed.invalid.insert(name.clone(), error);
+                false
+            }
+            Ok(_) => true,
+            Err(error) => {
+                let error = format!("invalid app configuration: {error}");
+                parsed.invalid.insert(name.clone(), error);
+                false
+            }
+        });
+    }
+    match RugixAppsConfig::deserialize(&value) {
+        Ok(config) => parsed.config = config,
+        Err(error) => {
+            // The policies apply to every app, so no app has a valid configuration.
+            let error = format!("invalid app configuration: {error}");
+            if let Some(Value::Object(apps)) = value.get("apps") {
+                for name in apps.keys() {
+                    parsed.invalid.insert(name.clone(), error.clone());
+                }
+            }
+            parsed.error = Some(error);
+        }
+    }
+    parsed
 }
 
 /// Configuration of an app with the policies of the configuration it does not
@@ -872,6 +1039,17 @@ fn effective_app_config(
         .unwrap_or(gc_keep);
     app.gc = Some(RugixAppGcPolicy::new().with_keep(Some(keep)));
     app
+}
+
+/// Whether the retry schedule of an app's previous status still applies.
+///
+/// States that a later version defines keep the schedule, so that they never
+/// cause an attempt before it is due.
+fn keeps_retry_schedule(state: Option<&RugixAppUpdateState>) -> bool {
+    matches!(
+        state,
+        Some(RugixAppUpdateState::Failed | RugixAppUpdateState::Other(_))
+    )
 }
 
 /// Whether the effective configuration of an app is unchanged.
@@ -910,12 +1088,15 @@ fn window_deferral(
     let window = config.window.as_ref().filter(|_| runs)?;
     match window_gate(window, TimeZone::system()) {
         WindowGate::Open => None,
-        WindowGate::Closed { opens_at } => {
-            Some(blocked(app_status.clone(), "window", None, opens_at))
-        }
+        WindowGate::Closed { opens_at } => Some(blocked(
+            app_status.clone(),
+            RugixAppBlockedCode::Window,
+            None,
+            opens_at,
+        )),
         WindowGate::Unsynchronized { recheck_at } => Some(blocked(
             app_status.clone(),
-            "window",
+            RugixAppBlockedCode::Window,
             Some("The device clock is not synchronized.".to_owned()),
             recheck_at,
         )),
@@ -928,14 +1109,14 @@ fn window_deferral(
 
 fn blocked(
     app_status: RugixAppStatus,
-    code: &str,
+    code: RugixAppBlockedCode,
     message: Option<String>,
     next_attempt_at: Option<Timestamp>,
 ) -> RugixAppStatus {
     app_status
         .with_state(Some(RugixAppUpdateState::Blocked))
         .with_blocked(Some(
-            RugixAppUpdateBlocked::new(code.to_owned()).with_message(message.map(Into::into)),
+            RugixAppUpdateBlocked::new(code).with_message(message.map(Into::into)),
         ))
         .with_next_attempt_at(next_attempt_at.map(Into::into))
 }
@@ -947,4 +1128,51 @@ fn failed(app_status: RugixAppStatus, error: &anyhow::Error) -> RugixAppStatus {
     app_status
         .with_state(Some(RugixAppUpdateState::Failed))
         .with_last_error(Some(error.into()))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// Unknown states keep the retry schedule of an app.
+    #[test]
+    fn retry_schedule_of_previous_states() {
+        let state = |value: &str| -> RugixAppUpdateState {
+            serde_json::from_value(serde_json::Value::String(value.to_owned())).unwrap()
+        };
+        assert!(keeps_retry_schedule(Some(&state("failed"))));
+        assert!(keeps_retry_schedule(Some(&state("downloading"))));
+        assert!(!keeps_retry_schedule(Some(&state("completed"))));
+        assert!(!keeps_retry_schedule(None));
+    }
+
+    /// An app with a desired state that a later version defines stays as it
+    /// is, and a status that reports such a state remains readable.
+    #[test]
+    fn unknown_desired_state() {
+        let property: DeviceProperty = serde_json::from_value(serde_json::json!({
+            "name": CONFIG_PROPERTY,
+            "value": { "apps": { "a": { "state": "paused" }, "b": { "state": "stopped" } } },
+            "protected": true,
+            "version": 1,
+            "lastUpdated": "2026-10-17T00:00:00Z",
+        }))
+        .unwrap();
+        let parsed = parse_config(Some(&property));
+        assert!(parsed.invalid["a"].contains("unknown desired state"));
+        assert!(parsed.config.apps.unwrap().contains_key("b"));
+
+        let status: RugixAppsStatus = serde_json::from_value(serde_json::json!({
+            "apps": {
+                "a": { "managed": true, "config": { "state": "paused" }, "failureCount": 2 },
+            },
+        }))
+        .unwrap();
+        let app = status.apps.get("a").unwrap();
+        assert!(matches!(
+            app.config.as_ref().and_then(|config| config.state.as_ref()),
+            Some(RugixAppDesiredState::Other(_))
+        ));
+        assert_eq!(app.failure_count, Some(2));
+    }
 }

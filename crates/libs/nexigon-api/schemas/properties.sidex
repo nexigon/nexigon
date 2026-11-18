@@ -68,8 +68,14 @@ record DiskInfo {
 /// built into the image as a JSON merge patch (RFC 7396): objects merge
 /// recursively, `null` removes a default, and any other value, including an
 /// array, replaces the default.
-#[unstable(feature = "ota_updates")]
+///
+/// [`OtaUpdateStatus`] describes how the contract evolves.
 record OtaUpdateConfig {
+    /// Format version of the property.
+    ///
+    /// Defaults to 1, the format that this version of the contract defines.
+    #[validate({ 1 <= _ }, message = "Format version must be at least 1.")]
+    format_version?: u32,
     /// Version path in the format `<repository>/<package>/<version>`.
     ///
     /// `<version>` is a tag or a version ID. A tag tracks the version the tag
@@ -98,8 +104,9 @@ record OtaUpdateConfig {
     spread?: OtaUpdateSpread,
     /// Rollout number.
     ///
-    /// Integrations ignore its value. Changing it changes the configuration,
-    /// which starts a new round of attempts on devices whose attempts failed.
+    /// Integrations ignore its value. Changing it changes the effective
+    /// configuration, which starts a new round of attempts on devices whose
+    /// attempts failed.
     rollout?: u32,
 }
 
@@ -109,7 +116,6 @@ record OtaUpdateConfig {
 /// operation, such as the reboot into the new version. Integrations may
 /// download and install an update outside the window if doing so does not
 /// interrupt operation.
-#[unstable(feature = "ota_updates")]
 record OtaUpdateWindow {
     /// Time ranges in which updates can be activated.
     ///
@@ -118,7 +124,6 @@ record OtaUpdateWindow {
 }
 
 /// Recurring time range of a maintenance window.
-#[unstable(feature = "ota_updates")]
 record OtaUpdateWindowRange {
     /// Days on which the range starts.
     ///
@@ -138,12 +143,10 @@ record OtaUpdateWindowRange {
     { matches(_, "^([01][0-9]|2[0-3]):[0-5][0-9]$") },
     message = "Time must have the format HH:MM (24-hour clock)."
 )]
-#[unstable(feature = "ota_updates")]
 wrapper TimeOfDay: string
 
 /// Day of the week.
 #[json(tagged = externally, rename_all = "lowercase")]
-#[unstable(feature = "ota_updates")]
 variant Weekday {
     Monday,
     Tuesday,
@@ -166,7 +169,6 @@ variant Weekday {
 ///   `start + floor(duration_secs * sqrt(u))`. The share of eligible devices
 ///   thus grows quadratically from 0 at the start to 1 after `duration_secs`.
 /// - With `percentage`, its position is below `percentage / 100`.
-#[unstable(feature = "ota_updates")]
 record OtaUpdateSpread {
     /// Time over which updates are spread, in seconds.
     duration_secs?: u32,
@@ -194,7 +196,6 @@ record OtaUpdateSpread {
 /// before that, such as an unreachable Nexigon Hub, do not count as attempts.
 /// The delay between attempts starts at `initial_delay_secs` and doubles after
 /// each failed attempt, up to `max_delay_secs`.
-#[unstable(feature = "ota_updates")]
 record OtaUpdateRetryPolicy {
     /// Maximum number of failed attempts for a version.
     ///
@@ -209,7 +210,7 @@ record OtaUpdateRetryPolicy {
     /// resets and a new round of attempts begins.
     ///
     /// Without a cooldown, the device stops attempting the version until the
-    /// version of the configuration changes or the failure count is cleared.
+    /// effective configuration changes or the failure count is cleared.
     cooldown_secs?: u32,
 }
 
@@ -221,9 +222,28 @@ record OtaUpdateRetryPolicy {
 /// (compare-and-swap), so that it does not overwrite concurrent changes. Other
 /// writers may only clear `failure_count` and `next_attempt_at`, which requests
 /// a new attempt.
-#[unstable(feature = "ota_updates")]
+///
+/// Within a format version, the contract evolves compatibly. Later versions
+/// only add optional fields, states, capabilities, and codes. Readers ignore
+/// fields that they do not know and treat unknown states, capabilities, and
+/// codes as unknown. An integration honors a configuration field that a later
+/// version adds only if it reports the corresponding capability.
+///
+/// A change that readers of earlier versions must not interpret increments the
+/// format version of the property. Readers do not interpret a property with a
+/// format version that they do not support. An integration does not apply such
+/// a configuration and reports the blocked code `unsupported-config-format`.
+/// Writers use a later format version of the configuration only for
+/// integrations that report support for it through a capability, which the
+/// later version defines.
 record OtaUpdateStatus {
-    /// Optional features of the OTA update contract that the integration supports.
+    /// Format version of the property.
+    ///
+    /// Defaults to 1, the format that this version of the contract defines.
+    #[validate({ 1 <= _ }, message = "Format version must be at least 1.")]
+    format_version?: u32,
+    /// Optional features of the OTA update contract that the integration
+    /// supports.
     capabilities?: [OtaUpdateCapability],
     /// Effective configuration, including the defaults the integration applies.
     config?: OtaUpdateConfig,
@@ -259,10 +279,14 @@ record OtaUpdateStatus {
     next_version_id?: PackageVersionId,
     /// Number of consecutive failed attempts for the next version.
     ///
-    /// Resets to zero when the next version or `config_version` changes, when
-    /// the retry cooldown ends, when an update succeeds, or when another writer
-    /// clears it.
+    /// Resets to zero when the next version or the effective configuration in
+    /// `config` changes, when the retry cooldown ends, when an update
+    /// succeeds, or when another writer clears it.
     failure_count?: u32,
+    /// Machine-readable reason of the last failed attempt.
+    ///
+    /// Present while `last_error` describes a failed attempt.
+    failure_code?: OtaUpdateFailureCode,
     /// Error message of the last failure, if any.
     last_error?: string,
     /// Earliest time of the next attempt.
@@ -275,10 +299,46 @@ record OtaUpdateStatus {
     updater?: OtaUpdater,
 }
 
+/// Optional feature of the OTA update contract.
+#[json(tagged = externally, rename_all = "kebab-case")]
+variant OtaUpdateCapability {
+    /// The integration honors `config.hold`.
+    Hold,
+    /// The integration honors `config.asset`.
+    Asset,
+    /// The integration honors `config.window`.
+    Window,
+    /// The integration honors `config.retry`.
+    Retry,
+    /// The integration honors `config.spread`.
+    Spread,
+    /// The integration installs checkpoints according to base versions.
+    Checkpoints,
+    /// Capability that a later version defines.
+    #[json(fallback)]
+    Other: string,
+}
+
+/// Reason of a failed update attempt.
+#[json(tagged = externally, rename_all = "kebab-case")]
+variant OtaUpdateFailureCode {
+    /// Downloading or installing the version failed.
+    InstallFailed,
+    /// The installation was interrupted, for example because the device shut
+    /// down.
+    Interrupted,
+    /// Rebooting into the installed version failed.
+    RebootFailed,
+    /// After the reboot, the device runs another version than the installed one.
+    RolledBack,
+    /// Code in kebab case that a later version or the integration defines.
+    #[json(fallback)]
+    Other: string,
+}
+
 /// Update system that installs versions on a device, such as Rugix Ctrl or RAUC.
 ///
 /// Slot names, states, and health values are those of the update system.
-#[unstable(feature = "ota_updates")]
 record OtaUpdater {
     /// Name of the update system, such as `rugix` or `rauc`.
     name: string,
@@ -298,7 +358,6 @@ record OtaUpdater {
 }
 
 /// Slot of an update system.
-#[unstable(feature = "ota_updates")]
 record OtaUpdaterSlot {
     /// Name of the slot.
     name: string,
@@ -310,31 +369,25 @@ record OtaUpdaterSlot {
     version?: string,
 }
 
-/// Optional feature of the OTA update contract.
-#[json(tagged = externally, rename_all = "camelCase")]
-#[unstable(feature = "ota_updates")]
-variant OtaUpdateCapability {
-    /// The integration honors `config.window`.
-    Window,
-    /// The integration honors `config.retry` and resets the failure count when
-    /// the configuration is written.
-    Retry,
-    /// The integration installs checkpoints according to base versions.
-    Checkpoints,
-    /// The integration honors `config.spread`.
-    Spread,
-    /// The integration honors `config.hold`.
-    Hold,
-    /// The integration honors `config.asset`.
-    Asset,
-}
-
 /// OTA update state.
 ///
 /// The resting states are `idle`, `completed`, `failed`, and `blocked`.
 /// The integration remains in one of these until the next check begins or
 /// the blocking condition clears.
-#[unstable(feature = "ota_updates")]
+///
+/// A rollback ends the attempt as failed with the failure code `rolled-back`.
+/// An integration that rolls back deliberately, for example because the new
+/// version fails a health check, reports `rollback` while it does so. It
+/// leaves `failure_count` unchanged and may describe the reason in
+/// `last_error`; the next check records the failure. A rollback that the
+/// device only detects after the reboot, for example because the boot loader
+/// fell back to the previous version, has no `rollback` state.
+///
+/// `installing`, `rebooting`, `committing`, and `rollback` belong to an
+/// attempt in progress. If the previous status reports one of them, the next
+/// check determines the outcome of the attempt from the running version. If it
+/// reports a state that the integration does not know, the integration keeps
+/// the failure count and the time of the next attempt, like for `failed`.
 #[json(tagged = externally, rename_all = "lowercase")]
 variant OtaUpdateState {
     /// No path is configured, or no update has been attempted yet.
@@ -350,39 +403,49 @@ variant OtaUpdateState {
     Completed,
     /// The last update failed.
     Failed,
-    /// An update is available but cannot proceed yet. See `blocked` for the reason.
+    /// The update cannot proceed yet. See `blocked` for the reason.
     Blocked,
-    /// The device is rolling back to the previous version.
+    /// The device is rolling back to the previous version, for example because
+    /// the new version failed a health check.
     Rollback,
+    /// State that a later version defines.
+    #[json(fallback)]
+    Other: string,
 }
 
 /// Information about a blocked update.
-#[unstable(feature = "ota_updates")]
 record OtaUpdateBlocked {
-    /// Machine-readable reason in kebab case.
-    ///
-    /// Nexigon defines these codes:
-    ///
-    /// - `hold`: The configuration holds the device at its current version.
-    /// - `spread`: The device waits for its turn in a spread or is outside the
-    ///   released percentage.
-    /// - `window`: The device waits for its maintenance window.
-    /// - `no-update-path`: The target is unreachable without going back across
-    ///   a checkpoint.
-    /// - `unknown-current-version`: The target has a base version, but
-    ///   `current_version` does not resolve to a package version.
-    /// - `no-asset`: The next version has no available asset with the filename
-    ///   in `config.asset`.
-    ///
-    /// Integrations may define their own codes for conditions specific to the
-    /// device, such as `awaiting-approval`.
-    #[validate(
-        { matches(_, "^[a-z0-9]+(-[a-z0-9]+)*$") },
-        message = "Code must be in kebab case."
-    )]
-    code: string,
+    /// Machine-readable reason.
+    code: OtaUpdateBlockedCode,
     /// Human-readable explanation.
     message?: string,
+}
+
+/// Reason of a blocked update.
+#[json(tagged = externally, rename_all = "kebab-case")]
+variant OtaUpdateBlockedCode {
+    /// The configuration holds the device at its current version.
+    Hold,
+    /// The device waits for its turn in a spread or is outside the released
+    /// percentage.
+    Spread,
+    /// The device waits for its maintenance window.
+    Window,
+    /// The target is unreachable without going back across a checkpoint.
+    NoUpdatePath,
+    /// The target has a base version, but `current_version` does not resolve
+    /// to a package version.
+    UnknownCurrentVersion,
+    /// The next version has no available asset with the filename in
+    /// `config.asset`.
+    NoAsset,
+    /// The configuration has a format version that the integration does not
+    /// support.
+    UnsupportedConfigFormat,
+    /// Code in kebab case that a later version or the integration defines, for
+    /// conditions specific to the device, such as `awaiting-approval`.
+    #[json(fallback)]
+    Other: string,
 }
 
 /// Device health information (`dev.nexigon.system.health`).

@@ -240,6 +240,42 @@ impl std::fmt::Display for VersionPath {
     }
 }
 
+/// Format version of the configuration and status properties that the agent
+/// reads and writes.
+pub(crate) const FORMAT_VERSION: u32 = 1;
+
+/// A property has a format version that the agent does not support.
+#[derive(Debug, thiserror::Error)]
+#[error("the property has format version {0}, which this version of the agent does not support")]
+pub(crate) struct UnsupportedFormat(pub u64);
+
+impl UnsupportedFormat {
+    /// Explanation for the status when the configuration has the format version.
+    pub(crate) fn config_message(&self) -> String {
+        format!(
+            "The configuration has format version {}, which this version of the agent does not support.",
+            self.0
+        )
+    }
+}
+
+/// Check that the agent supports the format version of a property value.
+///
+/// A property without a format version has version 1. A format version that is
+/// no integer passes, so that decoding the property reports it.
+pub(crate) fn check_format(value: &serde_json::Value) -> Result<(), UnsupportedFormat> {
+    let version = match value.get("formatVersion") {
+        Some(serde_json::Value::Number(version)) => version.as_u64(),
+        // Decoders accept integers as decimal strings.
+        Some(serde_json::Value::String(version)) => version.parse().ok(),
+        _ => None,
+    };
+    match version {
+        Some(version) if version != u64::from(FORMAT_VERSION) => Err(UnsupportedFormat(version)),
+        _ => Ok(()),
+    }
+}
+
 /// Hash of a Rugix bundle from the metadata of its asset, if any.
 pub(crate) fn rugix_bundle_hash(asset: &PackageVersionAsset) -> Option<String> {
     metadata::<AssetMetadata>(&asset.metadata)?
@@ -336,6 +372,19 @@ mod tests {
         }
         assert!(hub.resolve(&path).await.unwrap().is_none());
         assert_eq!(hub.resolve(&path).await.unwrap(), Some(version_id));
+    }
+
+    /// Properties without a format version have version 1.
+    #[test]
+    fn format_versions() {
+        let check = |value: &str| check_format(&serde_json::from_str(value).unwrap()).is_ok();
+        assert!(check(r#"{}"#));
+        assert!(check(r#"{"formatVersion":1}"#));
+        assert!(!check(r#"{"formatVersion":2}"#));
+        assert!(!check(r#"{"formatVersion":0}"#));
+        assert!(!check(r#"{"formatVersion":"2"}"#));
+        assert!(check(r#"{"formatVersion":null}"#));
+        assert!(check(r#"[]"#));
     }
 
     /// An image version that cannot be a tag needs no request to Nexigon Hub.

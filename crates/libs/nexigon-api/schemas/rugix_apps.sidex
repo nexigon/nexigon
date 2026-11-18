@@ -15,9 +15,16 @@ import repositories::PackageVersionId
 ///
 /// The policies `hold`, `window`, `retry`, `spread`, and `gc` apply to every app
 /// that does not set its own. They govern version changes. Changes of an app's
-/// `state` apply at the next check.
-#[unstable(feature = "rugix_apps")]
+/// `state` apply at the next check. An app whose configuration is invalid
+/// stays as it is, while the other apps reach their desired states.
+///
+/// [`RugixAppsStatus`] describes how the contract evolves.
 record RugixAppsConfig {
+    /// Format version of the property.
+    ///
+    /// Defaults to 1, the format that this version of the contract defines.
+    #[validate({ 1 <= _ }, message = "Format version must be at least 1.")]
+    format_version?: u32,
     /// Managed apps by name.
     apps?: [string: RugixAppConfig],
     /// Hold all apps at their current versions.
@@ -44,7 +51,6 @@ record RugixAppsConfig {
 /// Desired state of a managed app.
 ///
 /// A policy set here replaces the policy of the configuration for this app.
-#[unstable(feature = "rugix_apps")]
 record RugixAppConfig {
     /// Version path in the format `<repository>/<package>/<version>`.
     ///
@@ -74,8 +80,8 @@ record RugixAppConfig {
     /// Rollout number.
     ///
     /// The integration ignores its value. Changing it changes the app's
-    /// configuration, which starts a new round of attempts on devices whose
-    /// attempts failed.
+    /// effective configuration, which starts a new round of attempts on
+    /// devices whose attempts failed.
     rollout?: u32,
 }
 
@@ -85,7 +91,6 @@ record RugixAppConfig {
 /// to free storage. It keeps the running version and the most recent previously
 /// running versions, to which the app can switch back without downloading them
 /// again.
-#[unstable(feature = "rugix_apps")]
 record RugixAppGcPolicy {
     /// Number of previously running versions to keep.
     ///
@@ -95,7 +100,6 @@ record RugixAppGcPolicy {
 
 /// Desired state of a managed app.
 #[json(tagged = externally, rename_all = "lowercase")]
-#[unstable(feature = "rugix_apps")]
 variant RugixAppDesiredState {
     /// The app is installed and its workload runs.
     Running,
@@ -104,6 +108,12 @@ variant RugixAppDesiredState {
     Stopped,
     /// The app is uninstalled, including its persistent data.
     Removed,
+    /// Desired state that a later version defines.
+    ///
+    /// An integration that does not know the state leaves the app as it is and
+    /// reports its configuration as invalid.
+    #[json(fallback)]
+    Other: string,
 }
 
 /// Rugix Apps status (`dev.nexigon.rugix-apps.status`).
@@ -114,8 +124,29 @@ variant RugixAppDesiredState {
 /// (compare-and-swap), so that it does not overwrite concurrent changes. Other
 /// writers may only clear the `failure_count` and `next_attempt_at` of an app,
 /// which requests a new attempt.
-#[unstable(feature = "rugix_apps")]
+///
+/// Within a format version, the contract evolves compatibly. Later versions
+/// only add optional fields, states, capabilities, and codes. Readers ignore
+/// fields that they do not know and treat unknown states, capabilities, and
+/// codes as unknown. An integration honors a configuration field that a later
+/// version adds only if it reports the corresponding capability.
+///
+/// A change that readers of earlier versions must not interpret increments the
+/// format version of the property. Readers do not interpret a property with a
+/// format version that they do not support. An integration does not apply such
+/// a configuration and reports the blocked code `unsupported-config-format` for
+/// the apps that it lists. Writers use a later format version of the
+/// configuration only for integrations that report support for it through a
+/// capability, which the later version defines.
 record RugixAppsStatus {
+    /// Format version of the property.
+    ///
+    /// Defaults to 1, the format that this version of the contract defines.
+    #[validate({ 1 <= _ }, message = "Format version must be at least 1.")]
+    format_version?: u32,
+    /// Optional features of the Rugix Apps contract that the integration
+    /// supports.
+    capabilities?: [RugixAppsCapability],
     /// Version of the `dev.nexigon.rugix-apps.config` property that the integration
     /// last read.
     ///
@@ -134,7 +165,6 @@ record RugixAppsStatus {
 }
 
 /// Status of an app on a device.
-#[unstable(feature = "rugix_apps")]
 record RugixAppStatus {
     /// Whether `dev.nexigon.rugix-apps.config` lists the app.
     managed: bool,
@@ -161,6 +191,10 @@ record RugixAppStatus {
     /// the app changes, when the retry cooldown ends, when an update succeeds, or
     /// when another writer clears it.
     failure_count?: u32,
+    /// Machine-readable reason of the last failed attempt.
+    ///
+    /// Present while `last_error` describes a failed attempt.
+    failure_code?: RugixAppFailureCode,
     /// Error message of the last failure, if any.
     last_error?: string,
     /// Earliest time of the next attempt.
@@ -172,11 +206,51 @@ record RugixAppStatus {
     workload?: RugixAppWorkloadStatus,
 }
 
+/// Optional feature of the Rugix Apps contract.
+///
+/// The capabilities for policies apply to the policy of the configuration and
+/// to the policy of each app.
+#[json(tagged = externally, rename_all = "kebab-case")]
+variant RugixAppsCapability {
+    /// The integration honors `hold`.
+    Hold,
+    /// The integration honors `asset`.
+    Asset,
+    /// The integration honors `window`.
+    Window,
+    /// The integration honors `retry`.
+    Retry,
+    /// The integration honors `spread`.
+    Spread,
+    /// The integration honors `gc`.
+    Gc,
+    /// Capability that a later version defines.
+    #[json(fallback)]
+    Other: string,
+}
+
+/// Reason of a failed attempt to update an app.
+#[json(tagged = externally, rename_all = "kebab-case")]
+variant RugixAppFailureCode {
+    /// Downloading or installing the version failed.
+    InstallFailed,
+    /// The installation or activation was interrupted, for example because the
+    /// device shut down.
+    Interrupted,
+    /// Switching the app to the installed version failed.
+    ActivateFailed,
+    /// Code in kebab case that a later version or the integration defines.
+    #[json(fallback)]
+    Other: string,
+}
+
 /// State of an app's update process.
 ///
-/// The resting states are `idle`, `completed`, `failed`, and `blocked`.
+/// The resting states are `idle`, `completed`, `failed`, and `blocked`. If the
+/// previous status of an app reports a state that the integration does not
+/// know, the integration keeps the failure count and the time of the next
+/// attempt, like for `failed`.
 #[json(tagged = externally, rename_all = "lowercase")]
-#[unstable(feature = "rugix_apps")]
 variant RugixAppUpdateState {
     /// No path is configured.
     Idle,
@@ -192,37 +266,45 @@ variant RugixAppUpdateState {
     Completed,
     /// The last attempt failed.
     Failed,
-    /// An update is available but cannot proceed yet. See `blocked` for the
-    /// reason.
+    /// The update cannot proceed yet. See `blocked` for the reason.
     Blocked,
+    /// State that a later version defines.
+    #[json(fallback)]
+    Other: string,
 }
 
 /// Information about a blocked app update.
-#[unstable(feature = "rugix_apps")]
 record RugixAppUpdateBlocked {
-    /// Machine-readable reason in kebab case.
-    ///
-    /// Nexigon defines these codes:
-    ///
-    /// - `hold`: The configuration holds the app at its current version.
-    /// - `spread`: The device waits for its turn in a spread or is outside the
-    ///   released percentage.
-    /// - `window`: The device waits for its maintenance window. The new version
-    ///   may already be installed.
-    /// - `no-asset`: The target version has no bundle for the device's
-    ///   architecture or no available asset with the filename in `config.asset`.
-    #[validate(
-        { matches(_, "^[a-z0-9]+(-[a-z0-9]+)*$") },
-        message = "Code must be in kebab case."
-    )]
-    code: string,
+    /// Machine-readable reason.
+    code: RugixAppBlockedCode,
     /// Human-readable explanation.
     message?: string,
 }
 
+/// Reason of a blocked app update.
+#[json(tagged = externally, rename_all = "kebab-case")]
+variant RugixAppBlockedCode {
+    /// The configuration holds the app at its current version.
+    Hold,
+    /// The device waits for its turn in a spread or is outside the released
+    /// percentage.
+    Spread,
+    /// The device waits for its maintenance window. The new version may already
+    /// be installed.
+    Window,
+    /// The target version has no bundle for the device's architecture or no
+    /// available asset with the filename in `config.asset`.
+    NoAsset,
+    /// The configuration has a format version that the integration does not
+    /// support.
+    UnsupportedConfigFormat,
+    /// Code in kebab case that a later version or the integration defines.
+    #[json(fallback)]
+    Other: string,
+}
+
 /// Live status of an app's workload.
 #[json(tag = "state", rename_all = "lowercase")]
-#[unstable(feature = "rugix_apps")]
 variant RugixAppWorkloadStatus {
     /// The workload runs.
     Running,
@@ -234,10 +316,20 @@ variant RugixAppWorkloadStatus {
     Failed: RugixAppWorkloadMessage,
     /// Rugix Ctrl cannot determine the workload's status.
     Unknown,
+    /// Status that a later version defines.
+    #[json(fallback)]
+    Other: RugixAppWorkloadOther,
+}
+
+/// Workload status that a later version defines.
+record RugixAppWorkloadOther {
+    /// Name of the status.
+    state: string,
+    /// Human-readable explanation, if any.
+    message?: string,
 }
 
 /// Explanation of an app's workload status.
-#[unstable(feature = "rugix_apps")]
 record RugixAppWorkloadMessage {
     /// Human-readable explanation.
     message: string,
