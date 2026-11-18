@@ -1559,6 +1559,15 @@
       "output": {
         "$ref": "#/components/schemas/nexigon_api.json.JsonValue"
       },
+      "omittedOutputBytes": {
+        "type": [
+          "integer",
+          "string"
+        ],
+        "format": "uint64",
+        "minimum": 0,
+        "pattern": "^[0-9]+$"
+      },
       "error": {
         "type": "string"
       },
@@ -2171,7 +2180,7 @@
   },
   "nexigon_api.devices.PublishDeviceEventsAction": {
     "type": "object",
-    "description": "**Group `device`:** Part of the Device API, which Nexigon Agent and other software on devices use. Changes remain backward compatible for at least five years.\n\nPublish events of a device.\n\nNexigon Hub stores events as a history of device behavior. Each event has an ID\nthat is unique per device. An event published again with the same ID is not\nstored again, so publishing can safely be retried.\n\nNexigon Hub may limit the number of events that a device can store per day and\nper billing period. If storing the new events of a batch would exceed a limit,\nNexigon Hub rejects the whole batch with a `RateLimited` error that states when\nto retry. A batch with more new events than a limit allows fails with an\n`Invalid` error. Events with an already stored ID do not count toward the limits.",
+    "description": "**Group `device`:** Part of the Device API, which Nexigon Agent and other software on devices use. Changes remain backward compatible for at least five years.\n\nPublish events of a device.\n\nNexigon Hub stores events as a history of device behavior. Each event has an ID\nthat is unique per device. An event published again with the same ID is not\nstored again, so publishing can safely be retried.\n\nNexigon Hub may limit the number of events that a device can store per day and\nper billing period. If storing the new events of a batch would exceed a limit,\nNexigon Hub rejects the whole batch with a `RateLimited` error that states when\nto retry. A batch with more new events than a limit allows fails with an\n`Invalid` error. Events with an already stored ID do not count toward the limits.\n\nNexigon Hub also limits the size of each event, 4 KiB by default, and the number\nof events in a batch, 1000 by default. A batch that exceeds either limit fails with\nan `Invalid` error.",
     "properties": {
       "deviceId": {
         "$ref": "#/components/schemas/nexigon_api.devices.DeviceId"

@@ -34,6 +34,9 @@ record SetFleetPropertyAction {
     )]
     name: string,
     /// Value of the property.
+    ///
+    /// Nexigon Hub rejects values larger than the instance's limit, 64 KiB by
+    /// default.
     value: JsonValue,
 }
 
@@ -162,6 +165,9 @@ record DefineComputedFleetPropertyAction {
     )]
     strategy: string,
     /// Strategy-specific configuration.
+    ///
+    /// Nexigon Hub rejects configurations larger than the instance's limit for
+    /// property values, 64 KiB by default.
     config?: JsonValue,
 }
 

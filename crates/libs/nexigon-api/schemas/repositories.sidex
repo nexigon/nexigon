@@ -666,6 +666,10 @@ record AddPackageAssetAction {
         message = "Filename must be between 1 and 256 characters."
     )]
     filename: string,
+    /// Optional metadata to associate with the asset.
+    ///
+    /// Nexigon Hub rejects metadata larger than the instance's limit, 64 KiB by
+    /// default.
     metadata?: [string: JsonValue],
 }
 
@@ -698,6 +702,10 @@ record SetPackageAssetMetadataAction {
         message = "Filename must be between 1 and 256 characters."
     )]
     filename: string,
+    /// Metadata to set (replaces existing metadata).
+    ///
+    /// Nexigon Hub rejects metadata larger than the instance's limit, 64 KiB by
+    /// default.
     metadata: [string: JsonValue],
 }
 
@@ -731,6 +739,9 @@ record CreatePackageAction {
     )]
     kind?: string,
     /// Optional initial metadata.
+    ///
+    /// Nexigon Hub rejects metadata larger than the instance's limit, 64 KiB by
+    /// default.
     metadata?: [string: JsonValue],
 }
 
@@ -817,6 +828,9 @@ record SetPackageMetadataAction {
     /// ID of the package.
     package_id: PackageId,
     /// Metadata to set (replaces existing metadata).
+    ///
+    /// Nexigon Hub rejects metadata larger than the instance's limit, 64 KiB by
+    /// default.
     metadata: [string: JsonValue],
 }
 
@@ -1167,6 +1181,9 @@ record CreatePackageVersionAction {
     /// Tags to add to the package version.
     tags?: [AddTagItem],
     /// Optional initial metadata.
+    ///
+    /// Nexigon Hub rejects metadata larger than the instance's limit, 64 KiB by
+    /// default.
     metadata?: [string: JsonValue],
     /// Version that a device must run before installing this version.
     ///
@@ -1240,6 +1257,9 @@ record SetPackageVersionMetadataAction {
     /// ID of the package version.
     version_id: PackageVersionId,
     /// Metadata to set (replaces existing metadata).
+    ///
+    /// Nexigon Hub rejects metadata larger than the instance's limit, 64 KiB by
+    /// default.
     metadata: [string: JsonValue],
 }
 
@@ -1260,6 +1280,9 @@ record AddPackageVersionAssetAction {
     )]
     filename: string,
     /// Optional metadata to associate with this asset in the version.
+    ///
+    /// Nexigon Hub rejects metadata larger than the instance's limit, 64 KiB by
+    /// default.
     metadata?: [string: JsonValue],
 }
 
@@ -1297,6 +1320,9 @@ record SetPackageVersionAssetMetadataAction {
     )]
     filename: string,
     /// Metadata to set (replaces existing metadata).
+    ///
+    /// Nexigon Hub rejects metadata larger than the instance's limit, 64 KiB by
+    /// default.
     metadata: [string: JsonValue],
 }
 

@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+- Document the size limits of Nexigon Hub on the affected API fields. By
+  default, Nexigon Hub rejects property values, profile values, step values,
+  command inputs, metadata, and property schemas above 64 KiB, events above
+  4 KiB, batches of more than 1000 events, and device token claims above 4 KiB.
+  Add `omittedOutputBytes` to the state of operation steps, which holds the size
+  of a command output that exceeded the limit and was not stored.
+
+- Truncate the error text that the Agent attaches to its own system update and
+  app events to 2 KiB to keep these events small, since Nexigon Hub now limits
+  the size of events.
+
 - Offer the built-in `nexigon.ota.check` and `nexigon.rugix-apps.check`
   commands whenever the system update or Rugix Apps integration is enabled.
   Previously, they also required `[commands]`, which now enables only custom

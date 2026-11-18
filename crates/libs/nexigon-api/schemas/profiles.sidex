@@ -28,6 +28,9 @@ opaque DeviceProfileId
 /// Property value set by a device profile.
 record DeviceProfileProperty {
     /// Value of the property.
+    ///
+    /// Nexigon Hub rejects values larger than the instance's limit, 64 KiB by
+    /// default.
     value: JsonValue,
     /// Indicates whether devices are prevented from changing the property.
     protected: bool,

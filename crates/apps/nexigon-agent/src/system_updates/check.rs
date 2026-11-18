@@ -59,6 +59,7 @@ use crate::reconcile::hub::PropertyWrite;
 use crate::reconcile::hub::VersionPath;
 use crate::reconcile::hub::metadata;
 use crate::reconcile::hub::rugix_bundle_hash;
+use crate::reconcile::hub::truncate_event_text;
 use crate::reconcile::next_retry;
 use crate::reconcile::policy::SpreadState;
 use crate::reconcile::policy::merge_patch;
@@ -720,7 +721,7 @@ impl Checker {
         let mut attributes = sidex::types::Map::new();
         attributes.insert("currentVersion".into(), identity.version.clone().into());
         if let Some(error) = error {
-            attributes.insert("error".into(), error.into());
+            attributes.insert("error".into(), truncate_event_text(error).into());
         }
         self.hub
             .event(EVENT_CATEGORY, severity, message, attributes)

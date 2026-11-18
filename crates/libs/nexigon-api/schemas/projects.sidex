@@ -163,6 +163,9 @@ record SetPropertySchemaAction {
     )]
     name: string,
     /// JSON Schema document.
+    ///
+    /// Nexigon Hub rejects schemas larger than the instance's limit, 64 KiB by
+    /// default.
     #[json(name = "schema")]
     json_schema: JsonValue,
 }

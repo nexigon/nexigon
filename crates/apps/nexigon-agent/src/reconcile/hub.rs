@@ -247,6 +247,17 @@ pub(crate) fn rugix_bundle_hash(asset: &PackageVersionAsset) -> Option<String> {
         .bundle_hash
 }
 
+/// Truncate a text, such as an error chain, to fit into an event attribute.
+///
+/// Nexigon Hub rejects events above its size limit, 4 KiB by default, so the Agent
+/// keeps at most [`MAX_EVENT_TEXT_BYTES`] of a text in its own events.
+pub(crate) fn truncate_event_text(text: &str) -> &str {
+    &text[..text.floor_char_boundary(MAX_EVENT_TEXT_BYTES)]
+}
+
+/// Maximum size of a text in an event attribute in bytes.
+const MAX_EVENT_TEXT_BYTES: usize = 2048;
+
 /// Read the metadata of a version or asset, or `None` if it does not match.
 pub(crate) fn metadata<T: DeserializeOwned>(metadata: &impl Serialize) -> Option<T> {
     serde_json::to_value(metadata)

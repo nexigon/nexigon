@@ -66,6 +66,7 @@ use crate::reconcile::hub::Hub;
 use crate::reconcile::hub::PropertyWrite;
 use crate::reconcile::hub::VersionPath;
 use crate::reconcile::hub::rugix_bundle_hash;
+use crate::reconcile::hub::truncate_event_text;
 use crate::reconcile::next_retry;
 use crate::reconcile::policy::SpreadState;
 use crate::reconcile::policy::retry_policy_with_defaults;
@@ -788,7 +789,7 @@ impl Checker {
         attributes.insert("app".into(), app.into());
         attributes.insert("versionId".into(), version_id.to_string().into());
         if let Some(error) = error {
-            attributes.insert("error".into(), error.into());
+            attributes.insert("error".into(), truncate_event_text(error).into());
         }
         self.hub
             .event(EVENT_CATEGORY, severity, message, attributes)

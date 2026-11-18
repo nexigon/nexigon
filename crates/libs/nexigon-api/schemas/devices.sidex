@@ -248,6 +248,9 @@ record IssueDeviceTokenAction {
     )]
     valid_for_secs?: u32,
     /// Additional user-defined claims.
+    ///
+    /// Nexigon Hub rejects claims larger than the instance's limit, 4 KiB by
+    /// default.
     claims?: JsonValue,
 }
 
@@ -484,6 +487,10 @@ record ValidateDeviceHttpProxyTokenSuccess {
 /// Nexigon Hub rejects the whole batch with a `RateLimited` error that states when
 /// to retry. A batch with more new events than a limit allows fails with an
 /// `Invalid` error. Events with an already stored ID do not count toward the limits.
+///
+/// Nexigon Hub also limits the size of each event, 4 KiB by default, and the number
+/// of events in a batch, 1000 by default. A batch that exceeds either limit fails with
+/// an `Invalid` error.
 #[group(name = "device")]
 #[request(name = "devices_PublishEvents", response = Empty)]
 record PublishDeviceEventsAction {
@@ -578,6 +585,9 @@ record SetDevicePropertyAction {
     )]
     name: string,
     /// Value of the property.
+    ///
+    /// Nexigon Hub rejects values larger than the instance's limit, 64 KiB by
+    /// default.
     value: JsonValue,
     /// Indicates whether the property should be protected.
     protected?: bool,
@@ -1092,6 +1102,9 @@ record DeviceOperationSetDevicePropertyStep {
     )]
     name: string,
     /// Value to set.
+    ///
+    /// Nexigon Hub rejects values larger than the instance's limit, 64 KiB by
+    /// default.
     value: JsonValue,
     /// Whether the property is protected. Defaults to `false`.
     protected?: bool,
@@ -1120,6 +1133,10 @@ record DeviceOperationPatchDevicePropertyStep {
     )]
     name: string,
     /// Patch to apply. Without an own value, the patch applies to `null`.
+    ///
+    /// Nexigon Hub rejects patches larger than the instance's limit for property
+    /// values, 64 KiB by default. A step fails if the resulting value exceeds the
+    /// limit.
     patch: JsonValue,
     /// Whether the property is protected. Without this field, a property keeps
     /// its protection, and a new property is unprotected.
@@ -1171,6 +1188,9 @@ record DeviceOperationDeviceCommandStep {
     )]
     command: string,
     /// Command input.
+    ///
+    /// Nexigon Hub rejects inputs larger than the instance's limit, 64 KiB by
+    /// default.
     input: JsonValue,
     /// Time that the device has to run the command, in seconds. Defaults to
     /// one hour.
@@ -1327,6 +1347,10 @@ record DeviceOperationStepState {
     status: DeviceOperationStepStatus,
     /// Output that the device reported for a command.
     output?: JsonValue,
+    /// Size in bytes of the output that the device reported for a command, if
+    /// the output exceeded the instance's limit. Nexigon Hub then stores only
+    /// the size.
+    omitted_output_bytes?: u64,
     /// Error message when the step failed or timed out, or the latest error of
     /// a waiting step's expressions.
     error?: string,
@@ -1384,6 +1408,9 @@ record DeviceOperationStepReport {
     /// Result status.
     status: DeviceOperationStepReportStatus,
     /// Command output.
+    ///
+    /// Nexigon Hub stores outputs up to the instance's limit, 64 KiB by default,
+    /// and only the size of larger outputs.
     output?: JsonValue,
     /// Error message when the step failed.
     #[validate(
