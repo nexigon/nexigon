@@ -70,6 +70,7 @@ record DiskInfo {
 /// array, replaces the default.
 ///
 /// [`OtaUpdateStatus`] describes how the contract evolves.
+#[group(name = "device")]
 record OtaUpdateConfig {
     /// Format version of the property.
     ///
@@ -236,6 +237,7 @@ record OtaUpdateRetryPolicy {
 /// Writers use a later format version of the configuration only for
 /// integrations that report support for it through a capability, which the
 /// later version defines.
+#[group(name = "device")]
 record OtaUpdateStatus {
     /// Format version of the property.
     ///
@@ -596,6 +598,7 @@ record AgentCommandsConfig {
 
 /// Command manifest (`dev.nexigon.commands` property).
 #[unstable(feature = "device_commands")]
+#[group(name = "device")]
 record DeviceCommandManifest {
     /// Available commands.
     commands: [DeviceCommandDescriptor],

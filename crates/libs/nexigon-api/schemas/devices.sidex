@@ -816,6 +816,7 @@ variant DeviceCommandStatus {
 
 /// Hub-to-device frame.
 #[unstable(feature = "device_commands")]
+#[group(name = "device")]
 #[json(tag = "type")]
 variant DeviceCommandHubFrame {
     /// Invoke a command.
@@ -837,6 +838,7 @@ record DeviceCommandInvokeData {
 
 /// Device-to-hub frame.
 #[unstable(feature = "device_commands")]
+#[group(name = "device")]
 #[json(tag = "type")]
 variant DeviceCommandDeviceFrame {
     /// Diagnostic log lines from the command.
