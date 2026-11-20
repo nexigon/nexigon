@@ -10044,7 +10044,7 @@
         "description": "Status of a device certificate."
       },
       "nexigon_api.devices.DeviceCommandDeviceFrame": {
-        "description": "**Unstable (feature `device_commands`).**\n\nDevice-to-hub frame.",
+        "description": "**Unstable (feature `device_commands`).**\n\n**Group `device`:** Part of the Device API, which Nexigon Agent and other software on devices use. Changes remain backward compatible for at least five years.\n\nDevice-to-hub frame.",
         "oneOf": [
           {
             "type": "object",
@@ -10106,7 +10106,7 @@
       },
       "nexigon_api.devices.DeviceCommandDoneData": {
         "type": "object",
-        "description": "**Unstable (feature `device_commands`).**\n\nCommand completion.",
+        "description": "**Unstable (feature `device_commands`).**\n\n**Group `device`:** Part of the Device API, which Nexigon Agent and other software on devices use. Changes remain backward compatible for at least five years.\n\nCommand completion.",
         "properties": {
           "status": {
             "$ref": "#/components/schemas/nexigon_api.devices.DeviceCommandStatus"
@@ -10141,7 +10141,7 @@
         "unevaluatedProperties": false
       },
       "nexigon_api.devices.DeviceCommandHubFrame": {
-        "description": "**Unstable (feature `device_commands`).**\n\nHub-to-device frame.",
+        "description": "**Unstable (feature `device_commands`).**\n\n**Group `device`:** Part of the Device API, which Nexigon Agent and other software on devices use. Changes remain backward compatible for at least five years.\n\nHub-to-device frame.",
         "oneOf": [
           {
             "type": "object",
@@ -10175,7 +10175,7 @@
       },
       "nexigon_api.devices.DeviceCommandInvokeData": {
         "type": "object",
-        "description": "**Unstable (feature `device_commands`).**\n\nCommand invocation parameters.",
+        "description": "**Unstable (feature `device_commands`).**\n\n**Group `device`:** Part of the Device API, which Nexigon Agent and other software on devices use. Changes remain backward compatible for at least five years.\n\nCommand invocation parameters.",
         "properties": {
           "command": {
             "type": "string"
@@ -10201,7 +10201,7 @@
       },
       "nexigon_api.devices.DeviceCommandLogData": {
         "type": "object",
-        "description": "**Unstable (feature `device_commands`).**\n\nLog data.",
+        "description": "**Unstable (feature `device_commands`).**\n\n**Group `device`:** Part of the Device API, which Nexigon Agent and other software on devices use. Changes remain backward compatible for at least five years.\n\nLog data.",
         "properties": {
           "lines": {
             "type": "array",
@@ -10220,7 +10220,7 @@
           "Ok",
           "Error"
         ],
-        "description": "**Unstable (feature `device_commands`).**\n\nStatus of a device command invocation."
+        "description": "**Unstable (feature `device_commands`).**\n\n**Group `device`:** Part of the Device API, which Nexigon Agent and other software on devices use. Changes remain backward compatible for at least five years.\n\nStatus of a device command invocation."
       },
       "nexigon_api.devices.DeviceConnection": {
         "type": "object",
@@ -12240,7 +12240,7 @@
       },
       "nexigon_api.errors.ActionError": {
         "type": "object",
-        "description": "Action error.",
+        "description": "**Group `device`:** Part of the Device API, which Nexigon Agent and other software on devices use. Changes remain backward compatible for at least five years.\n\nAction error.",
         "properties": {
           "kind": {
             "$ref": "#/components/schemas/nexigon_api.errors.ActionErrorKind"
@@ -12275,10 +12275,10 @@
           "RateLimited",
           "Unavailable"
         ],
-        "description": "Kind of an action error."
+        "description": "**Group `device`:** Part of the Device API, which Nexigon Agent and other software on devices use. Changes remain backward compatible for at least five years.\n\nKind of an action error."
       },
       "nexigon_api.errors.ActionResult--": {
-        "description": "Action result.",
+        "description": "**Group `device`:** Part of the Device API, which Nexigon Agent and other software on devices use. Changes remain backward compatible for at least five years.\n\nAction result.",
         "oneOf": [
           {
             "type": "object",
@@ -16032,7 +16032,7 @@
       },
       "nexigon_api.properties.DeviceCommandDescriptor": {
         "type": "object",
-        "description": "**Unstable (feature `device_commands`).**\n\nDescriptor for an on-demand command.",
+        "description": "**Unstable (feature `device_commands`).**\n\n**Group `device`:** Part of the Device API, which Nexigon Agent and other software on devices use. Changes remain backward compatible for at least five years.\n\nDescriptor for an on-demand command.",
         "properties": {
           "name": {
             "type": "string"
@@ -16057,7 +16057,7 @@
       },
       "nexigon_api.properties.DeviceCommandManifest": {
         "type": "object",
-        "description": "**Unstable (feature `device_commands`).**\n\nCommand manifest (`dev.nexigon.commands` property).",
+        "description": "**Unstable (feature `device_commands`).**\n\n**Group `device`:** Part of the Device API, which Nexigon Agent and other software on devices use. Changes remain backward compatible for at least five years.\n\nCommand manifest (`dev.nexigon.commands` property).",
         "properties": {
           "commands": {
             "type": "array",

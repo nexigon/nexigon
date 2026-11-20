@@ -33,6 +33,7 @@ record ActionError {
 }
 
 /// Action result.
+#[group(name = "device")]
 #[json(tag = "result")]
 variant ActionResult<T> {
     #[json(content = "value")]

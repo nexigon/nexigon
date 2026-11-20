@@ -596,6 +596,7 @@ record AgentCommandsConfig {
 
 /// Command manifest (`dev.nexigon.commands` property).
 #[unstable(feature = "device_commands")]
+#[group(name = "device")]
 record DeviceCommandManifest {
     /// Available commands.
     commands: [DeviceCommandDescriptor],
