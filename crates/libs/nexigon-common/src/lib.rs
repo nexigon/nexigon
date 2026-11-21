@@ -60,6 +60,7 @@ use nexigon_api::types::repositories::SetPackageVersionBaseAction;
 use nexigon_api::types::repositories::SetPackageVersionDeletionScheduleAction;
 use nexigon_api::types::repositories::SetPackageVersionMetadataAction;
 use nexigon_api::types::repositories::SetPackageVersionNameAction;
+use nexigon_api::types::repositories::SetPackageVersionReleaseAction;
 use nexigon_api::types::repositories::SetPackageVersionRetentionAction;
 use nexigon_api::types::repositories::SetRepositoryDisplayNameAction;
 use nexigon_api::types::repositories::SetRepositoryPathNameAction;
@@ -622,6 +623,18 @@ pub enum VersionsCmd {
     /// Permanently protect a version from content changes and deletion; cancel its
     /// deadline.
     Seal {
+        /// Version path or ID.
+        version: String,
+    },
+    /// Mark a version as a release, which protects it from deletion and package
+    /// retention; cancel its deadline.
+    MarkRelease {
+        /// Version path or ID.
+        version: String,
+    },
+    /// Remove the release mark of a version, which makes it subject to package
+    /// retention again.
+    UnmarkRelease {
         /// Version path or ID.
         version: String,
     },
@@ -1194,6 +1207,12 @@ pub async fn execute_versions_cmd(
                 .context("setting package version protection")??;
             write_json(&output);
         }
+        VersionsCmd::MarkRelease { version } => {
+            set_version_release(executor, version, true).await?;
+        }
+        VersionsCmd::UnmarkRelease { version } => {
+            set_version_release(executor, version, false).await?;
+        }
 
         VersionsCmd::Resolve { version } => {
             let path = parse_version_path(version)?;
@@ -1390,6 +1409,21 @@ pub async fn execute_versions_cmd(
             }
         },
     }
+    Ok(())
+}
+
+/// Mark a version as a release or remove its release mark.
+async fn set_version_release(
+    executor: &mut impl Execute,
+    version: &str,
+    release: bool,
+) -> anyhow::Result<()> {
+    let version_id = resolve_version(executor, version).await?;
+    let output = executor
+        .execute(SetPackageVersionReleaseAction::new(version_id, release))
+        .await
+        .context("setting package version release status")??;
+    write_json(&output);
     Ok(())
 }
 

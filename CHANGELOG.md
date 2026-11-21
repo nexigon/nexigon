@@ -115,6 +115,9 @@ See the [release notes](releases/v0.7.0.md).
   paths are path names.
 - Define checkpoint releases with `repositories versions create --base` and
   `repositories versions set-base`.
+- Mark a version as a release with `repositories versions mark-release`, which
+  protects it from deletion and package retention, and remove the mark with
+  `repositories versions unmark-release`.
 - `projects devices list` lists one page of devices, newest first. Use
   `--limit` and `--cursor` to page through large projects. This requires Hub
   2026.4.0 or later, and CLI 0.6.1 and earlier cannot list devices on that Hub.
