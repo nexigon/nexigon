@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.7.0 (unreleased)
+## 0.7.0 (2026-11-22)
 
 See the [release notes](releases/v0.7.0.md).
 
